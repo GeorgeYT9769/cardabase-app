@@ -22,6 +22,9 @@ Cardabase is an app that lets you save EAN-13 club cards in your phone and use t
 
 - [GeorgeYT9769](https://www.github.com/GeorgeYT9769)
 
+## Thanks to
+
+- [Edin Divović](https://www.youtube.com/@NotEdin_)
 
 ## Support
 
