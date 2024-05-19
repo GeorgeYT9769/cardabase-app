@@ -30,8 +30,8 @@
   <img alt="GitHub forks" src="https://img.shields.io/github/forks/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Forks">
   <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/y/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Commit Activity">
   <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Last Commit">
-  <img alt="GitHub issues" src="https://img.shields.io/github/issues/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Issues">
-  <img alt="GitHub closed issues" src="https://img.shields.io/github/issues-closed/GeorgeYT9769/cardabase-app?style=for-the-badge&label=">
+  <img alt="GitHub issues" src="https://img.shields.io/github/issues/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Issues Opened">
+  <img alt="GitHub closed issues" src="https://img.shields.io/github/issues-closed/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Issues Closed">
   <img alt="GitHub closed pull requests" src="https://img.shields.io/github/issues-pr-closed/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Pull Requests">
   <img alt="GitHub license" src="https://img.shields.io/github/license/GeorgeYT9769/cardabase-app?style=for-the-badge&label=License">
   <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/GeorgeYT9769/cardabase-app/total?style=for-the-badge&label=Downloads">
