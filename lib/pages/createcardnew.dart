@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:restart_app/restart_app.dart';
@@ -69,31 +68,56 @@ class _CreateCardState extends State<CreateCard> {
         Restart.restartApp();
       }
     } else if (controller.text.isEmpty == true ) {
-      showToast(
-          "Card name cannot be empty",
-          context:context,
-          duration: const Duration(days: 0, hours: 0, minutes: 0, seconds: 2, milliseconds: 0, microseconds: 0),
-          animation: StyledToastAnimation.fade,
-          reverseAnimation: StyledToastAnimation.fade,
-          position: const StyledToastPosition(align: Alignment.topCenter)
-      );
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.error, size: 15, color: Colors.white,),
+                SizedBox(width: 10,),
+                Text('Card name cannot be empty', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            duration: Duration(milliseconds: 3000),
+            padding: EdgeInsets.all(5.0),
+            margin: EdgeInsets.fromLTRB(15, 0, 15, 30),
+            behavior: SnackBarBehavior.floating,
+            dismissDirection: DismissDirection.vertical,
+            backgroundColor: Color.fromARGB(255, 237, 67, 55),
+          ));
     } else if (controllercardid.text.isEmpty == true ) {
-      showToast(
-          "Card ID cannot be empty",
-          context:context,
-          duration: const Duration(days: 0, hours: 0, minutes: 0, seconds: 2, milliseconds: 0, microseconds: 0),
-          animation: StyledToastAnimation.fade,
-          reverseAnimation: StyledToastAnimation.fade,
-          position: const StyledToastPosition(align: Alignment.topCenter)
-      );
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.error, size: 15, color: Colors.white,),
+                SizedBox(width: 10,),
+                Text('Card ID cannot be empty', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            duration: Duration(milliseconds: 3000),
+            padding: EdgeInsets.symmetric(horizontal: 10.0),
+            margin: EdgeInsets.fromLTRB(15, 0, 15, 30),
+            behavior: SnackBarBehavior.floating,
+            dismissDirection: DismissDirection.vertical,
+            backgroundColor: Color.fromARGB(255, 237, 67, 55),
+          ));
     } else if (verifyEan13(controllercardid.text) == false) {
-      showToast(
-          "The ID numbers are wrong",
-          context:context,
-          duration: const Duration(days: 0, hours: 0, minutes: 0, seconds: 2, milliseconds: 0, microseconds: 0),
-          animation: StyledToastAnimation.fade,
-          reverseAnimation: StyledToastAnimation.fade,
-          position: const StyledToastPosition(align: Alignment.topCenter)
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.error, size: 15, color: Colors.white,),
+              SizedBox(width: 10,),
+              Text('Card ID has a mistake', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          duration: Duration(milliseconds: 3000),
+          padding: EdgeInsets.symmetric(horizontal: 10.0),
+          margin: EdgeInsets.fromLTRB(15, 0, 15, 30),
+          behavior: SnackBarBehavior.floating,
+          dismissDirection: DismissDirection.vertical,
+          backgroundColor: Color.fromARGB(255, 237, 67, 55),
+        ),
       );
     }
   }
@@ -143,7 +167,7 @@ class _CreateCardState extends State<CreateCard> {
   Widget build(BuildContext context) {
     return Scaffold(
       //resizeToAvoidBottomInset: false,
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(icon: Icon(Icons.arrow_back_ios_new, color: Theme.of(context).colorScheme.secondary,), onPressed: cancelCard,),
         title: Text(
@@ -158,7 +182,7 @@ class _CreateCardState extends State<CreateCard> {
         ),
         centerTitle: true,
         elevation: 0.0,
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
       ),
 //structure of all widgets
 //card widget
@@ -241,7 +265,7 @@ class _CreateCardState extends State<CreateCard> {
                 ),
                 const SizedBox(height: 10,),
 //color picker button
-                Container(
+                SizedBox(
                   height: 65,
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
@@ -270,7 +294,7 @@ class _CreateCardState extends State<CreateCard> {
                   children: [
                     //MyButton(text: 'Cancel', onPressed: () {}, width: MediaQuery.of(context).size.width / 2 - 20, height: 75, color: Colors.red.shade700,),
                     //MyButton(text: 'Save', onPressed: () {}, width: MediaQuery.of(context).size.width / 2 - 20, height: 75, color: Colors.green.shade700,), //widget.onSave
-                    Container(
+                    SizedBox(
                       width: MediaQuery.of(context).size.width / 2 - 30,
                       height: 75,
                       child: OutlinedButton(
@@ -294,7 +318,7 @@ class _CreateCardState extends State<CreateCard> {
                       ),
                     ),
                     const SizedBox(width: 20,),
-                    Container(
+                    SizedBox(
                       width: MediaQuery.of(context).size.width / 2 - 30,
                       height: 75,
                       child: OutlinedButton(

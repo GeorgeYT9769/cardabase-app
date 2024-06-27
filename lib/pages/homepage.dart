@@ -1,10 +1,8 @@
 import 'package:cardabase/pages/settings.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:cardabase/data/cardabase_db.dart'; //card database
 import 'package:cardabase/util/card_tile.dart';
-import 'package:restart_app/restart_app.dart';
 import 'createcardnew.dart';
 
 class Homepage extends StatefulWidget {
@@ -43,7 +41,7 @@ class _HomePageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,// - BACKGROUND COLOR (DEFAULT)
+      backgroundColor: Theme.of(context).colorScheme.surface,// - BACKGROUND COLOR (DEFAULT)
       appBar: AppBar(
         leading: IconButton(icon: Icon(Icons.settings, color: Theme.of(context).colorScheme.secondary,), onPressed: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) => const Settings()));},), //createNewCard
@@ -59,7 +57,7 @@ class _HomePageState extends State<Homepage> {
           ),
         centerTitle: true,
         elevation: 0.0,
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
       ),
       floatingActionButton: FloatingActionButton( //createNewCard
         onPressed: () {

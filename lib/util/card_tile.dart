@@ -1,5 +1,6 @@
 import 'package:cardabase/util/generate_qr.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 class CardTile extends StatelessWidget {
@@ -29,43 +30,36 @@ class CardTile extends StatelessWidget {
            ),
          ],
         ),
-        //startActionPane: ActionPane(
-        //  motion: const BehindMotion(),
-        //  children: [
-        //    SlidableAction(onPressed: widget.copyFunction,
-        //      icon: Icons.copy,
-        //      backgroundColor: Theme.of(context).colorScheme.secondary,
-        //      label: 'Duplicate card',
-        //    ),
-        //  ],
-        //),
-        child: SizedBox(
-          height: MediaQuery.of(context).size.width / 1.59 - 30, //height of button
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: cardTileColor,
-              foregroundColor: Colors.white,
-              elevation: 0.0,
-              shape: RoundedRectangleBorder( //to set border radius to button
-                  borderRadius: BorderRadius.circular(15)
+        child: Bounceable(
+          onTap: () {},
+          child: SizedBox(
+            height: MediaQuery.of(context).size.width / 1.59 - 30, //height of button
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: cardTileColor,
+                foregroundColor: Colors.white,
+                elevation: 0.0,
+                shape: RoundedRectangleBorder( //to set border radius to button
+                    borderRadius: BorderRadius.circular(15)
+                ),
               ),
-            ),
-            onPressed: () {
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return GenerateQR(cardid: cardnumber, sn: shopName, iconcolor: iconColor,);
-                  }
-              )
-             ;
-            },
-            child: Text(shopName, style: const TextStyle(
-              fontSize: 50,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Roboto-Regular.ttf',
-            ),),
-          )
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return GenerateQR(cardid: cardnumber, sn: shopName, iconcolor: iconColor,);
+                    }
+                )
+               ;
+              },
+              child: Text(shopName, style: const TextStyle(
+                fontSize: 50,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Roboto-Regular.ttf',
+              ),),
+            )
+          ),
         ),
       )
     );
