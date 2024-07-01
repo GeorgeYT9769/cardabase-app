@@ -47,7 +47,7 @@
 - Encrypted storage
 - Simple and user-friendly
 
-## 🔰 Getting Started
+## 📲 Installation
 
 1. Download official release.
 2. Locate the "Cardabase.apk" file (usually in the Internal storage/Downloads folder).
