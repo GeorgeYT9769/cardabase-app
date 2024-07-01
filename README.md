@@ -84,12 +84,13 @@ Contact me for more info :).
 
 <div align="center">
 
-  ![App Screenshot](https://github.com/GeorgeYT9769/cardabase-app/blob/main/mockups/app-mockup-ios-screenshot-5-cardabase-5.5-inch-1%20(Small).png?raw=true) ![App Screenshot](https://github.com/GeorgeYT9769/cardabase-app/blob/main/mockups/app-mockup-ios-screenshot-5-cardabase-5.5-inch-2%20(Small).png?raw=true)
-
-  ![App Screenshot](https://github.com/GeorgeYT9769/cardabase-app/blob/main/mockups/app-mockup-ios-screenshot-5-cardabase-5.5-inch-3%20(Small).png?raw=true) ![App Screenshot](https://github.com/GeorgeYT9769/cardabase-app/blob/main/mockups/app-mockup-ios-screenshot-5-cardabase-5.5-inch-4%20(Small).png?raw=true)
-
-  ![App Screenshot](https://github.com/GeorgeYT9769/cardabase-app/blob/main/mockups/app-mockup-ios-screenshot-5-cardabase-5.5-inch-5%20(Small).png?raw=true) ![App Screenshot](https://github.com/GeorgeYT9769/cardabase-app/blob/main/mockups/app-mockup-ios-screenshot-5-cardabase-5.5-inch-6%20(Small).png?raw=true)
-
-  ![App Screenshot](https://github.com/GeorgeYT9769/cardabase-app/blob/main/mockups/app-mockup-ios-screenshot-5-cardabase-5.5-inch-7%20(Small).png?raw=true) ![App Screenshot](https://github.com/GeorgeYT9769/cardabase-app/blob/main/mockups/app-mockup-ios-screenshot-5-cardabase-5.5-inch-8%20(Small).png?raw=true)
+  ![App Screenshot](fastlane\metadata\android\en-US\images\phoneScreenshots\1.png)
+  ![App Screenshot](fastlane\metadata\android\en-US\images\phoneScreenshots\2.png)
+  ![App Screenshot](fastlane\metadata\android\en-US\images\phoneScreenshots\3.png)
+  ![App Screenshot](fastlane\metadata\android\en-US\images\phoneScreenshots\4.png)
+  ![App Screenshot](fastlane\metadata\android\en-US\images\phoneScreenshots\5.png)
+  ![App Screenshot](fastlane\metadata\android\en-US\images\phoneScreenshots\6.png)
+  ![App Screenshot](fastlane\metadata\android\en-US\images\phoneScreenshots\7.png)
+  ![App Screenshot](fastlane\metadata\android\en-US\images\phoneScreenshots\8.png)
 
 </div>
