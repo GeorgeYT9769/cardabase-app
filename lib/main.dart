@@ -1,7 +1,7 @@
 import 'package:cardabase/pages/homepage.dart';
+import 'package:cardabase/pages/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:cardabase/theme/theme_provider.dart';
 import 'package:cardabase/theme/color_schemes.g.dart';
 
 void main() async {

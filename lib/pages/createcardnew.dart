@@ -1,3 +1,4 @@
+import 'package:cardabase/util/read_barcode.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -242,16 +243,17 @@ class _CreateCardState extends State<CreateCard> {
                       hintText: 'Card numbers',
                       hintStyle: TextStyle(color: Theme.of(context).colorScheme.secondary, fontFamily: 'Roboto-Regular.ttf'),
                       prefixIcon: Icon(Icons.numbers, color: Theme.of(context).colorScheme.secondary),
-                      suffixIcon: IconButton(icon: Icon(Icons.photo_camera_rounded, color: Theme.of(context).colorScheme.secondary),onPressed: () async {
-                        var res = await Navigator.push(
+                      suffixIcon: IconButton(icon: Icon(Icons.photo_camera_rounded, color: Theme.of(context).colorScheme.secondary),
+                        onPressed: () async {
+                        var result = await Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const SimpleBarcodeScannerPage(),
+                              builder: (context) => const QRViewExample(),
                             ));
                         setState(() {
-                          if (res is String) {
-                            if (res != "-1") {
-                              controllercardid.text = res;
+                          if (result is String) {
+                            if (result != "-1") {
+                              controllercardid.text = result;
                             } else {
                               controllercardid.text = "";
                             }

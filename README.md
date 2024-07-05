@@ -80,6 +80,21 @@ For support, message me on Discord: "georgeyt9769".
 ## 🤝 Contributing
 Contact me for more info :).
 
+## 🔨 Self-Building
+1. `git clone` the repository
+2. `cd cardabase-app` into it
+3. `flutter build apk` in Terminal
+
+Note: You might need to change version based on your installations:
+- Flutter: latest one,
+- Java: something compatible with Gradle
+- Gradle: android\gradle\wrapper\gradle-wrapper.properties - last line "distributionUrl" (change the "8.5" number)
+
+Used versions:
+- Flutter: 3.22.2
+- Java: JDK-21
+- Gradle: 8.5
+
 ## 📸 Screenshots
 
 <div align="center">

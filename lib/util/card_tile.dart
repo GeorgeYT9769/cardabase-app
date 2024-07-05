@@ -1,4 +1,4 @@
-import 'package:cardabase/util/generate_qr.dart';
+import 'package:cardabase/util/generate_barcode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
