@@ -1,4 +1,0 @@
-Used versions:
-- Flutter: 3.22.2
-- Java: JDK-21
-- Gradle: 8.5
