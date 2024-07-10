@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:restart_app/restart_app.dart';
-import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 import '../data/cardabase_db.dart';
 import '../util/color_picker.dart';
 
