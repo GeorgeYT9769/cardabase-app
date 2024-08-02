@@ -1,42 +1,63 @@
 name: Android Release
 
-# 1
 on:
-  # 2
   push:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
 
-  # 3
   workflow_dispatch:
 
-# 4
 jobs:
-  # 5
   build:
-    # 6
+    name: Create Android Build
+    needs: version
     runs-on: ubuntu-latest
-
-    # 7
     steps:
-      # 8
-      - uses: actions/checkout@v3
-      # 9
+      - uses: actions/checkout@v3  
+      - name: Get version.txt
+        uses: actions/download-artifact@v2
+        with:
+          name: gitversion
+      - name: Create new file without newline char from version.txt
+        run: tr -d '\n' < version.txt > version1.txt
+      - name: Read version
+        id: version
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: version1.txt
+      - name: Update version in YAML
+        run: sed -i 's/99.99.99+99/${{ steps.version.outputs.content }}+${{ github.run_number }}/g' pubspec.yaml
+      - name: Download Android keystore
+        id: android_keystore
+        uses: timheuer/base64-to-file@v1.0.3
+        with:
+          fileName: upload-keystore.jks
+          encodedString: ${{ secrets.KEYSTORE_BASE64 }}
+      - name: Create key.properties
+        run: |
+          echo "storeFile=${{ steps.android_keystore.outputs.filePath }}" > android/key.properties
+          echo "storePassword=${{ secrets.STORE_PASSWORD }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
       - uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: "21.x"
-      # 10   
+          cache: gradle
       - uses: subosito/flutter-action@v2
         with:
-          # 11
           flutter-version: "3.22.0"
           channel: 'stable'
-      # 12
+          cache: true
+     
       - name: Get dependencies
         run: flutter pub get
 
-      # Runs a set of commands using the runners shell
-      - name: Start release build
-        run: flutter build apk
+      - name: Start Android Release Build
+        run: flutter build appbundle
+      - name: Upload Android Release
+        uses: actions/upload-artifact@v2
+        with:
+          name: android-release
+          path: build/app/outputs/flutter-apk\app-release.apk
