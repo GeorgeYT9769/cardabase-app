@@ -9,12 +9,32 @@ on:
   workflow_dispatch:
 
 jobs:
+  version:
+    name: Create version number
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.7
+        with:
+          versionSpec: "5.x"
+      - name: Use GitVersion
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v0.9.7
+      - name: Create version.txt with nuGetVersion
+        run: echo ${{ steps.gitversion.outputs.nuGetVersion  }} > version.txt
+      - name: Upload version.txt
+        uses: actions/upload-artifact@v2
+        with:
+          name: gitversion
+          path: version.txt
+
   build:
     name: Create Android Build
     needs: version
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3  
+      - uses: actions/checkout@v3
       - name: Get version.txt
         uses: actions/download-artifact@v2
         with:
@@ -50,12 +70,13 @@ jobs:
           flutter-version: "3.22.0"
           channel: 'stable'
           cache: true
-     
+      
       - name: Get dependencies
         run: flutter pub get
 
       - name: Start Android Release Build
-        run: flutter build appbundle
+        run: flutter build apk
+
       - name: Upload Android Release
         uses: actions/upload-artifact@v2
         with:
