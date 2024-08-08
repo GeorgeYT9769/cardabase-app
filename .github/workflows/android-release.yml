@@ -40,10 +40,31 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Start Android Release Build
+      - name: Start Android Release Build ABI
+        run: flutter build apk --split-per-abi
+
+      - name: Start Android Release Build APK
         run: flutter build apk
 
-      - name: Upload Android Release
+      - name: Upload Android Release APK (x86)
+        uses: actions/upload-artifact@v2
+        with:
+          name: android-release
+          path: build/app/outputs/flutter-apk/app-x86_64-release.apk
+
+      - name: Upload Android Release APK (v7a)
+        uses: actions/upload-artifact@v2
+        with:
+          name: android-release
+          path: build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+
+      - name: Upload Android Release APK (v8a)
+        uses: actions/upload-artifact@v2
+        with:
+          name: android-release
+          path: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+
+      - name: Upload Android Release APK (uni)
         uses: actions/upload-artifact@v2
         with:
           name: android-release
