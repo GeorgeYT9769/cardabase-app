@@ -53,7 +53,7 @@
      alt="Get it on F-Droid"
      height="80">](https://f-droid.org/packages/com.georgeyt9769.cardabase/)
 
-Or
+OR
 
 1. Download [latest official release](https://github.com/GeorgeYT9769/cardabase-app/releases/latest).
 2. Locate the "Cardabase.apk" file (usually in the Internal storage/Downloads folder).
@@ -69,12 +69,6 @@ By downloading the app you agree:
 - That the owner, creators, and contributors are not responsible for any hardware, software, emotional, or other damages made by bugs in the app. Download and use on your own risk;
 - To allow Cardabase to use local storage (and camera - optional).
 
-## 👨 Authors/Contributors
-
-<a href="https://github.com/GeorgeYT9769/">
-  <img src="https://contrib.rocks/image?repo=GeorgeYT9769/cardabase-app" />
-</a>
-
 ## 🤝 Thanks to
 
 - [Edin Divović](https://www.youtube.com/@NotEdin_)
@@ -89,17 +83,18 @@ Contact me for more info :).
 ## 🔨 Self-Building
 1. `git clone` the repository
 2. `cd cardabase-app` into it
-3. `flutter build apk` in Terminal
-
-Note: You might need to change version based on your installations:
-- Flutter: latest one,
-- Java: something compatible with Gradle
-- Gradle: android\gradle\wrapper\gradle-wrapper.properties - last line "distributionUrl" (change the "8.5" number)
+3. `flutter build apk` in Terminal (you can add `--split-per-abi` if you want to get multiple versions)
 
 Used versions:
-- Flutter: 3.22.2
+- Flutter: 3.22.3 (or newer, used Flutter version is always added as a submodule, so you can use that one)
 - Java: JDK-21
 - Gradle: 8.5
+
+Note: Java and Gradle versions must be compatible with each other. [See this Compatibility Matrix](https://docs.gradle.org/current/userguide/compatibility.html).
+
+You may need to:
+- Specify JAVA_HOME in gradle.properties = `android/gradle.properties`, add a line `org.gradle.java.home="C:\\path\\to\\the\\jdk"`, where you have to specify your path, (<- in case of multiple/no versions or JAVA_HOME environment variable not specified)
+- Change Gradle version in gradle-wrapper.properties = `android\gradle\wrapper\gradle-wrapper.properties`, last line "distributionUrl" (change the "8.5" number). (<- in case of different Gradle installation)
 
 ## 📸 Screenshots
 
