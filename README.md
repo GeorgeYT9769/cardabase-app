@@ -49,7 +49,13 @@
 
 ## 📲 Installation
 
-1. Download official release.
+[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+     alt="Get it on F-Droid"
+     height="80">](https://f-droid.org/packages/com.georgeyt9769.cardabase/)
+
+Or
+
+1. Download [latest official release](https://github.com/GeorgeYT9769/cardabase-app/releases/latest).
 2. Locate the "Cardabase.apk" file (usually in the Internal storage/Downloads folder).
 3. Allow installing apps from unknown sources.
 4. Install it by clicking on the "Cardabase.apk" app and hitting the "Install" button.
