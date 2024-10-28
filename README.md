@@ -81,9 +81,10 @@ For support, message me on Discord: "georgeyt9769".
 Contact me for more info :).
 
 ## 🔨 Self-Building
-1. `git clone` the repository
-2. `cd cardabase-app` into it
-3. `flutter build apk` in Terminal (you can add `--split-per-abi` if you want to get multiple versions)
+1. `git clone` the repository,
+2. `cd cardabase-app` into it,
+3. `flutter pub get` to download the dependencies,
+4. `flutter build apk` in Terminal (you can add `--split-per-abi` if you want to get multiple versions).
 
 Used versions:
 - Flutter: 3.22.3 (or newer, used Flutter version is always added as a submodule, so you can use that one)
