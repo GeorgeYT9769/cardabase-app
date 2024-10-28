@@ -47,25 +47,25 @@ jobs:
         run: flutter build apk
 
       - name: Upload Android Release APK (x86)
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: android-release
           path: build/app/outputs/flutter-apk/app-x86_64-release.apk
 
       - name: Upload Android Release APK (v7a)
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: android-release
           path: build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
 
       - name: Upload Android Release APK (v8a)
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: android-release
           path: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 
       - name: Upload Android Release APK (uni)
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: android-release
           path: build/app/outputs/flutter-apk/app-release.apk
