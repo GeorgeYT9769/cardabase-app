@@ -195,12 +195,18 @@ class _CreateCardState extends State<CreateCard> {
                 margin: const EdgeInsets.all(20),
                 decoration: BoxDecoration(color: cardColorPreview, borderRadius: BorderRadius.circular(15)),
                 child: Center(
-                  child: Text(cardTextPreview, style: const TextStyle(
-                      fontSize: 50,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Roboto-Regular.ttf',
-                      color: Colors.white,
-                  ),),
+                  child: Wrap(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.all(20),
+                        child: Text(cardTextPreview, style: const TextStyle(
+                          fontSize: 50,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Roboto-Regular.ttf',
+                          color: Colors.white,
+                                            ),),
+                      ),
+                  ]),
                 ),
               )
           ),
@@ -219,7 +225,7 @@ class _CreateCardState extends State<CreateCard> {
                       blueValue = cardColorPreview.blue;
                     });
                   },
-                  maxLength: 10,
+                  maxLength: 20,
                   controller: controller,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary)),
