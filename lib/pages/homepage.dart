@@ -59,10 +59,17 @@ class _HomePageState extends State<Homepage> {
         elevation: 0.0,
         backgroundColor: Theme.of(context).colorScheme.surface,
       ),
-      floatingActionButton: FloatingActionButton( //createNewCard
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateCard()), ).then((value) => setState(() {}));},
-        child: const Icon(Icons.add_card),
+//createNewCard
+      floatingActionButton: Container(
+        height: 70,
+        width: 70,
+        child: FittedBox(
+          child: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateCard()), ).then((value) => setState(() {}));},
+            child: const Icon(Icons.add_card),
+          ),
+        ),
       ),
       body:
           ListView.builder(

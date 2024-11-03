@@ -3,6 +3,7 @@ import 'package:cardabase/pages/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:cardabase/theme/color_schemes.g.dart';
+import 'package:flutter/services.dart';
 
 void main() async {
   await Hive.initFlutter();
@@ -30,6 +31,11 @@ class Main extends StatelessWidget {
     } else if (themebox.get('apptheme') == true) {
         themeData = ThemeData(useMaterial3: true, colorScheme: darkColorScheme);
     }
+
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,

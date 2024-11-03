@@ -73,12 +73,46 @@ class _SettingsState extends State<Settings> {
 
       body: ListView(
         children: [
+          Container(
+            margin: const EdgeInsets.only(top: 10, left: 20),
+            child: const Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'App Settings',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Roboto-Regular.ttf',
+                    fontSize: 23,
+                  ),
+                ),
+              ],
+            ),
+          ),
           MySetting(
               aboutSettingHeader:
-              'Switches theme between dark blue and white',
+              'Switches theme between blue and white',
               settingAction: switchTheme, //() => Provider.of<ThemeProvider>(context, listen: false).toggleTheme()
               settingHeader: 'Switch theme',
               settingIcon: Icons.palette
+          ),
+          Container(
+            margin: const EdgeInsets.only(top: 20, left: 20,),
+            child: const Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Social Networks',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Roboto-Regular.ttf',
+                    fontSize: 23,
+                  ),
+                ),
+              ],
+            ),
           ),
           MySetting(
               aboutSettingHeader:
@@ -93,6 +127,13 @@ class _SettingsState extends State<Settings> {
               settingAction: () => _launchUrl(Uri.parse('https://github.com/GeorgeYT9769/cardabase-app')),
               settingHeader: 'GitHub',
               settingIcon: Icons.code
+          ),
+          MySetting(
+              aboutSettingHeader:
+              'Visit F-Droid page of this project',
+              settingAction: () => _launchUrl(Uri.parse('https://f-droid.org/en/packages/com.georgeyt9769.cardabase/')),
+              settingHeader: 'F-Droid',
+              settingIcon: Icons.store
           )
         ],
       ),

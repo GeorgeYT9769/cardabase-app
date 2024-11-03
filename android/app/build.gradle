@@ -32,7 +32,7 @@ android {
     namespace "com.georgeyt9769.cardabase"
     testNamespace "com.georgeyt9769.cardabase.test"
     compileSdkVersion flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+    ndkVersion "25.1.8937393"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

@@ -11,29 +11,50 @@ class ColorPickerSecondDialog extends StatefulWidget {
       _ColorPickerSecondDialogState();
 }
 
-class _ColorPickerSecondDialogState extends State<ColorPickerSecondDialog> with ChangeNotifier {
+class _ColorPickerSecondDialogState extends State<ColorPickerSecondDialog> {
+  Color? currentColor;
+
+  @override
+  void initState() {
+    super.initState();
+    currentColor = widget.cardColor; // Initialize the local color variable
+  }
+
+  @override
+  void dispose() {
+    super.dispose(); // Call super.dispose() to ensure proper cleanup
+  }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: Theme.of(context).colorScheme.background,
-      title: const Text('Pick a color!', style: TextStyle(fontFamily: 'Roboto-Regular.ttf',),),
+      title: const Text(
+        'Pick a color!',
+        style: TextStyle(fontFamily: 'Roboto-Regular.ttf'),
+      ),
       content: SingleChildScrollView(
-          child: ColorPicker(
-            enableAlpha: false,
-            pickerColor: widget.cardColor,
-            portraitOnly: true,
-            onColorChanged: (value) {
+        child: ColorPicker(
+          enableAlpha: false,
+          pickerColor: currentColor!,
+          portraitOnly: true,
+          onColorChanged: (value) {
+            if (mounted) { // Check if the widget is still mounted
               setState(() {
-                widget.cardColor = value;
+                currentColor = value; // Update the local color variable
               });
-            },
-          )),
+            }
+          },
+        ),
+      ),
       actions: <Widget>[
         ElevatedButton(
-          child: const Text('Got it', style: TextStyle(fontFamily: 'Roboto-Regular.ttf',),),
+          child: const Text(
+            'Got it',
+            style: TextStyle(fontFamily: 'Roboto-Regular.ttf'),
+          ),
           onPressed: () {
-            Navigator.pop(context, widget.cardColor);
+            Navigator.pop(context, currentColor); // Pass the current color
           },
         ),
       ],

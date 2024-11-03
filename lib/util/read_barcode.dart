@@ -37,6 +37,16 @@ class _QRViewExampleState extends State<QRViewExample> {
                     margin: const EdgeInsets.all(10),
                     child: IconButton(
                       style: const ButtonStyle(iconSize: WidgetStatePropertyAll(30)),
+                      icon: const Icon(Icons.arrow_back_ios_new),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.all(10),
+                    child: IconButton(
+                      style: const ButtonStyle(iconSize: WidgetStatePropertyAll(30)),
                       icon: const Icon(Icons.flash_on),
                       onPressed: () async {
                         await controller?.toggleFlash();
