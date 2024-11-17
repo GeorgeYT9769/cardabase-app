@@ -14,4 +14,4 @@ By downloading the app you agree:
 - To allow Cardabase use local storage (and camera - optional).
 
 Note:
-- Images might differ from actual app design.
+- Images might be different from the actual app design.
