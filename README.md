@@ -1,43 +1,38 @@
 <a name="readme-top"></a>
 
 <br />
-<div align="center">
-  <a href="https://github.com/github_username/repo_name">
-    <img src="CB.png" alt="Logo" width="80" height="80">
-  </a>
 
 <h1 align="center">Cardabase</h1>
 
   <p align="center">
     Cardabase is an app that lets you save EAN-13 club cards on your phone and use them later.
     <br />
+    <div align="center">
+      <img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/featureGraphic.png?raw=true" alt="Banner">
     <!-- <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a>
     <br /> -->
+    <br />
+    <div align="center">
+      <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Stars">
+      <img alt="GitHub forks" src="https://img.shields.io/github/forks/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Forks">
+      <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/y/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Commit Activity">
+      <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Last Commit">
+      <img alt="GitHub issues" src="https://img.shields.io/github/issues/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Issues Opened">
+      <img alt="GitHub closed issues" src="https://img.shields.io/github/issues-closed/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Issues Closed">
+      <img alt="GitHub closed pull requests" src="https://img.shields.io/github/issues-pr-closed/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Pull Requests">
+      <img alt="GitHub license" src="https://img.shields.io/github/license/GeorgeYT9769/cardabase-app?style=for-the-badge&label=License">
+      <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/GeorgeYT9769/cardabase-app/total?style=for-the-badge&label=Downloads">
+    </div>
     <br />
     <a href="https://georgeyt9769.github.io/cardabase/">Website</a>
     ·
     <a href="https://georgeyt9769.github.io/cardabase/webapp/index.html">View Demo</a>
     ·
-    <a href="https://github.com/GeorgeYT9769/cardabase-app/issues/new">Report Bug</a>
+    <a href="https://github.com/GeorgeYT9769/cardabase-app/issues/new">Report a Bug</a>
   </p>
 </div>
 
 <br />
-
-
-<div align="center">
-  <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Stars">
-  <img alt="GitHub forks" src="https://img.shields.io/github/forks/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Forks">
-  <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/y/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Commit Activity">
-  <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Last Commit">
-  <img alt="GitHub issues" src="https://img.shields.io/github/issues/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Issues Opened">
-  <img alt="GitHub closed issues" src="https://img.shields.io/github/issues-closed/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Issues Closed">
-  <img alt="GitHub closed pull requests" src="https://img.shields.io/github/issues-pr-closed/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Pull Requests">
-  <img alt="GitHub license" src="https://img.shields.io/github/license/GeorgeYT9769/cardabase-app?style=for-the-badge&label=License">
-  <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/GeorgeYT9769/cardabase-app/total?style=for-the-badge&label=Downloads">
-</div>
-
-
 
 ## 👌 Features
 
@@ -99,15 +94,13 @@ You may need to:
 
 ## 📸 Screenshots
 
-<div align="center">
-
-![App Screenshot](https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/1.png?raw=true)
-![App Screenshot](https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/2.png?raw=true)
-![App Screenshot](https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/3.png?raw=true)
-![App Screenshot](https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/4.png?raw=true)
-![App Screenshot](https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/5.png?raw=true)
-![App Screenshot](https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/6.png?raw=true)
-![App Screenshot](https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/7.png?raw=true)
-![App Screenshot](https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/8.png?raw=true)
-
+<div>
+<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/1.png?raw=true" width=249>
+<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/2.png?raw=true" width=249>
+<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/3.png?raw=true" width=249>
+<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/4.png?raw=true" width=249>
+<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/5.png?raw=true" width=249>
+<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/6.png?raw=true" width=249>
+<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/7.png?raw=true" width=249>
+<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/8.png?raw=true" width=249>
 </div>
