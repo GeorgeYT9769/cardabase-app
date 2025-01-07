@@ -28,7 +28,7 @@ class _ColorPickerSecondDialogState extends State<ColorPickerSecondDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       title: const Text(
         'Pick a color!',
         style: TextStyle(fontFamily: 'Roboto-Regular.ttf'),

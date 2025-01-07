@@ -2,12 +2,12 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:cardabase/util/setting_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:restart_app/restart_app.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'password.dart';
+import '../theme/theme_provider.dart';
 
-final themebox = Hive.box('mytheme');
-final box = Hive.box('mybox');
-int count = 0;
+final settingsbox = Hive.box('settingsBox');
+final isDarkMode = ThemeProvider.isDarkMode;
 
 class Settings extends StatefulWidget {
   const Settings({super.key,});
@@ -20,27 +20,7 @@ class _SettingsState extends State<Settings> {
 
   @override
   void initState() {
-
     super.initState();
-  }
-
-  void switchTheme() {
-    if (themebox.get('apptheme') == false) {
-      setState(() {
-        themebox.put('apptheme', true);
-        Restart.restartApp();
-      });
-    } else if (themebox.get('apptheme') == true) {
-      setState(() {
-        themebox.put('apptheme', false);
-        Restart.restartApp();
-      });
-    } else {
-      setState(() {
-        themebox.put('apptheme', true);
-        Restart.restartApp();
-      });
-    }
   }
 
   Future<void> _launchUrl(url) async {
@@ -93,9 +73,18 @@ class _SettingsState extends State<Settings> {
           MySetting(
               aboutSettingHeader:
               'Switches theme between blue and white',
-              settingAction: switchTheme, //() => Provider.of<ThemeProvider>(context, listen: false).toggleTheme()
+              settingAction: ThemeProvider.toggleTheme, //() => Provider.of<ThemeProvider>(context, listen: false).toggleTheme()
               settingHeader: 'Switch theme',
               settingIcon: Icons.palette
+          ),
+          MySetting(
+            aboutSettingHeader:
+            'Manage the password for the cards',
+            settingAction: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => PasswordScreen()));
+            },
+            settingHeader: 'Password',
+            settingIcon: Icons.password
           ),
           Container(
             margin: const EdgeInsets.only(top: 20, left: 20,),

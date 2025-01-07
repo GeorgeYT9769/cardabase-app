@@ -1,5 +1,4 @@
 import 'package:cardabase/pages/homepage.dart';
-import 'package:cardabase/pages/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:cardabase/theme/color_schemes.g.dart';
@@ -7,9 +6,9 @@ import 'package:flutter/services.dart';
 
 void main() async {
   await Hive.initFlutter();
-  var box = await Hive.openBox('mybox');
-  var themebox = await Hive.openBox('mytheme');
-  var firstcard = await Hive.openBox('firstcardd');
+  var allcards = await Hive.openBox('mybox'); //storage for cards
+  await Hive.openBox('settingsBox'); // storage for settings
+  var password = await Hive.openBox('password'); // storage for password
 
   runApp(
     Main(),
@@ -20,27 +19,26 @@ void main() async {
 class Main extends StatelessWidget {
   Main({super.key});
 
-  var themeData = ThemeData(useMaterial3: true, colorScheme: lightColorScheme);
-
-
   @override
   Widget build(BuildContext context) {
-
-    if (themebox.get('apptheme') == false) {
-        themeData = ThemeData(useMaterial3: true, colorScheme: lightColorScheme);
-    } else if (themebox.get('apptheme') == true) {
-        themeData = ThemeData(useMaterial3: true, colorScheme: darkColorScheme);
-    }
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const Homepage(),
-      theme: themeData,
+    return ValueListenableBuilder(
+      valueListenable: Hive.box('settingsBox').listenable(),
+      builder: (context, box, widget) {
+        bool isDarkMode = box.get('isDarkMode', defaultValue: false);
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+          theme: ThemeData(colorScheme: lightColorScheme),
+          darkTheme: ThemeData(colorScheme: darkColorScheme),
+          home: Homepage(),
+        );
+      },
     );
   }
 }

@@ -7,8 +7,42 @@ class GenerateBarcode extends StatelessWidget {
   String cardid;
   String cardtext;
   Color iconcolor;
+  String cardType;
 
-  GenerateBarcode({super.key, required this.cardid, required this.cardtext, required this.iconcolor});
+  GenerateBarcode({super.key, required this.cardid, required this.cardtext, required this.iconcolor, required this.cardType});
+
+  Barcode getBarcodeType(String cardType) {
+    switch (cardType) {
+      case 'CardType.code39':
+        return Barcode.code39();
+      case 'CardType.code93':
+        return Barcode.code93();
+      case 'CardType.code128':
+        return Barcode.code128();
+      case 'CardType.ean13':
+        return Barcode.ean13(drawEndChar: true);
+      case 'CardType.ean8':
+        return Barcode.ean8();
+      case 'CardType.ean5':
+        return Barcode.ean5();
+      case 'CardType.ean2':
+        return Barcode.ean2();
+      case 'CardType.upca':
+        return Barcode.upcA();
+      case 'CardType.upce':
+        return Barcode.upcE();
+      case 'CardType.codabar':
+        return Barcode.codabar();
+      case 'CardType.qrcode':
+        return Barcode.qrCode();
+      case 'CardType.datamatrix':
+        return Barcode.dataMatrix();
+      case 'CardType.aztec':
+        return Barcode.aztec();
+      default:
+        return Barcode.ean13(drawEndChar: true); // Fallback barcode
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,9 +112,9 @@ class GenerateBarcode extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10.0),
                         color: Colors.white),
                     child: BarcodeWidget(
-                      padding: const EdgeInsets.all(5),
+                      padding: const EdgeInsets.all(10),
                       data: cardid,
-                      barcode: Barcode.ean13(drawEndChar: true),
+                      barcode: getBarcodeType(cardType), //Barcode.ean13(drawEndChar: true)
                       drawText: true,
                       style: const TextStyle(color: Colors.black),
                     ),

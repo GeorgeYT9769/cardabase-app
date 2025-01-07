@@ -6,13 +6,11 @@ class cardabase_db {
 
   final _myBox = Hive.box('mybox');
 
-  //first time
-  void createInitialData() {
-      _myBox.add(["Default card", "6820060015240", 158, 158, 158]);
-  }
-
   //load the data
   void loadData() {
+    if (_myBox.get('CARDLIST') == null) {
+      _myBox.put('CARDLIST', []);
+    }
     myShops = _myBox.get('CARDLIST');
   }
 
