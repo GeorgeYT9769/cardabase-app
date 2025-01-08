@@ -41,6 +41,7 @@
 - Light, fast and smooth
 - Encrypted storage
 - Simple and user-friendly
+- Support for modern barcode types
 
 ## 📲 Installation
 
