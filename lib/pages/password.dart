@@ -201,6 +201,15 @@ class _PasswordScreenState extends State<PasswordScreen> {
             padding: const EdgeInsets.all(20),
             child: ListView(
                 children: [
+                  Text('CREATE A PASSWORD', style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Roboto-Regular.ttf',
+                    fontSize: 20,
+                    color: Theme.of(context).colorScheme.tertiary,
+                  ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 10,),
                   Text('Give your cards a password. Once you have set it up, you may use that password to safeguard your cards.', style: TextStyle( //cardTypeText
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Roboto-Regular.ttf',
@@ -288,7 +297,16 @@ class _PasswordScreenState extends State<PasswordScreen> {
         padding: const EdgeInsets.all(20),
         child: ListView(
           children: [
-            Text('If you wish to change your password or stop using it, you may do so here.', style: TextStyle( //cardTypeText
+            Text('RESET PASSWORD', style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Roboto-Regular.ttf',
+              fontSize: 20,
+              color: Theme.of(context).colorScheme.tertiary,
+            ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10,),
+            Text('If you wish to change your password or stop using it, you may do so here.', style: TextStyle(
               fontWeight: FontWeight.bold,
               fontFamily: 'Roboto-Regular.ttf',
               fontSize: 15,

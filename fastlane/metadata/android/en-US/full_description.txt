@@ -1,4 +1,4 @@
-Cardabase is an app that lets you save EAN-13 club cards on your phone and use them later.
+Save your loyalty cards using Cardabase and use them later.
 
 Features:
 - Light/dark mode toggle
@@ -6,12 +6,13 @@ Features:
 - Light, fast and smooth
 - Encrypted storage
 - Simple and user-friendly
+- Support for modern barcode types
+
+Note:
+- Images might be different from the actual app design.
 
 Acknowledgments:
 By downloading the app you agree:
 - To accept the MIT license;
 - That the owner, creators, and contributors are not responsible for any hardware, software, emotional, or other damages made by the app. Download and use on your own risk;
 - To allow Cardabase use local storage (and camera - optional).
-
-Note:
-- Images might be different from the actual app design.

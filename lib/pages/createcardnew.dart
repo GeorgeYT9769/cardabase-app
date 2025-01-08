@@ -84,7 +84,7 @@ class _CreateCardState extends State<CreateCard> {
       case 'CardType.aztec':
         return 'Type: AZTEC';
       default:
-        return 'Pick a card type'; // Fallback barcode
+        return 'Card Type';
     }
   }
 
@@ -110,7 +110,7 @@ class _CreateCardState extends State<CreateCard> {
   }
 
   void saveNewCard() { //x;
-    if (controller.text.isNotEmpty && verifyEan(controllercardid.text) == true && cardTypeText != 'Pick a card type') {
+    if (controller.text.isNotEmpty && verifyEan(controllercardid.text) == true && cardTypeText != 'Card Type') {
       setState(() {
         cdb.myShops.add([controller.text, controllercardid.text, redValue, greenValue, blueValue, cardTypeText, hasPassword]);
       });
@@ -121,7 +121,7 @@ class _CreateCardState extends State<CreateCard> {
       redValue = 158;
       blueValue = 158;
       greenValue = 158;
-      cardTypeText = 'Pick a card type';
+      cardTypeText = 'Card Type';
       hasPassword = false;
     } else if (controller.text.isEmpty == true ) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -133,7 +133,7 @@ class _CreateCardState extends State<CreateCard> {
               children: [
                 Icon(Icons.error, size: 15, color: Colors.white,),
                 SizedBox(width: 10,),
-                Text('Card name cannot be empty!', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+                Text('Card Name cannot be empty!', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
               ],
             ),
             duration: const Duration(milliseconds: 3000),
@@ -184,7 +184,7 @@ class _CreateCardState extends State<CreateCard> {
           backgroundColor: const Color.fromARGB(255, 237, 67, 55),
         ),
       );
-    } else if (cardTypeText == 'Pick a card type') {
+    } else if (cardTypeText == 'Card Type') {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           shape: RoundedRectangleBorder(
@@ -194,7 +194,7 @@ class _CreateCardState extends State<CreateCard> {
             children: [
               Icon(Icons.error, size: 15, color: Colors.white,),
               SizedBox(width: 10,),
-              Text('Card type was not chosen!', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+              Text('Card Type was not selected!', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
             ],
           ),
           duration: const Duration(milliseconds: 3000),
@@ -330,7 +330,7 @@ class _CreateCardState extends State<CreateCard> {
   }
 
   CardType? selectedCardType;
-  String cardTypeText = 'Pick a card type';
+  String cardTypeText = 'Card Type';
 
   void _showBarcodeSelectorDialog() async {
     CardType? result = await showDialog<CardType>(
@@ -451,7 +451,7 @@ class _CreateCardState extends State<CreateCard> {
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
                     focusColor: Theme.of(context).colorScheme.primary,
                     enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
-                    labelText: 'Card name',
+                    labelText: 'Card Name',
                     labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary, fontFamily: 'Roboto-Regular.ttf'),
                     prefixIcon: Icon(Icons.abc, color: Theme.of(context).colorScheme.secondary),
                   ),
@@ -537,7 +537,7 @@ class _CreateCardState extends State<CreateCard> {
                         minimumSize: const Size.fromHeight(100),
                       ),
                       onPressed: openColorPickerDialog,
-                      child: Text('Pick a color', style: TextStyle(
+                      child: Text('Card Color', style: TextStyle(
                         color: Theme.of(context).colorScheme.tertiary,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'Roboto-Regular.ttf',

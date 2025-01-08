@@ -1,1 +1,1 @@
-Cardabase is an app that lets you save EAN-13 club cards on your phone.
+Cardabase is an app that lets you save your loyalty club cards to your phone.
