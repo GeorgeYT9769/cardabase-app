@@ -23,12 +23,6 @@
       <img alt="GitHub license" src="https://img.shields.io/github/license/GeorgeYT9769/cardabase-app?style=for-the-badge&label=License">
       <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/GeorgeYT9769/cardabase-app/total?style=for-the-badge&label=Downloads">
     </div>
-    <br />
-    <a href="https://georgeyt9769.github.io/cardabase/">Website</a>
-    ·
-    <a href="https://georgeyt9769.github.io/cardabase/webapp/index.html">View Demo</a>
-    ·
-    <a href="https://github.com/GeorgeYT9769/cardabase-app/issues/new">Report a Bug</a>
   </p>
 </div>
 
