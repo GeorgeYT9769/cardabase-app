@@ -5,12 +5,11 @@
 <h1 align="center">Cardabase</h1>
 
   <p align="center">
-    Cardabase is an app that lets you save EAN-13 club cards on your phone and use them later.
+    Cardabase is an app that lets you save your loyalty cards to your phone and use them later.
     <br />
     <div align="center">
       <img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/featureGraphic.png?raw=true" alt="Banner">
-    <!-- <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a>
-    <br /> -->
+    <!-- <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a> https://discord.com/invite/fZNDfG2xv3 -->
     <br />
     <div align="center">
       <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Stars">
@@ -22,6 +21,10 @@
       <img alt="GitHub closed pull requests" src="https://img.shields.io/github/issues-pr-closed/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Pull Requests">
       <img alt="GitHub license" src="https://img.shields.io/github/license/GeorgeYT9769/cardabase-app?style=for-the-badge&label=License">
       <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/GeorgeYT9769/cardabase-app/total?style=for-the-badge&label=Downloads">
+      <br />
+      <a href="https://discord.com/invite/fZNDfG2xv3">
+        <img alt="Discord" src="https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white">
+      </a>
     </div>
   </p>
 </div>
@@ -46,17 +49,17 @@
 OR
 
 1. Download [latest official release](https://github.com/GeorgeYT9769/cardabase-app/releases/latest).
-2. Locate the "Cardabase.apk" file (usually in the Internal storage/Downloads folder).
+2. Locate the "cardabase-(version you got).apk" file (usually in the Internal storage/Downloads folder).
 3. Allow installing apps from unknown sources.
-4. Install it by clicking on the "Cardabase.apk" app and hitting the "Install" button.
-- Note: If any error occurred while installing the app, please open a new issue.
+4. Install it by clicking on the "Install" button.
+- Note: If any error occurred while installing or using the app, please open a new issue.
 
 ## ❗ Acknowledgments
 
 By downloading the app you agree:
 
 - To accept the MIT license;
-- That the owner, creators, and contributors are not responsible for any hardware, software, emotional, or other damages made by bugs in the app. Download and use on your own risk;
+- That the owner, creators, and contributors are not responsible for any hardware, software, emotional, or other damages made by bugs in the app. Download and use at your own risk;
 - To allow Cardabase to use local storage (and camera - optional).
 
 ## 🤝 Thanks to
@@ -77,7 +80,7 @@ Contact me for more info :).
 4. `flutter build apk` in Terminal (you can add `--split-per-abi` if you want to get multiple versions).
 
 Used versions:
-- Flutter: 3.22.3 (or newer, used Flutter version is always added as a submodule, so you can use that one)
+- Flutter: 3.24.5 (or newer, used Flutter version is always added as a submodule, so you can use that one)
 - Java: JDK-21
 - Gradle: 8.5
 
