@@ -89,7 +89,11 @@ Contact me for more info :).
 
 Used versions:
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 - Flutter: 3.24.5 (or newer, used Flutter version is always added as a submodule, so you can use that one)
+=======
+- Flutter: 3.29.0 (or newer, used Flutter version is always added as a submodule, so you can use that one)
+>>>>>>> Stashed changes
 =======
 - Flutter: 3.29.0 (or newer, used Flutter version is always added as a submodule, so you can use that one)
 >>>>>>> Stashed changes
