@@ -62,6 +62,14 @@ By downloading the app you agree:
 - That the owner, creators, and contributors are not responsible for any hardware, software, emotional, or other damages made by bugs in the app. Download and use at your own risk;
 - To allow Cardabase to use local storage (and camera - optional).
 
+## 🔜 Coming soon
+
+- Ability to **EDIT** a card details
+- Quick **IMPORT / EXPORT** a card via QR code
+- Some kind of **SORTING** system and display the most used ones at the top
+- Set full **BRIGHTNESS** automatically to make reading easier (could be customized)
+- When reading a **BARCODE** with in-built scanner, the **TYPE** could be **AUTOMATICALLY APPLIED**
+
 ## 🤝 Thanks to
 
 - [Edin Divović](https://www.youtube.com/@NotEdin_)
@@ -80,7 +88,11 @@ Contact me for more info :).
 4. `flutter build apk` in Terminal (you can add `--split-per-abi` if you want to get multiple versions).
 
 Used versions:
+<<<<<<< Updated upstream
 - Flutter: 3.24.5 (or newer, used Flutter version is always added as a submodule, so you can use that one)
+=======
+- Flutter: 3.29.0 (or newer, used Flutter version is always added as a submodule, so you can use that one)
+>>>>>>> Stashed changes
 - Java: JDK-21
 - Gradle: 8.5
 
