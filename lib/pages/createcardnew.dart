@@ -27,6 +27,7 @@ enum CardType {
 }
 
 class CreateCard extends StatefulWidget {
+
   const CreateCard({super.key});
 
   @override
@@ -243,7 +244,7 @@ class _CreateCardState extends State<CreateCard> {
   bool verifyEan(String eanCode) {
     if (cardTypeText == 'CardType.ean13') {
       if (eanCode == '9769') {
-        controllercardid.text = '978020137962';
+        controllercardid.text = '9780201379624';
         return true;
       } else if (eanCode.length != 13 || int.tryParse(eanCode) == null) {
         return false;
@@ -385,10 +386,53 @@ class _CreateCardState extends State<CreateCard> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(icon: Icon(Icons.arrow_back_ios_new, color: Theme.of(context).colorScheme.secondary,), onPressed: cancelCard,),
+        actions: [
+          IconButton(
+              icon: Icon(Icons.qr_code_2, color: Theme.of(context).colorScheme.secondary,),
+              onPressed: () async {
+                var result = await Navigator.push(
+                context, MaterialPageRoute(
+                    builder: (context) => const QRBarReader(),
+                ));
+                setState(() {
+                  if (result is Map<String, dynamic>) {
+
+                    String code = result["code"];
+
+                    if (code != "-1") {
+
+                      List<String> rawList = code.replaceAll("[", "").replaceAll("]", "").split(", ");
+
+                      // Convert values into correct types
+                      String name = rawList[0];
+                      String number = rawList[1];
+                      int red = int.parse(rawList[2]);
+                      int green = int.parse(rawList[3]);
+                      int blue = int.parse(rawList[4]);
+                      String cardType = rawList[5];
+                      bool hasPwd = rawList[6] == "true";
+
+                      setState(() {
+                        controller.text = name;
+                        cardTextPreview = name;
+                        cardColorPreview = Color.fromARGB(255, red, green, blue);
+                        controllercardid.text = number;
+                        redValue = red;
+                        greenValue = green;
+                        blueValue = blue;
+                        cardTypeText = cardType;
+                        hasPassword = hasPwd;
+                      });
+                    }
+                  }
+                });
+              },
+          )
+        ],
         title: Text(
-            'Add a card',
+            'New card',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 18,
               fontWeight: FontWeight.w900,
               fontFamily: 'xirod',
               letterSpacing: 8,
@@ -471,23 +515,81 @@ class _CreateCardState extends State<CreateCard> {
                       labelText: 'Card ID',
                       labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary, fontFamily: 'Roboto-Regular.ttf'),
                       prefixIcon: Icon(Icons.numbers, color: Theme.of(context).colorScheme.secondary),
-                      suffixIcon: IconButton(icon: Icon(Icons.photo_camera_rounded, color: Theme.of(context).colorScheme.secondary),
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.photo_camera_rounded, color: Theme.of(context).colorScheme.secondary),
                         onPressed: () async {
-                        var result = await Navigator.push(
+                          var result = await Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const QRViewExample(),
-                            ));
-                        setState(() {
-                          if (result is String) {
-                            if (result != "-1") {
-                              controllercardid.text = result;
-                            } else {
-                              controllercardid.text = "";
+                              builder: (context) => const QRBarReader(),
+                            ),
+                          );
+
+                          setState(() {
+                            if (result is Map<String, dynamic>) {
+                              String code = result["code"];
+                              var format = result["format"].toString();
+
+                              if (code != "-1") {
+                                controllercardid.text = code;
+
+                                // Update selectedCardType and cardTypeText consistently
+                                switch (format) {
+                                  case 'BarcodeFormat.code39':
+                                    selectedCardType = CardType.code39;
+                                    cardTypeText = selectedCardType.toString();
+                                    break;
+                                  case 'BarcodeFormat.code93':
+                                    selectedCardType = CardType.code93;
+                                    cardTypeText = selectedCardType.toString();
+                                    break;
+                                  case 'BarcodeFormat.code128':
+                                    selectedCardType = CardType.code128;
+                                    cardTypeText = selectedCardType.toString();
+                                    break;
+                                  case 'BarcodeFormat.ean13':
+                                    selectedCardType = CardType.ean13;
+                                    cardTypeText = selectedCardType.toString();
+                                    break;
+                                  case 'BarcodeFormat.ean8':
+                                    selectedCardType = CardType.ean8;
+                                    cardTypeText = selectedCardType.toString();
+                                    break;
+                                  case 'BarcodeFormat.upcA':
+                                    selectedCardType = CardType.upca;
+                                    cardTypeText = selectedCardType.toString();
+                                    break;
+                                  case 'BarcodeFormat.upcE':
+                                    selectedCardType = CardType.upce;
+                                    cardTypeText = selectedCardType.toString();
+                                    break;
+                                  case 'BarcodeFormat.codabar':
+                                    selectedCardType = CardType.codabar;
+                                    cardTypeText = selectedCardType.toString();
+                                    break;
+                                  case 'BarcodeFormat.qrcode':
+                                    selectedCardType = CardType.qrcode;
+                                    cardTypeText = selectedCardType.toString();
+                                    break;
+                                  case 'BarcodeFormat.dataMatrix':
+                                    selectedCardType = CardType.datamatrix;
+                                    cardTypeText = selectedCardType.toString();
+                                    break;
+                                  case 'BarcodeFormat.aztec':
+                                    selectedCardType = CardType.aztec;
+                                    cardTypeText = selectedCardType.toString();
+                                    break;
+                                  default:
+                                    selectedCardType = null;
+                                    cardTypeText = 'Card Type';
+                                }
+                              } else {
+                                controllercardid.text = "";
+                              }
                             }
-                          }
-                        });
-                      },),
+                          });
+                        },
+                      ),
                     ),
                     keyboardType: TextInputType.number,
                     //maxLength: 13,

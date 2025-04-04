@@ -5,9 +5,12 @@ import 'package:hive/hive.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'password.dart';
 import '../theme/theme_provider.dart';
+import '../theme/brightness_provider.dart';
 
 final settingsbox = Hive.box('settingsBox');
 final isDarkMode = ThemeProvider.isDarkMode;
+final brightness = BrightnessProvider.brightness;
+bool bulb = BrightnessProvider.brightness;
 
 class Settings extends StatefulWidget {
   const Settings({super.key,});
@@ -28,6 +31,13 @@ class _SettingsState extends State<Settings> {
     throw Exception('Could not launch $url');
   }}
 
+  void changeBrightness() {
+    BrightnessProvider.toggleBrightness();
+    setState(() {
+      bulb = !bulb;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,7 +49,7 @@ class _SettingsState extends State<Settings> {
         title: Text(
             'Settings',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 18,
               fontWeight: FontWeight.w900,
               fontFamily: 'xirod',
               letterSpacing: 8,
@@ -75,7 +85,8 @@ class _SettingsState extends State<Settings> {
               'Switches theme between blue and white',
               settingAction: ThemeProvider.toggleTheme, //() => Provider.of<ThemeProvider>(context, listen: false).toggleTheme()
               settingHeader: 'Switch theme',
-              settingIcon: Icons.palette
+              settingIcon: Icons.palette,
+              iconColor: Theme.of(context).colorScheme.tertiary,
           ),
           MySetting(
             aboutSettingHeader:
@@ -84,7 +95,16 @@ class _SettingsState extends State<Settings> {
               Navigator.push(context, MaterialPageRoute(builder: (context) => PasswordScreen()));
             },
             settingHeader: 'Password',
-            settingIcon: Icons.password
+            settingIcon: Icons.password,
+            iconColor: Theme.of(context).colorScheme.tertiary,
+          ),
+          MySetting(
+              aboutSettingHeader:
+              'Automatic brightness in card details',
+              settingAction: changeBrightness, //BrightnessProvider.toggleBrightness
+              settingHeader: 'AUTO Brightness',
+              settingIcon: bulb ? Icons.lightbulb_outline : Icons.lightbulb,
+              iconColor: bulb ? Colors.red : Colors.green,
           ),
           Container(
             margin: const EdgeInsets.only(top: 20, left: 20,),
@@ -104,26 +124,37 @@ class _SettingsState extends State<Settings> {
             ),
           ),
           MySetting(
-              aboutSettingHeader:
-              'Visit website for this project',
-              settingAction: () => _launchUrl(Uri.parse('https://georgeyt9769.github.io/cardabase/')),
-              settingHeader: 'Website',
-              settingIcon: Icons.info
+            aboutSettingHeader:
+            'Join Cardabase Discord commmunity',
+            settingAction: () => _launchUrl(Uri.parse('https://discord.com/invite/fZNDfG2xv3')),
+            settingHeader: 'Discord',
+            settingIcon: Icons.discord,
+            iconColor: Theme.of(context).colorScheme.tertiary,
           ),
           MySetting(
               aboutSettingHeader:
               'Visit source code of this project',
               settingAction: () => _launchUrl(Uri.parse('https://github.com/GeorgeYT9769/cardabase-app')),
               settingHeader: 'GitHub',
-              settingIcon: Icons.code
+              settingIcon: Icons.code,
+              iconColor: Theme.of(context).colorScheme.tertiary,
           ),
           MySetting(
               aboutSettingHeader:
               'Visit F-Droid page of this project',
               settingAction: () => _launchUrl(Uri.parse('https://f-droid.org/en/packages/com.georgeyt9769.cardabase/')),
               settingHeader: 'F-Droid',
-              settingIcon: Icons.store
-          )
+              settingIcon: Icons.store,
+              iconColor: Theme.of(context).colorScheme.tertiary,
+          ),
+          MySetting(
+            aboutSettingHeader:
+            'Check out the website for this project',
+            settingAction: () => _launchUrl(Uri.parse('https://georgeyt9769.github.io/cardabase/')),
+            settingHeader: 'Website',
+            settingIcon: Icons.info,
+            iconColor: Theme.of(context).colorScheme.tertiary,
+          ),
         ],
       ),
     );

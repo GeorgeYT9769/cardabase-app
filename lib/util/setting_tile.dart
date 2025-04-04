@@ -7,9 +7,10 @@ class MySetting extends StatelessWidget {
   final String aboutSettingHeader;
   final settingIcon;
   final settingAction;
+  final Color iconColor;
 
 
-  const MySetting({super.key, required this.aboutSettingHeader, required this.settingAction, required this.settingHeader, required this.settingIcon});
+  const MySetting({super.key, required this.aboutSettingHeader, required this.settingAction, required this.settingHeader, required this.settingIcon, required this.iconColor});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +34,7 @@ class MySetting extends StatelessWidget {
           child: Row(
             children: [
               const SizedBox(width: 10,),
-              Icon(settingIcon, color: Theme.of(context).colorScheme.tertiary, size: 30,),
+              Icon(settingIcon, color: iconColor, size: 30,),
               const SizedBox(width: 20,),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

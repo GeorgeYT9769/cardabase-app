@@ -5,7 +5,7 @@
 <h1 align="center">Cardabase</h1>
 
   <p align="center">
-    Cardabase is an app that lets you save your loyalty cards to your phone and use them later.
+    Cardabase is your digital wallet for loyalty cards. Save all your shop cards in one secure place and access them instantly.
     <br />
     <div align="center">
       <img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/featureGraphic.png?raw=true" alt="Banner">
@@ -33,12 +33,14 @@
 
 ## 👌 Features
 
-- Light/dark mode toggle
-- Modern look
-- Light, fast and smooth
+- Light/dark mode themes
+- Modern look with user-friendly layout
+- Light, fast and smooth experience
 - Encrypted storage
-- Simple and user-friendly
 - Support for modern barcode types
+- Password protected cards
+- Share cards easily with QR Codes
+- Does not use internet connection
 
 ## 📲 Installation
 
@@ -64,11 +66,21 @@ By downloading the app you agree:
 
 ## 🔜 Coming soon
 
-- Ability to **EDIT** a card details
-- Quick **IMPORT / EXPORT** a card via QR code
 - Some kind of **SORTING** system and display the most used ones at the top
-- Set full **BRIGHTNESS** automatically to make reading easier (could be customized)
-- When reading a **BARCODE** with in-built scanner, the **TYPE** could be **AUTOMATICALLY APPLIED**
+- idk, let me know via issues ;)
+
+## 📥 Import a card via QR Code
+
+From 1.3.0, you can easily import a card via QR Code.
+This is how the structure of the data in the QR Code looks like:
+`[<Card Name>, <Card ID>, <R value>, <G value>, <B value>, <Card Type>, <Password>]`
+- `<Card Name>` - Name of the card (String)
+- `<Card ID>` - ID of the card (String)
+- `<R value>` - Value of Red color, 0 - 255 (int)
+- `<G value>` - Value of Green color, 0 - 255 (int)
+- `<B value>` - Value of Blue color, 0 - 255 (int)
+- `<Card Type>` - Type of the card, they can be [THESE](https://github.com/GeorgeYT9769/cardabase-app/blob/2e86905c4fb4f861cd3008506a681aab96ea9b38/lib/pages/createcardnew.dart#L9-L27) or [THESE](https://github.com/GeorgeYT9769/cardabase-app/blob/2e86905c4fb4f861cd3008506a681aab96ea9b38/lib/pages/createcardnew.dart#L58-L89), (same types) (CardType)
+- `<Password>` - If the card has a password or not (bool)
 
 ## 🤝 Thanks to
 

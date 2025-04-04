@@ -35,6 +35,7 @@ class _ColorPickerSecondDialogState extends State<ColorPickerSecondDialog> {
       ),
       content: SingleChildScrollView(
         child: ColorPicker(
+          pickerAreaBorderRadius: BorderRadius.circular(10.0),
           enableAlpha: false,
           pickerColor: currentColor!,
           portraitOnly: true,
@@ -48,14 +49,21 @@ class _ColorPickerSecondDialogState extends State<ColorPickerSecondDialog> {
         ),
       ),
       actions: <Widget>[
-        ElevatedButton(
-          child: const Text(
-            'Got it',
-            style: TextStyle(fontFamily: 'Roboto-Regular.ttf'),
+        Center(
+          child: ElevatedButton(
+            child: Text(
+              'Got it',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Roboto-Regular.ttf',
+                fontSize: 15,
+                color: Theme.of(context).colorScheme.tertiary,
+              ),
+            ),
+            onPressed: () {
+              Navigator.pop(context, currentColor); // Pass the current color
+            },
           ),
-          onPressed: () {
-            Navigator.pop(context, currentColor); // Pass the current color
-          },
         ),
       ],
     );

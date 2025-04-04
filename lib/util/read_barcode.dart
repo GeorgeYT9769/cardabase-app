@@ -1,16 +1,16 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 
-class QRViewExample extends StatefulWidget {
-  const QRViewExample({super.key});
+class QRBarReader extends StatefulWidget {
+  const QRBarReader({super.key});
 
   @override
-  State<StatefulWidget> createState() => _QRViewExampleState();
+  State<StatefulWidget> createState() => _QRBarReaderState();
 }
 
-class _QRViewExampleState extends State<QRViewExample> {
+class _QRBarReaderState extends State<QRBarReader> {
   Barcode? result;
   QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
@@ -85,7 +85,7 @@ class _QRViewExampleState extends State<QRViewExample> {
       key: qrKey,
       onQRViewCreated: _onQRViewCreated,
       overlay: QrScannerOverlayShape(
-          borderColor: Colors.red,
+          borderColor: Color(0xFF1960A5),
           borderRadius: 10,
           borderLength: 30,
           borderWidth: 10,
@@ -104,9 +104,14 @@ class _QRViewExampleState extends State<QRViewExample> {
         result = scanData;
       });
       await controller.pauseCamera();
-      Navigator.pop(context, result!.code);
+      print(result);
+      Navigator.pop(context, {
+        "code": result!.code,
+        "format": result!.format.toString(), // Convert format to string if needed
+      });
     });
   }
+
 
   void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
     log('${DateTime.now().toIso8601String()}_onPermissionSet $p');
@@ -119,7 +124,6 @@ class _QRViewExampleState extends State<QRViewExample> {
 
   @override
   void dispose() {
-    controller?.dispose();
     super.dispose();
   }
 }

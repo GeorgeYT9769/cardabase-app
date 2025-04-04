@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cardabase/data/cardabase_db.dart'; //card database
 import 'package:cardabase/util/card_tile.dart';
 import 'createcardnew.dart';
+import 'editcard.dart';
 
 class Homepage extends StatefulWidget {
 
@@ -15,13 +16,11 @@ class Homepage extends StatefulWidget {
 class _HomePageState extends State<Homepage> {
   cardabase_db cdb = cardabase_db();
 
-
   @override
   void initState() {
     cdb.loadData();
     super.initState();
   }
-
 
   //Deleting a card
   void deleteCard(int index) {
@@ -29,6 +28,43 @@ class _HomePageState extends State<Homepage> {
       cdb.myShops.removeAt(index);
     });
     cdb.updateDataBase();
+  }
+
+  void duplicateCard(int index) {
+    setState(() {
+      cdb.myShops.insert(index + 1,[cdb.myShops[index][0], cdb.myShops[index][1], cdb.myShops[index][2], cdb.myShops[index][3], cdb.myShops[index][4], cdb.myShops[index][5], cdb.myShops[index][6]]);
+    });
+    cdb.updateDataBase();
+  }
+
+  void editCard(context, int index) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditCard(
+          cardColorPreview: Color.fromARGB(
+              255, cdb.myShops[index][2], cdb.myShops[index][3], cdb.myShops[index][4]
+          ),
+          redValue: cdb.myShops[index][2],
+          greenValue: cdb.myShops[index][3],
+          blueValue: cdb.myShops[index][4],
+          hasPassword: (cdb.myShops[index].length > 6 && cdb.myShops[index][6] is bool)
+              ? cdb.myShops[index][6]
+              : false,
+          index: index,
+          cardTextPreview: cdb.myShops[index][0],
+          cardName: cdb.myShops[index][0],
+          cardId: cdb.myShops[index][1],
+          cardType: (cdb.myShops[index].length > 5 && cdb.myShops[index][5] is String)
+              ? cdb.myShops[index][5]
+              : 'CardType.ean13',
+        ),
+      ),
+    ).then((value) {
+      setState(() {
+        cdb.loadData(); // Reload data after returning from EditCard
+      });
+    });
   }
 
   @override
@@ -73,6 +109,7 @@ class _HomePageState extends State<Homepage> {
             ),
           )
           : ListView.builder(
+
             itemCount: cdb.myShops.length,
             itemBuilder: (context, index) {
               return CardTile(
@@ -82,15 +119,17 @@ class _HomePageState extends State<Homepage> {
                 cardTileColor: Color.fromARGB(
                     255, cdb.myShops[index][2], cdb.myShops[index][3], cdb.myShops[index][4]
                 ),
-                iconColor: Color.fromARGB(
-                    255, cdb.myShops[index][2], cdb.myShops[index][3], cdb.myShops[index][4]
-                ),
                 cardType: (cdb.myShops[index].length > 5 && cdb.myShops[index][5] is String)
                     ? cdb.myShops[index][5]
                     : 'CardType.ean13',
                 hasPassword: (cdb.myShops[index].length > 6 && cdb.myShops[index][6] is bool)
                     ? cdb.myShops[index][6]
                     : false,
+                red: cdb.myShops[index][2],
+                green: cdb.myShops[index][3],
+                blue: cdb.myShops[index][4],
+                duplicateFunction: (context) => duplicateCard(index),
+                editFunction: (context) => editCard(context, index),
               );
             },
           ),

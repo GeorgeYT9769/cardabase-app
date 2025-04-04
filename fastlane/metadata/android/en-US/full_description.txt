@@ -1,12 +1,15 @@
-Save your loyalty cards using Cardabase and use them later.
+Cardabase is your digital wallet for loyalty cards. Save all your shop cards in one secure place and access them instantly.
+
 
 Features:
-- Light/dark mode toggle
-- Modern look
-- Light, fast and smooth
+- Light/dark mode themes
+- Modern look with user-friendly layout
+- Light, fast and smooth experience
 - Encrypted storage
-- Simple and user-friendly
 - Support for modern barcode types
+- Password protected cards
+- Share cards easily with QR Codes
+- Does not use internet connection
 
 Note:
 - Images might be different from the actual app design.

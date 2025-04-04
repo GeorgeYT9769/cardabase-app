@@ -184,7 +184,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
         title: Text(
             'Password',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 18,
               fontWeight: FontWeight.w900,
               fontFamily: 'xirod',
               letterSpacing: 8,
