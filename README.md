@@ -88,15 +88,7 @@ Contact me for more info :).
 4. `flutter build apk` in Terminal (you can add `--split-per-abi` if you want to get multiple versions).
 
 Used versions:
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-- Flutter: 3.24.5 (or newer, used Flutter version is always added as a submodule, so you can use that one)
-=======
 - Flutter: 3.29.0 (or newer, used Flutter version is always added as a submodule, so you can use that one)
->>>>>>> Stashed changes
-=======
-- Flutter: 3.29.0 (or newer, used Flutter version is always added as a submodule, so you can use that one)
->>>>>>> Stashed changes
 - Java: JDK-21
 - Gradle: 8.5
 
