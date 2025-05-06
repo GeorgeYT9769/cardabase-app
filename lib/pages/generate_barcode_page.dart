@@ -81,6 +81,12 @@ class _GenerateBarcodeState extends State<GenerateBarcode> {
         return Barcode.ean5();
       case 'CardType.ean2':
         return Barcode.ean2();
+      case 'CardType.itf':
+        return Barcode.itf();
+      case 'CardType.itf14':
+        return Barcode.itf14();
+      case 'CardType.itf16':
+        return Barcode.itf16();
       case 'CardType.upca':
         return Barcode.upcA();
       case 'CardType.upce':
