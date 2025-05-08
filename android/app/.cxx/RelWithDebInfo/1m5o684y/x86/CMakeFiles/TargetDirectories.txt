@@ -1,0 +1,2 @@
+D:/Github/cardabase-app/cardabase-app/android/app/.cxx/RelWithDebInfo/1m5o684y/x86/CMakeFiles/edit_cache.dir
+D:/Github/cardabase-app/cardabase-app/android/app/.cxx/RelWithDebInfo/1m5o684y/x86/CMakeFiles/rebuild_cache.dir

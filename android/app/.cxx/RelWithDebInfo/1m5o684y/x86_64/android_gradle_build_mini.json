@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "D:\\flutter\\flutter\\packages\\flutter_tools\\gradle\\src\\main\\groovy\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "C:\\Users\\PC\\AppData\\Local\\Android\\sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+      "-C",
+      "D:\\Github\\cardabase-app\\cardabase-app\\android\\app\\.cxx\\RelWithDebInfo\\1m5o684y\\x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "C:\\Users\\PC\\AppData\\Local\\Android\\sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+    "-C",
+    "D:\\Github\\cardabase-app\\cardabase-app\\android\\app\\.cxx\\RelWithDebInfo\\1m5o684y\\x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}
