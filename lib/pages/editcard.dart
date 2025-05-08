@@ -14,6 +14,9 @@ enum CardType {
   ean8('EAN-8', 'ean8'),
   ean5('EAN-5', 'ean5'),
   ean2('EAN-2', 'ean2'),
+  itf('ITF', 'itf'),
+  itf14('ITF-14', 'itf14'),
+  itf16('ITF-16', 'itf16'),
   upca('UPC-A', 'upca'),
   upce('UPC-E', 'upce'),
   codabar('Codabar', 'codabar'),
@@ -74,6 +77,12 @@ class _EditCardState extends State<EditCard> {
         return 'Type: EAN 5';
       case 'CardType.ean2':
         return 'Type: EAN 2';
+      case 'CardType.itf':
+        return 'Type: ITF';
+      case 'CardType.itf14':
+        return 'Type: ITF-14';
+      case 'CardType.itf16':
+        return 'Type: ITF-16';
       case 'CardType.upca':
         return 'Type: UPC-A';
       case 'CardType.upce':
@@ -295,6 +304,8 @@ class _EditCardState extends State<EditCard> {
       } else {
         return true;
       }
+    } else if (cardTypeText == 'CardType.itf') {
+      return int.tryParse(eanCode) != null;
     } else if (cardTypeText == 'CardType.upca') {
       if (eanCode.length != 12 || int.tryParse(eanCode) == null) {
         return false;
