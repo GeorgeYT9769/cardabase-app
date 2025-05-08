@@ -306,8 +306,6 @@ class _EditCardState extends State<EditCard> {
       }
     } else if (cardTypeText == 'CardType.itf') {
       return int.tryParse(eanCode) != null;
-<<<<<<< Updated upstream
-=======
     } else if (cardTypeText == 'CardType.itf14') {
 
       if (eanCode.length != 14 || int.tryParse(eanCode) == null) {
@@ -345,8 +343,6 @@ class _EditCardState extends State<EditCard> {
 
       int checkDigit = (10 - (sum % 10)) % 10;
       return checkDigit == int.parse(eanCode[15]);
-
->>>>>>> Stashed changes
     } else if (cardTypeText == 'CardType.upca') {
       if (eanCode.length != 12 || int.tryParse(eanCode) == null) {
         return false;
@@ -568,8 +564,10 @@ class _EditCardState extends State<EditCard> {
 //text field card id
                 TextFormField(
                     controller: controllercardid,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.deny(RegExp(r'[ \.,\-]')), // Denies any characters except numbers on android keyboard
+                    inputFormatters:  selectedCardType == CardType.qrcode
+                        ? null
+                        : [
+                      FilteringTextInputFormatter.deny(RegExp(r'[ \.,\-]')),
                     ],
                     decoration: InputDecoration(
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),

@@ -302,8 +302,6 @@ class _CreateCardState extends State<CreateCard> {
       }
     } else if (cardTypeText == 'CardType.itf') {
       return int.tryParse(eanCode) != null;
-<<<<<<< Updated upstream
-=======
     } else if (cardTypeText == 'CardType.itf14') {
 
       if (eanCode.length != 14 || int.tryParse(eanCode) == null) {
@@ -341,8 +339,6 @@ class _CreateCardState extends State<CreateCard> {
 
       int checkDigit = (10 - (sum % 10)) % 10;
       return checkDigit == int.parse(eanCode[15]);
-
->>>>>>> Stashed changes
     } else if (cardTypeText == 'CardType.upca') {
       if (eanCode.length != 12 || int.tryParse(eanCode) == null) {
         return false;
