@@ -302,16 +302,6 @@ class _CreateCardState extends State<CreateCard> {
       }
     } else if (cardTypeText == 'CardType.itf') {
       return int.tryParse(eanCode) != null;
-    } else if (cardTypeText == 'CardType.itf14') {
-      return
-        int.tryParse(eanCode) != null
-        && eanCode.length <= 13
-        && eanCode.length >= 14;
-    } else if (cardTypeText == 'CardType.itf16') {
-      return
-        int.tryParse(eanCode) != null
-        && eanCode.length <= 15
-        && eanCode.length >= 16;
     } else if (cardTypeText == 'CardType.upca') {
       if (eanCode.length != 12 || int.tryParse(eanCode) == null) {
         return false;
