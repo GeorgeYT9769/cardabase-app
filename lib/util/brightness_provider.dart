@@ -7,6 +7,5 @@ class BrightnessProvider {
 
   static void toggleBrightness() {
     _bbox.put('setBrightness', !brightness);
-    print(!brightness);
   }
 }

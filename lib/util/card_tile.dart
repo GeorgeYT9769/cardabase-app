@@ -1,8 +1,10 @@
 import 'package:cardabase/pages/generate_barcode_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../data/cardabase_db.dart';
+import 'vibration_provider.dart';
+
 
 class CardTile extends StatefulWidget {
   final String shopName;
@@ -13,6 +15,11 @@ class CardTile extends StatefulWidget {
   final bool hasPassword;
   final Function(BuildContext) duplicateFunction;
   final Function(BuildContext) editFunction;
+  final Function(BuildContext) moveUpFunction;
+  final Function(BuildContext) moveDownFunction;
+  final double labelSize;
+  final double borderSize;
+  final double marginSize;
 
   int red;
   int green;
@@ -30,7 +37,12 @@ class CardTile extends StatefulWidget {
     required this.green,
     required this.blue,
     required this.duplicateFunction,
-    required this.editFunction
+    required this.editFunction,
+    required this.moveUpFunction,
+    required this.moveDownFunction,
+    required this.labelSize,
+    required this.borderSize,
+    required this.marginSize,
   });
 
   @override
@@ -50,7 +62,7 @@ class _CardTileState extends State<CardTile> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Enter Password'),
+          title: Text('Enter Password', style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface, fontFamily: 'Roboto-Regular.ttf',) ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -113,6 +125,7 @@ class _CardTileState extends State<CardTile> {
                         );
                       });
                     } else {
+                      VibrationProvider.vibrateSuccess();
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           shape: RoundedRectangleBorder(
@@ -138,10 +151,12 @@ class _CardTileState extends State<CardTile> {
                           behavior: SnackBarBehavior.floating,
                           dismissDirection: DismissDirection.vertical,
                           backgroundColor: const Color.fromARGB(255, 237, 67, 55),
+                          elevation: 0.0,
                         ),
                       );
                     }
                   },
+                  style: ElevatedButton.styleFrom(elevation: 0.0),
                   child: Text(
                     'Unlock',
                     style: TextStyle(
@@ -181,18 +196,15 @@ class _CardTileState extends State<CardTile> {
       }
     }
 
-    return Container(
-      margin: const EdgeInsets.all(20),
-      alignment: Alignment.center,
-      child: GestureDetector(
-        onLongPress: () => _showBottomSheet(context),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width - 40,
-            minHeight: 100,
-          ),
+    return Bounceable(
+      onTap: () {},
+      child: Container(
+        margin: EdgeInsets.all(widget.marginSize),
+        alignment: Alignment.center,
+        child: GestureDetector(
+          onLongPress: () => _showBottomSheet(context),
           child: SizedBox(
-            height: MediaQuery.of(context).size.width / 1.585 - 30,
+            height: (MediaQuery.of(context).size.width - 40) / 1.586,
             width: double.infinity,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -200,14 +212,14 @@ class _CardTileState extends State<CardTile> {
                 foregroundColor: Colors.white,
                 elevation: 0.0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(widget.borderSize),
                 ),
               ),
               onPressed: askForPassword,
               child: Text(
                 widget.shopName,
-                style: const TextStyle(
-                  fontSize: 50,
+                style: TextStyle(
+                  fontSize: widget.labelSize,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Roboto-Regular.ttf',
                 ),
@@ -221,16 +233,12 @@ class _CardTileState extends State<CardTile> {
     );
   }
 
-  void duplicateCard() {
-    setState(() {
-      cdb.myShops.add([widget.shopName, widget.cardnumber, widget.red, widget.green, widget.blue, widget.cardType, widget.hasPassword]);
-    });
-  }
-
   // Function to show the custom bottom sheet menu
   void _showBottomSheet(BuildContext context) {
+    VibrationProvider.vibrateSuccess();
     showModalBottomSheet(
       context: context,
+      elevation: 0.0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -240,29 +248,48 @@ class _CardTileState extends State<CardTile> {
           child: Wrap(
             children: [
               ListTile(
-                leading: Icon(Icons.edit, color: Colors.blue),
-                title: Text('Edit'),
+                leading: Icon(Icons.edit, color: Theme.of(context).colorScheme.tertiary),
+                title: Text('Edit', style: TextStyle(fontFamily: 'Roboto-Regular.ttf',)),
                 onTap: () {
                   Navigator.pop(context);
                   widget.editFunction(context);
                 },
               ),
               ListTile(
-                leading: Icon(Icons.content_copy, color: Colors.grey),
-                title: Text('Duplicate'),
+                leading: Icon(Icons.content_copy, color: Theme.of(context).colorScheme.tertiary),
+                title: Text('Duplicate', style: TextStyle(fontFamily: 'Roboto-Regular.ttf',)),
                 onTap: () {
                   Navigator.pop(context);
                   widget.duplicateFunction(context);
                 },
               ),
               ListTile(
+                leading: Icon(Icons.arrow_upward, color: Theme.of(context).colorScheme.tertiary),
+                title: Text('Move UP', style: TextStyle(fontFamily: 'Roboto-Regular.ttf',)),
+                onTap: () {
+                  Navigator.pop(context);
+                  widget.moveUpFunction(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.arrow_downward, color: Theme.of(context).colorScheme.tertiary),
+                title: Text('Move DOWN', style: TextStyle(fontFamily: 'Roboto-Regular.ttf',)),
+                onTap: () {
+                  Navigator.pop(context);
+                  widget.moveDownFunction(context);
+                },
+              ),
+              ListTile(
                 leading: Icon(Icons.delete, color: Colors.red),
-                title: Text('Remove'),
+                title: Text('Remove', style: TextStyle(fontFamily: 'Roboto-Regular.ttf',)),
                 onTap: () {
                   Navigator.pop(context);
                   widget.deleteFunction(context);
                 },
               ),
+              SizedBox(
+                height: 70,
+              )
             ],
           ),
         );

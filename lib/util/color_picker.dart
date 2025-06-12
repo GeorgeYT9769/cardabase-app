@@ -29,9 +29,9 @@ class _ColorPickerSecondDialogState extends State<ColorPickerSecondDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      title: const Text(
+      title: Text(
         'Pick a color!',
-        style: TextStyle(fontFamily: 'Roboto-Regular.ttf'),
+        style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface, fontFamily: 'Roboto-Regular.ttf',),
       ),
       content: SingleChildScrollView(
         child: ColorPicker(
@@ -51,6 +51,10 @@ class _ColorPickerSecondDialogState extends State<ColorPickerSecondDialog> {
       actions: <Widget>[
         Center(
           child: ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context, currentColor); // Pass the current color
+            },
+            style: ElevatedButton.styleFrom(elevation: 0.0),
             child: Text(
               'Got it',
               style: TextStyle(
@@ -60,9 +64,6 @@ class _ColorPickerSecondDialogState extends State<ColorPickerSecondDialog> {
                 color: Theme.of(context).colorScheme.tertiary,
               ),
             ),
-            onPressed: () {
-              Navigator.pop(context, currentColor); // Pass the current color
-            },
           ),
         ),
       ],

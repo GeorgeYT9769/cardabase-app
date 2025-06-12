@@ -5,6 +5,7 @@ import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../data/cardabase_db.dart';
 import '../util/color_picker.dart';
+import '../util/vibration_provider.dart';
 
 enum CardType {
   code39('Code 39', 'code39'),
@@ -54,10 +55,6 @@ class _CreateCardState extends State<CreateCard> {
   TextEditingController controllercardid = TextEditingController();
 
   bool hasPassword = false;
-
-  Color bgColor = Colors.green.shade700;
-  String msg = 'SAVE';
-  var icon = Icon(Icons.check);
 
   String getBarcodeTypeText(String cardTypeText) {
     switch (cardTypeText) {
@@ -111,9 +108,9 @@ class _CreateCardState extends State<CreateCard> {
       if (value != null) {
         setState(() {
           cardColorPreview = value;
-          redValue = cardColorPreview.red;
-          greenValue = cardColorPreview.green;
-          blueValue = cardColorPreview.blue;
+          redValue = (cardColorPreview.r * 255.0).round();
+          greenValue = (cardColorPreview.g * 255.0).round();
+          blueValue = (cardColorPreview.b * 255.0).round();
         });
       }
     });
@@ -134,6 +131,7 @@ class _CreateCardState extends State<CreateCard> {
       cardTypeText = 'Card Type';
       hasPassword = false;
     } else if (controller.text.isEmpty == true ) {
+      VibrationProvider.vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             shape: RoundedRectangleBorder(
@@ -154,6 +152,7 @@ class _CreateCardState extends State<CreateCard> {
             backgroundColor: const Color.fromARGB(255, 237, 67, 55),
           ));
     } else if (controllercardid.text.isEmpty == true ) {
+      VibrationProvider.vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               shape: RoundedRectangleBorder(
@@ -174,6 +173,7 @@ class _CreateCardState extends State<CreateCard> {
             backgroundColor: const Color.fromARGB(255, 237, 67, 55),
           ));
     } else if (verifyEan(controllercardid.text) == false) {
+      VibrationProvider.vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           shape: RoundedRectangleBorder(
@@ -195,6 +195,7 @@ class _CreateCardState extends State<CreateCard> {
         ),
       );
     } else if (cardTypeText == 'Card Type') {
+      VibrationProvider.vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           shape: RoundedRectangleBorder(
@@ -216,6 +217,7 @@ class _CreateCardState extends State<CreateCard> {
         ),
       );
     } else {
+      VibrationProvider.vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           shape: RoundedRectangleBorder(
@@ -248,7 +250,7 @@ class _CreateCardState extends State<CreateCard> {
     greenValue = 158;
   }
 
-  //CHECKING IF THE CARD CAN BE DISPLAYED
+  //CHECKING IF THE CARD CAN BE SAVED (AND ALSO DISPLAYED)
   //P.S. WRITTEN BY CHAT-GPT CUZ GOT NO IDEA HOW TO CHECK THEM MYSELF :)
   bool verifyEan(String eanCode) {
     if (cardTypeText == 'CardType.ean13') {
@@ -386,7 +388,7 @@ class _CreateCardState extends State<CreateCard> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Select Barcode Type'),
+          title: Text('Select Barcode Type', style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface, fontFamily: 'Roboto-Regular.ttf',),),
           content: SizedBox(
             height: 300, // Custom height for the dialog
             width: double.maxFinite,
@@ -433,57 +435,57 @@ class _CreateCardState extends State<CreateCard> {
       //resizeToAvoidBottomInset: false,
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        leading: IconButton(icon: Icon(Icons.arrow_back_ios_new, color: Theme.of(context).colorScheme.secondary,), onPressed: cancelCard,),
-        actions: [
-          IconButton(
-              icon: Icon(Icons.qr_code_2, color: Theme.of(context).colorScheme.secondary,),
-              onPressed: () async {
-                var result = await Navigator.push(
+        leading: IconButton(
+          icon: Icon(Icons.qr_code_2, color: Theme.of(context).colorScheme.secondary,),
+          onPressed: () async {
+            var result = await Navigator.push(
                 context, MaterialPageRoute(
-                    builder: (context) => const QRBarReader(),
-                ));
-                setState(() {
-                  if (result is Map<String, dynamic>) {
+              builder: (context) => const QRBarReader(),
+            ));
+            setState(() {
+              if (result is Map<String, dynamic>) {
 
-                    String code = result["code"];
+                String code = result["code"];
 
-                    if (code != "-1") {
+                if (code != "-1") {
 
-                      List<String> rawList = code.replaceAll("[", "").replaceAll("]", "").split(", ");
+                  List<String> rawList = code.replaceAll("[", "").replaceAll("]", "").split(", ");
 
-                      // Convert values into correct types
-                      String name = rawList[0];
-                      String number = rawList[1];
-                      int red = int.parse(rawList[2]);
-                      int green = int.parse(rawList[3]);
-                      int blue = int.parse(rawList[4]);
-                      String cardType = rawList[5];
-                      bool hasPwd = rawList[6] == "true";
+                  // Convert values into correct types
+                  String name = rawList[0];
+                  String number = rawList[1];
+                  int red = int.parse(rawList[2]);
+                  int green = int.parse(rawList[3]);
+                  int blue = int.parse(rawList[4]);
+                  String cardType = rawList[5];
+                  bool hasPwd = rawList[6] == "true";
 
-                      setState(() {
-                        controller.text = name;
-                        cardTextPreview = name;
-                        cardColorPreview = Color.fromARGB(255, red, green, blue);
-                        controllercardid.text = number;
-                        redValue = red;
-                        greenValue = green;
-                        blueValue = blue;
-                        cardTypeText = cardType;
-                        hasPassword = hasPwd;
-                      });
-                    }
-                  }
-                });
-              },
-          )
+                  setState(() {
+                    controller.text = name;
+                    cardTextPreview = name;
+                    cardColorPreview = Color.fromARGB(255, red, green, blue);
+                    controllercardid.text = number;
+                    redValue = red;
+                    greenValue = green;
+                    blueValue = blue;
+                    cardTypeText = cardType;
+                    hasPassword = hasPwd;
+                  });
+                }
+              }
+            });
+          },
+        ),
+        actions: [
+          IconButton(icon: Icon(Icons.arrow_back_ios_new, color: Theme.of(context).colorScheme.secondary,), onPressed: cancelCard,),
         ],
         title: Text(
             'New card',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 17,
               fontWeight: FontWeight.w900,
               fontFamily: 'xirod',
-              letterSpacing: 8,
+              letterSpacing: 5,
               color: Theme.of(context).colorScheme.tertiary,
             )
         ),
@@ -532,9 +534,9 @@ class _CreateCardState extends State<CreateCard> {
                   onChanged: (String value) {
                     setState(() {
                       cardTextPreview = value;
-                      redValue = cardColorPreview.red;
-                      greenValue = cardColorPreview.green;
-                      blueValue = cardColorPreview.blue;
+                      redValue = (cardColorPreview.r * 255.0).round();
+                      greenValue = (cardColorPreview.g * 255.0).round();
+                      blueValue = (cardColorPreview.b * 255.0).round();
                     });
                   },
                   //maxLength: 20,
@@ -722,25 +724,30 @@ class _CreateCardState extends State<CreateCard> {
             ),
           ),
         ],),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
-        child: SizedBox(
-          height: 60,
-          width: double.infinity,
-          child: FloatingActionButton.extended(
-            heroTag: 'saveFAB',
-            onPressed: saveNewCard,
-            tooltip: 'SAVE',
-            backgroundColor: bgColor,
-            icon: icon,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10), // Custom border radius
+      floatingActionButton: Bounceable(
+        onTap: () {},
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+          child: SizedBox(
+            height: 60,
+            width: double.infinity,
+            child: FloatingActionButton.extended(
+              elevation: 0.0,
+              heroTag: 'saveFAB',
+              onPressed: saveNewCard,
+              tooltip: 'SAVE',
+              backgroundColor: Colors.green.shade700,
+              icon: Icon(Icons.check, color: Colors.white,),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10), // Custom border radius
+              ),
+              label: Text('SAVE', style: TextStyle( //cardTypeText
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Roboto-Regular.ttf',
+                fontSize: 18,
+                color: Colors.white
+              ),),
             ),
-            label: Text(msg, style: TextStyle( //cardTypeText
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Roboto-Regular.ttf',
-              fontSize: 18
-            ),),
           ),
         ),
       ),

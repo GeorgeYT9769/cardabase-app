@@ -9,7 +9,6 @@ void main() async {
   var allcards = await Hive.openBox('mybox'); //storage for cards
   await Hive.openBox('settingsBox'); // storage for settings
   var password = await Hive.openBox('password'); // storage for password
-
   runApp(
     Main(),
   );
@@ -34,8 +33,24 @@ class Main extends StatelessWidget {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
-          theme: ThemeData(colorScheme: lightColorScheme),
-          darkTheme: ThemeData(colorScheme: darkColorScheme),
+          theme: ThemeData(
+            useMaterial3: true,
+            colorScheme: lightColorScheme,
+            pageTransitionsTheme: const PageTransitionsTheme(
+              builders: <TargetPlatform, PageTransitionsBuilder>{
+                TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
+              }
+            )
+          ),
+          darkTheme: ThemeData(
+            useMaterial3: true,
+            colorScheme: darkColorScheme,
+              pageTransitionsTheme: const PageTransitionsTheme(
+                  builders: <TargetPlatform, PageTransitionsBuilder>{
+                    TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
+                  }
+              )
+          ),
           home: Homepage(),
         );
       },

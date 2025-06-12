@@ -40,7 +40,7 @@ class MySetting extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(settingHeader, style: TextStyle(color: Theme.of(context).colorScheme.tertiary, fontSize: 20, fontFamily: 'Roboto-Regular.ttf',)),
-                  const SizedBox(height: 10,),
+                  const SizedBox(height: 5,),
                   Text(aboutSettingHeader, style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 12, fontFamily: 'Roboto-Regular.ttf',)),
                 ],
               ),

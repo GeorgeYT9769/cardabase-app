@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 
@@ -37,9 +38,10 @@ class _QRBarReaderState extends State<QRBarReader> {
                     margin: const EdgeInsets.all(10),
                     child: IconButton(
                       style: const ButtonStyle(iconSize: WidgetStatePropertyAll(30)),
-                      icon: const Icon(Icons.arrow_back_ios_new),
-                      onPressed: () {
-                        Navigator.of(context).pop();
+                      icon: const Icon(Icons.cameraswitch),
+                      onPressed: () async {
+                        await controller?.flipCamera();
+                        setState(() {});
                       },
                     ),
                   ),
@@ -58,10 +60,9 @@ class _QRBarReaderState extends State<QRBarReader> {
                     margin: const EdgeInsets.all(10),
                     child: IconButton(
                       style: const ButtonStyle(iconSize: WidgetStatePropertyAll(30)),
-                      icon: const Icon(Icons.cameraswitch),
-                      onPressed: () async {
-                        await controller?.flipCamera();
-                        setState(() {});
+                      icon: const Icon(Icons.arrow_back_ios_new),
+                      onPressed: () {
+                        Navigator.of(context).pop();
                       },
                     ),
                   ),
@@ -104,7 +105,6 @@ class _QRBarReaderState extends State<QRBarReader> {
         result = scanData;
       });
       await controller.pauseCamera();
-      print(result);
       Navigator.pop(context, {
         "code": result!.code,
         "format": result!.format.toString(), // Convert format to string if needed
@@ -116,8 +116,33 @@ class _QRBarReaderState extends State<QRBarReader> {
   void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
     log('${DateTime.now().toIso8601String()}_onPermissionSet $p');
     if (!p) {
+      VibrationProvider.vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('no Permission')),
+          SnackBar(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            content: const Row(
+              children: [
+                Icon(Icons.error, size: 15, color: Colors.white),
+                SizedBox(width: 10),
+                Text(
+                  'No permission!',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            duration: const Duration(milliseconds: 3000),
+            padding: const EdgeInsets.all(5.0),
+            margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+            behavior: SnackBarBehavior.floating,
+            dismissDirection: DismissDirection.vertical,
+            backgroundColor: const Color.fromARGB(255, 237, 67, 55),
+          )
       );
     }
   }

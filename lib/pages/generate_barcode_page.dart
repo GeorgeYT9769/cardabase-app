@@ -38,14 +38,12 @@ class _GenerateBarcodeState extends State<GenerateBarcode> {
   }
 
   Future<void> _increaseBrightness() async {
-    try {
-      // Get current brightness
-      _previousBrightness = await ScreenBrightness().system;
-      // Set brightness to max (1.0)
-      await ScreenBrightness().setApplicationScreenBrightness(1.0);
-    } catch (e) {
-      print("Error getting or setting brightness: $e");
-    }
+    // Get current brightness
+    _previousBrightness = await ScreenBrightness().system;
+    // Set brightness to max (1.0)
+    await ScreenBrightness().setApplicationScreenBrightness(1.0);
+
+    //print("Error getting or setting brightness: $e");
   }
 
   @override
@@ -55,13 +53,9 @@ class _GenerateBarcodeState extends State<GenerateBarcode> {
   }
 
   Future<void> _resetBrightness() async {
-    try {
-      if (_previousBrightness != null) {
-        // Restore the original brightness
-        await ScreenBrightness().setApplicationScreenBrightness(_previousBrightness!);
-      }
-    } catch (e) {
-      print("Error resetting brightness: $e");
+    if (_previousBrightness != null) {
+      // Restore the original brightness
+      await ScreenBrightness().setApplicationScreenBrightness(_previousBrightness!);
     }
   }
 
@@ -109,9 +103,7 @@ class _GenerateBarcodeState extends State<GenerateBarcode> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        leading: IconButton(icon: Icon(Icons.arrow_back_ios_new, color: Theme.of(context).colorScheme.secondary,), onPressed: () => Navigator.of(context).pop(),),
-        actions: [
-          IconButton(
+        leading: IconButton(
             icon: Icon(Icons.qr_code_2,
               color: Theme.of(context).colorScheme.secondary,),
             onPressed: () {
@@ -119,7 +111,7 @@ class _GenerateBarcodeState extends State<GenerateBarcode> {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      title: Text('Share'),
+                      title: Text('Share', style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface, fontFamily: 'Roboto-Regular.ttf',),),
                       content: Container(
                         height: 200,
                         padding: const EdgeInsets.all(15),
@@ -137,15 +129,16 @@ class _GenerateBarcodeState extends State<GenerateBarcode> {
                       actions: [
                         Center(
                           child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(elevation: 0.0),
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
                             child: Text('DONE', style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Roboto-Regular.ttf',
-                                fontSize: 15,
-                                color: Theme.of(context).colorScheme.tertiary,
-                                ),),
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Roboto-Regular.ttf',
+                              fontSize: 15,
+                              color: Theme.of(context).colorScheme.tertiary,
+                            ),),
                           ),
                         ),
                       ],
@@ -153,15 +146,17 @@ class _GenerateBarcodeState extends State<GenerateBarcode> {
                   }
               );
             }
-          ),
+        ),
+        actions: [
+          IconButton(icon: Icon(Icons.arrow_back_ios_new, color: Theme.of(context).colorScheme.secondary,), onPressed: () => Navigator.of(context).pop(),),
         ],
         title: Text(
             'Details',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 17,
               fontWeight: FontWeight.w900,
               fontFamily: 'xirod',
-              letterSpacing: 8,
+              letterSpacing: 5,
               color: Theme.of(context).colorScheme.tertiary,
             )
         ),
@@ -175,16 +170,16 @@ class _GenerateBarcodeState extends State<GenerateBarcode> {
           children: [
             //FRONT FACE
             SizedBox(
-              height: MediaQuery.of(context).size.width / 1.50, //height of button
+              height: MediaQuery.of(context).size.width / 1.586, //height of button
               width: MediaQuery.of(context).size.width,
               child: Container(
-                margin: const EdgeInsets.all(20),
+                margin: const EdgeInsets.fromLTRB(20, 12, 20, 12),
                 decoration: BoxDecoration(color: widget.cardTileColor, borderRadius: BorderRadius.circular(15)),
                 child: Center(
                   child: Wrap(
                       children: [
                         Container(
-                          margin: const EdgeInsets.fromLTRB(20, 0, 20, 00),
+                          margin: const EdgeInsets.all(20),
                           child: Text(
                             widget.cardtext,
                             style: const TextStyle(
@@ -204,11 +199,11 @@ class _GenerateBarcodeState extends State<GenerateBarcode> {
             const SizedBox(height: 10,),
             //BACK FACE
             SizedBox(
-                height: MediaQuery.of(context).size.width / 1.50, //height of button
+                height: MediaQuery.of(context).size.width / 1.586, //height of button
                 width: MediaQuery.of(context).size.width,
                 child: Container(
                   padding: const EdgeInsets.all(10),
-                  margin: const EdgeInsets.all(20),
+                  margin: const EdgeInsets.fromLTRB(20, 12, 20, 12),
                   decoration: BoxDecoration(color: widget.cardTileColor, borderRadius: BorderRadius.circular(15)),
                   child: Container(
                     height: 120,
@@ -222,12 +217,19 @@ class _GenerateBarcodeState extends State<GenerateBarcode> {
                       barcode: getBarcodeType(widget.cardType), //Barcode.ean13(drawEndChar: true)
                       drawText: true,
                       style: const TextStyle(color: Colors.black),
+                      errorBuilder: (context, error) => Center(
+                        child: Text(
+                          'Invalid barcode data',
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Roboto-Regular.ttf', color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
                     ),
                   ),
                 )
             ),
             const SizedBox(height: 30,),
-            ButtonTile(buttonText: 'DONE', buttonAction: () => Navigator.pop(context)),
+            ButtonTile(buttonText: 'DONE', buttonAction: () => Navigator.pop(context),),
             const SizedBox(height: 30,),
             ]
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:password_strength_checker/password_strength_checker.dart';
+import '../util/vibration_provider.dart';
 
 class PasswordScreen extends StatefulWidget {
   const PasswordScreen({super.key});
@@ -39,7 +40,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
               )  ,
               content: const Row(
                 children: [
-                  Icon(Icons.error, size: 15, color: Colors.white,),
+                  Icon(Icons.check, size: 15, color: Colors.white,),
                   SizedBox(width: 10,),
                   Text('Success!', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
                 ],
@@ -52,6 +53,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
               backgroundColor: const Color.fromARGB(255, 92, 184, 92),
             ));
       } else {
+        VibrationProvider.vibrateSuccess();
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               shape: RoundedRectangleBorder(
@@ -73,6 +75,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
             ));
       }
     } else {
+      VibrationProvider.vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             shape: RoundedRectangleBorder(
@@ -111,7 +114,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
             )  ,
             content: const Row(
               children: [
-                Icon(Icons.error, size: 15, color: Colors.white,),
+                Icon(Icons.check, size: 15, color: Colors.white,),
                 SizedBox(width: 10,),
                 Text('Success!', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
               ],
@@ -124,6 +127,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
             backgroundColor: const Color.fromARGB(255, 92, 184, 92),
           ));
     } else {
+      VibrationProvider.vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             shape: RoundedRectangleBorder(
@@ -178,16 +182,19 @@ class _PasswordScreenState extends State<PasswordScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,// - BACKGROUND COLOR (DEFAULT)
       appBar: AppBar(
-        leading: IconButton(icon: Icon(Icons.arrow_back_ios_new, color: Theme.of(context).colorScheme.secondary,), onPressed: () {
-          Navigator.pop(context);
-        },),
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(icon: Icon(Icons.arrow_back_ios_new, color: Theme.of(context).colorScheme.secondary,), onPressed: () {
+            Navigator.pop(context);
+          },),
+        ],
         title: Text(
             'Password',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 17,
               fontWeight: FontWeight.w900,
               fontFamily: 'xirod',
-              letterSpacing: 8,
+              letterSpacing: 5,
               color: Theme.of(context).colorScheme.tertiary,
             )
         ),
