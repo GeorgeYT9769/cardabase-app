@@ -1,5 +1,12 @@
 LATEST NEWS:
 
+25.06.2025:
+1.4.1:
+- Swapped news screen with sort screen, so now it makes more sense,
+- Fixed online news not being loaded due to missing permission,
+- Code optimization,
+- Please join the Discord server so we can discuss new ideas and bugs...
+
 12.06.2025:
 1.4.0:
 - Added bouncy effect on homescreen,

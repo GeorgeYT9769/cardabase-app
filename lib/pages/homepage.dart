@@ -444,9 +444,7 @@ class _HomePageState extends State<Homepage> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,// - BACKGROUND COLOR (DEFAULT)
       appBar: AppBar(
-        leading: IconButton(icon: Icon(Icons.newspaper, color: Theme.of(context).colorScheme.secondary,), onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const NewsPage()));
-        },), //createNewCard
+        leading: IconButton(icon: Icon(Icons.sort, color: Theme.of(context).colorScheme.secondary,), onPressed: columnAmountDialog), //createNewCard
         actions: [
           IconButton(
             icon: Icon(Icons.settings, color: Theme.of(context).colorScheme.secondary,),
@@ -464,7 +462,9 @@ class _HomePageState extends State<Homepage> {
           ),
         ],
         title: TextButton(
-          onPressed: columnAmountDialog,
+          onPressed:  () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const NewsPage()));
+          },
           child: Text(
             'Cardabase',
             style: TextStyle(
