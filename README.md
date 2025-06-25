@@ -101,8 +101,8 @@ Contact me for more info :).
 
 Used versions:
 - Flutter: 3.29.0 (or newer, used Flutter version is always added as a submodule, so you can use that one)
-- Java: JDK-21
-- Gradle: 8.5
+- Java: JDK-24
+- Gradle: 8.14.2
 
 Note: Java and Gradle versions must be compatible with each other. [See this Compatibility Matrix](https://docs.gradle.org/current/userguide/compatibility.html).
 
