@@ -66,7 +66,12 @@ By downloading the app you agree:
 
 ## 🔜 Coming soon
 
-- Some kind of **SORTING** system and display the most used ones at the top
+- add tags, so users can filter by different types, like 'beauty', 'tech', 'groceries' and others, users would create the tags
+- add biometric identification for the password
+- add sorting system, by name, by ID, by color, by date created...
+- add a counter to every card, so when card is clicked, it would add a point, then this could be used to sort by the most used cards
+- custom color theme, custom theme builder
+- maybe redesign and overhaul the whole storage system and design
 - idk, let me know via issues ;)
 
 ## 📥 Import a card via QR Code
@@ -92,6 +97,7 @@ For support, message me on Discord: "georgeyt9769".
 
 ## 🤝 Contributing
 Contact me for more info :).
+If your phone does not have issues with the app, you can add your device into the Tests file.
 
 ## 🔨 Self-Building
 1. `git clone` the repository,
@@ -100,7 +106,7 @@ Contact me for more info :).
 4. `flutter build apk` in Terminal (you can add `--split-per-abi` if you want to get multiple versions).
 
 Used versions:
-- Flutter: 3.29.0 (or newer, used Flutter version is always added as a submodule, so you can use that one)
+- Flutter: 3.32.0 (or newer, used Flutter version is always added as a submodule, so you can use that one)
 - Java: JDK-24
 - Gradle: 8.14.2
 
