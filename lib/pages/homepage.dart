@@ -22,6 +22,7 @@ class _HomePageState extends State<Homepage> {
   final passwordbox = Hive.box('password');
   int columnAmount = 1;
   double columnAmountDouble = 1.0;
+  bool reorderMode = false;
 
   @override
   void initState() {
@@ -273,6 +274,12 @@ class _HomePageState extends State<Homepage> {
     }
   }
 
+  void toggleReorderMode() {
+    setState(() {
+      reorderMode = !reorderMode;
+    });
+  }
+
   //Deleting a card
   void deleteCard(int index) {
     setState(() {
@@ -507,11 +514,27 @@ class _HomePageState extends State<Homepage> {
             ),
           )
           : (columnAmount == 1
-            ? ListView.builder(
+            ? ReorderableListView(
+                buildDefaultDragHandles: false,
                 physics: const BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
-                itemCount: cdb.myShops.length,
-                itemBuilder: (context, index) {
-                  return CardTile(
+                onReorder: (oldIndex, newIndex) {
+                  setState(() {
+                    if (newIndex > oldIndex) newIndex -= 1;
+                    final item = cdb.myShops.removeAt(oldIndex);
+                    cdb.myShops.insert(newIndex, item);
+                    cdb.updateDataBase();
+                  });
+                },
+                children: List.generate(
+                  cdb.myShops.length,
+                      (index) => CardTile(
+                    key: ValueKey('card_${cdb.myShops[index][1]}'), // Unique key
+                        dragHandle: reorderMode
+                            ? ReorderableDragStartListener(
+                          index: index,
+                          child: Icon(Icons.drag_handle),
+                        )
+                            : null,
                     shopName: cdb.myShops[index][0],
                     deleteFunction: (context) => askForPasswordDelete(index),
                     cardnumber: cdb.myShops[index][1],
@@ -534,8 +557,9 @@ class _HomePageState extends State<Homepage> {
                     labelSize: 50,
                     borderSize: 15,
                     marginSize: 20,
-                  );
-                },
+                    reorderFunction: (context) => toggleReorderMode(),
+                  ),
+                ),
               )
             : GridView.builder(
                 padding: const EdgeInsets.all(0),
@@ -570,6 +594,7 @@ class _HomePageState extends State<Homepage> {
                     labelSize: 50 / columnAmount,
                     borderSize: 15 / columnAmount,
                     marginSize: 20 / (columnAmount / 2),
+                    reorderFunction: (context) => toggleReorderMode()
                   );
                 },
               )

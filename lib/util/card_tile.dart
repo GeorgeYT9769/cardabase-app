@@ -20,6 +20,8 @@ class CardTile extends StatefulWidget {
   final double labelSize;
   final double borderSize;
   final double marginSize;
+  final Widget? dragHandle;
+  final Function(BuildContext) reorderFunction;
 
   int red;
   int green;
@@ -43,6 +45,8 @@ class CardTile extends StatefulWidget {
     required this.labelSize,
     required this.borderSize,
     required this.marginSize,
+    this.dragHandle,
+    required this.reorderFunction,
   });
 
   @override
@@ -51,7 +55,6 @@ class CardTile extends StatefulWidget {
 
 class _CardTileState extends State<CardTile> {
   final passwordbox = Hive.box('password');
-
   cardabase_db cdb = cardabase_db();
 
   @override
@@ -196,38 +199,46 @@ class _CardTileState extends State<CardTile> {
       }
     }
 
+    // Inside the build method of CardTile
     return Bounceable(
       onTap: () {},
       child: Container(
         margin: EdgeInsets.all(widget.marginSize),
         alignment: Alignment.center,
-        child: GestureDetector(
-          onLongPress: () => _showBottomSheet(context),
-          child: SizedBox(
-            height: (MediaQuery.of(context).size.width - 40) / 1.586,
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: widget.cardTileColor,
-                foregroundColor: Colors.white,
-                elevation: 0.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(widget.borderSize),
+        child: Row(
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onLongPress: () => _showBottomSheet(context),
+                child: SizedBox(
+                  height: (MediaQuery.of(context).size.width - 40) / 1.586,
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: widget.cardTileColor,
+                      foregroundColor: Colors.white,
+                      elevation: 0.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(widget.borderSize),
+                      ),
+                    ),
+                    onPressed: askForPassword,
+                    child: Text(
+                      widget.shopName,
+                      style: TextStyle(
+                        fontSize: widget.labelSize,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Roboto-Regular.ttf',
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                    ),
+                  ),
                 ),
-              ),
-              onPressed: askForPassword,
-              child: Text(
-                widget.shopName,
-                style: TextStyle(
-                  fontSize: widget.labelSize,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Roboto-Regular.ttf',
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
               ),
             ),
-          ),
+            if (widget.dragHandle != null) widget.dragHandle!, // Now on the right
+          ],
         ),
       ),
     );
@@ -261,6 +272,14 @@ class _CardTileState extends State<CardTile> {
                 onTap: () {
                   Navigator.pop(context);
                   widget.duplicateFunction(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.reorder, color: Theme.of(context).colorScheme.tertiary),
+                title: Text('Reorder', style: TextStyle(fontFamily: 'Roboto-Regular.ttf',)),
+                onTap: () {
+                  Navigator.pop(context);
+                  widget.reorderFunction(context);
                 },
               ),
               ListTile(

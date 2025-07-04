@@ -85,6 +85,7 @@ class _NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin
           },),
         ],
         bottom: TabBar(
+          physics: const BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
           controller: _tabController,
           labelStyle: TextStyle(color: Theme.of(context).colorScheme.tertiary, fontSize: 18, fontFamily: 'Roboto-Regular.ttf',),
           tabs: const [
@@ -94,6 +95,7 @@ class _NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin
         ),
       ),
       body: TabBarView(
+        physics: const BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
         controller: _tabController,
         children: [
           RefreshIndicator(
