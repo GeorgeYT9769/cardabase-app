@@ -117,11 +117,27 @@ class _EditCardState extends State<EditCard> {
     });
   }
 
-  void saveNewCard() { //x;
-    if (controller.text.isNotEmpty && verifyEan(controllercardid.text) == true && cardTypeText != 'Card Type') {
-      setState(() {
 
-        cdb.myShops.insert(widget.index + 1,[controller.text, controllercardid.text, widget.redValue, widget.greenValue, widget.blueValue, cardTypeText, widget.hasPassword]);
+  void saveNewCard() {
+    if (controller.text.isNotEmpty && verifyEan(controllercardid.text) == true && cardTypeText != 'Card Type') {
+      final now = DateTime.now();
+      final uniqueId = '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
+      setState(() {
+        // Insert the new card as a map at the correct position
+        cdb.myShops.insert(
+          widget.index + 1,
+          {
+            'cardName': controller.text,
+            'cardId': controllercardid.text,
+            'redValue': widget.redValue,
+            'greenValue': widget.greenValue,
+            'blueValue': widget.blueValue,
+            'cardType': cardTypeText,
+            'hasPassword': widget.hasPassword,
+            'uniqueId': uniqueId,
+          }
+        );
+        // Remove the old card at the original index
         cdb.myShops.removeAt(widget.index);
       });
       cdb.updateDataBase();

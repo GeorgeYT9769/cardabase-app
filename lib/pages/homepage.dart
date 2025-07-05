@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cardabase/data/cardabase_db.dart'; //card database
 import 'package:cardabase/util/card_tile.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
+import '../util/card_tile.dart';
 import '../util/vibration_provider.dart';
 import 'createcardnew.dart';
 import 'editcard.dart';
@@ -188,22 +189,18 @@ class _HomePageState extends State<Homepage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => EditCard(
-                            cardColorPreview: Color.fromARGB(
-                                255, cdb.myShops[index][2], cdb.myShops[index][3], cdb.myShops[index][4]
-                            ),
-                            redValue: cdb.myShops[index][2],
-                            greenValue: cdb.myShops[index][3],
-                            blueValue: cdb.myShops[index][4],
-                            hasPassword: (cdb.myShops[index].length > 6 && cdb.myShops[index][6] is bool)
-                                ? cdb.myShops[index][6]
-                                : false,
                             index: index,
-                            cardTextPreview: cdb.myShops[index][0],
-                            cardName: cdb.myShops[index][0],
-                            cardId: cdb.myShops[index][1],
-                            cardType: (cdb.myShops[index].length > 5 && cdb.myShops[index][5] is String)
-                                ? cdb.myShops[index][5]
-                                : 'CardType.ean13',
+                            cardColorPreview: Color.fromARGB(
+                                255, cdb.myShops[index]['redValue'], cdb.myShops[index]['greenValue'], cdb.myShops[index]['blueValue']
+                            ),
+                            redValue: cdb.myShops[index]['redValue'] ?? 158,
+                            greenValue: cdb.myShops[index]['greenValue'] ?? 158,
+                            blueValue: cdb.myShops[index]['blueValue'] ?? 158,
+                            hasPassword: cdb.myShops[index]['hasPassword'] ?? false,
+                            cardTextPreview: (cdb.myShops[index]['cardName'] ?? '').toString(),
+                            cardName: cdb.myShops[index]['cardName'] ?? '',
+                            cardId: (cdb.myShops[index]['cardId'] ?? '').toString(),
+                            cardType: (cdb.myShops[index]['cardType'] ?? 'CardType.ean13').toString(),
                           ),
                         ),
                       ).then((value) {
@@ -263,7 +260,7 @@ class _HomePageState extends State<Homepage> {
   }
 
   askForPasswordDelete(int index) {
-    if (cdb.myShops[index][6] == true) {
+    if (cdb.myShops[index]['hasPassword'] == true) {
       if (passwordbox.isNotEmpty) {
         showUnlockDialogDelete(context, index);
       } else {
@@ -277,6 +274,8 @@ class _HomePageState extends State<Homepage> {
   void toggleReorderMode() {
     setState(() {
       reorderMode = !reorderMode;
+      print(reorderMode);
+      print(cdb.myShops);
     });
   }
 
@@ -288,15 +287,9 @@ class _HomePageState extends State<Homepage> {
     cdb.updateDataBase();
   }
 
-  void duplicateCard(int index) {
-    setState(() {
-      cdb.myShops.insert(index + 1,[cdb.myShops[index][0], cdb.myShops[index][1], cdb.myShops[index][2], cdb.myShops[index][3], cdb.myShops[index][4], cdb.myShops[index][5], cdb.myShops[index][6]]);
-    });
-    cdb.updateDataBase();
-  }
-
   void editCard(context, int index) {
-    if (cdb.myShops[index][6] == true) {
+    final card = cdb.myShops[index];
+    if (cdb.myShops[index]['hasPassword'] == true) {
       if (passwordbox.isNotEmpty) {
         showUnlockDialogEdit(context, index);
       } else {
@@ -305,22 +298,18 @@ class _HomePageState extends State<Homepage> {
           context,
           MaterialPageRoute(
             builder: (context) => EditCard(
-              cardColorPreview: Color.fromARGB(
-                  255, cdb.myShops[index][2], cdb.myShops[index][3], cdb.myShops[index][4]
-              ),
-              redValue: cdb.myShops[index][2],
-              greenValue: cdb.myShops[index][3],
-              blueValue: cdb.myShops[index][4],
-              hasPassword: (cdb.myShops[index].length > 6 && cdb.myShops[index][6] is bool)
-                  ? cdb.myShops[index][6]
-                  : false,
               index: index,
-              cardTextPreview: cdb.myShops[index][0],
-              cardName: cdb.myShops[index][0],
-              cardId: cdb.myShops[index][1],
-              cardType: (cdb.myShops[index].length > 5 && cdb.myShops[index][5] is String)
-                  ? cdb.myShops[index][5]
-                  : 'CardType.ean13',
+              cardColorPreview: Color.fromARGB(
+                  255, card['redValue'], card['greenValue'], card['blueValue']
+              ),
+              redValue: card['redValue'],
+              greenValue: card['greenValue'],
+              blueValue: card['blueValue'],
+              hasPassword: card['hasPassword'] ?? false,
+              cardTextPreview: card['cardName'].toString(),
+              cardName: card['cardName'].toString(),
+              cardId: (card['cardId'] ?? '').toString(),
+              cardType: (card['cardType'] ?? 'CardType.ean13').toString(),
             ),
           ),
         ).then((value) {
@@ -328,7 +317,6 @@ class _HomePageState extends State<Homepage> {
             cdb.loadData();
           });
         });
-
       }
     } else {
 
@@ -336,22 +324,18 @@ class _HomePageState extends State<Homepage> {
         context,
         MaterialPageRoute(
           builder: (context) => EditCard(
-            cardColorPreview: Color.fromARGB(
-                255, cdb.myShops[index][2], cdb.myShops[index][3], cdb.myShops[index][4]
-            ),
-            redValue: cdb.myShops[index][2],
-            greenValue: cdb.myShops[index][3],
-            blueValue: cdb.myShops[index][4],
-            hasPassword: (cdb.myShops[index].length > 6 && cdb.myShops[index][6] is bool)
-                ? cdb.myShops[index][6]
-                : false,
             index: index,
-            cardTextPreview: cdb.myShops[index][0],
-            cardName: cdb.myShops[index][0],
-            cardId: cdb.myShops[index][1],
-            cardType: (cdb.myShops[index].length > 5 && cdb.myShops[index][5] is String)
-                ? cdb.myShops[index][5]
-                : 'CardType.ean13',
+            cardColorPreview: Color.fromARGB(
+                255, card['redValue'], card['greenValue'], card['blueValue']
+            ),
+            redValue: card['redValue'],
+            greenValue: card['greenValue'],
+            blueValue: card['blueValue'],
+            hasPassword: card['hasPassword'] ?? false,
+            cardTextPreview: card['cardName'].toString(),
+            cardName: card['cardName'].toString(),
+            cardId: (card['cardId'] ?? '').toString(),
+            cardType: (card['cardType'] ?? 'CardType.ean13').toString(),
           ),
         ),
       ).then((value) {
@@ -361,27 +345,27 @@ class _HomePageState extends State<Homepage> {
       });
     }
 
-    }
+  }
 
   void moveUp(int index) {
-    if (index > 0) {
-      setState(() {
-        final item = cdb.myShops.removeAt(index);
-        cdb.myShops.insert(index - 1, item);
-        cdb.updateDataBase();
-      });
-    }
+  if (index > 0) {
+    setState(() {
+      final item = cdb.myShops.removeAt(index);
+      cdb.myShops.insert(index - 1, item);
+      cdb.updateDataBase();
+    });
   }
+}
 
   void moveDown(int index) {
-    if (index + 1 != cdb.myShops.length) {
-      setState(() {
-        cdb.myShops.insert(index + 2,[cdb.myShops[index][0], cdb.myShops[index][1], cdb.myShops[index][2], cdb.myShops[index][3], cdb.myShops[index][4], cdb.myShops[index][5], cdb.myShops[index][6]]);
-        cdb.myShops.removeAt(index);
-        cdb.updateDataBase();
-      });
-    }
+  if (index + 1 < cdb.myShops.length) {
+    setState(() {
+      final item = cdb.myShops.removeAt(index);
+      cdb.myShops.insert(index + 1, item);
+      cdb.updateDataBase();
+    });
   }
+}
 
   void columnAmountDialog() async {
     await showDialog(
@@ -448,6 +432,130 @@ class _HomePageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
+    Widget content;
+
+    if (cdb.myShops.isEmpty) {
+      content = const Center(
+        child: Text(
+          'Your Cardabase is empty',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Roboto-Regular.ttf',),
+        ),
+      );
+    } else if (columnAmount == 1) {
+      if (reorderMode) {
+        content = ReorderableListView(
+          buildDefaultDragHandles: false,
+          physics: const BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
+          onReorder: (oldIndex, newIndex) {
+            setState(() {
+              if (newIndex > oldIndex) newIndex -= 1;
+              final item = cdb.myShops.removeAt(oldIndex);
+              cdb.myShops.insert(newIndex, item);
+              cdb.updateDataBase();
+            });
+          },
+          children: List.generate(
+            cdb.myShops.length,
+            (index) => CardTile(
+              key: ValueKey('${cdb.myShops[index]['uniqueId']}'),
+              dragHandle: reorderMode
+              ? ReorderableDragStartListener(
+                index: index,
+                child: Icon(Icons.drag_handle, color: Theme.of(context).colorScheme.secondary,),
+              )
+              : null,
+              shopName: (cdb.myShops[index]['cardName'] ?? 'No Name').toString(),
+              deleteFunction: (context) => askForPasswordDelete(index),
+              cardnumber: cdb.myShops[index]['cardId'].toString(),
+              cardTileColor: Color.fromARGB(
+                255,
+                cdb.myShops[index]['redValue'] ?? 158,
+                cdb.myShops[index]['greenValue'] ?? 158,
+                cdb.myShops[index]['blueValue'] ?? 158,
+              ),
+              cardType: cdb.myShops[index]['cardType'] ?? 'CardType.ean13',
+              hasPassword: cdb.myShops[index]['hasPassword'] ?? false,
+              red: cdb.myShops[index]['redValue'] ?? 158,
+              green: cdb.myShops[index]['greenValue'] ?? 158,
+              blue: cdb.myShops[index]['blueValue'] ?? 158,
+              editFunction: (context) => editCard(context, index),
+              moveUpFunction: (context) => moveUp(index),
+              moveDownFunction: (context) => moveDown(index),
+              labelSize: 50,
+              borderSize: 15,
+              marginSize: 20,
+              reorderFunction: (context) => toggleReorderMode(),
+            ),
+          ),
+        );
+      } else {
+        content = ListView.builder(
+          itemCount: cdb.myShops.length,
+          itemBuilder: (context, index) => CardTile(
+            key: ValueKey('${cdb.myShops[index]['uniqueId']}'),
+            shopName: (cdb.myShops[index]['cardName'] ?? 'No Name').toString(),
+            deleteFunction: (context) => askForPasswordDelete(index),
+            cardnumber: cdb.myShops[index]['cardId'].toString(),
+            cardTileColor: Color.fromARGB(
+              255,
+              cdb.myShops[index]['redValue'] ?? 158,
+              cdb.myShops[index]['greenValue'] ?? 158,
+              cdb.myShops[index]['blueValue'] ?? 158,
+            ),
+            cardType: cdb.myShops[index]['cardType'] ?? 'CardType.ean13',
+            hasPassword: cdb.myShops[index]['hasPassword'] ?? false,
+            red: cdb.myShops[index]['redValue'] ?? 158,
+            green: cdb.myShops[index]['greenValue'] ?? 158,
+            blue: cdb.myShops[index]['blueValue'] ?? 158,
+            editFunction: (context) => editCard(context, index),
+            moveUpFunction: (context) => moveUp(index),
+            moveDownFunction: (context) => moveDown(index),
+            labelSize: 50,
+            borderSize: 15,
+            marginSize: 20,
+            reorderFunction: (context) => toggleReorderMode(),
+          ),
+        );
+      }
+    } else {
+      content = GridView.builder(
+        padding: const EdgeInsets.all(0),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: columnAmount,
+          crossAxisSpacing: 0,
+          mainAxisSpacing: 0,
+          childAspectRatio: 1.4,
+        ),
+        itemCount: cdb.myShops.length,
+        itemBuilder: (context, index) {
+          return CardTile(
+            key: ValueKey('${cdb.myShops[index]['uniqueId']}'),
+            shopName: (cdb.myShops[index]['cardName'] ?? 'No Name').toString(),
+            deleteFunction: (context) => askForPasswordDelete(index),
+            cardnumber: cdb.myShops[index]['cardId'].toString(),
+            cardTileColor: Color.fromARGB(
+              255,
+              cdb.myShops[index]['redValue'] ?? 158,
+              cdb.myShops[index]['greenValue'] ?? 158,
+              cdb.myShops[index]['blueValue'] ?? 158,
+            ),
+            cardType: cdb.myShops[index]['cardType'] ?? 'CardType.ean13',
+            hasPassword: cdb.myShops[index]['hasPassword'] ?? false,
+            red: cdb.myShops[index]['redValue'] ?? 158,
+            green: cdb.myShops[index]['greenValue'] ?? 158,
+            blue: cdb.myShops[index]['blueValue'] ?? 158,
+            editFunction: (context) => editCard(context, index),
+            moveUpFunction: (context) => moveUp(index),
+            moveDownFunction: (context) => moveDown(index),
+            labelSize: 50 / columnAmount,
+            borderSize: 15 / columnAmount,
+            marginSize: 20 / (columnAmount / 2),
+            reorderFunction: (context) => toggleReorderMode(),
+          );
+        },
+      );
+    }
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,// - BACKGROUND COLOR (DEFAULT)
       appBar: AppBar(
@@ -506,99 +614,7 @@ class _HomePageState extends State<Homepage> {
           ),
         ),
       ),
-      body: cdb.myShops.isEmpty
-           ? const Center(
-            child: Text(
-              'Your Cardabase is empty',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Roboto-Regular.ttf',),
-            ),
-          )
-          : (columnAmount == 1
-            ? ReorderableListView(
-                buildDefaultDragHandles: false,
-                physics: const BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
-                onReorder: (oldIndex, newIndex) {
-                  setState(() {
-                    if (newIndex > oldIndex) newIndex -= 1;
-                    final item = cdb.myShops.removeAt(oldIndex);
-                    cdb.myShops.insert(newIndex, item);
-                    cdb.updateDataBase();
-                  });
-                },
-                children: List.generate(
-                  cdb.myShops.length,
-                      (index) => CardTile(
-                    key: ValueKey('card_${cdb.myShops[index][1]}'), // Unique key
-                        dragHandle: reorderMode
-                            ? ReorderableDragStartListener(
-                          index: index,
-                          child: Icon(Icons.drag_handle),
-                        )
-                            : null,
-                    shopName: cdb.myShops[index][0],
-                    deleteFunction: (context) => askForPasswordDelete(index),
-                    cardnumber: cdb.myShops[index][1],
-                    cardTileColor: Color.fromARGB(
-                        255, cdb.myShops[index][2], cdb.myShops[index][3], cdb.myShops[index][4]
-                    ),
-                    cardType: (cdb.myShops[index].length > 5 && cdb.myShops[index][5] is String)
-                        ? cdb.myShops[index][5]
-                        : 'CardType.ean13',
-                    hasPassword: (cdb.myShops[index].length > 6 && cdb.myShops[index][6] is bool)
-                        ? cdb.myShops[index][6]
-                        : false,
-                    red: cdb.myShops[index][2],
-                    green: cdb.myShops[index][3],
-                    blue: cdb.myShops[index][4],
-                    duplicateFunction: (context) => duplicateCard(index),
-                    editFunction: (context) => editCard(context, index),
-                    moveUpFunction: (context) => moveUp(index),
-                    moveDownFunction: (context) => moveDown(index),
-                    labelSize: 50,
-                    borderSize: 15,
-                    marginSize: 20,
-                    reorderFunction: (context) => toggleReorderMode(),
-                  ),
-                ),
-              )
-            : GridView.builder(
-                padding: const EdgeInsets.all(0),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: columnAmount,
-                  crossAxisSpacing: 0,
-                  mainAxisSpacing: 0,
-                  childAspectRatio: 1.4,
-                ),
-                itemCount: cdb.myShops.length,
-                itemBuilder: (context, index) {
-                  return CardTile(
-                    shopName: cdb.myShops[index][0],
-                    deleteFunction: (context) => askForPasswordDelete(index),
-                    cardnumber: cdb.myShops[index][1],
-                    cardTileColor: Color.fromARGB(
-                        255, cdb.myShops[index][2], cdb.myShops[index][3], cdb.myShops[index][4]
-                    ),
-                    cardType: (cdb.myShops[index].length > 5 && cdb.myShops[index][5] is String)
-                        ? cdb.myShops[index][5]
-                        : 'CardType.ean13',
-                    hasPassword: (cdb.myShops[index].length > 6 && cdb.myShops[index][6] is bool)
-                        ? cdb.myShops[index][6]
-                        : false,
-                    red: cdb.myShops[index][2],
-                    green: cdb.myShops[index][3],
-                    blue: cdb.myShops[index][4],
-                    duplicateFunction: (context) => duplicateCard(index),
-                    editFunction: (context) => editCard(context, index),
-                    moveUpFunction: (context) => moveUp(index),
-                    moveDownFunction: (context) => moveDown(index),
-                    labelSize: 50 / columnAmount,
-                    borderSize: 15 / columnAmount,
-                    marginSize: 20 / (columnAmount / 2),
-                    reorderFunction: (context) => toggleReorderMode()
-                  );
-                },
-              )
-          ),
-      );
+      body: content,
+    );
   }
 }

@@ -118,8 +118,19 @@ class _CreateCardState extends State<CreateCard> {
 
   void saveNewCard() { //x;
     if (controller.text.isNotEmpty && verifyEan(controllercardid.text) == true && cardTypeText != 'Card Type') {
+      final now = DateTime.now();
+      final uniqueId = '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
       setState(() {
-        cdb.myShops.add([controller.text, controllercardid.text, redValue, greenValue, blueValue, cardTypeText, hasPassword]);
+        cdb.myShops.add({
+          'cardName': controller.text,
+          'cardId': controllercardid.text,
+          'redValue': redValue,
+          'greenValue': greenValue,
+          'blueValue': blueValue,
+          'cardType': cardTypeText,
+          'hasPassword': hasPassword,
+          'uniqueId': uniqueId,
+        });
       });
       cdb.updateDataBase();
       Navigator.pop(context);

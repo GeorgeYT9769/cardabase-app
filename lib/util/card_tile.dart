@@ -13,7 +13,6 @@ class CardTile extends StatefulWidget {
   final Color cardTileColor;
   final String cardType;
   final bool hasPassword;
-  final Function(BuildContext) duplicateFunction;
   final Function(BuildContext) editFunction;
   final Function(BuildContext) moveUpFunction;
   final Function(BuildContext) moveDownFunction;
@@ -38,7 +37,6 @@ class CardTile extends StatefulWidget {
     required this.red,
     required this.green,
     required this.blue,
-    required this.duplicateFunction,
     required this.editFunction,
     required this.moveUpFunction,
     required this.moveDownFunction,
@@ -264,14 +262,6 @@ class _CardTileState extends State<CardTile> {
                 onTap: () {
                   Navigator.pop(context);
                   widget.editFunction(context);
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.content_copy, color: Theme.of(context).colorScheme.tertiary),
-                title: Text('Duplicate', style: TextStyle(fontFamily: 'Roboto-Regular.ttf',)),
-                onTap: () {
-                  Navigator.pop(context);
-                  widget.duplicateFunction(context);
                 },
               ),
               ListTile(

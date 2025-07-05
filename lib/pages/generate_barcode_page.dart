@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'dart:convert';
 
 class GenerateBarcode extends StatefulWidget {
 
