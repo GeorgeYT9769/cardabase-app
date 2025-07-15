@@ -1,14 +1,17 @@
 import 'package:cardabase/pages/news.dart';
 import 'package:cardabase/pages/settings.dart';
+import 'package:cardabase/util/setting_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:cardabase/data/cardabase_db.dart'; //card database
 import 'package:cardabase/util/card_tile.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
+import 'package:http/http.dart';
 import '../util/card_tile.dart';
 import '../util/vibration_provider.dart';
 import 'createcardnew.dart';
 import 'editcard.dart';
 import 'package:hive/hive.dart';
+import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 
 class Homepage extends StatefulWidget {
 
@@ -374,14 +377,59 @@ class _HomePageState extends State<Homepage> {
         return StatefulBuilder(
           builder: (context, setState2) {
             return AlertDialog(
-              title: Text('View', style: TextStyle(
+              title: Text('Sort', style: TextStyle(
                 color: Theme.of(context).colorScheme.inverseSurface,
                 fontFamily: 'Roboto-Regular.ttf',),),
               content: SizedBox(
-                height: 100,
+                height: 400,
                 width: double.maxFinite,
                 child: Column(
                   children: <Widget>[
+                    Text('Sort by:', style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
+                      fontFamily: 'Roboto-Regular.ttf',
+                      color: Theme.of(context).colorScheme.tertiary,
+                    )),
+                    SizedBox(height: 10,),
+                    DropdownMenu(
+                      dropdownMenuEntries: [
+                        DropdownMenuEntry<String>(value: 'nameaz', label: 'Name 0-Z'),
+                        DropdownMenuEntry<String>(value: 'nameza', label: 'Name Z-0'),
+                        DropdownMenuEntry<String>(value: 'latest', label: 'Latest'),
+                        DropdownMenuEntry<String>(value: 'oldest', label: 'Oldest'),
+                      ],
+                      initialSelection: Hive.box('settingsBox').get('sort', defaultValue: 'none'),
+                      inputDecorationTheme: InputDecorationTheme(
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
+                        focusColor: Theme.of(context).colorScheme.primary,
+                        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
+                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary, fontFamily: 'Roboto-Regular.ttf'),
+                        iconColor: Theme.of(context).colorScheme.primary,
+                      ),
+                      onSelected: (value) {
+                        setState(() {
+                          if (value == 'nameaz') {
+                            cdb.myShops.sort((a, b) => a['cardName'].compareTo(b['cardName']));
+                          } else if (value == 'nameza') {
+                            cdb.myShops.sort((a, b) => b['cardName'].compareTo(a['cardName']));
+                          } else if (value == 'latest') {
+                            cdb.myShops.sort((a, b) => b['uniqueId'].compareTo(a['uniqueId']));
+                          } else if (value == 'oldest') {
+                            cdb.myShops.sort((a, b) => a['uniqueId'].compareTo(b['uniqueId']));
+                          }
+                          Hive.box('settingsBox').put('sort', value);
+                          cdb.updateDataBase();
+                        });
+                      }
+                      ,
+                    ),
+                    SizedBox(height: 15,),
+                    Divider(
+                      color: Theme.of(context).colorScheme.primary,
+                      thickness: 1.0,
+                    ),
+                    SizedBox(height: 15,),
                     Text('Columns: $columnAmount', style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w900,
@@ -405,9 +453,27 @@ class _HomePageState extends State<Homepage> {
                         });
                       },
                     ),
+                    SizedBox(height: 15,),
+                    Divider(
+                      color: Theme.of(context).colorScheme.primary,
+                      thickness: 1.0,
+                    ),
+                    SizedBox(height: 15,),
+                    MySetting(
+                        aboutSettingHeader: 'Reorder Cards',
+                        settingAction: () {
+                          setState2(() {
+                            toggleReorderMode();
+                          });
+                          },
+                        settingHeader: 'Reorder',
+                        settingIcon: Icons.reorder,
+                        iconColor: reorderMode ? Colors.green : Colors.red,
+                    )
                   ],
                 ),
               ),
+
               actions: [
                 Center(
                   child: ElevatedButton(
@@ -432,8 +498,31 @@ class _HomePageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
-    Widget content;
+    return FutureBuilder(
+    future: Hive.isBoxOpen('mybox') ? Future.value() : Hive.openBox('mybox'),
+    builder: (context, snapshot) {
+      if (snapshot.hasError) {
+        return Center(
+          child: Text(
+            'Storage error: ${snapshot.error}',
+            style: const TextStyle(color: Colors.red, fontSize: 18),
+            textAlign: TextAlign.center,
+          ),
+        );
+      }
+      if (snapshot.connectionState != ConnectionState.done) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      // Your normal build code here
+      return _buildMainContent(context);
+    },
+  );
+}
 
+Widget _buildMainContent(BuildContext context) {
+  Widget content;
+
+  try {
     if (cdb.myShops.isEmpty) {
       content = const Center(
         child: Text(
@@ -459,11 +548,11 @@ class _HomePageState extends State<Homepage> {
             (index) => CardTile(
               key: ValueKey('${cdb.myShops[index]['uniqueId']}'),
               dragHandle: reorderMode
-              ? ReorderableDragStartListener(
-                index: index,
-                child: Icon(Icons.drag_handle, color: Theme.of(context).colorScheme.secondary,),
-              )
-              : null,
+                  ? ReorderableDragStartListener(
+                      index: index,
+                      child: Icon(Icons.drag_handle, color: Theme.of(context).colorScheme.secondary,),
+                    )
+                  : null,
               shopName: (cdb.myShops[index]['cardName'] ?? 'No Name').toString(),
               deleteFunction: (context) => askForPasswordDelete(index),
               cardnumber: cdb.myShops[index]['cardId'].toString(),
@@ -484,137 +573,198 @@ class _HomePageState extends State<Homepage> {
               labelSize: 50,
               borderSize: 15,
               marginSize: 20,
-              reorderFunction: (context) => toggleReorderMode(),
+              tags: cdb.myShops[index]['tags'] ?? [],
+              reorderMode: reorderMode,
             ),
           ),
         );
       } else {
         content = ListView.builder(
           itemCount: cdb.myShops.length,
-          itemBuilder: (context, index) => CardTile(
-            key: ValueKey('${cdb.myShops[index]['uniqueId']}'),
-            shopName: (cdb.myShops[index]['cardName'] ?? 'No Name').toString(),
-            deleteFunction: (context) => askForPasswordDelete(index),
-            cardnumber: cdb.myShops[index]['cardId'].toString(),
-            cardTileColor: Color.fromARGB(
-              255,
-              cdb.myShops[index]['redValue'] ?? 158,
-              cdb.myShops[index]['greenValue'] ?? 158,
-              cdb.myShops[index]['blueValue'] ?? 158,
-            ),
-            cardType: cdb.myShops[index]['cardType'] ?? 'CardType.ean13',
-            hasPassword: cdb.myShops[index]['hasPassword'] ?? false,
-            red: cdb.myShops[index]['redValue'] ?? 158,
-            green: cdb.myShops[index]['greenValue'] ?? 158,
-            blue: cdb.myShops[index]['blueValue'] ?? 158,
-            editFunction: (context) => editCard(context, index),
-            moveUpFunction: (context) => moveUp(index),
-            moveDownFunction: (context) => moveDown(index),
-            labelSize: 50,
-            borderSize: 15,
-            marginSize: 20,
-            reorderFunction: (context) => toggleReorderMode(),
-          ),
+          itemBuilder: (context, index) {
+            // Do NOT wrap this in try-catch!
+            return CardTile(
+              key: ValueKey('${cdb.myShops[index]['uniqueId']}'),
+              shopName: (cdb.myShops[index]['cardName'] ?? 'No Name').toString(),
+              deleteFunction: (context) => askForPasswordDelete(index),
+              cardnumber: cdb.myShops[index]['cardId'].toString(),
+              cardTileColor: Color.fromARGB(
+                255,
+                cdb.myShops[index]['redValue'] ?? 158,
+                cdb.myShops[index]['greenValue'] ?? 158,
+                cdb.myShops[index]['blueValue'] ?? 158,
+              ),
+              cardType: cdb.myShops[index]['cardType'] ?? 'CardType.ean13',
+              hasPassword: cdb.myShops[index]['hasPassword'] ?? false,
+              red: cdb.myShops[index]['redValue'] ?? 158,
+              green: cdb.myShops[index]['greenValue'] ?? 158,
+              blue: cdb.myShops[index]['blueValue'] ?? 158,
+              editFunction: (context) => editCard(context, index),
+              moveUpFunction: (context) => moveUp(index),
+              moveDownFunction: (context) => moveDown(index),
+              labelSize: 50,
+              borderSize: 15,
+              marginSize: 20,
+              tags: cdb.myShops[index]['tags'] ?? [],
+              reorderMode: reorderMode,
+            );
+          },
         );
       }
     } else {
-      content = GridView.builder(
-        padding: const EdgeInsets.all(0),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: columnAmount,
-          crossAxisSpacing: 0,
-          mainAxisSpacing: 0,
-          childAspectRatio: 1.4,
-        ),
-        itemCount: cdb.myShops.length,
-        itemBuilder: (context, index) {
-          return CardTile(
-            key: ValueKey('${cdb.myShops[index]['uniqueId']}'),
-            shopName: (cdb.myShops[index]['cardName'] ?? 'No Name').toString(),
-            deleteFunction: (context) => askForPasswordDelete(index),
-            cardnumber: cdb.myShops[index]['cardId'].toString(),
-            cardTileColor: Color.fromARGB(
-              255,
-              cdb.myShops[index]['redValue'] ?? 158,
-              cdb.myShops[index]['greenValue'] ?? 158,
-              cdb.myShops[index]['blueValue'] ?? 158,
-            ),
-            cardType: cdb.myShops[index]['cardType'] ?? 'CardType.ean13',
-            hasPassword: cdb.myShops[index]['hasPassword'] ?? false,
-            red: cdb.myShops[index]['redValue'] ?? 158,
-            green: cdb.myShops[index]['greenValue'] ?? 158,
-            blue: cdb.myShops[index]['blueValue'] ?? 158,
-            editFunction: (context) => editCard(context, index),
-            moveUpFunction: (context) => moveUp(index),
-            moveDownFunction: (context) => moveDown(index),
-            labelSize: 50 / columnAmount,
-            borderSize: 15 / columnAmount,
-            marginSize: 20 / (columnAmount / 2),
-            reorderFunction: (context) => toggleReorderMode(),
-          );
-        },
-      );
-    }
-
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,// - BACKGROUND COLOR (DEFAULT)
-      appBar: AppBar(
-        leading: IconButton(icon: Icon(Icons.sort, color: Theme.of(context).colorScheme.secondary,), onPressed: columnAmountDialog), //createNewCard
-        actions: [
-          IconButton(
-            icon: Icon(Icons.settings, color: Theme.of(context).colorScheme.secondary,),
-            onPressed: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Settings()),
-              );
-              if (result == true && mounted) {
-                setState(() {
-                  cdb.loadData();
-                });
-              }
-            },
+      if (reorderMode) {
+        content = ReorderableGridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: columnAmount,
+            crossAxisSpacing: 0,
+            mainAxisSpacing: 0,
+            childAspectRatio: 1.4,
           ),
-        ],
-        title: TextButton(
-          onPressed:  () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const NewsPage()));
+          itemCount: cdb.myShops.length,
+          onReorder: (oldIndex, newIndex) {
+            setState(() {
+              final item = cdb.myShops.removeAt(oldIndex);
+              cdb.myShops.insert(newIndex, item);
+              cdb.updateDataBase();
+            });
           },
-          child: Text(
-            'Cardabase',
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w900,
-              fontFamily: 'xirod',
-              letterSpacing: 5,
-              color: Theme.of(context).colorScheme.tertiary,
-              )
-            ),
-        ),
-        centerTitle: true,
-        elevation: 0.0,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-      ),
-//createNewCard
-      floatingActionButton: Bounceable(
-        onTap: () {},
-        child: SizedBox(
-          height: 70,
-          width: 70,
-          child: FittedBox(
-            child: FloatingActionButton(
-              elevation: 0.0,
-              enableFeedback: true,
-              tooltip: 'Add a card',
-              onPressed: () {
-                print(cdb.myShops);
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateCard()), ).then((value) => setState(() {}));},
-              child: const Icon(Icons.add_card),
-            ),
+          itemBuilder: (context, index) {
+            return CardTile(
+              key: ValueKey('${cdb.myShops[index]['uniqueId']}'),
+              shopName: (cdb.myShops[index]['cardName'] ?? 'No Name').toString(),
+              deleteFunction: (context) => askForPasswordDelete(index),
+              cardnumber: cdb.myShops[index]['cardId'].toString(),
+              cardTileColor: Color.fromARGB(
+                255,
+                cdb.myShops[index]['redValue'] ?? 158,
+                cdb.myShops[index]['greenValue'] ?? 158,
+                cdb.myShops[index]['blueValue'] ?? 158,
+              ),
+              cardType: cdb.myShops[index]['cardType'] ?? 'CardType.ean13',
+              hasPassword: cdb.myShops[index]['hasPassword'] ?? false,
+              red: cdb.myShops[index]['redValue'] ?? 158,
+              green: cdb.myShops[index]['greenValue'] ?? 158,
+              blue: cdb.myShops[index]['blueValue'] ?? 158,
+              editFunction: (context) => editCard(context, index),
+              moveUpFunction: (context) => moveUp(index),
+              moveDownFunction: (context) => moveDown(index),
+              labelSize: 50 / columnAmount,
+              borderSize: 15 / columnAmount,
+              marginSize: 20 / (columnAmount / 2),
+              tags: cdb.myShops[index]['tags'] ?? [],
+              reorderMode: reorderMode,
+            );
+          },
+        );
+      } else {
+        content = GridView.builder(
+          padding: const EdgeInsets.all(0),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: columnAmount,
+            crossAxisSpacing: 0,
+            mainAxisSpacing: 0,
+            childAspectRatio: 1.4,
           ),
-        ),
+          itemCount: cdb.myShops.length,
+          itemBuilder: (context, index) {
+            return CardTile(
+              key: ValueKey('${cdb.myShops[index]['uniqueId']}'),
+              shopName: (cdb.myShops[index]['cardName'] ?? 'No Name').toString(),
+              deleteFunction: (context) => askForPasswordDelete(index),
+              cardnumber: cdb.myShops[index]['cardId'].toString(),
+              cardTileColor: Color.fromARGB(
+                255,
+                cdb.myShops[index]['redValue'] ?? 158,
+                cdb.myShops[index]['greenValue'] ?? 158,
+                cdb.myShops[index]['blueValue'] ?? 158,
+              ),
+              cardType: cdb.myShops[index]['cardType'] ?? 'CardType.ean13',
+              hasPassword: cdb.myShops[index]['hasPassword'] ?? false,
+              red: cdb.myShops[index]['redValue'] ?? 158,
+              green: cdb.myShops[index]['greenValue'] ?? 158,
+              blue: cdb.myShops[index]['blueValue'] ?? 158,
+              editFunction: (context) => editCard(context, index),
+              moveUpFunction: (context) => moveUp(index),
+              moveDownFunction: (context) => moveDown(index),
+              labelSize: 50 / columnAmount,
+              borderSize: 15 / columnAmount,
+              marginSize: 20 / (columnAmount / 2),
+              tags: cdb.myShops[index]['tags'] ?? [],
+              reorderMode: reorderMode,
+            );
+          },
+        );
+      }
+    }
+  } catch (e, stack) {
+    content = Center(
+      child: Text(
+        'Error: $e',
+        style: const TextStyle(color: Colors.red, fontSize: 18),
+        textAlign: TextAlign.center,
       ),
-      body: content,
     );
   }
+
+  return Scaffold(
+    backgroundColor: Theme.of(context).colorScheme.surface,
+    appBar: AppBar(
+      leading: IconButton(icon: Icon(Icons.sort, color: Theme.of(context).colorScheme.secondary,), onPressed: columnAmountDialog), //createNewCard
+      actions: [
+        IconButton(
+          icon: Icon(Icons.settings, color: Theme.of(context).colorScheme.secondary,),
+          onPressed: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Settings()),
+            );
+            if (result == true && mounted) {
+              setState(() {
+                cdb.loadData();
+              });
+            }
+          },
+        ),
+      ],
+      title: TextButton(
+        onPressed:  () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const NewsPage()));
+        },
+        child: Text(
+          'Cardabase',
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w900,
+            fontFamily: 'xirod',
+            letterSpacing: 5,
+            color: Theme.of(context).colorScheme.tertiary,
+            )
+          ),
+      ),
+      centerTitle: true,
+      elevation: 0.0,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+    ),
+//createNewCard
+    floatingActionButton: Bounceable(
+      onTap: () {},
+      child: SizedBox(
+        height: 70,
+        width: 70,
+        child: FittedBox(
+          child: FloatingActionButton(
+            elevation: 0.0,
+            enableFeedback: true,
+            tooltip: 'Add a card',
+            onPressed: () {
+              print(cdb.myShops);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateCard()), ).then((value) => setState(() {}));},
+            child: const Icon(Icons.add_card),
+          ),
+        ),
+      ),
+    ),
+    body: content
+  );
+}
 }

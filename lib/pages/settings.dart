@@ -395,6 +395,16 @@ class _SettingsState extends State<Settings> {
               ),
               MySetting(
                 aboutSettingHeader:
+                'Manage the tags for your cards',
+                settingAction: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => PasswordScreen()));
+                },
+                settingHeader: 'Tags',
+                settingIcon: Icons.label,
+                iconColor: Theme.of(context).colorScheme.tertiary,
+              ),
+              MySetting(
+                aboutSettingHeader:
                 'Import your cards',
                 settingAction: () async {
                   final imported = await showImportDialog(context);

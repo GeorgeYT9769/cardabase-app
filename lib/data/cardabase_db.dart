@@ -31,4 +31,8 @@ class cardabase_db {
     _myBox.put('CARDLIST', myShops);
   }
 
+  void sortType() {
+    myShops.sort((a, b) => a['cardType'].compareTo(b['cardType']));
+  }
+
 }

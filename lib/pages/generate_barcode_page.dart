@@ -18,8 +18,9 @@ class GenerateBarcode extends StatefulWidget {
   int red;
   int green;
   int blue;
+  List tags;
 
-  GenerateBarcode({super.key, required this.cardid, required this.cardtext, required this.cardTileColor, required this.cardType, required this.hasPassword, required this.red, required this.green, required this.blue});
+  GenerateBarcode({super.key, required this.cardid, required this.cardtext, required this.cardTileColor, required this.cardType, required this.hasPassword, required this.red, required this.green, required this.blue, required this.tags});
 
   @override
   State<GenerateBarcode> createState() => _GenerateBarcodeState();
@@ -121,7 +122,7 @@ class _GenerateBarcodeState extends State<GenerateBarcode> {
                             color: Colors.white),
                         child: BarcodeWidget(
                           padding: const EdgeInsets.all(10),
-                          data: '[${widget.cardtext}, ${widget.cardid}, ${widget.red}, ${widget.green}, ${widget.blue}, ${widget.cardType}, ${widget.hasPassword}]',
+                          data: '[${widget.cardtext}, ${widget.cardid}, ${widget.red}, ${widget.green}, ${widget.blue}, ${widget.cardType}, ${widget.hasPassword},${widget.tags}]',
                           barcode: Barcode.qrCode(), //Barcode.ean13(drawEndChar: true)
                           drawText: true,
                           style: const TextStyle(color: Colors.black),

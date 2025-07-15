@@ -20,7 +20,8 @@ class CardTile extends StatefulWidget {
   final double borderSize;
   final double marginSize;
   final Widget? dragHandle;
-  final Function(BuildContext) reorderFunction;
+  final List<String> tags;
+  final bool reorderMode;
 
   int red;
   int green;
@@ -44,7 +45,8 @@ class CardTile extends StatefulWidget {
     required this.borderSize,
     required this.marginSize,
     this.dragHandle,
-    required this.reorderFunction,
+    required this.tags,
+    required this.reorderMode,
   });
 
   @override
@@ -121,6 +123,7 @@ class _CardTileState extends State<CardTile> {
                               red: widget.red,
                               green: widget.green,
                               blue: widget.blue,
+                              tags: [],
                             ),
                           ),
                         );
@@ -191,6 +194,7 @@ class _CardTileState extends State<CardTile> {
               red: widget.red,
               green: widget.green,
               blue: widget.blue,
+              tags: [],
             ),
           ),
         );
@@ -207,7 +211,7 @@ class _CardTileState extends State<CardTile> {
           children: [
             Expanded(
               child: GestureDetector(
-                onLongPress: () => _showBottomSheet(context),
+                onLongPress: widget.reorderMode ? null : () => _showBottomSheet(context),
                 child: SizedBox(
                   height: (MediaQuery.of(context).size.width - 40) / 1.586,
                   width: double.infinity,
@@ -262,14 +266,6 @@ class _CardTileState extends State<CardTile> {
                 onTap: () {
                   Navigator.pop(context);
                   widget.editFunction(context);
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.reorder, color: Theme.of(context).colorScheme.tertiary),
-                title: Text('Reorder', style: TextStyle(fontFamily: 'Roboto-Regular.ttf',)),
-                onTap: () {
-                  Navigator.pop(context);
-                  widget.reorderFunction(context);
                 },
               ),
               ListTile(

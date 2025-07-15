@@ -479,6 +479,7 @@ class _EditCardState extends State<EditCard> {
                   int blue = int.parse(rawList[4]);
                   String cardType = rawList[5];
                   bool hasPwd = rawList[6] == "true";
+                  List<String> tags = rawList.sublist(7);
 
                   setState(() {
                     controller.text = name;

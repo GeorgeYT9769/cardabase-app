@@ -43,6 +43,7 @@ dependencies:
   permission_handler: ^12.0.0+1
   http: ^1.4.0
   haptic_feedback: ^0.5.1+1
+  reorderable_grid_view: ^2.2.8
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

@@ -130,6 +130,7 @@ class _CreateCardState extends State<CreateCard> {
           'cardType': cardTypeText,
           'hasPassword': hasPassword,
           'uniqueId': uniqueId,
+          'tags': [],
         });
       });
       cdb.updateDataBase();
