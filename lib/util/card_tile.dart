@@ -20,7 +20,7 @@ class CardTile extends StatefulWidget {
   final double borderSize;
   final double marginSize;
   final Widget? dragHandle;
-  final List<String> tags;
+  final List<dynamic> tags;
   final bool reorderMode;
 
   int red;

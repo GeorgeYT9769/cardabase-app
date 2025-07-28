@@ -56,6 +56,8 @@ class _CreateCardState extends State<CreateCard> {
 
   bool hasPassword = false;
 
+  Set<String> selectedTags = {};
+
   String getBarcodeTypeText(String cardTypeText) {
     switch (cardTypeText) {
       case 'CardType.code39':
@@ -95,6 +97,8 @@ class _CreateCardState extends State<CreateCard> {
     }
   }
 
+  final List<dynamic> allTags = Hive.box('settingsBox').get('tags', defaultValue: <dynamic>[]) as List<dynamic>;
+
 //functions
   Future<void> openColorPickerDialog() async {
     await showDialog(
@@ -130,7 +134,7 @@ class _CreateCardState extends State<CreateCard> {
           'cardType': cardTypeText,
           'hasPassword': hasPassword,
           'uniqueId': uniqueId,
-          'tags': [],
+          'tags': selectedTags.toList(),
         });
       });
       cdb.updateDataBase();
@@ -443,6 +447,7 @@ class _CreateCardState extends State<CreateCard> {
 //structure of the page
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       //resizeToAvoidBottomInset: false,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -508,6 +513,7 @@ class _CreateCardState extends State<CreateCard> {
 //structure of all widgets
 //card widget
       body: ListView(
+          physics: BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
           children: [
           SizedBox(
               height: MediaQuery.of(context).size.width / 1.50, //height of button
@@ -536,7 +542,6 @@ class _CreateCardState extends State<CreateCard> {
                 ),
               )
           ),
-
           Container(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -558,12 +563,12 @@ class _CreateCardState extends State<CreateCard> {
                     focusColor: Theme.of(context).colorScheme.primary,
                     enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
                     labelText: 'Card Name',
-                    labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary, fontFamily: 'Roboto-Regular.ttf'),
+                    labelStyle: TextStyle(color: Theme.of(context).colorScheme.inverseSurface, fontFamily: 'Roboto-Regular.ttf', fontWeight: FontWeight.bold, fontSize: 17),
                     prefixIcon: Icon(Icons.abc, color: Theme.of(context).colorScheme.secondary),
                   ),
                   style: TextStyle(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 20,),
+                const SizedBox(height: 15,),
 //text field card id
                 TextFormField(
                     controller: controllercardid,
@@ -577,7 +582,7 @@ class _CreateCardState extends State<CreateCard> {
                       focusColor: Theme.of(context).colorScheme.primary,
                       enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
                       labelText: 'Card ID',
-                      labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary, fontFamily: 'Roboto-Regular.ttf'),
+                      labelStyle: TextStyle(color: Theme.of(context).colorScheme.inverseSurface, fontFamily: 'Roboto-Regular.ttf', fontWeight: FontWeight.bold, fontSize: 17),
                       prefixIcon: Icon(Icons.numbers, color: Theme.of(context).colorScheme.secondary),
                       suffixIcon: IconButton(
                         icon: Icon(Icons.photo_camera_rounded, color: Theme.of(context).colorScheme.secondary),
@@ -659,7 +664,7 @@ class _CreateCardState extends State<CreateCard> {
                     //maxLength: 13,
                     style: TextStyle(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold)
                 ),
-                const SizedBox(height: 20,),
+                const SizedBox(height: 15,),
                 Bounceable(
                   onTap: () {},
                   child: SizedBox(
@@ -677,15 +682,16 @@ class _CreateCardState extends State<CreateCard> {
                       ),
                       onPressed: _showBarcodeSelectorDialog,
                       child: Text(getBarcodeTypeText(cardTypeText), style: TextStyle( //cardTypeText
-                        color: Theme.of(context).colorScheme.tertiary,
+                        color: Theme.of(context).colorScheme.inverseSurface,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'Roboto-Regular.ttf',
+                        fontSize: 17,
                       ),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 20,),
+                const SizedBox(height: 15,),
 //color picker button
                 Bounceable(
                   onTap: () {},
@@ -704,12 +710,60 @@ class _CreateCardState extends State<CreateCard> {
                       ),
                       onPressed: openColorPickerDialog,
                       child: Text('Card Color', style: TextStyle(
-                        color: Theme.of(context).colorScheme.tertiary,
+                        color: Theme.of(context).colorScheme.inverseSurface,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'Roboto-Regular.ttf',
+                        fontSize: 17,
                       ),
                       ),
                     ),
+                  ),
+                ),
+                const SizedBox(height: 15,),
+                SizedBox(
+                  height: 40,
+                  child: ListView.builder(
+                    physics: const BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: allTags.length,
+                    itemBuilder: (context, chipIndex) {
+                      final tag = allTags[chipIndex];
+                      final isSelected = selectedTags.contains(tag);
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                        child: ActionChip(
+                          label: Text(tag),
+                          onPressed: () {
+                            setState(() {
+                              if (isSelected) {
+                                selectedTags.remove(tag);
+                              } else {
+                                selectedTags.add(tag);
+                              }
+                            });
+                          },
+                          labelStyle: TextStyle(
+                            color: isSelected
+                                ? Theme.of(context).colorScheme.onPrimary
+                                : Theme.of(context).colorScheme.inverseSurface,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Roboto-Regular.ttf',
+                          ),
+                          backgroundColor: isSelected
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.surface,
+                          side: BorderSide(
+                            color: isSelected
+                                ? Theme.of(context).colorScheme.primary
+                                : Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                            width: isSelected ? 2 : 1,
+                          ),
+                          avatar: isSelected
+                              ? Icon(Icons.check, size: 18, color: Theme.of(context).colorScheme.onPrimary)
+                              : null,
+                        ),
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(height: 10,),
@@ -720,7 +774,7 @@ class _CreateCardState extends State<CreateCard> {
                         fontWeight: FontWeight.bold,
                         fontFamily: 'Roboto-Regular.ttf',
                         fontSize: 15,
-                        color: Theme.of(context).colorScheme.tertiary
+                        color: Theme.of(context).colorScheme.inverseSurface
                     )),
                     controlAffinity: ListTileControlAffinity.leading,
                     side: BorderSide(color: Theme.of(context).colorScheme.primary),

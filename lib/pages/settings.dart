@@ -1,3 +1,4 @@
+import 'package:cardabase/pages/tags_page.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:cardabase/util/setting_tile.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../data/cardabase_db.dart';
+import '../util/camera.dart';
 import 'password.dart';
 import '../theme/theme_provider.dart';
 import '../util/brightness_provider.dart';
@@ -340,6 +342,7 @@ class _SettingsState extends State<Settings> {
             backgroundColor: Theme.of(context).colorScheme.surface,
           ),
           body: ListView(
+            physics: BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
             children: [
               Container(
                 margin: const EdgeInsets.only(top: 10, left: 20),
@@ -359,6 +362,19 @@ class _SettingsState extends State<Settings> {
                   ],
                 ),
               ),
+              //MySetting(
+              //  aboutSettingHeader:
+              //  'Camera',
+              //  settingAction: () {
+              //    Navigator.push(
+              //      context,
+              //      MaterialPageRoute(builder: (context) => IDCameraScreen()),
+              //    );
+              //  },
+              //  settingHeader: 'Camera',
+              //  settingIcon: Icons.camera_alt,
+              //  iconColor: Theme.of(context).colorScheme.tertiary,
+              //),
               MySetting(
                 aboutSettingHeader:
                 'Switches theme between blue and white',
@@ -385,7 +401,7 @@ class _SettingsState extends State<Settings> {
               ),
               MySetting(
                 aboutSettingHeader:
-                'Manage the password for the cards',
+                'Protect your cards',
                 settingAction: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => PasswordScreen()));
                 },
@@ -395,9 +411,9 @@ class _SettingsState extends State<Settings> {
               ),
               MySetting(
                 aboutSettingHeader:
-                'Manage the tags for your cards',
+                'Categorize your cards',
                 settingAction: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => PasswordScreen()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => TagsPage()));
                 },
                 settingHeader: 'Tags',
                 settingIcon: Icons.label,
@@ -405,7 +421,7 @@ class _SettingsState extends State<Settings> {
               ),
               MySetting(
                 aboutSettingHeader:
-                'Import your cards',
+                'Load all your cards',
                 settingAction: () async {
                   final imported = await showImportDialog(context);
                   if (imported == true) {
@@ -421,7 +437,7 @@ class _SettingsState extends State<Settings> {
               ),
               MySetting(
                 aboutSettingHeader:
-                'Export all your cards in one file',
+                'Backup all your cards into one file',
                 settingAction: askForPasswordExport,
                 settingHeader: 'Export Cardabase',
                 settingIcon: Icons.upload,

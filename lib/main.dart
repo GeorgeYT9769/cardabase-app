@@ -5,6 +5,7 @@ import 'package:cardabase/theme/color_schemes.g.dart';
 import 'package:flutter/services.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   ErrorWidget.builder = (FlutterErrorDetails details) {
     return Center(
       child: Text(
@@ -15,9 +16,9 @@ void main() async {
     );
   };
   await Hive.initFlutter();
-  var allcards = await Hive.openBox('mybox'); //storage for cards
+  await Hive.openBox('mybox'); //storage for cards
   await Hive.openBox('settingsBox'); // storage for settings
-  var password = await Hive.openBox('password'); // storage for password
+  await Hive.openBox('password'); // storage for password
   runApp(
     Main(),
   );

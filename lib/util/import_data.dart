@@ -91,6 +91,8 @@ Future<bool> showImportDialog(BuildContext context) async {
                 }
                 if (cardMap.isNotEmpty) {
                   try {
+                    final now = DateTime.now();
+                    final uniqueId = '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
                     final newMap = {
                       'cardName': cardMap['cardName'] ?? '',
                       'cardId': cardMap['cardId'] ?? '',
@@ -99,7 +101,8 @@ Future<bool> showImportDialog(BuildContext context) async {
                       'blueValue': int.tryParse(cardMap['blueValue'] ?? '0') ?? 0,
                       'cardType': cardMap['cardType'] ?? '',
                       'hasPassword': (cardMap['hasPassword']?.toLowerCase() == 'true'),
-                      'uniqueId': cardMap['uniqueId'] ?? '',
+                      'uniqueId': uniqueId + importedCount.toString(),
+                      'tags': cardMap['tags']?.split(',').map((e) => e.trim()).toList() ?? [],
                     };
                     newCards.add(newMap);
                     importedCount++;
@@ -126,6 +129,7 @@ Future<bool> showImportDialog(BuildContext context) async {
                       'cardType': values[5],
                       'hasPassword': values[6].toLowerCase() == 'true',
                       'uniqueId': uniqueId + importedCount.toString(),
+                      'tags': [],
                     };
                     newCards.add(newMap);
                     importedCount++;

@@ -60,8 +60,7 @@ Future<void> exportCardList(BuildContext context) async {
 
       // Create a text string
       final StringBuffer txtBuffer = StringBuffer();
-      txtBuffer.writeln('If you don\'t know what are you doing, please don\'t touch this file');
-      txtBuffer.writeln('[Shop Name, Card Number, Red, Green, Blue, Card Type, Has Password]');
+      txtBuffer.writeln('If you don\'t know what are you doing, please don\'t touch this file. One mistake and you can lose all your data!');
       txtBuffer.writeln('=======================================================================');
       for (var card in cardList) {
         if (card is Map) {
@@ -73,8 +72,8 @@ Future<void> exportCardList(BuildContext context) async {
             'greenValue: ${card['greenValue'] ?? ''}, '
             'blueValue: ${card['blueValue'] ?? ''}, '
             'cardType: ${card['cardType'] ?? ''}, '
-            'hasPassword: ${card['hasPassword'] ?? ''}'
-            'uniqueId: ${card['uniqueId'] ?? ''}'
+            'hasPassword: ${card['hasPassword'] ?? ''}, '
+            'uniqueId: ${card['uniqueId'] ?? ''}, '
             '}',
           );
         }

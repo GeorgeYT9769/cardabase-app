@@ -41,8 +41,9 @@ class EditCard extends StatefulWidget {
   String cardName;
   String cardId;
   String cardType;
+  List<dynamic> tags;
 
-  EditCard({super.key, required this.cardColorPreview, required this.redValue, required this.greenValue, required this.blueValue, required this.hasPassword, required this.index, required this.cardTextPreview, required this.cardName, required this.cardId, required this.cardType});
+  EditCard({super.key, required this.cardColorPreview, required this.redValue, required this.greenValue, required this.blueValue, required this.hasPassword, required this.index, required this.cardTextPreview, required this.cardName, required this.cardId, required this.cardType, required this.tags});
 
   @override
   State<EditCard> createState() => _EditCardState();
@@ -56,6 +57,8 @@ class _EditCardState extends State<EditCard> {
 
   TextEditingController controller = TextEditingController();
   TextEditingController controllercardid = TextEditingController();
+
+  late Set<String> selectedTags;
 
   String getBarcodeTypeText(String cardTypeText) {
     switch (cardTypeText) {
@@ -96,6 +99,8 @@ class _EditCardState extends State<EditCard> {
     }
   }
 
+  final List<dynamic> allTags = Hive.box('settingsBox').get('tags', defaultValue: <dynamic>[]) as List<dynamic>;
+
 //functions
   Future<void> openColorPickerDialog() async {
     await showDialog(
@@ -135,6 +140,7 @@ class _EditCardState extends State<EditCard> {
             'cardType': cardTypeText,
             'hasPassword': widget.hasPassword,
             'uniqueId': uniqueId,
+            'tags': selectedTags.toList(),
           }
         );
         // Remove the old card at the original index
@@ -449,6 +455,7 @@ class _EditCardState extends State<EditCard> {
     widget.blueValue = widget.blueValue;
     cardTypeText = widget.cardType;
     widget.hasPassword = widget.hasPassword;
+    selectedTags = Set<String>.from(widget.tags.map((e) => e.toString()));
   }
 
   @override
@@ -517,6 +524,7 @@ class _EditCardState extends State<EditCard> {
 //structure of all widgets
 //card widget
       body: ListView(
+        physics: BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
         children: [
           SizedBox(
               height: MediaQuery.of(context).size.width / 1.50, //height of button
@@ -661,6 +669,53 @@ class _EditCardState extends State<EditCard> {
                       ),
                       ),
                     ),
+                  ),
+                ),
+                const SizedBox(height: 15,),
+                SizedBox(
+                  height: 40,
+                  child: ListView.builder(
+                    physics: const BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: allTags.length,
+                    itemBuilder: (context, chipIndex) {
+                      final tag = allTags[chipIndex].toString();
+                      final isSelected = selectedTags.contains(tag);
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                        child: ActionChip(
+                          label: Text(tag),
+                          onPressed: () {
+                            setState(() {
+                              if (isSelected) {
+                                selectedTags.remove(tag);
+                              } else {
+                                selectedTags.add(tag);
+                              }
+                            });
+                          },
+                          labelStyle: TextStyle(
+                            color: isSelected
+                                ? Theme.of(context).colorScheme.onPrimary
+                                : Theme.of(context).colorScheme.inverseSurface,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Roboto-Regular.ttf',
+                          ),
+                          backgroundColor: isSelected
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.surface,
+                          side: BorderSide(
+                            color: isSelected
+                                ? Theme.of(context).colorScheme.primary
+                                : Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                            width: isSelected ? 2 : 1,
+                          ),
+                          avatar: isSelected
+                              ? Icon(Icons.check, size: 18, color: Theme.of(context).colorScheme.onPrimary)
+                              : null,
+                        ),
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(height: 10,),
