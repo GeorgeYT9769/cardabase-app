@@ -44,6 +44,9 @@ dependencies:
   http: ^1.4.0
   haptic_feedback: ^0.5.1+1
   reorderable_grid_view: ^2.2.8
+  zxing2: ^0.2.4
+  image_picker: ^1.1.2
+  image: ^4.5.4
   # camera: ^0.11.2
 
   # The following adds the Cupertino Icons font to your application.

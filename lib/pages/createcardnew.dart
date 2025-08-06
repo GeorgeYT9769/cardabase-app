@@ -93,7 +93,7 @@ class _CreateCardState extends State<CreateCard> {
       case 'CardType.aztec':
         return 'Type: AZTEC';
       default:
-        return 'Card Type';
+        return 'Barcode Type';
     }
   }
 
@@ -121,7 +121,7 @@ class _CreateCardState extends State<CreateCard> {
   }
 
   void saveNewCard() { //x;
-    if (controller.text.isNotEmpty && verifyEan(controllercardid.text) == true && cardTypeText != 'Card Type') {
+    if (controller.text.isNotEmpty && verifyEan(controllercardid.text) == true && cardTypeText != 'Barcode Type') {
       final now = DateTime.now();
       final uniqueId = '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
       setState(() {
@@ -144,7 +144,7 @@ class _CreateCardState extends State<CreateCard> {
       redValue = 158;
       blueValue = 158;
       greenValue = 158;
-      cardTypeText = 'Card Type';
+      cardTypeText = 'Barcode Type';
       hasPassword = false;
     } else if (controller.text.isEmpty == true ) {
       VibrationProvider.vibrateSuccess();
@@ -210,7 +210,7 @@ class _CreateCardState extends State<CreateCard> {
           backgroundColor: const Color.fromARGB(255, 237, 67, 55),
         ),
       );
-    } else if (cardTypeText == 'Card Type') {
+    } else if (cardTypeText == 'Barcode Type') {
       VibrationProvider.vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -221,7 +221,7 @@ class _CreateCardState extends State<CreateCard> {
             children: [
               Icon(Icons.error, size: 15, color: Colors.white,),
               SizedBox(width: 10,),
-              Text('Card Type was not selected!', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+              Text('Barcode Type missing!', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
             ],
           ),
           duration: const Duration(milliseconds: 3000),
@@ -397,14 +397,14 @@ class _CreateCardState extends State<CreateCard> {
   }
 
   CardType? selectedCardType;
-  String cardTypeText = 'Card Type';
+  String cardTypeText = 'Barcode Type';
 
   void _showBarcodeSelectorDialog() async {
     CardType? result = await showDialog<CardType>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Select Barcode Type', style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface, fontFamily: 'Roboto-Regular.ttf',),),
+          title: Text('Barcode Type', style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface, fontFamily: 'Roboto-Regular.ttf',),),
           content: SizedBox(
             height: 300, // Custom height for the dialog
             width: double.maxFinite,
@@ -650,7 +650,35 @@ class _CreateCardState extends State<CreateCard> {
                                     break;
                                   default:
                                     selectedCardType = null;
-                                    cardTypeText = 'Card Type';
+                                    cardTypeText =
+                                    'Barcode Type'; //controllercardid.text = "";
+                                }
+                                if (code.startsWith("[") &&
+                                    code.endsWith("]")) {
+                                  List<String> rawList = code.replaceAll(
+                                      "[", "").replaceAll("]", "").split(", ");
+
+                                  // Convert values into correct types
+                                  String name = rawList[0];
+                                  String number = rawList[1];
+                                  int red = int.parse(rawList[2]);
+                                  int green = int.parse(rawList[3]);
+                                  int blue = int.parse(rawList[4]);
+                                  String cardType = rawList[5];
+                                  bool hasPwd = rawList[6] == "true";
+
+                                  setState(() {
+                                    controller.text = name;
+                                    cardTextPreview = name;
+                                    cardColorPreview =
+                                        Color.fromARGB(255, red, green, blue);
+                                    controllercardid.text = number;
+                                    redValue = red;
+                                    greenValue = green;
+                                    blueValue = blue;
+                                    cardTypeText = cardType;
+                                    hasPassword = hasPwd;
+                                  });
                                 }
                               } else {
                                 controllercardid.text = "";

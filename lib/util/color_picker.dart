@@ -35,14 +35,18 @@ class _ColorPickerSecondDialogState extends State<ColorPickerSecondDialog> {
       ),
       content: SingleChildScrollView(
         child: ColorPicker(
+          labelTypes: const [ColorLabelType.rgb],
+          displayThumbColor: true,
+          hexInputBar: true,
           pickerAreaBorderRadius: BorderRadius.circular(10.0),
+          paletteType: PaletteType.hsv,
           enableAlpha: false,
           pickerColor: currentColor!,
           portraitOnly: true,
           onColorChanged: (value) {
-            if (mounted) { // Check if the widget is still mounted
+            if (mounted) {
               setState(() {
-                currentColor = value; // Update the local color variable
+                currentColor = value;
               });
             }
           },
@@ -52,7 +56,7 @@ class _ColorPickerSecondDialogState extends State<ColorPickerSecondDialog> {
         Center(
           child: ElevatedButton(
             onPressed: () {
-              Navigator.pop(context, currentColor); // Pass the current color
+              Navigator.pop(context, currentColor);
             },
             style: ElevatedButton.styleFrom(elevation: 0.0),
             child: Text(

@@ -470,7 +470,7 @@ class _SettingsState extends State<Settings> {
               ),
               MySetting(
                 aboutSettingHeader:
-                'Join Cardabase Discord commmunity',
+                'Join Cardabase Discord community',
                 settingAction: () => _launchUrl(Uri.parse('https://discord.com/invite/fZNDfG2xv3')),
                 settingHeader: 'Discord',
                 settingIcon: Icons.discord,

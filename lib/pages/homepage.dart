@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:cardabase/data/cardabase_db.dart'; //card database
 import 'package:cardabase/util/card_tile.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
-import 'package:http/http.dart';
-import '../util/card_tile.dart';
 import '../util/vibration_provider.dart';
 import 'createcardnew.dart';
 import 'editcard.dart';
@@ -374,6 +372,11 @@ class _HomePageState extends State<Homepage> {
 
 
   void columnAmountDialog() async {
+
+    // Get tags from Hive settingsBox
+    final box = Hive.box('settingsBox');
+    final List<dynamic> allTags = box.get('tags', defaultValue: <dynamic>[]) as List<dynamic>;
+
     await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -386,97 +389,165 @@ class _HomePageState extends State<Homepage> {
               content: SizedBox(
                 height: 400,
                 width: double.maxFinite,
-                child: Column(
-                  children: <Widget>[
-                    Text('Sort by:', style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'Roboto-Regular.ttf',
-                      color: Theme.of(context).colorScheme.tertiary,
-                    )),
-                    SizedBox(height: 10,),
-                    DropdownMenu(
-                      dropdownMenuEntries: [
-                        DropdownMenuEntry<String>(value: 'nameaz', label: 'Name 0-Z'),
-                        DropdownMenuEntry<String>(value: 'nameza', label: 'Name Z-0'),
-                        DropdownMenuEntry<String>(value: 'latest', label: 'Latest'),
-                        DropdownMenuEntry<String>(value: 'oldest', label: 'Oldest'),
-                      ],
-                      initialSelection: Hive.box('settingsBox').get('sort', defaultValue: 'none'),
-                      inputDecorationTheme: InputDecorationTheme(
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
-                        focusColor: Theme.of(context).colorScheme.primary,
-                        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
-                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary, fontFamily: 'Roboto-Regular.ttf'),
-                        iconColor: Theme.of(context).colorScheme.primary,
+                child: SingleChildScrollView(
+                  physics: BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
+                  child: Column(
+                    children: <Widget>[
+                      Text('Tags:', style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w900,
+                        fontFamily: 'Roboto-Regular.ttf',
+                        color: Theme.of(context).colorScheme.tertiary,
+                      )),
+                      SizedBox(height: 10,),
+                      SingleChildScrollView(
+                        physics: BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: List.generate(
+                            allTags.length,
+                                (chipIndex) => Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                              child: ActionChip(
+                                label: Text(allTags[chipIndex]),
+                                onPressed: () async {
+                                  setState2 (() {
+                                    setState(() {
+                                      final tag = allTags[chipIndex];
+                                      if (selectedTag == tag) {
+                                        selectedTag = null;
+                                        cdb.loadData();
+                                      } else {
+                                        selectedTag = tag;
+                                        cdb.loadData();
+                                        cdb.myShops = cdb.myShops.where((shop) {
+                                          final tags = shop['tags'];
+                                          if (tags is List) {
+                                            return tags.contains(tag);
+                                          }
+                                          return false;
+                                        }).toList();
+                                      }
+                                    });
+                                  });
+                                },
+                                labelStyle: TextStyle(
+                                  color: selectedTag == allTags[chipIndex]
+                                      ? Theme.of(context).colorScheme.onPrimary
+                                      : Theme.of(context).colorScheme.inverseSurface,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Roboto-Regular.ttf',
+                                ),
+                                backgroundColor: selectedTag == allTags[chipIndex]
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context).colorScheme.surface,
+                                side: BorderSide(
+                                  color: selectedTag == allTags[chipIndex]
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                                  width: selectedTag == allTags[chipIndex] ? 2 : 1,
+                                ),
+                                avatar: selectedTag == allTags[chipIndex]
+                                    ? Icon(Icons.check, size: 18, color: Theme.of(context).colorScheme.onPrimary)
+                                    : null,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                      onSelected: (value) {
-                        setState(() {
-                          if (value == 'nameaz') {
-                            cdb.myShops.sort((a, b) => a['cardName'].compareTo(b['cardName']));
-                          } else if (value == 'nameza') {
-                            cdb.myShops.sort((a, b) => b['cardName'].compareTo(a['cardName']));
-                          } else if (value == 'latest') {
-                            cdb.myShops.sort((a, b) => b['uniqueId'].compareTo(a['uniqueId']));
-                          } else if (value == 'oldest') {
-                            cdb.myShops.sort((a, b) => a['uniqueId'].compareTo(b['uniqueId']));
-                          }
-                          Hive.box('settingsBox').put('sort', value);
-                          cdb.updateDataBase();
-                        });
-                      }
-                      ,
-                    ),
-                    SizedBox(height: 15,),
-                    Divider(
-                      color: Theme.of(context).colorScheme.primary,
-                      thickness: 1.0,
-                    ),
-                    SizedBox(height: 15,),
-                    Text('Columns: $columnAmount', style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'Roboto-Regular.ttf',
-                      color: Theme.of(context).colorScheme.tertiary,
-                    )),
-                    SizedBox(height: 10,),
-                    Slider(
-                      year2023: false,
-                      value: columnAmountDouble,
-                      min: 1,
-                      max: 5,
-                      divisions: 4,
-                      onChanged: (double newValue) {
-                        setState2(() {
+                      SizedBox(height: 5,),
+                      Divider(
+                        color: Theme.of(context).colorScheme.primary,
+                        thickness: 1.0,
+                      ),
+                      SizedBox(height: 10,),
+                      Text('Sort by:', style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w900,
+                        fontFamily: 'Roboto-Regular.ttf',
+                        color: Theme.of(context).colorScheme.tertiary,
+                      )),
+                      SizedBox(height: 10,),
+                      DropdownMenu(
+                        dropdownMenuEntries: [
+                          DropdownMenuEntry<String>(value: 'nameaz', label: 'Name 0-Z'),
+                          DropdownMenuEntry<String>(value: 'nameza', label: 'Name Z-0'),
+                          DropdownMenuEntry<String>(value: 'latest', label: 'Latest'),
+                          DropdownMenuEntry<String>(value: 'oldest', label: 'Oldest'),
+                        ],
+                        initialSelection: Hive.box('settingsBox').get('sort', defaultValue: 'none'),
+                        inputDecorationTheme: InputDecorationTheme(
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
+                          focusColor: Theme.of(context).colorScheme.primary,
+                          enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
+                          labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary, fontFamily: 'Roboto-Regular.ttf'),
+                          iconColor: Theme.of(context).colorScheme.primary,
+                        ),
+                        onSelected: (value) {
                           setState(() {
-                            columnAmountDouble = newValue;
-                            columnAmount = columnAmountDouble.round().toInt();
-                            Hive.box('settingsBox').put('columnAmount', columnAmount); // Save to Hive
+                            if (value == 'nameaz') {
+                              cdb.myShops.sort((a, b) => a['cardName'].compareTo(b['cardName']));
+                            } else if (value == 'nameza') {
+                              cdb.myShops.sort((a, b) => b['cardName'].compareTo(a['cardName']));
+                            } else if (value == 'latest') {
+                              cdb.myShops.sort((a, b) => b['uniqueId'].compareTo(a['uniqueId']));
+                            } else if (value == 'oldest') {
+                              cdb.myShops.sort((a, b) => a['uniqueId'].compareTo(b['uniqueId']));
+                            }
+                            Hive.box('settingsBox').put('sort', value);
+                            cdb.updateDataBase();
                           });
-                        });
-                      },
-                    ),
-                    SizedBox(height: 15,),
-                    Divider(
-                      color: Theme.of(context).colorScheme.primary,
-                      thickness: 1.0,
-                    ),
-                    SizedBox(height: 15,),
-                    MySetting(
+                        }
+                        ,
+                      ),
+                      SizedBox(height: 10,),
+                      Divider(
+                        color: Theme.of(context).colorScheme.primary,
+                        thickness: 1.0,
+                      ),
+                      MySetting(
                         aboutSettingHeader: 'Reorder Cards',
                         settingAction: () {
                           setState2(() {
                             toggleReorderMode();
                           });
-                          },
+                        },
                         settingHeader: 'Reorder',
                         settingIcon: Icons.reorder,
                         iconColor: reorderMode ? Colors.green : Colors.red,
-                    )
-                  ],
+                      ),
+                      Divider(
+                        color: Theme.of(context).colorScheme.primary,
+                        thickness: 1.0,
+                      ),
+                      SizedBox(height: 10,),
+                      Text('Columns: $columnAmount', style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w900,
+                        fontFamily: 'Roboto-Regular.ttf',
+                        color: Theme.of(context).colorScheme.tertiary,
+                      )),
+                      SizedBox(height: 10,),
+                      Slider(
+                        year2023: false,
+                        value: columnAmountDouble,
+                        min: 1,
+                        max: 5,
+                        divisions: 4,
+                        onChanged: (double newValue) {
+                          setState2(() {
+                            setState(() {
+                              columnAmountDouble = newValue;
+                              columnAmount = columnAmountDouble.round().toInt();
+                              Hive.box('settingsBox').put('columnAmount', columnAmount); // Save to Hive
+                            });
+                          });
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
-
               actions: [
                 Center(
                   child: ElevatedButton(
@@ -524,10 +595,6 @@ class _HomePageState extends State<Homepage> {
 
 Widget _buildMainContent(BuildContext context) {
   Widget content;
-
-  // Get tags from Hive settingsBox
-  final box = Hive.box('settingsBox');
-  final List<dynamic> allTags = box.get('tags', defaultValue: <dynamic>[]) as List<dynamic>;
 
   try {
     if (cdb.myShops.isEmpty) {
@@ -779,121 +846,24 @@ Widget _buildMainContent(BuildContext context) {
       backgroundColor: Theme.of(context).colorScheme.surface,
     ),
 //createNewCard
-    //floatingActionButton: Bounceable(
-    //  onTap: () {},
-    //  child: SizedBox(
-    //    height: 70,
-    //    width: 70,
-    //    child: FittedBox(
-    //      child: FloatingActionButton(
-    //        elevation: 0.0,
-    //        enableFeedback: true,
-    //        tooltip: 'Add a card',
-    //        onPressed: () {
-    //          Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateCard()), ).then((value) => setState(() {}));},
-    //        child: const Icon(Icons.add_card),
-    //      ),
-    //    ),
-    //  ),
-    //),
-    body: Stack(
-    children: [
-      Positioned.fill(
-        child: content,
-      ),
-      Positioned(
-        left: 0,
-        right: 0,
-        bottom: 20,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                physics: BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.only(left: 16, right: 8, bottom: 8),
-                child: Row(
-                  children: List.generate(
-                    allTags.length,
-                    (chipIndex) => Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                      child: ActionChip(
-                        label: Text(allTags[chipIndex]),
-                        onPressed: () async {
-                          setState(() {
-                            final tag = allTags[chipIndex];
-                            if (selectedTag == tag) {
-                              selectedTag = null;
-                              cdb.loadData();
-                            } else {
-                              selectedTag = tag;
-                              cdb.loadData();
-                              cdb.myShops = cdb.myShops.where((shop) {
-                                final tags = shop['tags'];
-                                if (tags is List) {
-                                  return tags.contains(tag);
-                                }
-                                return false;
-                              }).toList();
-                            }
-                          });
-                        },
-                        labelStyle: TextStyle(
-                          color: selectedTag == allTags[chipIndex]
-                              ? Theme.of(context).colorScheme.onPrimary
-                              : Theme.of(context).colorScheme.inverseSurface,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Roboto-Regular.ttf',
-                        ),
-                        backgroundColor: selectedTag == allTags[chipIndex]
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.surface,
-                        side: BorderSide(
-                          color: selectedTag == allTags[chipIndex]
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
-                          width: selectedTag == allTags[chipIndex] ? 2 : 1,
-                        ),
-                        avatar: selectedTag == allTags[chipIndex]
-                            ? Icon(Icons.check, size: 18, color: Theme.of(context).colorScheme.onPrimary)
-                            : null,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            // FAB
-            Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Bounceable(
-                onTap: () {},
-                child: SizedBox(
-                  height: 70,
-                  width: 70,
-                  child: FittedBox(
-                    child: FloatingActionButton(
-                      elevation: 0.0,
-                      enableFeedback: true,
-                      tooltip: 'Add a card',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const CreateCard()),
-                        ).then((value) => setState(() {}));
-                      },
-                      child: const Icon(Icons.add_card),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
+    floatingActionButton: Bounceable(
+      onTap: () {},
+      child: SizedBox(
+        height: 70,
+        width: 70,
+        child: FittedBox(
+          child: FloatingActionButton(
+            elevation: 0.0,
+            enableFeedback: true,
+            tooltip: 'Add a card',
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateCard()), ).then((value) => setState(() {}));},
+            child: const Icon(Icons.add_card),
+          ),
         ),
       ),
-    ],
-  ),
+    ),
+    body: content,
 );
 }
 }
