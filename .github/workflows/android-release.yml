@@ -36,7 +36,10 @@ jobs:
           flutter-version: "3.35.1"
           channel: 'stable'
           cache: true
-      
+
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses
+
       - name: Get dependencies
         run: flutter pub get
 
