@@ -38,11 +38,11 @@ class _PasswordScreenState extends State<PasswordScreen> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)
               )  ,
-              content: const Row(
+              content: Row(
                 children: [
                   Icon(Icons.check, size: 15, color: Colors.white,),
                   SizedBox(width: 10,),
-                  Text('Success!', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+                  Text('Success!', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
                 ],
               ),
               duration: const Duration(milliseconds: 3000),
@@ -59,11 +59,11 @@ class _PasswordScreenState extends State<PasswordScreen> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)
               )  ,
-              content: const Row(
+              content: Row(
                 children: [
                   Icon(Icons.error, size: 15, color: Colors.white,),
                   SizedBox(width: 10,),
-                  Text('Passwords does not match!', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+                  Text('Passwords does not match!', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
                 ],
               ),
               duration: const Duration(milliseconds: 3000),
@@ -81,11 +81,11 @@ class _PasswordScreenState extends State<PasswordScreen> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10)
             )  ,
-            content: const Row(
+            content: Row(
               children: [
                 Icon(Icons.error, size: 15, color: Colors.white,),
                 SizedBox(width: 10,),
-                Text('Password cannot be empty!', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+                Text('Password cannot be empty!', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
               ],
             ),
             duration: const Duration(milliseconds: 3000),
@@ -112,11 +112,11 @@ class _PasswordScreenState extends State<PasswordScreen> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10)
             )  ,
-            content: const Row(
+            content: Row(
               children: [
                 Icon(Icons.check, size: 15, color: Colors.white,),
                 SizedBox(width: 10,),
-                Text('Success!', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+                Text('Success!', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
               ],
             ),
             duration: const Duration(milliseconds: 3000),
@@ -133,11 +133,11 @@ class _PasswordScreenState extends State<PasswordScreen> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10)
             )  ,
-            content: const Row(
+            content: Row(
               children: [
                 Icon(Icons.error, size: 15, color: Colors.white,),
                 SizedBox(width: 10,),
-                Text('Incorrect password!', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+                Text('Incorrect password!', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
               ],
             ),
             duration: const Duration(milliseconds: 3000),
@@ -190,7 +190,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
         ],
         title: Text(
             'Password',
-            style: TextStyle(
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
               fontSize: 17,
               fontWeight: FontWeight.w900,
               fontFamily: 'xirod',
@@ -208,20 +208,18 @@ class _PasswordScreenState extends State<PasswordScreen> {
             padding: const EdgeInsets.all(20),
             child: ListView(
                 children: [
-                  Text('CREATE A PASSWORD', style: TextStyle(
+                  Text('CREATE A PASSWORD', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'Roboto-Regular.ttf',
                     fontSize: 20,
-                    color: Theme.of(context).colorScheme.tertiary,
+                    color: Theme.of(context).colorScheme.inverseSurface,
                   ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 10,),
-                  Text('Give your cards a password. Once you have set it up, you may use that password to safeguard your cards.', style: TextStyle( //cardTypeText
+                  Text('Give your cards a password. Once you have set it up, you may use that password to safeguard your cards.', style: Theme.of(context).textTheme.bodyLarge?.copyWith( //cardTypeText
                       fontWeight: FontWeight.bold,
-                      fontFamily: 'Roboto-Regular.ttf',
                       fontSize: 15,
-                      color: Theme.of(context).colorScheme.tertiary,
+                      color: Theme.of(context).colorScheme.inverseSurface,
                     ),
                     textAlign: TextAlign.justify,
                   ),
@@ -233,11 +231,11 @@ class _PasswordScreenState extends State<PasswordScreen> {
                       focusColor: Theme.of(context).colorScheme.primary,
                       enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
                       labelText: 'Password',
-                      labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary, fontFamily: 'Roboto-Regular.ttf'),
+                      labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.secondary),
                       prefixIcon: Icon(Icons.password, color: Theme.of(context).colorScheme.secondary),
                       suffixIcon: IconButton(icon: Icon(hidePassword ? Icons.visibility_off : Icons.visibility, color: Theme.of(context).colorScheme.secondary), onPressed: showPasswordFunc),
                     ),
-                    style: TextStyle(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold),
                     keyboardType: TextInputType.visiblePassword,
                     obscureText: hidePassword,
                     onChanged: (value) {
@@ -252,11 +250,11 @@ class _PasswordScreenState extends State<PasswordScreen> {
                       focusColor: Theme.of(context).colorScheme.primary,
                       enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
                       labelText: 'Password again',
-                      labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary, fontFamily: 'Roboto-Regular.ttf'),
+                      labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.secondary,),
                       prefixIcon: Icon(Icons.password, color: Theme.of(context).colorScheme.secondary),
                       suffixIcon: IconButton(icon: Icon(hideConfirmPassword ? Icons.visibility_off : Icons.visibility, color: Theme.of(context).colorScheme.secondary), onPressed: showConfirmPasswordFunc),
                     ),
-                    style: TextStyle(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontWeight: FontWeight.bold),
                     keyboardType: TextInputType.visiblePassword,
                     obscureText: hideConfirmPassword,
                   ),
@@ -287,10 +285,9 @@ class _PasswordScreenState extends State<PasswordScreen> {
                           minimumSize: const Size.fromHeight(100),
                         ),
                         onPressed: setPasswordFunc,
-                        child: Text('SET', style: TextStyle(
-                          color: Theme.of(context).colorScheme.tertiary,
+                        child: Text('SET', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.inverseSurface,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'Roboto-Regular.ttf',
                         ),
                         ),
                       ),
@@ -304,20 +301,18 @@ class _PasswordScreenState extends State<PasswordScreen> {
         padding: const EdgeInsets.all(20),
         child: ListView(
           children: [
-            Text('RESET PASSWORD', style: TextStyle(
+            Text('RESET PASSWORD', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
               fontWeight: FontWeight.bold,
-              fontFamily: 'Roboto-Regular.ttf',
               fontSize: 20,
-              color: Theme.of(context).colorScheme.tertiary,
+              color: Theme.of(context).colorScheme.inverseSurface,
             ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10,),
-            Text('If you wish to change your password or stop using it, you may do so here.', style: TextStyle(
+            Text('If you wish to change your password or stop using it, you may do so here.', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
               fontWeight: FontWeight.bold,
-              fontFamily: 'Roboto-Regular.ttf',
               fontSize: 15,
-              color: Theme.of(context).colorScheme.tertiary,
+              color: Theme.of(context).colorScheme.inverseSurface,
             ),
               textAlign: TextAlign.justify,
             ),
@@ -329,11 +324,11 @@ class _PasswordScreenState extends State<PasswordScreen> {
                 focusColor: Theme.of(context).colorScheme.primary,
                 enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
                 labelText: 'Password',
-                labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary, fontFamily: 'Roboto-Regular.ttf'),
+                labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface),
                 prefixIcon: Icon(Icons.password, color: Theme.of(context).colorScheme.secondary),
                 suffixIcon: IconButton(icon: Icon(hidePassword ? Icons.visibility_off : Icons.visibility, color: Theme.of(context).colorScheme.secondary), onPressed: showPasswordFunc),
               ),
-              style: TextStyle(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontWeight: FontWeight.bold),
               keyboardType: TextInputType.visiblePassword,
               obscureText: hidePassword,
             ),
@@ -354,10 +349,9 @@ class _PasswordScreenState extends State<PasswordScreen> {
                     minimumSize: const Size.fromHeight(100),
                   ),
                   onPressed: resetPasswordFunc,
-                  child: Text('RESET', style: TextStyle(
-                    color: Theme.of(context).colorScheme.tertiary,
+                  child: Text('RESET', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.inverseSurface,
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'Roboto-Regular.ttf',
                   ),
                   ),
                 ),

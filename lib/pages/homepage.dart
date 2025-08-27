@@ -41,7 +41,7 @@ class _HomePageState extends State<Homepage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Enter Password', style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface, fontFamily: 'Roboto-Regular.ttf',) ),
+        title: Text('Enter Password', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 30)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -61,9 +61,8 @@ class _HomePageState extends State<Homepage> {
                   ),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                labelStyle: TextStyle(
+                labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Theme.of(context).colorScheme.secondary,
-                  fontFamily: 'Roboto-Regular.ttf',
                 ),
                 prefixIcon: Icon(
                   Icons.password,
@@ -71,14 +70,14 @@ class _HomePageState extends State<Homepage> {
                 ),
                 labelText: 'Password',
               ),
-              style: TextStyle(
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: Theme.of(context).colorScheme.tertiary,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 20),
             Center(
-              child: ElevatedButton(
+              child: OutlinedButton(
                 onPressed: () {
                   if (controller.text == passwordbox.get('PW')) {
                     FocusScope.of(context).unfocus();
@@ -94,13 +93,13 @@ class _HomePageState extends State<Homepage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        content: const Row(
+                        content: Row(
                           children: [
                             Icon(Icons.error, size: 15, color: Colors.white),
                             SizedBox(width: 10),
                             Text(
                               'Incorrect password!',
-                              style: TextStyle(
+                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 fontSize: 18,
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -118,14 +117,12 @@ class _HomePageState extends State<Homepage> {
                     );
                   }
                 },
-                style: ElevatedButton.styleFrom(elevation: 0.0),
+                style: OutlinedButton.styleFrom(elevation: 0.0, side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11))),
                 child: Text(
                   'DELETE',
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'Roboto-Regular.ttf',
                     fontSize: 15,
-                    color: Theme.of(context).colorScheme.tertiary,
                   ),
                 ),
               ),
@@ -142,7 +139,7 @@ class _HomePageState extends State<Homepage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Enter Password', style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface, fontFamily: 'Roboto-Regular.ttf',) ),
+        title: Text('Enter Password', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 30) ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -162,9 +159,8 @@ class _HomePageState extends State<Homepage> {
                   ),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                labelStyle: TextStyle(
+                labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Theme.of(context).colorScheme.secondary,
-                  fontFamily: 'Roboto-Regular.ttf',
                 ),
                 prefixIcon: Icon(
                   Icons.password,
@@ -172,14 +168,14 @@ class _HomePageState extends State<Homepage> {
                 ),
                 labelText: 'Password',
               ),
-              style: TextStyle(
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: Theme.of(context).colorScheme.tertiary,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 20),
             Center(
-              child: ElevatedButton(
+              child: OutlinedButton(
                 onPressed: () {
                   if (controller.text == passwordbox.get('PW')) {
                     FocusScope.of(context).unfocus();
@@ -220,13 +216,13 @@ class _HomePageState extends State<Homepage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        content: const Row(
+                        content: Row(
                           children: [
                             Icon(Icons.error, size: 15, color: Colors.white),
                             SizedBox(width: 10),
                             Text(
                               'Incorrect password!',
-                              style: TextStyle(
+                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 fontSize: 18,
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -244,14 +240,12 @@ class _HomePageState extends State<Homepage> {
                     );
                   }
                 },
-                style: ElevatedButton.styleFrom(elevation: 0.0),
+                style: OutlinedButton.styleFrom(elevation: 0.0, side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11))),
                 child: Text(
                   'EDIT',
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'Roboto-Regular.ttf',
                     fontSize: 15,
-                    color: Theme.of(context).colorScheme.tertiary,
                   ),
                 ),
               ),
@@ -280,7 +274,6 @@ class _HomePageState extends State<Homepage> {
     });
   }
 
-  //Deleting a card
   void deleteCard(int index) {
     setState(() {
       cdb.myShops.removeAt(index);
@@ -373,7 +366,6 @@ class _HomePageState extends State<Homepage> {
 
   void columnAmountDialog() async {
 
-    // Get tags from Hive settingsBox
     final box = Hive.box('settingsBox');
     final List<dynamic> allTags = box.get('tags', defaultValue: <dynamic>[]) as List<dynamic>;
 
@@ -383,9 +375,10 @@ class _HomePageState extends State<Homepage> {
         return StatefulBuilder(
           builder: (context, setState2) {
             return AlertDialog(
-              title: Text('Sort', style: TextStyle(
+              title: Text('Sort', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: Theme.of(context).colorScheme.inverseSurface,
-                fontFamily: 'Roboto-Regular.ttf',),),
+                fontSize: 30
+              )),
               content: SizedBox(
                 height: 400,
                 width: double.maxFinite,
@@ -393,11 +386,10 @@ class _HomePageState extends State<Homepage> {
                   physics: BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
                   child: Column(
                     children: <Widget>[
-                      Text('Tags:', style: TextStyle(
+                      Text('Tags:', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontSize: 17,
-                        fontWeight: FontWeight.w900,
-                        fontFamily: 'Roboto-Regular.ttf',
-                        color: Theme.of(context).colorScheme.tertiary,
+                        color: Theme.of(context).colorScheme.inverseSurface,
+                        fontWeight: FontWeight.w900
                       )),
                       SizedBox(height: 10,),
                       SingleChildScrollView(
@@ -431,12 +423,10 @@ class _HomePageState extends State<Homepage> {
                                     });
                                   });
                                 },
-                                labelStyle: TextStyle(
+                                labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                   color: selectedTag == allTags[chipIndex]
                                       ? Theme.of(context).colorScheme.onPrimary
                                       : Theme.of(context).colorScheme.inverseSurface,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Roboto-Regular.ttf',
                                 ),
                                 backgroundColor: selectedTag == allTags[chipIndex]
                                     ? Theme.of(context).colorScheme.primary
@@ -461,26 +451,48 @@ class _HomePageState extends State<Homepage> {
                         thickness: 1.0,
                       ),
                       SizedBox(height: 10,),
-                      Text('Sort by:', style: TextStyle(
+                      Text('Sort by:', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontSize: 17,
-                        fontWeight: FontWeight.w900,
-                        fontFamily: 'Roboto-Regular.ttf',
-                        color: Theme.of(context).colorScheme.tertiary,
+                        color: Theme.of(context).colorScheme.inverseSurface,
+                        fontWeight: FontWeight.w900
                       )),
                       SizedBox(height: 10,),
                       DropdownMenu(
                         dropdownMenuEntries: [
-                          DropdownMenuEntry<String>(value: 'nameaz', label: 'Name 0-Z'),
-                          DropdownMenuEntry<String>(value: 'nameza', label: 'Name Z-0'),
-                          DropdownMenuEntry<String>(value: 'latest', label: 'Latest'),
-                          DropdownMenuEntry<String>(value: 'oldest', label: 'Oldest'),
+                          DropdownMenuEntry<String>(
+                              value: 'nameaz',
+                              label: 'Name 0-Z',
+                              style: ButtonStyle(
+                                  elevation: WidgetStateProperty.all(0.0),
+                              )
+                          ),
+                          DropdownMenuEntry<String>(
+                              value: 'nameza',
+                              label: 'Name Z-0',
+                              style: ButtonStyle(
+                                  elevation: WidgetStateProperty.all(0.0),
+                              )
+                          ),
+                          DropdownMenuEntry<String>(
+                              value: 'latest',
+                              label: 'Latest',
+                              style: ButtonStyle(
+                                  elevation: WidgetStateProperty.all(0.0),)
+                          ),
+                          DropdownMenuEntry<String>(
+                              value: 'oldest',
+                              label: 'Oldest',
+                              style: ButtonStyle(
+                                  elevation: WidgetStateProperty.all(0.0),
+                              )
+                          ),
                         ],
-                        initialSelection: Hive.box('settingsBox').get('sort', defaultValue: 'none'),
+                        initialSelection: Hive.box('settingsBox').get('sort', defaultValue: 'nameaz'),
                         inputDecorationTheme: InputDecorationTheme(
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
                           focusColor: Theme.of(context).colorScheme.primary,
                           enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
-                          labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary, fontFamily: 'Roboto-Regular.ttf'),
+                          labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.secondary),
                           iconColor: Theme.of(context).colorScheme.primary,
                         ),
                         onSelected: (value) {
@@ -509,6 +521,7 @@ class _HomePageState extends State<Homepage> {
                         aboutSettingHeader: 'Reorder Cards',
                         settingAction: () {
                           setState2(() {
+                            VibrationProvider.vibrateSuccess();
                             toggleReorderMode();
                           });
                         },
@@ -521,11 +534,10 @@ class _HomePageState extends State<Homepage> {
                         thickness: 1.0,
                       ),
                       SizedBox(height: 10,),
-                      Text('Columns: $columnAmount', style: TextStyle(
+                      Text('Columns: $columnAmount', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontSize: 17,
                         fontWeight: FontWeight.w900,
-                        fontFamily: 'Roboto-Regular.ttf',
-                        color: Theme.of(context).colorScheme.tertiary,
+                        color: Theme.of(context).colorScheme.inverseSurface,
                       )),
                       SizedBox(height: 10,),
                       Slider(
@@ -537,9 +549,10 @@ class _HomePageState extends State<Homepage> {
                         onChanged: (double newValue) {
                           setState2(() {
                             setState(() {
+                              VibrationProvider.vibrateSuccess();
                               columnAmountDouble = newValue;
                               columnAmount = columnAmountDouble.round().toInt();
-                              Hive.box('settingsBox').put('columnAmount', columnAmount); // Save to Hive
+                              Hive.box('settingsBox').put('columnAmount', columnAmount);
                             });
                           });
                         },
@@ -550,16 +563,15 @@ class _HomePageState extends State<Homepage> {
               ),
               actions: [
                 Center(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(elevation: 0.0),
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(elevation: 0.0, side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11))),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: Text('SELECT', style: TextStyle(
+                    child: Text('SELECT', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.bold,
-                      fontFamily: 'Roboto-Regular.ttf',
                       fontSize: 15,
-                      color: Theme.of(context).colorScheme.tertiary,
+                      color: Theme.of(context).colorScheme.inverseSurface,
                     ),),
                   ),
                 ),
@@ -579,7 +591,7 @@ class _HomePageState extends State<Homepage> {
         return Center(
           child: Text(
             'Storage error: ${snapshot.error}',
-            style: const TextStyle(color: Colors.red, fontSize: 18),
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.red, fontSize: 18),
             textAlign: TextAlign.center,
           ),
         );
@@ -587,7 +599,6 @@ class _HomePageState extends State<Homepage> {
       if (snapshot.connectionState != ConnectionState.done) {
         return const Center(child: CircularProgressIndicator());
       }
-      // Your normal build code here
       return _buildMainContent(context);
     },
   );
@@ -598,10 +609,10 @@ Widget _buildMainContent(BuildContext context) {
 
   try {
     if (cdb.myShops.isEmpty) {
-      content = const Center(
+      content = Center(
         child: Text(
           'Your Cardabase is empty',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Roboto-Regular.ttf',),
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       );
     } else if (columnAmount == 1) {
@@ -800,7 +811,7 @@ Widget _buildMainContent(BuildContext context) {
     content = Center(
       child: Text(
         'Error: $e',
-        style: const TextStyle(color: Colors.red, fontSize: 18),
+        style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.red, fontSize: 18),
         textAlign: TextAlign.center,
       ),
     );
@@ -826,20 +837,9 @@ Widget _buildMainContent(BuildContext context) {
           },
         ),
       ],
-      title: TextButton(
-        onPressed:  () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const NewsPage()));
-        },
-        child: Text(
-          'Cardabase',
-          style: TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.w900,
-            fontFamily: 'xirod',
-            letterSpacing: 5,
-            color: Theme.of(context).colorScheme.tertiary,
-            )
-          ),
+      title: Text(
+        'Cardabase',
+        style: Theme.of(context).textTheme.titleLarge?.copyWith()
       ),
       centerTitle: true,
       elevation: 0.0,
@@ -857,7 +857,12 @@ Widget _buildMainContent(BuildContext context) {
             enableFeedback: true,
             tooltip: 'Add a card',
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateCard()), ).then((value) => setState(() {}));},
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (builder) => const CreateCard(), )
+              ).then((value) => setState(() {
+                cdb.loadData();
+              }));},
             child: const Icon(Icons.add_card),
           ),
         ),

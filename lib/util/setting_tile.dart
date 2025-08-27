@@ -5,8 +5,8 @@ class MySetting extends StatelessWidget {
 
   final String settingHeader;
   final String aboutSettingHeader;
-  final settingIcon;
-  final settingAction;
+  final IconData settingIcon;
+  final void Function() settingAction;
   final Color iconColor;
 
 
@@ -39,9 +39,9 @@ class MySetting extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(settingHeader, style: TextStyle(color: Theme.of(context).colorScheme.tertiary, fontSize: 20, fontFamily: 'Roboto-Regular.ttf',)),
+                  Text(settingHeader, style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 20, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 5,),
-                  Text(aboutSettingHeader, style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 12, fontFamily: 'Roboto-Regular.ttf',)),
+                  Text(aboutSettingHeader, style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 12.5, fontWeight: FontWeight.w400)),
                 ],
               ),
             ],

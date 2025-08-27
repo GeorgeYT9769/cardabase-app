@@ -28,7 +28,7 @@ class ButtonTile extends StatelessWidget {
               minimumSize: const Size.fromHeight(65),
             ),
             onPressed: buttonAction,
-            child: Text(buttonText, style: TextStyle(color: Theme.of(context).colorScheme.tertiary, fontSize: 20, fontFamily: 'Roboto-Regular.ttf',)),
+            child: Text(buttonText, style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontSize: 20)),
           )
       ),
     );

@@ -15,11 +15,9 @@ class cardabase_db {
     } else if (data is List) {
       myShops = data;
     } else if (data is Map) {
-      // If old data was a Map, convert to a List of one map
       myShops = [Map<String, dynamic>.from(data)];
       _myBox.put('CARDLIST', myShops);
     } else {
-      // Fallback: reset to empty list
       myShops = [];
       _myBox.put('CARDLIST', []);
     }

@@ -41,7 +41,7 @@ class _QRBarReaderState extends State<QRBarReader> {
                   Container(
                     margin: const EdgeInsets.all(10),
                     child: IconButton(
-                      style: const ButtonStyle(iconSize: WidgetStatePropertyAll(30)),
+                      style: ButtonStyle(iconSize: WidgetStatePropertyAll(30), iconColor: WidgetStatePropertyAll(Theme.of(context).colorScheme.inverseSurface)),
                       icon: const Icon(Icons.cameraswitch),
                       onPressed: () async {
                         await controller?.flipCamera();
@@ -52,7 +52,7 @@ class _QRBarReaderState extends State<QRBarReader> {
                   Container(
                     margin: const EdgeInsets.all(10),
                     child: IconButton(
-                      style: const ButtonStyle(iconSize: WidgetStatePropertyAll(30)),
+                      style: ButtonStyle(iconSize: WidgetStatePropertyAll(30), iconColor: WidgetStatePropertyAll(Theme.of(context).colorScheme.inverseSurface)),
                       icon: const Icon(Icons.flash_on),
                       onPressed: () async {
                         await controller?.toggleFlash();
@@ -63,7 +63,7 @@ class _QRBarReaderState extends State<QRBarReader> {
                   Container(
                     margin: const EdgeInsets.all(10),
                     child: IconButton(
-                      style: const ButtonStyle(iconSize: WidgetStatePropertyAll(30)),
+                      style: ButtonStyle(iconSize: WidgetStatePropertyAll(30), iconColor: WidgetStatePropertyAll(Theme.of(context).colorScheme.inverseSurface)),
                       icon: const Icon(Icons.photo),
                       onPressed: _pickImage,
                     ),
@@ -71,7 +71,7 @@ class _QRBarReaderState extends State<QRBarReader> {
                   Container(
                     margin: const EdgeInsets.all(10),
                     child: IconButton(
-                      style: const ButtonStyle(iconSize: WidgetStatePropertyAll(30)),
+                      style: ButtonStyle(iconSize: WidgetStatePropertyAll(30), iconColor: WidgetStatePropertyAll(Theme.of(context).colorScheme.inverseSurface)),
                       icon: const Icon(Icons.arrow_back_ios_new),
                       onPressed: () {
                         Navigator.of(context).pop();
@@ -125,8 +125,6 @@ class _QRBarReaderState extends State<QRBarReader> {
   Future<String?> decodeImage(Uint8List bytes) async {
     try {
       final image = img.decodeImage(Uint8List.fromList(bytes));
-      print('Got Image!');
-
       if (image != null) {
         LuminanceSource source = RGBLuminanceSource(
           image.width,
@@ -146,12 +144,9 @@ class _QRBarReaderState extends State<QRBarReader> {
         var result = reader.decode(bitmap);
         return result.text;
       } else {
-        debugPrint(
-            'Error: Image decoding failed. The input data may not be a valid image.');
         return null;
       }
     } catch (e) {
-      debugPrint('Exception during QR code decoding: $e');
       return null;
     }
   }
@@ -169,20 +164,19 @@ class _QRBarReaderState extends State<QRBarReader> {
         "format": "QR_CODE",
       });
     } else {
-      log('Failed to decode QR code from image.');
       VibrationProvider.vibrateError();
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
-            content: const Row(
+            content: Row(
               children: [
                 Icon(Icons.error, size: 15, color: Colors.white),
                 SizedBox(width: 10),
                 Text(
                   'Error!',
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontSize: 18,
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -204,7 +198,6 @@ class _QRBarReaderState extends State<QRBarReader> {
 
 
   void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
-    log('${DateTime.now().toIso8601String()}_onPermissionSet $p');
     if (!p) {
       VibrationProvider.vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -212,13 +205,13 @@ class _QRBarReaderState extends State<QRBarReader> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
-            content: const Row(
+            content: Row(
               children: [
                 Icon(Icons.error, size: 15, color: Colors.white),
                 SizedBox(width: 10),
                 Text(
                   'No permission!',
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontSize: 18,
                     color: Colors.white,
                     fontWeight: FontWeight.bold,

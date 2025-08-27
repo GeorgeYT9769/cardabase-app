@@ -1,6 +1,6 @@
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';
-import '../data/cardabase_db.dart';// Import your CardType enum if needed
+import '../data/cardabase_db.dart';
 
 cardabase_db cdb = cardabase_db();
 
@@ -12,37 +12,36 @@ Future<bool> showImportDialog(BuildContext context) async {
   final result = await showDialog(
     context: context,
     builder: (context) => AlertDialog(
-      title: Text('Import Card Data', style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface, fontFamily: 'Roboto-Regular.ttf',),),
+      title: Text('Import Card Data', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 30),),
       content: SizedBox(
         width: double.maxFinite,
         child: TextField(
           controller: textController,
           maxLines: 10,
           decoration: InputDecoration(
-            hintStyle: TextStyle(color: Theme.of(context).colorScheme.inverseSurface, fontFamily: 'Roboto-Regular.ttf', fontSize: 15),
+            hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 15),
             hintText: 'This action will rewrite existing cards!\n \nPaste your Cardabase here:',
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
             focusColor: Theme.of(context).colorScheme.primary,
             enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
           ),
-          style: TextStyle(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold),
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold),
         ),
       ),
       actions: [
-        ElevatedButton(
+        OutlinedButton(
           onPressed: () => Navigator.of(context).pop(),
-          style: ElevatedButton.styleFrom(elevation: 0.0),
+          style: OutlinedButton.styleFrom(elevation: 0.0, side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11))),
           child: Text(
             'Cancel',
-            style: TextStyle(
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
               fontWeight: FontWeight.bold,
-              fontFamily: 'Roboto-Regular.ttf',
               fontSize: 15,
               color: Theme.of(context).colorScheme.tertiary,
             ),
           ),
         ),
-        ElevatedButton(
+        OutlinedButton(
           onPressed: () {
             final input = textController.text.trim();
             if (input.isEmpty) {
@@ -52,11 +51,11 @@ Future<bool> showImportDialog(BuildContext context) async {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)
                   ),
-                  content: const Row(
+                  content: Row(
                     children: [
                       Icon(Icons.error, size: 15, color: Colors.white,),
                       SizedBox(width: 10,),
-                      Text('No data!', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+                      Text('No data!', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
                     ],
                   ),
                   duration: const Duration(milliseconds: 3000),
@@ -76,7 +75,6 @@ Future<bool> showImportDialog(BuildContext context) async {
             for (final line in lines) {
               final trimmed = line.trim();
 
-              // Map-style: {key: value, ...}
               if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
                 final cleaned = trimmed.substring(1, trimmed.length - 1); // remove { }
                 final fields = cleaned.split(',').map((e) => e.trim()).toList();
@@ -85,7 +83,7 @@ Future<bool> showImportDialog(BuildContext context) async {
                   final kv = field.split(':');
                   if (kv.length >= 2) {
                     final key = kv[0].trim();
-                    final value = kv.sublist(1).join(':').trim(); // in case value contains ':'
+                    final value = kv.sublist(1).join(':').trim();
                     cardMap[key] = value;
                   }
                 }
@@ -112,7 +110,6 @@ Future<bool> showImportDialog(BuildContext context) async {
                 }
               }
 
-              // List-style: [value, value, ...]
               else if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
                 final cleaned = trimmed.substring(1, trimmed.length - 1);
                 final values = cleaned.split(',').map((e) => e.trim()).toList();
@@ -134,13 +131,12 @@ Future<bool> showImportDialog(BuildContext context) async {
                     newCards.add(newMap);
                     importedCount++;
                   } catch (e) {
-                    // Optionally handle parse errors
+                    // parse errors
                   }
                 }
               }
             }
 
-            // Replace existing cards with imported ones
             if (newCards.isNotEmpty) {
               cdb.myShops.clear();
               cdb.myShops.addAll(newCards);
@@ -158,7 +154,7 @@ Future<bool> showImportDialog(BuildContext context) async {
                   children: [
                     Icon(Icons.check, size: 15, color: Colors.white,),
                     SizedBox(width: 10,),
-                    Text('Imported $importedCount cards!', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+                    Text('Imported $importedCount cards!', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
                   ],
                 ),
                 duration: const Duration(milliseconds: 3000),
@@ -170,12 +166,11 @@ Future<bool> showImportDialog(BuildContext context) async {
               )
             );
           },
-          style: ElevatedButton.styleFrom(elevation: 0.0),
+          style: OutlinedButton.styleFrom(elevation: 0.0, side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11))),
           child: Text(
             'Import',
-            style: TextStyle(
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
               fontWeight: FontWeight.bold,
-              fontFamily: 'Roboto-Regular.ttf',
               fontSize: 15,
               color: Theme.of(context).colorScheme.tertiary,
             ),

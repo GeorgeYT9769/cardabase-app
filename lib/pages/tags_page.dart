@@ -17,7 +17,7 @@ class _TagsPageState extends State<TagsPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Add a tag', style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface, fontFamily: 'Roboto-Regular.ttf',)),
+        title: Text('Add a tag', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 30)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -36,9 +36,8 @@ class _TagsPageState extends State<TagsPage> {
                   ),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                labelStyle: TextStyle(
+                labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Theme.of(context).colorScheme.secondary,
-                  fontFamily: 'Roboto-Regular.ttf',
                 ),
                 prefixIcon: Icon(
                   Icons.label,
@@ -46,24 +45,23 @@ class _TagsPageState extends State<TagsPage> {
                 ),
                 labelText: 'Tag',
               ),
-              style: TextStyle(
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: Theme.of(context).colorScheme.tertiary,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 20),
             Center(
-              child: ElevatedButton(
+              child: OutlinedButton(
                 onPressed: () {
                   addTag(controller.text);
                   Navigator.of(context).pop();
                 },
-                style: ElevatedButton.styleFrom(elevation: 0.0),
+                style: OutlinedButton.styleFrom(elevation: 0.0, side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11))),
                 child: Text(
                   'ADD',
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'Roboto-Regular.ttf',
                     fontSize: 15,
                     color: Theme.of(context).colorScheme.tertiary,
                   ),
@@ -89,11 +87,11 @@ class _TagsPageState extends State<TagsPage> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10)
             )  ,
-            content: const Row(
+            content: Row(
               children: [
                 Icon(Icons.error, size: 15, color: Colors.white,),
                 SizedBox(width: 10,),
-                Text('Tag already exists!', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+                Text('Tag already exists!', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
               ],
             ),
             duration: const Duration(milliseconds: 3000),
@@ -119,11 +117,11 @@ class _TagsPageState extends State<TagsPage> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10)
             )  ,
-            content: const Row(
+            content: Row(
               children: [
                 Icon(Icons.error, size: 15, color: Colors.white,),
                 SizedBox(width: 10,),
-                Text('Tag does not exist!', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+                Text('Tag does not exist!', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
               ],
             ),
             duration: const Duration(milliseconds: 3000),
@@ -142,11 +140,7 @@ class _TagsPageState extends State<TagsPage> {
       appBar: AppBar(
         title: Text(
             'Tags',
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w900,
-              fontFamily: 'xirod',
-              letterSpacing: 5,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: Theme.of(context).colorScheme.tertiary,
             )
         ),
@@ -167,7 +161,7 @@ class _TagsPageState extends State<TagsPage> {
             return Center(
               child: Text(
                 'No tags added',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Roboto-Regular.ttf',),
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 20, fontWeight: FontWeight.bold,),
               ),
             );
           }
@@ -179,9 +173,8 @@ class _TagsPageState extends State<TagsPage> {
               return ListTile(
                 title: Text(
                   tags[index],
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Theme.of(context).colorScheme.inverseSurface,
-                    fontFamily: 'Roboto-Regular.ttf',
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),

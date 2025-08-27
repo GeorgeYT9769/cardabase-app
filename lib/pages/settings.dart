@@ -7,6 +7,9 @@ import 'package:hive/hive.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../data/cardabase_db.dart';
 import '../util/camera.dart';
+import '../util/devoptions.dart';
+import '../util/systemfont_provider.dart';
+import 'info.dart';
 import 'password.dart';
 import '../theme/theme_provider.dart';
 import '../util/brightness_provider.dart';
@@ -20,6 +23,8 @@ final brightness = BrightnessProvider.brightness;
 bool bulb = BrightnessProvider.brightness;
 bool vibrate = VibrationProvider.vibrate;
 cardabase_db cdb = cardabase_db();
+bool devOptions = DeveloperOptionsProvider.developerOptions;
+bool useSystemFontEverywhere = SystemFontProvider.useSystemFont;
 
 class Settings extends StatefulWidget {
   const Settings({super.key,});
@@ -59,6 +64,20 @@ class _SettingsState extends State<Settings> {
     });
   }
 
+  void toggleDeveloperOptions() {
+    DeveloperOptionsProvider.toggleDeveloperOptions();
+    setState(() {
+      devOptions = !devOptions;
+    });
+  }
+
+  void toggleSystemFontEverywhere() {
+    SystemFontProvider.toggleSystemFont();
+    setState(() {
+      useSystemFontEverywhere = !useSystemFontEverywhere;
+    });
+  }
+
   void resetCardabase() {
     setState(() {
       cdb.myShops.removeRange(0, cdb.myShops.length);
@@ -72,11 +91,11 @@ class _SettingsState extends State<Settings> {
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10)
           )  ,
-          content: const Row(
+          content: Row(
             children: [
               Icon(Icons.check, size: 15, color: Colors.white,),
               SizedBox(width: 10,),
-              Text('Cardabase was reset!', style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+              Text('Cardabase was reset!', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
             ],
           ),
           duration: const Duration(milliseconds: 3000),
@@ -86,7 +105,7 @@ class _SettingsState extends State<Settings> {
           dismissDirection: DismissDirection.vertical,
           backgroundColor: const Color.fromARGB(255, 92, 184, 92),
         ));
-    Navigator.of(context).pop(true); // Bubble up to homepage
+    Navigator.of(context).pop(true);
   }
 
   showUnlockDialogExport(BuildContext context) {
@@ -95,7 +114,7 @@ class _SettingsState extends State<Settings> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Enter Password', style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface, fontFamily: 'Roboto-Regular.ttf',) ),
+        title: Text('Enter Password', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 30) ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -115,9 +134,8 @@ class _SettingsState extends State<Settings> {
                   ),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                labelStyle: TextStyle(
+                labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Theme.of(context).colorScheme.secondary,
-                  fontFamily: 'Roboto-Regular.ttf',
                 ),
                 prefixIcon: Icon(
                   Icons.password,
@@ -125,14 +143,14 @@ class _SettingsState extends State<Settings> {
                 ),
                 labelText: 'Password',
               ),
-              style: TextStyle(
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: Theme.of(context).colorScheme.tertiary,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 20),
             Center(
-              child: ElevatedButton(
+              child: OutlinedButton(
                 onPressed: () {
                   if (controller.text == passwordbox.get('PW')) {
                     FocusScope.of(context).unfocus();
@@ -148,13 +166,13 @@ class _SettingsState extends State<Settings> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        content: const Row(
+                        content: Row(
                           children: [
                             Icon(Icons.error, size: 15, color: Colors.white),
                             SizedBox(width: 10),
                             Text(
                               'Incorrect password!',
-                              style: TextStyle(
+                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 fontSize: 18,
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -172,12 +190,11 @@ class _SettingsState extends State<Settings> {
                     );
                   }
                 },
-                style: ElevatedButton.styleFrom(elevation: 0.0),
+                style: OutlinedButton.styleFrom(elevation: 0.0, side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11))),
                 child: Text(
                   'EXPORT',
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'Roboto-Regular.ttf',
                     fontSize: 15,
                     color: Theme.of(context).colorScheme.tertiary,
                   ),
@@ -194,6 +211,7 @@ class _SettingsState extends State<Settings> {
     if (passwordbox.isNotEmpty) {
       showUnlockDialogExport(context);
     } else {
+      VibrationProvider.vibrateSuccess();
       exportCardList(context);
     }
   }
@@ -204,11 +222,11 @@ class _SettingsState extends State<Settings> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Are you sure?', style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface, fontFamily: 'Roboto-Regular.ttf',)),
+        title: Text('Are you sure?', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 30)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('This action cannot be undone!', style: TextStyle(color: Theme.of(context).colorScheme.tertiary, fontFamily: 'Roboto-Regular.ttf',)),
+            Text('This action cannot be undone!', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, )),
             if (passwordbox.isNotEmpty)
               TextFormField(
                 controller: controller,
@@ -226,9 +244,8 @@ class _SettingsState extends State<Settings> {
                     ),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  labelStyle: TextStyle(
+                  labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Theme.of(context).colorScheme.secondary,
-                    fontFamily: 'Roboto-Regular.ttf',
                   ),
                   prefixIcon: Icon(
                     Icons.password,
@@ -236,14 +253,14 @@ class _SettingsState extends State<Settings> {
                   ),
                   labelText: 'Password',
                 ),
-                style: TextStyle(
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Theme.of(context).colorScheme.tertiary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             const SizedBox(height: 20),
             Center(
-              child: ElevatedButton(
+              child: OutlinedButton(
                 onPressed: () {
                   if (passwordbox.isNotEmpty) {
                     if (controller.text == passwordbox.get('PW')) {
@@ -259,13 +276,13 @@ class _SettingsState extends State<Settings> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          content: const Row(
+                          content: Row(
                             children: [
                               Icon(Icons.error, size: 15, color: Colors.white),
                               SizedBox(width: 10),
                               Text(
                                 'Incorrect password!',
-                                style: TextStyle(
+                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                   fontSize: 18,
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
@@ -283,17 +300,15 @@ class _SettingsState extends State<Settings> {
                       );
                     }
                   } else {
-                    // No password set, just reset
                     Navigator.pop(context);
                     resetCardabase();
                   }
                 },
-                style: ElevatedButton.styleFrom(elevation: 0.0),
+                style: OutlinedButton.styleFrom(elevation: 0.0, side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11))),
                 child: Text(
                   'DELETE',
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'Roboto-Regular.ttf',
                     fontSize: 15,
                     color: Theme.of(context).colorScheme.tertiary,
                   ),
@@ -329,11 +344,7 @@ class _SettingsState extends State<Settings> {
             ],
             title: Text(
                 'Settings',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w900,
-                  fontFamily: 'xirod',
-                  letterSpacing: 5,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   color: Theme.of(context).colorScheme.tertiary,
                 )
             ),
@@ -352,9 +363,8 @@ class _SettingsState extends State<Settings> {
                   children: [
                     Text(
                       'App Settings',
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'Roboto-Regular.ttf',
                           fontSize: 23,
                           color: Theme.of(context).colorScheme.inverseSurface
                       ),
@@ -398,6 +408,13 @@ class _SettingsState extends State<Settings> {
                 settingHeader: 'Vibrate',
                 settingIcon: vibrate ? Icons.vibration : Icons.phone_android_sharp,
                 iconColor: vibrate ? Colors.green : Colors.red,
+              ),
+              MySetting(
+                aboutSettingHeader:"Use System font everywhere",
+                settingAction: toggleSystemFontEverywhere,
+                settingHeader: 'System Font',
+                settingIcon: useSystemFontEverywhere ? Icons.font_download: Icons.font_download_outlined ,
+                iconColor: useSystemFontEverywhere ? Colors.green : Colors.red,
               ),
               MySetting(
                 aboutSettingHeader:
@@ -458,15 +475,24 @@ class _SettingsState extends State<Settings> {
                   children: [
                     Text(
                       'Social Networks',
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'Roboto-Regular.ttf',
                           fontSize: 23,
                           color: Theme.of(context).colorScheme.inverseSurface
                       ),
                     ),
                   ],
                 ),
+              ),
+              MySetting(
+                aboutSettingHeader:
+                'About Cardabase',
+                settingAction: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const InfoScreen()));
+                },
+                settingHeader: 'App INFO',
+                settingIcon: Icons.info,
+                iconColor: Theme.of(context).colorScheme.tertiary,
               ),
               MySetting(
                 aboutSettingHeader:
@@ -497,9 +523,35 @@ class _SettingsState extends State<Settings> {
                 'Check out the website for this project',
                 settingAction: () => _launchUrl(Uri.parse('https://georgeyt9769.github.io/cardabase/')),
                 settingHeader: 'Website',
-                settingIcon: Icons.info,
+                settingIcon: Icons.web,
                 iconColor: Theme.of(context).colorScheme.tertiary,
               ),
+              //uncomment this to enable dev options in the settings
+              //Container(
+              //  margin: const EdgeInsets.only(top: 20, left: 20,),
+              //  child: Column(
+              //    mainAxisAlignment: MainAxisAlignment.center,
+              //    crossAxisAlignment: CrossAxisAlignment.start,
+              //    children: [
+              //      Text(
+              //        'Other',
+              //        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              //            fontWeight: FontWeight.bold,
+              //            fontSize: 23,
+              //            color: Theme.of(context).colorScheme.inverseSurface
+              //        ),
+              //      ),
+              //    ],
+              //  ),
+              //),
+              //MySetting(
+              //  aboutSettingHeader:
+              //  'Toggle developer options',
+              //  settingAction: toggleDeveloperOptions,
+              //  settingHeader: 'DEV Options',
+              //  settingIcon:Icons.developer_mode,
+              //  iconColor: devOptions ? Colors.red : Colors.green,
+              //),
             ],
           ),
         ),

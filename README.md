@@ -40,7 +40,7 @@
 - Support for modern barcode types
 - Password protected cards
 - Share cards easily with QR Codes
-- Does not use internet connection
+- Does not need internet connection
 
 ## 📲 Installation
 
@@ -62,23 +62,56 @@ By downloading the app you agree:
 
 - To accept the MIT license;
 - That the owner, creators, and contributors are not responsible for any hardware, software, emotional, or other damages made by bugs in the app. Download and use at your own risk;
-- To allow Cardabase to use local storage (and camera - optional).
+- To allow Cardabase to use local storage (camera, internet connection - optional).
 
 ## 🔜 Coming soon
 
-- add tags, so users can filter by different types, like 'beauty', 'tech', 'groceries' and others, users would create the tags
 - add biometric identification for the password
-- add sorting system, by name, by ID, by color, by date created...
 - add a counter to every card, so when card is clicked, it would add a point, then this could be used to sort by the most used cards
 - custom color theme, custom theme builder
-- maybe redesign and overhaul the whole storage system and design
+- images for the cards
 - idk, let me know via issues ;)
+
+## 📦 Storage System
+
+From 1.5.0, Cardabase uses this storage system:
+
+`'ID': VALUE # EXAMPLE,`
+`'cardName': <Card Name>,`   
+`'cardId': <Card ID>,`  
+`'redValue': <R value>,`  
+`'greenValue': <G value>,`  
+`'blueValue': <B value>,`  
+`'cardType': <Card Type>,`  
+`'hasPassword': <Password>,`
+`'uniqueId': <Unique ID>,`
+`'tags': <Tags>,`
+
+- `<Card Name>` - Name of the card (String)
+- `<Card ID>` - ID of the card (String)
+- `<R value>` - Value of Red color, 0 - 255 (int)
+- `<G value>` - Value of Green color, 0 - 255 (int)
+- `<B value>` - Value of Blue color, 0 - 255 (int)
+- `<Card Type>` - Type of the card, they can be [THESE](https://github.com/GeorgeYT9769/cardabase-app/blob/2e86905c4fb4f861cd3008506a681aab96ea9b38/lib/pages/createcardnew.dart#L9-L27) or [THESE](https://github.com/GeorgeYT9769/cardabase-app/blob/2e86905c4fb4f861cd3008506a681aab96ea9b38/lib/pages/createcardnew.dart#L58-L89), (same types) (String)
+- `<Password>` - If the card has a password or not (bool)
+- `<Unique ID>` - ID of each card, YYYYMMDDHHMMSSX, X is a bonus number only applied when importing all cards at once (String)
+- `<Tags>` - List of tags to categorize the cards (List with Strings in it)
 
 ## 📥 Import a card via QR Code
 
 From 1.3.0, you can easily import a card via QR Code.
 This is how the structure of the data in the QR Code looks like:
-`[<Card Name>, <Card ID>, <R value>, <G value>, <B value>, <Card Type>, <Password>]`
+`
+'cardName': controller.text,
+'cardId': controllercardid.text,
+'redValue': redValue,
+'greenValue': greenValue,
+'blueValue': blueValue,
+'cardType': cardTypeText,
+'hasPassword': hasPassword,
+'uniqueId': uniqueId,
+'tags': selectedTags.toList(),
+`
 - `<Card Name>` - Name of the card (String)
 - `<Card ID>` - ID of the card (String)
 - `<R value>` - Value of Red color, 0 - 255 (int)

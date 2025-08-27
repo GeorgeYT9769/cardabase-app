@@ -67,13 +67,7 @@ class _NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin
       appBar: AppBar(
         title: Text(
             'News',
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w900,
-              fontFamily: 'xirod',
-              letterSpacing: 5,
-              color: Theme.of(context).colorScheme.tertiary,
-            )
+            style: Theme.of(context).textTheme.titleLarge?.copyWith()
         ),
         centerTitle: true,
         elevation: 0.0,
@@ -87,7 +81,9 @@ class _NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin
         bottom: TabBar(
           physics: const BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
           controller: _tabController,
-          labelStyle: TextStyle(color: Theme.of(context).colorScheme.tertiary, fontSize: 18, fontFamily: 'Roboto-Regular.ttf',),
+          labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 18),
+          unselectedLabelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontSize: 18),
+          indicatorColor: Theme.of(context).colorScheme.inverseSurface,
           tabs: const [
             Tab(text: 'Online'),
             Tab(text: 'Local'),
@@ -106,10 +102,9 @@ class _NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin
               children: [
                 Text(
                   _onlineContent,
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Theme.of(context).colorScheme.inverseSurface,
                     fontSize: 15,
-                    fontFamily: 'Roboto-Regular.ttf',
                   ),
                 ),
               ],
@@ -123,10 +118,9 @@ class _NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin
               children: [
                 Text(
                   _localContent,
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Theme.of(context).colorScheme.inverseSurface,
                     fontSize: 15,
-                    fontFamily: 'Roboto-Regular.ttf',
                   ),
                 ),
               ],
