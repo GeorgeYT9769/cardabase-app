@@ -17,12 +17,12 @@ class _ColorPickerSecondDialogState extends State<ColorPickerSecondDialog> {
   @override
   void initState() {
     super.initState();
-    currentColor = widget.cardColor; // Initialize the local color variable
+    currentColor = widget.cardColor;
   }
 
   @override
   void dispose() {
-    super.dispose(); // Call super.dispose() to ensure proper cleanup
+    super.dispose();
   }
 
   @override
@@ -31,18 +31,22 @@ class _ColorPickerSecondDialogState extends State<ColorPickerSecondDialog> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       title: Text(
         'Pick a color!',
-        style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface, fontFamily: 'Roboto-Regular.ttf',),
+        style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface,fontSize: 30),
       ),
       content: SingleChildScrollView(
         child: ColorPicker(
+          labelTypes: const [ColorLabelType.rgb],
+          displayThumbColor: true,
+          hexInputBar: true,
           pickerAreaBorderRadius: BorderRadius.circular(10.0),
+          paletteType: PaletteType.hsv,
           enableAlpha: false,
           pickerColor: currentColor!,
           portraitOnly: true,
           onColorChanged: (value) {
-            if (mounted) { // Check if the widget is still mounted
+            if (mounted) {
               setState(() {
-                currentColor = value; // Update the local color variable
+                currentColor = value;
               });
             }
           },
@@ -50,16 +54,15 @@ class _ColorPickerSecondDialogState extends State<ColorPickerSecondDialog> {
       ),
       actions: <Widget>[
         Center(
-          child: ElevatedButton(
+          child: OutlinedButton(
             onPressed: () {
-              Navigator.pop(context, currentColor); // Pass the current color
+              Navigator.pop(context, currentColor);
             },
-            style: ElevatedButton.styleFrom(elevation: 0.0),
+            style: OutlinedButton.styleFrom(elevation: 0.0, side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11))),
             child: Text(
               'Got it',
-              style: TextStyle(
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 fontWeight: FontWeight.bold,
-                fontFamily: 'Roboto-Regular.ttf',
                 fontSize: 15,
                 color: Theme.of(context).colorScheme.tertiary,
               ),

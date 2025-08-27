@@ -8,10 +8,10 @@
 		},
 		"paths" : 
 		{
-			"cmake" : "C:/Users/PC/AppData/Local/Android/Sdk/cmake/3.22.1/bin/cmake.exe",
-			"cpack" : "C:/Users/PC/AppData/Local/Android/Sdk/cmake/3.22.1/bin/cpack.exe",
-			"ctest" : "C:/Users/PC/AppData/Local/Android/Sdk/cmake/3.22.1/bin/ctest.exe",
-			"root" : "C:/Users/PC/AppData/Local/Android/Sdk/cmake/3.22.1/share/cmake-3.22"
+			"cmake" : "D:/Android/Sdk/cmake/3.22.1/bin/cmake.exe",
+			"cpack" : "D:/Android/Sdk/cmake/3.22.1/bin/cpack.exe",
+			"ctest" : "D:/Android/Sdk/cmake/3.22.1/bin/ctest.exe",
+			"root" : "D:/Android/Sdk/cmake/3.22.1/share/cmake-3.22"
 		},
 		"version" : 
 		{

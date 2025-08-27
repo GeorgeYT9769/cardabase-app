@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'dart:convert';
 
 class GenerateBarcode extends StatefulWidget {
 
@@ -17,8 +18,9 @@ class GenerateBarcode extends StatefulWidget {
   int red;
   int green;
   int blue;
+  List tags;
 
-  GenerateBarcode({super.key, required this.cardid, required this.cardtext, required this.cardTileColor, required this.cardType, required this.hasPassword, required this.red, required this.green, required this.blue});
+  GenerateBarcode({super.key, required this.cardid, required this.cardtext, required this.cardTileColor, required this.cardType, required this.hasPassword, required this.red, required this.green, required this.blue, required this.tags});
 
   @override
   State<GenerateBarcode> createState() => _GenerateBarcodeState();
@@ -38,12 +40,8 @@ class _GenerateBarcodeState extends State<GenerateBarcode> {
   }
 
   Future<void> _increaseBrightness() async {
-    // Get current brightness
     _previousBrightness = await ScreenBrightness().system;
-    // Set brightness to max (1.0)
     await ScreenBrightness().setApplicationScreenBrightness(1.0);
-
-    //print("Error getting or setting brightness: $e");
   }
 
   @override
@@ -54,7 +52,6 @@ class _GenerateBarcodeState extends State<GenerateBarcode> {
 
   Future<void> _resetBrightness() async {
     if (_previousBrightness != null) {
-      // Restore the original brightness
       await ScreenBrightness().setApplicationScreenBrightness(_previousBrightness!);
     }
   }
@@ -111,7 +108,7 @@ class _GenerateBarcodeState extends State<GenerateBarcode> {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      title: Text('Share', style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface, fontFamily: 'Roboto-Regular.ttf',),),
+                      title: Text('Share', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 30),),
                       content: Container(
                         height: 200,
                         padding: const EdgeInsets.all(15),
@@ -120,7 +117,7 @@ class _GenerateBarcodeState extends State<GenerateBarcode> {
                             color: Colors.white),
                         child: BarcodeWidget(
                           padding: const EdgeInsets.all(10),
-                          data: '[${widget.cardtext}, ${widget.cardid}, ${widget.red}, ${widget.green}, ${widget.blue}, ${widget.cardType}, ${widget.hasPassword}]',
+                          data: '[${widget.cardtext}, ${widget.cardid}, ${widget.red}, ${widget.green}, ${widget.blue}, ${widget.cardType}, ${widget.hasPassword},${widget.tags}]',
                           barcode: Barcode.qrCode(), //Barcode.ean13(drawEndChar: true)
                           drawText: true,
                           style: const TextStyle(color: Colors.black),
@@ -128,14 +125,13 @@ class _GenerateBarcodeState extends State<GenerateBarcode> {
                       ),
                       actions: [
                         Center(
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(elevation: 0.0),
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(elevation: 0.0, side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11))),
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
-                            child: Text('DONE', style: TextStyle(
+                            child: Text('DONE', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'Roboto-Regular.ttf',
                               fontSize: 15,
                               color: Theme.of(context).colorScheme.tertiary,
                             ),),
@@ -152,13 +148,7 @@ class _GenerateBarcodeState extends State<GenerateBarcode> {
         ],
         title: Text(
             'Details',
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w900,
-              fontFamily: 'xirod',
-              letterSpacing: 5,
-              color: Theme.of(context).colorScheme.tertiary,
-            )
+            style: Theme.of(context).textTheme.titleLarge?.copyWith()
         ),
         centerTitle: true,
         elevation: 0.0,
@@ -182,10 +172,9 @@ class _GenerateBarcodeState extends State<GenerateBarcode> {
                           margin: const EdgeInsets.all(20),
                           child: Text(
                             widget.cardtext,
-                            style: const TextStyle(
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                               fontSize: 50,
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'Roboto-Regular.ttf',
                               color: Colors.white,
                             ),
                             maxLines: 2,
@@ -220,7 +209,7 @@ class _GenerateBarcodeState extends State<GenerateBarcode> {
                       errorBuilder: (context, error) => Center(
                         child: Text(
                           'Invalid barcode data',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Roboto-Regular.ttf', color: Colors.red),
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red),
                           textAlign: TextAlign.center,
                         ),
                       ),

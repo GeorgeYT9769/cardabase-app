@@ -5,10 +5,10 @@
 -DANDROID_PLATFORM=android-24
 -DANDROID_ABI=x86
 -DCMAKE_ANDROID_ARCH_ABI=x86
--DANDROID_NDK=C:\Users\PC\AppData\Local\Android\sdk\ndk\25.1.8937393
--DCMAKE_ANDROID_NDK=C:\Users\PC\AppData\Local\Android\sdk\ndk\25.1.8937393
--DCMAKE_TOOLCHAIN_FILE=C:\Users\PC\AppData\Local\Android\sdk\ndk\25.1.8937393\build\cmake\android.toolchain.cmake
--DCMAKE_MAKE_PROGRAM=C:\Users\PC\AppData\Local\Android\sdk\cmake\3.22.1\bin\ninja.exe
+-DANDROID_NDK=D:\Android\sdk\ndk\25.1.8937393
+-DCMAKE_ANDROID_NDK=D:\Android\sdk\ndk\25.1.8937393
+-DCMAKE_TOOLCHAIN_FILE=D:\Android\sdk\ndk\25.1.8937393\build\cmake\android.toolchain.cmake
+-DCMAKE_MAKE_PROGRAM=D:\Android\sdk\cmake\3.22.1\bin\ninja.exe
 -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=D:\Github\cardabase-app\cardabase-app\build\app\intermediates\cxx\Debug\1x6r1z2a\obj\x86
 -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=D:\Github\cardabase-app\cardabase-app\build\app\intermediates\cxx\Debug\1x6r1z2a\obj\x86
 -DCMAKE_BUILD_TYPE=Debug

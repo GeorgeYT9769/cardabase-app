@@ -8,15 +8,29 @@ class cardabase_db {
 
   //load the data
   void loadData() {
-    if (_myBox.get('CARDLIST') == null) {
+    final data = _myBox.get('CARDLIST');
+    if (data == null) {
+      _myBox.put('CARDLIST', []);
+      myShops = [];
+    } else if (data is List) {
+      myShops = data;
+    } else if (data is Map) {
+      myShops = [Map<String, dynamic>.from(data)];
+      _myBox.put('CARDLIST', myShops);
+    } else {
+      myShops = [];
       _myBox.put('CARDLIST', []);
     }
-    myShops = _myBox.get('CARDLIST');
+    //myShops = _myBox.get('CARDLIST');
   }
 
   //update the data
   void updateDataBase() {
     _myBox.put('CARDLIST', myShops);
+  }
+
+  void sortType() {
+    myShops.sort((a, b) => a['cardType'].compareTo(b['cardType']));
   }
 
 }

@@ -1,3 +1,4 @@
+import 'package:barcode_widget/barcode_widget.dart';
 import 'package:cardabase/pages/generate_barcode_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
@@ -13,13 +14,15 @@ class CardTile extends StatefulWidget {
   final Color cardTileColor;
   final String cardType;
   final bool hasPassword;
-  final Function(BuildContext) duplicateFunction;
   final Function(BuildContext) editFunction;
   final Function(BuildContext) moveUpFunction;
   final Function(BuildContext) moveDownFunction;
   final double labelSize;
   final double borderSize;
   final double marginSize;
+  final Widget? dragHandle;
+  final List<dynamic> tags;
+  final bool reorderMode;
 
   int red;
   int green;
@@ -36,13 +39,15 @@ class CardTile extends StatefulWidget {
     required this.red,
     required this.green,
     required this.blue,
-    required this.duplicateFunction,
     required this.editFunction,
     required this.moveUpFunction,
     required this.moveDownFunction,
     required this.labelSize,
     required this.borderSize,
     required this.marginSize,
+    this.dragHandle,
+    required this.tags,
+    required this.reorderMode,
   });
 
   @override
@@ -51,8 +56,46 @@ class CardTile extends StatefulWidget {
 
 class _CardTileState extends State<CardTile> {
   final passwordbox = Hive.box('password');
-
   cardabase_db cdb = cardabase_db();
+
+  Barcode getBarcodeType(String cardType) {
+    switch (cardType) {
+      case 'CardType.code39':
+        return Barcode.code39();
+      case 'CardType.code93':
+        return Barcode.code93();
+      case 'CardType.code128':
+        return Barcode.code128();
+      case 'CardType.ean13':
+        return Barcode.ean13(drawEndChar: true);
+      case 'CardType.ean8':
+        return Barcode.ean8();
+      case 'CardType.ean5':
+        return Barcode.ean5();
+      case 'CardType.ean2':
+        return Barcode.ean2();
+      case 'CardType.itf':
+        return Barcode.itf();
+      case 'CardType.itf14':
+        return Barcode.itf14();
+      case 'CardType.itf16':
+        return Barcode.itf16();
+      case 'CardType.upca':
+        return Barcode.upcA();
+      case 'CardType.upce':
+        return Barcode.upcE();
+      case 'CardType.codabar':
+        return Barcode.codabar();
+      case 'CardType.qrcode':
+        return Barcode.qrCode();
+      case 'CardType.datamatrix':
+        return Barcode.dataMatrix();
+      case 'CardType.aztec':
+        return Barcode.aztec();
+      default:
+        return Barcode.ean13(drawEndChar: true);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +105,7 @@ class _CardTileState extends State<CardTile> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Enter Password', style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface, fontFamily: 'Roboto-Regular.ttf',) ),
+          title: Text('Enter Password', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 30) ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -82,9 +125,8 @@ class _CardTileState extends State<CardTile> {
                     ),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  labelStyle: TextStyle(
+                  labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Theme.of(context).colorScheme.secondary,
-                    fontFamily: 'Roboto-Regular.ttf',
                   ),
                   prefixIcon: Icon(
                     Icons.password,
@@ -92,20 +134,18 @@ class _CardTileState extends State<CardTile> {
                   ),
                   labelText: 'Password',
                 ),
-                style: TextStyle(
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Theme.of(context).colorScheme.tertiary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 20),
               Center(
-                child: ElevatedButton(
+                child: OutlinedButton(
                   onPressed: () {
                     if (controller.text == passwordbox.get('PW')) {
-                      // Hide the keyboard explicitly
                       FocusScope.of(context).unfocus();
 
-                      // Wait for the keyboard to close before dismissing the dialog
                       Future.delayed(const Duration(milliseconds: 100), () {
                         Navigator.pop(context);
                         Navigator.push(
@@ -120,6 +160,7 @@ class _CardTileState extends State<CardTile> {
                               red: widget.red,
                               green: widget.green,
                               blue: widget.blue,
+                              tags: [],
                             ),
                           ),
                         );
@@ -131,13 +172,13 @@ class _CardTileState extends State<CardTile> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          content: const Row(
+                          content: Row(
                             children: [
                               Icon(Icons.error, size: 15, color: Colors.white),
                               SizedBox(width: 10),
                               Text(
                                 'Incorrect password!',
-                                style: TextStyle(
+                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                   fontSize: 18,
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
@@ -156,12 +197,11 @@ class _CardTileState extends State<CardTile> {
                       );
                     }
                   },
-                  style: ElevatedButton.styleFrom(elevation: 0.0),
+                  style: OutlinedButton.styleFrom(elevation: 0.0, side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11))),
                   child: Text(
                     'Unlock',
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.bold,
-                      fontFamily: 'Roboto-Regular.ttf',
                       fontSize: 15,
                       color: Theme.of(context).colorScheme.tertiary,
                     ),
@@ -190,6 +230,7 @@ class _CardTileState extends State<CardTile> {
               red: widget.red,
               green: widget.green,
               blue: widget.blue,
+              tags: [],
             ),
           ),
         );
@@ -201,39 +242,45 @@ class _CardTileState extends State<CardTile> {
       child: Container(
         margin: EdgeInsets.all(widget.marginSize),
         alignment: Alignment.center,
-        child: GestureDetector(
-          onLongPress: () => _showBottomSheet(context),
-          child: SizedBox(
-            height: (MediaQuery.of(context).size.width - 40) / 1.586,
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: widget.cardTileColor,
-                foregroundColor: Colors.white,
-                elevation: 0.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(widget.borderSize),
+        child: Row(
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onLongPress: widget.reorderMode ? null : () => _showBottomSheet(context),
+                child: SizedBox(
+                  height: (MediaQuery.of(context).size.width - 40) / 1.586,
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: widget.cardTileColor,
+                      foregroundColor: Colors.white,
+                      elevation: 0.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(widget.borderSize),
+                      ),
+                    ),
+                    onPressed: askForPassword,
+                    child: Text(
+                      widget.shopName,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontSize: widget.labelSize,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                    ),
+                  ),
                 ),
-              ),
-              onPressed: askForPassword,
-              child: Text(
-                widget.shopName,
-                style: TextStyle(
-                  fontSize: widget.labelSize,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Roboto-Regular.ttf',
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
               ),
             ),
-          ),
+            if (widget.dragHandle != null) widget.dragHandle!,
+          ],
         ),
       ),
     );
   }
 
-  // Function to show the custom bottom sheet menu
   void _showBottomSheet(BuildContext context) {
     VibrationProvider.vibrateSuccess();
     showModalBottomSheet(
@@ -249,23 +296,15 @@ class _CardTileState extends State<CardTile> {
             children: [
               ListTile(
                 leading: Icon(Icons.edit, color: Theme.of(context).colorScheme.tertiary),
-                title: Text('Edit', style: TextStyle(fontFamily: 'Roboto-Regular.ttf',)),
+                title: Text('Edit', style: Theme.of(context).textTheme.bodyLarge?.copyWith()),
                 onTap: () {
                   Navigator.pop(context);
                   widget.editFunction(context);
                 },
               ),
               ListTile(
-                leading: Icon(Icons.content_copy, color: Theme.of(context).colorScheme.tertiary),
-                title: Text('Duplicate', style: TextStyle(fontFamily: 'Roboto-Regular.ttf',)),
-                onTap: () {
-                  Navigator.pop(context);
-                  widget.duplicateFunction(context);
-                },
-              ),
-              ListTile(
                 leading: Icon(Icons.arrow_upward, color: Theme.of(context).colorScheme.tertiary),
-                title: Text('Move UP', style: TextStyle(fontFamily: 'Roboto-Regular.ttf',)),
+                title: Text('Move UP', style: Theme.of(context).textTheme.bodyLarge?.copyWith()),
                 onTap: () {
                   Navigator.pop(context);
                   widget.moveUpFunction(context);
@@ -273,7 +312,7 @@ class _CardTileState extends State<CardTile> {
               ),
               ListTile(
                 leading: Icon(Icons.arrow_downward, color: Theme.of(context).colorScheme.tertiary),
-                title: Text('Move DOWN', style: TextStyle(fontFamily: 'Roboto-Regular.ttf',)),
+                title: Text('Move DOWN', style: Theme.of(context).textTheme.bodyLarge?.copyWith()),
                 onTap: () {
                   Navigator.pop(context);
                   widget.moveDownFunction(context);
@@ -281,7 +320,7 @@ class _CardTileState extends State<CardTile> {
               ),
               ListTile(
                 leading: Icon(Icons.delete, color: Colors.red),
-                title: Text('Remove', style: TextStyle(fontFamily: 'Roboto-Regular.ttf',)),
+                title: Text('DELETE', style: Theme.of(context).textTheme.bodyLarge?.copyWith()),
                 onTap: () {
                   Navigator.pop(context);
                   widget.deleteFunction(context);
