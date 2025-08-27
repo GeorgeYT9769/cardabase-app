@@ -37,6 +37,10 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Add Android SDK tools to PATH
+        run: echo "ANDROID_HOME=$HOME/Library/Android/sdk" >> $GITHUB_ENV
+             echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
+
       - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses
 
