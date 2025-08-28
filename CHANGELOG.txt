@@ -1,5 +1,9 @@
 LATEST CHANGELOG:
 
+28.08.2025:
+1.5.1:
+- Fix for F-Droid build (optional update)
+
 27.08.2025:
 1.5.0:
 - Reworked the storage system; now it uses maps with keys instead of lists - this change means better system in card management, cards now have tags and unique IDs. But this means that your old cards will cause errors, but that is normal, it is using a new system on storage with old system. What to do? Settings->Export Cardabase->Import Cardabase. This will export all your cards (since they are still there, only displaying them causes errors) and import them back while converting them into new system,

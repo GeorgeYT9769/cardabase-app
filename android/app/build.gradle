@@ -35,25 +35,25 @@ android {
     ndkVersion "29.0.13846066"
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_24
-        targetCompatibility JavaVersion.VERSION_24
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
         coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_24
+        jvmTarget = JavaVersion.VERSION_21
     }
 
     kotlin {
-        jvmToolchain(24)
+        jvmToolchain(21)
     }
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_24
-        targetCompatibility = JavaVersion.VERSION_24
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
 
         toolchain {
-            languageVersion = JavaLanguageVersion.of(24)
+            languageVersion = JavaLanguageVersion.of(21)
         }
     }
 

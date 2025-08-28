@@ -29,7 +29,7 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
-          java-version: "24.x"
+          java-version: "21.x"
           cache: gradle
       - uses: subosito/flutter-action@v2
         with:
@@ -51,7 +51,7 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Start Android Release Build ABI
+      - name: Start Android Release Build APK ABIs
         run: flutter build apk --split-per-abi
 
       - name: Start Android Release Build APK
