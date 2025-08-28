@@ -32,7 +32,7 @@ allprojects {
             if (project.hasProperty("kotlin")) {
                 project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
                     kotlinOptions {
-                        jvmTarget = "24"
+                        jvmTarget = "21"
                     }
                 }
             }
