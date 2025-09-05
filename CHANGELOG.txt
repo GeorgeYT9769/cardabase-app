@@ -1,5 +1,9 @@
 LATEST CHANGELOG:
 
+05.09.2025:
+1.5.2:
+- Fixed some bugs and F-Droid build issue (optional update)
+
 28.08.2025:
 1.5.1:
 - Fix for F-Droid build (optional update)
