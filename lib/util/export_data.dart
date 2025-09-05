@@ -56,7 +56,7 @@ Future<void> exportCardList(BuildContext context) async {
       }
 
       final StringBuffer txtBuffer = StringBuffer();
-      txtBuffer.writeln('If you don\'t know what are you doing, please don\'t touch this file. One mistake and you can lose all your data!');
+      txtBuffer.writeln('If you do not know what are you doing, please do not touch this file. One mistake and you can lose all your data!');
       txtBuffer.writeln('=======================================================================');
       for (var card in cardList) {
         if (card is Map) {

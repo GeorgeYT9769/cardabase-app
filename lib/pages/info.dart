@@ -150,7 +150,7 @@ class _InfoScreenState extends State<InfoScreen> {
               ),
               const SizedBox(height: 5),
               Text(
-                'Developed by GeorgeYT9769',
+                'Developed by Juraj Ondovčík',
                 style: Theme.of(context).textTheme.bodyLarge,
                 textAlign: TextAlign.center,
               ),

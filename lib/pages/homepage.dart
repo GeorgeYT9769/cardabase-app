@@ -487,7 +487,7 @@ class _HomePageState extends State<Homepage> {
                               )
                           ),
                         ],
-                        initialSelection: Hive.box('settingsBox').get('sort', defaultValue: 'nameaz'),
+                        initialSelection: Hive.box('settingsBox').get('sort', defaultValue: 'oldest'),
                         inputDecorationTheme: InputDecorationTheme(
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
                           focusColor: Theme.of(context).colorScheme.primary,
