@@ -1,5 +1,9 @@
 LATEST CHANGELOG:
 
+06.09.2025
+1.5.3:
+- Set minifyEnabled and shrinkResources to true in the build.gradle (optional update)
+
 05.09.2025:
 1.5.2:
 - Fixed some bugs and F-Droid build issue (optional update)
