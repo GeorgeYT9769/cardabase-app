@@ -550,7 +550,7 @@ class _SettingsState extends State<Settings> {
               //  settingAction: toggleDeveloperOptions,
               //  settingHeader: 'DEV Options',
               //  settingIcon:Icons.developer_mode,
-              //  iconColor: devOptions ? Colors.red : Colors.green,
+              //  iconColor: devOptions ? Colors.green : Colors.red,
               //),
             ],
           ),

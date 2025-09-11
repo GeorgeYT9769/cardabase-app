@@ -1,5 +1,11 @@
 LATEST CHANGELOG:
 
+11.09.2025:
+1.5.4:
+- Fixed a bug where not granting permission would vibrate and crash the app,
+- Welcome screen now shows changes accordingly to the last version of the app from CHANGELOG.txt,
+- Small improvements
+
 06.09.2025
 1.5.3:
 - Set minifyEnabled and shrinkResources to true in the build.gradle (optional update)
@@ -30,7 +36,6 @@ LATEST CHANGELOG:
 - New app screenshots,
 - Small changes, under-the-hood improvements and bug fixes,
 - Please join the Discord server so we can discuss new ideas and bugs...
-
 
 25.06.2025:
 1.4.1:

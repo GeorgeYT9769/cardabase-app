@@ -1,10 +1,12 @@
 import 'package:cardabase/pages/news.dart';
 import 'package:cardabase/pages/settings.dart';
+import 'package:cardabase/pages/welcome_screen.dart';
 import 'package:cardabase/util/setting_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:cardabase/data/cardabase_db.dart'; //card database
 import 'package:cardabase/util/card_tile.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import '../util/vibration_provider.dart';
 import 'createcardnew.dart';
 import 'editcard.dart';
@@ -822,6 +824,22 @@ Widget _buildMainContent(BuildContext context) {
     appBar: AppBar(
       leading: IconButton(icon: Icon(Icons.sort, color: Theme.of(context).colorScheme.secondary,), onPressed: columnAmountDialog), //createNewCard
       actions: [
+        ValueListenableBuilder(
+          valueListenable: Hive.box('settingsBox').listenable(), // Listen to the settingsBox
+          builder: (context, settingsBox, child) {
+            final bool showLegacyCardButton = settingsBox.get('developerOptions', defaultValue: false);
+            return showLegacyCardButton
+                ? IconButton(
+              icon: Icon(Icons.web_stories, color: Theme.of(context).colorScheme.secondary,),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (builder) => const WelcomeScreen(currentAppVersion: "1.5.0"),)
+                );
+              })
+                : const SizedBox.shrink();
+          },
+        ),
         IconButton(
           icon: Icon(Icons.settings, color: Theme.of(context).colorScheme.secondary,),
           onPressed: () async {

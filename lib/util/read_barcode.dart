@@ -20,13 +20,22 @@ class _QRBarReaderState extends State<QRBarReader> {
   QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
+  bool _permissionDeniedShown = false;
+
   @override
   void reassemble() {
     super.reassemble();
     if (Platform.isAndroid) {
-      controller!.pauseCamera();
+      controller?.pauseCamera();
     }
-    controller!.resumeCamera();
+    controller?.resumeCamera();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _permissionDeniedShown = false;
+    log('QRBarReader initState called.');
   }
 
   @override
@@ -45,7 +54,7 @@ class _QRBarReaderState extends State<QRBarReader> {
                       icon: const Icon(Icons.cameraswitch),
                       onPressed: () async {
                         await controller?.flipCamera();
-                        setState(() {});
+                        if (mounted) setState(() {});
                       },
                     ),
                   ),
@@ -56,7 +65,7 @@ class _QRBarReaderState extends State<QRBarReader> {
                       icon: const Icon(Icons.flash_on),
                       onPressed: () async {
                         await controller?.toggleFlash();
-                        setState(() {});
+                        if (mounted) setState(() {});
                       },
                     ),
                   ),
@@ -74,6 +83,7 @@ class _QRBarReaderState extends State<QRBarReader> {
                       style: ButtonStyle(iconSize: WidgetStatePropertyAll(30), iconColor: WidgetStatePropertyAll(Theme.of(context).colorScheme.inverseSurface)),
                       icon: const Icon(Icons.arrow_back_ios_new),
                       onPressed: () {
+                        controller?.pauseCamera();
                         Navigator.of(context).pop();
                       },
                     ),
@@ -83,7 +93,6 @@ class _QRBarReaderState extends State<QRBarReader> {
             ]
         )
     );
-
   }
 
   Widget _buildQrView(BuildContext context) {
@@ -95,30 +104,45 @@ class _QRBarReaderState extends State<QRBarReader> {
       key: qrKey,
       onQRViewCreated: _onQRViewCreated,
       overlay: QrScannerOverlayShape(
-          borderColor: Color(0xFF1960A5),
-          borderRadius: 10,
-          borderLength: 30,
-          borderWidth: 10,
-          cutOutSize: scanArea,
+        borderColor: const Color(0xFF1960A5),
+        borderRadius: 10,
+        borderLength: 30,
+        borderWidth: 10,
+        cutOutSize: scanArea,
       ),
       onPermissionSet: (ctrl, p) => _onPermissionSet(context, ctrl, p),
     );
   }
 
-
   void _onQRViewCreated(QRViewController controller) {
+    if (!mounted) {
+      log('QRView created, but widget not mounted. Skipping controller assignment.');
+      return;
+    }
     setState(() {
       this.controller = controller;
     });
+    log('QRView controller assigned.');
+
     controller.scannedDataStream.listen((scanData) async {
+      if (!mounted) {
+        log('Scanned data received, but widget not mounted. Skipping.');
+        return;
+      }
+
       setState(() {
         result = scanData;
       });
-      await controller.pauseCamera();
-      Navigator.pop(context, {
-        "code": result!.code,
-        "format": result!.format.toString(),
-      });
+      log('QR code scanned: ${scanData.code}');
+
+      await this.controller?.pauseCamera();
+
+      if (mounted) {
+        Navigator.pop(context, {
+          "code": result?.code,
+          "format": result?.format.toString(),
+        });
+      }
     });
   }
 
@@ -138,15 +162,14 @@ class _QRBarReaderState extends State<QRBarReader> {
         );
 
         var bitmap = BinaryBitmap(GlobalHistogramBinarizer(source));
-
         var reader = QRCodeReader();
-
         var result = reader.decode(bitmap);
         return result.text;
       } else {
         return null;
       }
     } catch (e) {
+      log('Error decoding image from gallery: $e');
       return null;
     }
   }
@@ -158,7 +181,13 @@ class _QRBarReaderState extends State<QRBarReader> {
     final bytes = await imageFile.readAsBytes();
     final decodedResult = await decodeImage(bytes);
 
+    if (!mounted) {
+      log('Image picked and decoded, but widget not mounted. Skipping navigation/snackbar.');
+      return;
+    }
+
     if (decodedResult != null) {
+      log('Image decoded successfully: $decodedResult');
       Navigator.pop(context, {
         "code": decodedResult,
         "format": "QR_CODE",
@@ -170,13 +199,13 @@ class _QRBarReaderState extends State<QRBarReader> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
-            content: Row(
+            content: const Row(
               children: [
                 Icon(Icons.error, size: 15, color: Colors.white),
                 SizedBox(width: 10),
                 Text(
                   'Error!',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  style: TextStyle(
                     fontSize: 18,
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -193,45 +222,76 @@ class _QRBarReaderState extends State<QRBarReader> {
           )
       );
     }
-
   }
 
-
   void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
+    log('onPermissionSet called: permission = $p, _permissionDeniedShown = $_permissionDeniedShown, mounted = $mounted');
+
     if (!p) {
-      VibrationProvider.vibrateSuccess();
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            content: Row(
-              children: [
-                Icon(Icons.error, size: 15, color: Colors.white),
-                SizedBox(width: 10),
-                Text(
-                  'No permission!',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontSize: 18,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
+      if (!_permissionDeniedShown) {
+        VibrationProvider.vibrateError();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
-              ],
-            ),
-            duration: const Duration(milliseconds: 3000),
-            padding: const EdgeInsets.all(5.0),
-            margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-            behavior: SnackBarBehavior.floating,
-            dismissDirection: DismissDirection.vertical,
-            backgroundColor: const Color.fromARGB(255, 237, 67, 55),
-          )
-      );
+                content: const Row(
+                  children: [
+                    Icon(Icons.error, size: 15, color: Colors.white),
+                    SizedBox(width: 10),
+                    Text(
+                      'No camera permission!',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                duration: const Duration(milliseconds: 3000),
+                padding: const EdgeInsets.all(5.0),
+                margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+                behavior: SnackBarBehavior.floating,
+                dismissDirection: DismissDirection.vertical,
+                backgroundColor: const Color.fromARGB(255, 237, 67, 55),
+              )
+          );
+          setState(() {
+            _permissionDeniedShown = true;
+          });
+          log('Permission denied message shown. _permissionDeniedShown set to true.');
+
+          if (mounted) {
+            log('Permission denied, closing scanner.');
+          }
+        } else {
+          log('Widget not mounted, skipping snackbar for permission denial.');
+        }
+      } else {
+        log('Permission denied, but message already shown. Skipping duplicate snackbar.');
+      }
+    } else {
+      if (_permissionDeniedShown) {
+        if (mounted) {
+          setState(() {
+            _permissionDeniedShown = false;
+          });
+          log('Permission granted. _permissionDeniedShown reset to false.');
+        } else {
+          log('Widget not mounted, skipping _permissionDeniedShown reset.');
+        }
+      } else {
+        log('Permission granted, and message was not previously shown. No action needed.');
+      }
     }
   }
 
   @override
   void dispose() {
+    log('QRBarReader dispose called. Disposing controller.');
+    controller?.dispose();
     super.dispose();
   }
 }

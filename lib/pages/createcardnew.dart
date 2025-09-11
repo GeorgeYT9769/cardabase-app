@@ -505,18 +505,18 @@ class _CreateCardState extends State<CreateCard> {
           },
         ),
         actions: [
-          //ValueListenableBuilder(
-          //  valueListenable: Hive.box('settingsBox').listenable(), // Listen to the settingsBox
-          //  builder: (context, settingsBox, child) {
-          //    final bool showLegacyCardButton = settingsBox.get('developerOptions', defaultValue: false);
-          //    return showLegacyCardButton
-          //        ? const SizedBox.shrink()
-          //        : IconButton(
-          //      icon: Icon(Icons.credit_card_off, color: Theme.of(context).colorScheme.secondary,),
-          //      onPressed: addLegacyCard,
-          //    );
-          //  },
-          //),
+          ValueListenableBuilder(
+            valueListenable: Hive.box('settingsBox').listenable(), // Listen to the settingsBox
+            builder: (context, settingsBox, child) {
+              final bool showLegacyCardButton = settingsBox.get('developerOptions', defaultValue: false);
+              return showLegacyCardButton
+                  ? IconButton(
+                icon: Icon(Icons.credit_card_off, color: Theme.of(context).colorScheme.secondary,),
+                onPressed: addLegacyCard,
+              )
+                  : const SizedBox.shrink();
+            },
+          ),
           IconButton(icon: Icon(Icons.arrow_back_ios_new, color: Theme.of(context).colorScheme.secondary,), onPressed: cancelCard,),
         ],
         title: Text(
@@ -833,7 +833,7 @@ class _CreateCardState extends State<CreateCard> {
       floatingActionButton: Bounceable(
         onTap: () {},
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
           child: SizedBox(
             height: 60,
             width: double.infinity,
