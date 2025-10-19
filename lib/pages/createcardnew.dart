@@ -41,7 +41,7 @@ class CreateCard extends StatefulWidget {
   State<CreateCard> createState() => _CreateCardState();
 }
 
-class _CreateCardState extends State<CreateCard> {
+class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateMixin {
 
   final passwordbox = Hive.box('password');
 
@@ -56,10 +56,14 @@ class _CreateCardState extends State<CreateCard> {
   String cardTextPreview = 'Card';
   TextEditingController controller = TextEditingController();
   TextEditingController controllercardid = TextEditingController();
+  TextEditingController noteController = TextEditingController();
 
   bool hasPassword = false;
 
   Set<String> selectedTags = {};
+
+  late final FocusNode cardNameFocusNode;
+  late final FocusNode cardIdFocusNode;
 
   String getBarcodeTypeText(String cardTypeText) {
     switch (cardTypeText) {
@@ -138,12 +142,14 @@ class _CreateCardState extends State<CreateCard> {
           'hasPassword': hasPassword,
           'uniqueId': uniqueId,
           'tags': selectedTags.toList(),
+          'note': noteController.text,
         });
       });
       cdb.updateDataBase();
       Navigator.pop(context);
       controller.text = '';
       controllercardid.text = '';
+      noteController.text = '';
       redValue = 158;
       blueValue = 158;
       greenValue = 158;
@@ -264,6 +270,7 @@ class _CreateCardState extends State<CreateCard> {
     Navigator.of(context).pop();
     controller.text = '';
     controllercardid.text = '';
+    noteController.text = '';
     redValue = 158;
     blueValue = 158;
     greenValue = 158;
@@ -455,6 +462,11 @@ class _CreateCardState extends State<CreateCard> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
 //structure of the page
   @override
   Widget build(BuildContext context) {
@@ -530,306 +542,341 @@ class _CreateCardState extends State<CreateCard> {
 //structure of all widgets
 //card widget
       body: ListView(
-          physics: BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
-          children: [
+        physics: BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
+        children: [
           SizedBox(
-              height: MediaQuery.of(context).size.width / 1.50, //height of button
-              width: MediaQuery.of(context).size.width,
-              child: Container(
-                margin: const EdgeInsets.all(20),
-                decoration: BoxDecoration(color: cardColorPreview, borderRadius: BorderRadius.circular(15)),
-                child: Center(
-                  child: Wrap(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-                        child: Text(
-                          cardTextPreview,
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontSize: 50,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                          maxLines: 2,
-                          textAlign: TextAlign.center,
+            height: MediaQuery.of(context).size.width / 1.50, //height of button
+            width: MediaQuery.of(context).size.width,
+            child: Container(
+              margin: const EdgeInsets.all(20),
+              decoration: BoxDecoration(color: cardColorPreview, borderRadius: BorderRadius.circular(15)),
+              child: Center(
+                child: Wrap(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+                      child: Text(
+                        cardTextPreview,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontSize: 50,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
+                        maxLines: 2,
+                        textAlign: TextAlign.center,
                       ),
-                  ]),
+                    ),
+                  ],
                 ),
-              )
+              ),
+            ),
           ),
-          Container(
-            padding: const EdgeInsets.all(20),
+          DefaultTabController(
+            length: 2,
             child: Column(
               children: [
-//text field card name
-                TextFormField(
-                  onChanged: (String value) {
-                    setState(() {
-                      cardTextPreview = value;
-                      redValue = (cardColorPreview.r * 255.0).round();
-                      greenValue = (cardColorPreview.g * 255.0).round();
-                      blueValue = (cardColorPreview.b * 255.0).round();
-                    });
-                  },
-                  //maxLength: 20,
-                  controller: controller,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
-                    focusColor: Theme.of(context).colorScheme.primary,
-                    enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
-                    labelText: 'Card Name',
-                    labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontWeight: FontWeight.bold, fontSize: 17),
-                    prefixIcon: Icon(Icons.abc, color: Theme.of(context).colorScheme.secondary),
-                  ),
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold),
+                TabBar(
+                  tabs: [
+                    Tab(text: 'Card Details'),
+                    Tab(text: 'Others'),
+                  ],
+                  labelColor: Theme.of(context).colorScheme.primary,
+                  unselectedLabelColor: Theme.of(context).colorScheme.onSurface,
+                  splashFactory: NoSplash.splashFactory,
                 ),
-                const SizedBox(height: 15,),
-//text field card id
-                TextFormField(
-                    controller: controllercardid,
-                    inputFormatters:  selectedCardType == CardType.qrcode
-                        ? null
-                        : [
-                      FilteringTextInputFormatter.deny(RegExp(r'[ \.,\-]')),
-                    ],
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
-                      focusColor: Theme.of(context).colorScheme.primary,
-                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
-                      labelText: 'Card ID',
-                      labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontWeight: FontWeight.bold, fontSize: 17),
-                      prefixIcon: Icon(Icons.numbers, color: Theme.of(context).colorScheme.secondary),
-                      suffixIcon: IconButton(
-                        icon: Icon(Icons.photo_camera_rounded, color: Theme.of(context).colorScheme.secondary),
-                        onPressed: () async {
-                          var result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const QRBarReader(),
-                            ),
-                          );
-
-                          setState(() {
-                            if (result is Map<String, dynamic>) {
-                              String code = result["code"];
-                              var format = result["format"].toString();
-
-                              if (code != "-1") {
-                                controllercardid.text = code;
-
-                                // Update selectedCardType and cardTypeText consistently
-                                switch (format) {
-                                  case 'BarcodeFormat.code39':
-                                    selectedCardType = CardType.code39;
-                                    cardTypeText = selectedCardType.toString();
-                                    break;
-                                  case 'BarcodeFormat.code93':
-                                    selectedCardType = CardType.code93;
-                                    cardTypeText = selectedCardType.toString();
-                                    break;
-                                  case 'BarcodeFormat.code128':
-                                    selectedCardType = CardType.code128;
-                                    cardTypeText = selectedCardType.toString();
-                                    break;
-                                  case 'BarcodeFormat.ean13':
-                                    selectedCardType = CardType.ean13;
-                                    cardTypeText = selectedCardType.toString();
-                                    break;
-                                  case 'BarcodeFormat.ean8':
-                                    selectedCardType = CardType.ean8;
-                                    cardTypeText = selectedCardType.toString();
-                                    break;
-                                  case 'BarcodeFormat.upcA':
-                                    selectedCardType = CardType.upca;
-                                    cardTypeText = selectedCardType.toString();
-                                    break;
-                                  case 'BarcodeFormat.upcE':
-                                    selectedCardType = CardType.upce;
-                                    cardTypeText = selectedCardType.toString();
-                                    break;
-                                  case 'BarcodeFormat.codabar':
-                                    selectedCardType = CardType.codabar;
-                                    cardTypeText = selectedCardType.toString();
-                                    break;
-                                  case 'BarcodeFormat.qrcode':
-                                    selectedCardType = CardType.qrcode;
-                                    cardTypeText = selectedCardType.toString();
-                                    break;
-                                  case 'BarcodeFormat.dataMatrix':
-                                    selectedCardType = CardType.datamatrix;
-                                    cardTypeText = selectedCardType.toString();
-                                    break;
-                                  case 'BarcodeFormat.aztec':
-                                    selectedCardType = CardType.aztec;
-                                    cardTypeText = selectedCardType.toString();
-                                    break;
-                                  default:
-                                    selectedCardType = null;
-                                    cardTypeText =
-                                    'Barcode Type'; //controllercardid.text = "";
-                                }
-                                if (code.startsWith("[") &&
-                                    code.endsWith("]")) {
-                                  List<String> rawList = code.replaceAll(
-                                      "[", "").replaceAll("]", "").split(", ");
-
-                                  // Convert values into correct types
-                                  String name = rawList[0];
-                                  String number = rawList[1];
-                                  int red = int.parse(rawList[2]);
-                                  int green = int.parse(rawList[3]);
-                                  int blue = int.parse(rawList[4]);
-                                  String cardType = rawList[5];
-                                  bool hasPwd = rawList[6] == "true";
-
-                                  setState(() {
-                                    controller.text = name;
-                                    cardTextPreview = name;
-                                    cardColorPreview =
-                                        Color.fromARGB(255, red, green, blue);
-                                    controllercardid.text = number;
-                                    redValue = red;
-                                    greenValue = green;
-                                    blueValue = blue;
-                                    cardTypeText = cardType;
-                                    hasPassword = hasPwd;
-                                  });
-                                }
-                              } else {
-                                controllercardid.text = "";
-                              }
-                            }
-                          });
-                        },
-                      ),
-                    ),
-                    keyboardType: TextInputType.number,
-                    //maxLength: 13,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold)
-                ),
-                const SizedBox(height: 15,),
-                Bounceable(
-                  onTap: () {},
-                  child: SizedBox(
-                    height: 60,
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.all(15),
-                        side: BorderSide(color: Theme.of(context).colorScheme.primary,),
-                        backgroundColor: Colors.transparent,
-                        elevation: 0.0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        minimumSize: const Size.fromHeight(100),
-                      ),
-                      onPressed: _showBarcodeSelectorDialog,
-                      child: Text(getBarcodeTypeText(cardTypeText), style: Theme.of(context).textTheme.bodyLarge?.copyWith( //cardTypeText
-                        color: Theme.of(context).colorScheme.inverseSurface,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17,
-                      ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 15,),
-//color picker button
-                Bounceable(
-                  onTap: () {},
-                  child: SizedBox(
-                    height: 60,
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.all(15),
-                        side: BorderSide(color: Theme.of(context).colorScheme.primary,),
-                        backgroundColor: Colors.transparent,
-                        elevation: 0.0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        minimumSize: const Size.fromHeight(100),
-                      ),
-                      onPressed: openColorPickerDialog,
-                      child: Text('Card Color', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.inverseSurface,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17,
-                      ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 15,),
                 SizedBox(
-                  height: 40,
-                  child: ListView.builder(
-                    physics: const BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
-                    scrollDirection: Axis.horizontal,
-                    itemCount: allTags.length,
-                    itemBuilder: (context, chipIndex) {
-                      final tag = allTags[chipIndex];
-                      final isSelected = selectedTags.contains(tag);
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-                        child: ActionChip(
-                          label: Text(tag),
-                          onPressed: () {
-                            setState(() {
-                              if (isSelected) {
-                                selectedTags.remove(tag);
-                              } else {
-                                selectedTags.add(tag);
-                              }
-                            });
-                          },
-                          labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: isSelected
-                                ? Theme.of(context).colorScheme.onPrimary
-                                : Theme.of(context).colorScheme.inverseSurface,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          backgroundColor: isSelected
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.surface,
-                          side: BorderSide(
-                            color: isSelected
-                                ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
-                            width: isSelected ? 2 : 1,
-                          ),
-                          avatar: isSelected
-                              ? Icon(Icons.check, size: 18, color: Theme.of(context).colorScheme.onPrimary)
-                              : null,
+                  height: 600, // Set a fixed height for TabBarView to avoid unbounded height error
+                  child: TabBarView(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          children: [
+                            //text field card name
+                            TextFormField(
+                              onChanged: (String value) {
+                                setState(() {
+                                  cardTextPreview = value;
+                                  redValue = (cardColorPreview.r * 255.0).round();
+                                  greenValue = (cardColorPreview.g * 255.0).round();
+                                  blueValue = (cardColorPreview.b * 255.0).round();
+                                });
+                              },
+                              controller: controller,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
+                                focusColor: Theme.of(context).colorScheme.primary,
+                                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
+                                labelText: 'Card Name',
+                                labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontWeight: FontWeight.bold, fontSize: 17),
+                                prefixIcon: Icon(Icons.abc, color: Theme.of(context).colorScheme.secondary),
+                              ),
+                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 15,),
+                            //text field card id
+                            TextFormField(
+                              controller: controllercardid,
+                              inputFormatters:  selectedCardType == CardType.qrcode
+                                  ? null
+                                  : [
+                                FilteringTextInputFormatter.deny(RegExp(r'[ \.,\-]')),
+                              ],
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
+                                focusColor: Theme.of(context).colorScheme.primary,
+                                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
+                                labelText: 'Card ID',
+                                labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontWeight: FontWeight.bold, fontSize: 17),
+                                prefixIcon: Icon(Icons.numbers, color: Theme.of(context).colorScheme.secondary),
+                                suffixIcon: IconButton(
+                                  icon: Icon(Icons.photo_camera_rounded, color: Theme.of(context).colorScheme.secondary),
+                                  onPressed: () async {
+                                    var result = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const QRBarReader(),
+                                      ),
+                                    );
+                                    setState(() {
+                                      if (result is Map<String, dynamic>) {
+                                        String code = result["code"];
+                                        var format = result["format"].toString();
+                                        if (code != "-1") {
+                                          controllercardid.text = code;
+                                          // Update selectedCardType and cardTypeText consistently
+                                          switch (format) {
+                                            case 'BarcodeFormat.code39':
+                                              selectedCardType = CardType.code39;
+                                              cardTypeText = selectedCardType.toString();
+                                              break;
+                                            case 'BarcodeFormat.code93':
+                                              selectedCardType = CardType.code93;
+                                              cardTypeText = selectedCardType.toString();
+                                              break;
+                                            case 'BarcodeFormat.code128':
+                                              selectedCardType = CardType.code128;
+                                              cardTypeText = selectedCardType.toString();
+                                              break;
+                                            case 'BarcodeFormat.ean13':
+                                              selectedCardType = CardType.ean13;
+                                              cardTypeText = selectedCardType.toString();
+                                              break;
+                                            case 'BarcodeFormat.ean8':
+                                              selectedCardType = CardType.ean8;
+                                              cardTypeText = selectedCardType.toString();
+                                              break;
+                                            case 'BarcodeFormat.upcA':
+                                              selectedCardType = CardType.upca;
+                                              cardTypeText = selectedCardType.toString();
+                                              break;
+                                            case 'BarcodeFormat.upcE':
+                                              selectedCardType = CardType.upce;
+                                              cardTypeText = selectedCardType.toString();
+                                              break;
+                                            case 'BarcodeFormat.codabar':
+                                              selectedCardType = CardType.codabar;
+                                              cardTypeText = selectedCardType.toString();
+                                              break;
+                                            case 'BarcodeFormat.qrcode':
+                                              selectedCardType = CardType.qrcode;
+                                              cardTypeText = selectedCardType.toString();
+                                              break;
+                                            case 'BarcodeFormat.dataMatrix':
+                                              selectedCardType = CardType.datamatrix;
+                                              cardTypeText = selectedCardType.toString();
+                                              break;
+                                            case 'BarcodeFormat.aztec':
+                                              selectedCardType = CardType.aztec;
+                                              cardTypeText = selectedCardType.toString();
+                                              break;
+                                            default:
+                                              selectedCardType = null;
+                                              cardTypeText =
+                                              'Barcode Type'; //controllercardid.text = "";
+                                          }
+                                          if (code.startsWith("[") &&
+                                              code.endsWith("]")) {
+                                            List<String> rawList = code.replaceAll(
+                                                "[", "").replaceAll("]", "").split(", ");
+
+                                            // Convert values into correct types
+                                            String name = rawList[0];
+                                            String number = rawList[1];
+                                            int red = int.parse(rawList[2]);
+                                            int green = int.parse(rawList[3]);
+                                            int blue = int.parse(rawList[4]);
+                                            String cardType = rawList[5];
+                                            bool hasPwd = rawList[6] == "true";
+
+                                            setState(() {
+                                              controller.text = name;
+                                              cardTextPreview = name;
+                                              cardColorPreview =
+                                                  Color.fromARGB(255, red, green, blue);
+                                              controllercardid.text = number;
+                                              redValue = red;
+                                              greenValue = green;
+                                              blueValue = blue;
+                                              cardTypeText = cardType;
+                                              hasPassword = hasPwd;
+                                            });
+                                          }
+                                        } else {
+                                          controllercardid.text = "";
+                                        }
+                                      }
+                                    });
+                                  },
+                                ),
+                              ),
+                              keyboardType: TextInputType.number,
+                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 15,),
+                            Bounceable(
+                              onTap: () {},
+                              child: SizedBox(
+                                height: 60,
+                                child: OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.all(15),
+                                    side: BorderSide(color: Theme.of(context).colorScheme.primary,),
+                                    backgroundColor: Colors.transparent,
+                                    elevation: 0.0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    minimumSize: const Size.fromHeight(100),
+                                  ),
+                                  onPressed: _showBarcodeSelectorDialog,
+                                  child: Text(getBarcodeTypeText(cardTypeText), style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: Theme.of(context).colorScheme.inverseSurface,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17,
+                                  ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 15,),
+                            Bounceable(
+                              onTap: () {},
+                              child: SizedBox(
+                                height: 60,
+                                child: OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.all(15),
+                                    side: BorderSide(color: Theme.of(context).colorScheme.primary,),
+                                    backgroundColor: Colors.transparent,
+                                    elevation: 0.0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    minimumSize: const Size.fromHeight(100),
+                                  ),
+                                  onPressed: openColorPickerDialog,
+                                  child: Text('Card Color', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: Theme.of(context).colorScheme.inverseSurface,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17,
+                                  ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 15,),
+                            SizedBox(
+                              height: 40,
+                              child: ListView.builder(
+                                physics: const BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
+                                scrollDirection: Axis.horizontal,
+                                itemCount: allTags.length,
+                                itemBuilder: (context, chipIndex) {
+                                  final tag = allTags[chipIndex];
+                                  final isSelected = selectedTags.contains(tag);
+                                  return Padding(
+                                    padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                                    child: ActionChip(
+                                      label: Text(tag),
+                                      onPressed: () {
+                                        setState(() {
+                                          if (isSelected) {
+                                            selectedTags.remove(tag);
+                                          } else {
+                                            selectedTags.add(tag);
+                                          }
+                                        });
+                                      },
+                                      labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                        color: isSelected
+                                            ? Theme.of(context).colorScheme.onPrimary
+                                            : Theme.of(context).colorScheme.inverseSurface,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      backgroundColor: isSelected
+                                          ? Theme.of(context).colorScheme.primary
+                                          : Theme.of(context).colorScheme.surface,
+                                      side: BorderSide(
+                                        color: isSelected
+                                            ? Theme.of(context).colorScheme.primary
+                                            : Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                                        width: isSelected ? 2 : 1,
+                                      ),
+                                      avatar: isSelected
+                                          ? Icon(Icons.check, size: 18, color: Theme.of(context).colorScheme.onPrimary)
+                                          : null,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(height: 10,),
+                            passwordbox.isNotEmpty
+                            ? CheckboxListTile(
+                                value: hasPassword,
+                                title: Text('Use a password for this card', style: Theme.of(context).textTheme.bodyLarge?.copyWith( //cardTypeText
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                    color: Theme.of(context).colorScheme.inverseSurface
+                                )),
+                                controlAffinity: ListTileControlAffinity.leading,
+                                side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                                onChanged: (bool? checked) {
+                                  setState(() {
+                                    hasPassword = checked!;
+                                  });
+                                })
+                            : const SizedBox(height: 10,),
+                            const SizedBox(height: 100,),
+                          ],
                         ),
-                      );
-                    },
+                      ),
+                      // Second tab: custom widget placeholder
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        child: TextField(
+                          controller: noteController,
+                          maxLines: 10,
+                          decoration: InputDecoration(
+                            hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 15),
+                            hintText: 'Card notes...',
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
+                            focusColor: Theme.of(context).colorScheme.primary,
+                            enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
+                          ),
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 10,),
-                passwordbox.isNotEmpty
-                ? CheckboxListTile(
-                    value: hasPassword,
-                    title: Text('Use a password for this card', style: Theme.of(context).textTheme.bodyLarge?.copyWith( //cardTypeText
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                        color: Theme.of(context).colorScheme.inverseSurface
-                    )),
-                    controlAffinity: ListTileControlAffinity.leading,
-                    side: BorderSide(color: Theme.of(context).colorScheme.primary),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                    onChanged: (bool? checked) {
-                      setState(() {
-                        hasPassword = checked!;
-                      });
-                    })
-                : const SizedBox(height: 10,),
-                const SizedBox(height: 100,),
               ],
             ),
           ),
-        ],),
+        ],
+      ),
       floatingActionButton: Bounceable(
         onTap: () {},
         child: Padding(
@@ -845,12 +892,12 @@ class _CreateCardState extends State<CreateCard> {
               backgroundColor: Colors.green.shade700,
               icon: Icon(Icons.check, color: Colors.white,),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10), // Custom border radius
+                borderRadius: BorderRadius.circular(10),
               ),
               label: Text('SAVE', style: Theme.of(context).textTheme.bodyLarge?.copyWith( //cardTypeText
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: Colors.white
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: Colors.white
               ),),
             ),
           ),

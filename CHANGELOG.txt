@@ -1,5 +1,12 @@
 LATEST CHANGELOG:
 
+19.10.2025:
+1.6.0::
+- You can now add notes to your cards,
+- There are now auto backups meaning you can turn it on and set a duration how often you want the app to back up your cards automatically,
+- Small impovements and bug fixes.
+
+
 11.09.2025:
 1.5.4:
 - Fixed a bug where not granting permission would vibrate and crash the app,

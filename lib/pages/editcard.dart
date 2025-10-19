@@ -42,8 +42,9 @@ class EditCard extends StatefulWidget {
   String cardId;
   String cardType;
   List<dynamic> tags;
+  String notes;
 
-  EditCard({super.key, required this.cardColorPreview, required this.redValue, required this.greenValue, required this.blueValue, required this.hasPassword, required this.index, required this.cardTextPreview, required this.cardName, required this.cardId, required this.cardType, required this.tags});
+  EditCard({super.key, required this.cardColorPreview, required this.redValue, required this.greenValue, required this.blueValue, required this.hasPassword, required this.index, required this.cardTextPreview, required this.cardName, required this.cardId, required this.cardType, required this.tags, required this.notes});
 
   @override
   State<EditCard> createState() => _EditCardState();
@@ -57,6 +58,7 @@ class _EditCardState extends State<EditCard> {
 
   TextEditingController controller = TextEditingController();
   TextEditingController controllercardid = TextEditingController();
+  TextEditingController noteController = TextEditingController();
 
   late Set<String> selectedTags;
 
@@ -129,18 +131,19 @@ class _EditCardState extends State<EditCard> {
       final uniqueId = '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
       setState(() {
         cdb.myShops.insert(
-          widget.index + 1,
-          {
-            'cardName': controller.text,
-            'cardId': controllercardid.text,
-            'redValue': widget.redValue,
-            'greenValue': widget.greenValue,
-            'blueValue': widget.blueValue,
-            'cardType': cardTypeText,
-            'hasPassword': widget.hasPassword,
-            'uniqueId': uniqueId,
-            'tags': selectedTags.toList(),
-          }
+            widget.index + 1,
+            {
+              'cardName': controller.text,
+              'cardId': controllercardid.text,
+              'redValue': widget.redValue,
+              'greenValue': widget.greenValue,
+              'blueValue': widget.blueValue,
+              'cardType': cardTypeText,
+              'hasPassword': widget.hasPassword,
+              'uniqueId': uniqueId,
+              'tags': selectedTags.toList(),
+              'note': noteController.text,
+            }
         );
         cdb.myShops.removeAt(widget.index);
       });
@@ -148,6 +151,7 @@ class _EditCardState extends State<EditCard> {
       Navigator.pop(context);
       controller.text = '';
       controllercardid.text = '';
+      noteController.text = '';
       widget.redValue = 158;
       widget.blueValue = 158;
       widget.greenValue = 158;
@@ -263,6 +267,7 @@ class _EditCardState extends State<EditCard> {
     Navigator.of(context).pop();
     controller.text = '';
     controllercardid.text = '';
+    noteController.text = '';
     widget.redValue = 158;
     widget.blueValue = 158;
     widget.greenValue = 158;
@@ -454,6 +459,7 @@ class _EditCardState extends State<EditCard> {
     cardTypeText = widget.cardType;
     widget.hasPassword = widget.hasPassword;
     selectedTags = Set<String>.from(widget.tags.map((e) => e.toString()));
+    noteController.text = widget.notes;
   }
 
   @override
@@ -544,186 +550,223 @@ class _EditCardState extends State<EditCard> {
               )
           ),
 
-          Container(
-            padding: const EdgeInsets.all(20),
+          DefaultTabController(
+            length: 2,
             child: Column(
               children: [
-//text field card name
-                TextFormField(
-                  onChanged: (String value) {
-                    setState(() {
-                      widget.cardTextPreview = value;
-                      widget.redValue = (widget.cardColorPreview.r * 255.0).round();
-                      widget.greenValue = (widget.cardColorPreview.g * 255.0).round();
-                      widget.blueValue = (widget.cardColorPreview.b * 255.0).round();
-                    });
-                  },
-                  //maxLength: 20,
-                  controller: controller,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
-                    focusColor: Theme.of(context).colorScheme.primary,
-                    enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
-                    labelText: 'Card Name',
-                    labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.secondary),
-                    prefixIcon: Icon(Icons.abc, color: Theme.of(context).colorScheme.secondary),
-                  ),
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold),
+                TabBar(
+                  tabs: [
+                    Tab(text: 'Card Details'),
+                    Tab(text: 'Others'),
+                  ],
+                  labelColor: Theme.of(context).colorScheme.primary,
+                  unselectedLabelColor: Theme.of(context).colorScheme.onSurface,
+                  splashFactory: NoSplash.splashFactory,
                 ),
-                const SizedBox(height: 20,),
-//text field card id
-                TextFormField(
-                    controller: controllercardid,
-                    inputFormatters:  selectedCardType == CardType.qrcode
-                        ? null
-                        : [
-                      FilteringTextInputFormatter.deny(RegExp(r'[ \.,\-]')),
-                    ],
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
-                      focusColor: Theme.of(context).colorScheme.primary,
-                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
-                      labelText: 'Card ID',
-                      labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.secondary,),
-                      prefixIcon: Icon(Icons.numbers, color: Theme.of(context).colorScheme.secondary),
-                      suffixIcon: IconButton(icon: Icon(Icons.photo_camera_rounded, color: Theme.of(context).colorScheme.secondary),
-                        onPressed: () async {
-                          var result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const QRBarReader(),
-                              ));
-                          setState(() {
-                            if (result is String) {
-                              if (result != "-1") {
-                                controllercardid.text = result;
-                              } else {
-                                controllercardid.text = "";
-                              }
-                            }
-                          });
-                        },),
-                    ),
-                    keyboardType: TextInputType.number,
-                    //maxLength: 13,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold)
-                ),
-                const SizedBox(height: 20,),
-                Bounceable(
-                  onTap: () {},
-                  child: SizedBox(
-                    height: 60,
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.all(15),
-                        side: BorderSide(color: Theme.of(context).colorScheme.primary,),
-                        backgroundColor: Colors.transparent,
-                        elevation: 0.0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        minimumSize: const Size.fromHeight(100),
-                      ),
-                      onPressed: _showBarcodeSelectorDialog,
-                      child: Text(getBarcodeTypeText(cardTypeText), style: Theme.of(context).textTheme.bodyLarge?.copyWith( //cardTypeText
-                        color: Theme.of(context).colorScheme.tertiary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20,),
-//color picker button
-                Bounceable(
-                  onTap: () {},
-                  child: SizedBox(
-                    height: 60,
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.all(15),
-                        side: BorderSide(color: Theme.of(context).colorScheme.primary,),
-                        backgroundColor: Colors.transparent,
-                        elevation: 0.0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        minimumSize: const Size.fromHeight(100),
-                      ),
-                      onPressed: openColorPickerDialog,
-                      child: Text('Card Color', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.tertiary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 15,),
                 SizedBox(
-                  height: 40,
-                  child: ListView.builder(
-                    physics: const BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
-                    scrollDirection: Axis.horizontal,
-                    itemCount: allTags.length,
-                    itemBuilder: (context, chipIndex) {
-                      final tag = allTags[chipIndex].toString();
-                      final isSelected = selectedTags.contains(tag);
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-                        child: ActionChip(
-                          label: Text(tag),
-                          onPressed: () {
-                            setState(() {
-                              if (isSelected) {
-                                selectedTags.remove(tag);
-                              } else {
-                                selectedTags.add(tag);
-                              }
-                            });
-                          },
-                          labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: isSelected
-                                ? Theme.of(context).colorScheme.onPrimary
-                                : Theme.of(context).colorScheme.inverseSurface,
-                            fontWeight: FontWeight.bold,
+                height: 600,
+                  child: TabBarView(
+                    children: [
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        children: [
+                    //text field card name
+                          TextFormField(
+                            onChanged: (String value) {
+                              setState(() {
+                                widget.cardTextPreview = value;
+                                widget.redValue = (widget.cardColorPreview.r * 255.0).round();
+                                widget.greenValue = (widget.cardColorPreview.g * 255.0).round();
+                                widget.blueValue = (widget.cardColorPreview.b * 255.0).round();
+                              });
+                            },
+                            //maxLength: 20,
+                            controller: controller,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
+                              focusColor: Theme.of(context).colorScheme.primary,
+                              enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
+                              labelText: 'Card Name',
+                              labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.secondary),
+                              prefixIcon: Icon(Icons.abc, color: Theme.of(context).colorScheme.secondary),
+                            ),
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold),
                           ),
-                          backgroundColor: isSelected
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.surface,
-                          side: BorderSide(
-                            color: isSelected
-                                ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                            width: isSelected ? 2 : 1,
+                          const SizedBox(height: 20,),
+                    //text field card id
+                          TextFormField(
+                              controller: controllercardid,
+                              inputFormatters:  selectedCardType == CardType.qrcode
+                                  ? null
+                                  : [
+                                FilteringTextInputFormatter.deny(RegExp(r'[ \.,\-]')),
+                              ],
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
+                                focusColor: Theme.of(context).colorScheme.primary,
+                                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
+                                labelText: 'Card ID',
+                                labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.secondary,),
+                                prefixIcon: Icon(Icons.numbers, color: Theme.of(context).colorScheme.secondary),
+                                suffixIcon: IconButton(icon: Icon(Icons.photo_camera_rounded, color: Theme.of(context).colorScheme.secondary),
+                                  onPressed: () async {
+                                    var result = await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const QRBarReader(),
+                                        ));
+                                    setState(() {
+                                      if (result is String) {
+                                        if (result != "-1") {
+                                          controllercardid.text = result;
+                                        } else {
+                                          controllercardid.text = "";
+                                        }
+                                      }
+                                    });
+                                  },),
+                              ),
+                              keyboardType: TextInputType.number,
+                              //maxLength: 13,
+                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold)
                           ),
-                          avatar: isSelected
-                              ? Icon(Icons.check, size: 18, color: Theme.of(context).colorScheme.onPrimary)
-                              : null,
+                          const SizedBox(height: 20,),
+                          Bounceable(
+                            onTap: () {},
+                            child: SizedBox(
+                              height: 60,
+                              child: OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.all(15),
+                                  side: BorderSide(color: Theme.of(context).colorScheme.primary,),
+                                  backgroundColor: Colors.transparent,
+                                  elevation: 0.0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  minimumSize: const Size.fromHeight(100),
+                                ),
+                                onPressed: _showBarcodeSelectorDialog,
+                                child: Text(getBarcodeTypeText(cardTypeText), style: Theme.of(context).textTheme.bodyLarge?.copyWith( //cardTypeText
+                                  color: Theme.of(context).colorScheme.tertiary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20,),
+                    //color picker button
+                          Bounceable(
+                            onTap: () {},
+                            child: SizedBox(
+                              height: 60,
+                              child: OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.all(15),
+                                  side: BorderSide(color: Theme.of(context).colorScheme.primary,),
+                                  backgroundColor: Colors.transparent,
+                                  elevation: 0.0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  minimumSize: const Size.fromHeight(100),
+                                ),
+                                onPressed: openColorPickerDialog,
+                                child: Text('Card Color', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                  color: Theme.of(context).colorScheme.tertiary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 15,),
+                          SizedBox(
+                            height: 40,
+                            child: ListView.builder(
+                              physics: const BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
+                              scrollDirection: Axis.horizontal,
+                              itemCount: allTags.length,
+                              itemBuilder: (context, chipIndex) {
+                                final tag = allTags[chipIndex].toString();
+                                final isSelected = selectedTags.contains(tag);
+                                return Padding(
+                                  padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                                  child: ActionChip(
+                                    label: Text(tag),
+                                    onPressed: () {
+                                      setState(() {
+                                        if (isSelected) {
+                                          selectedTags.remove(tag);
+                                        } else {
+                                          selectedTags.add(tag);
+                                        }
+                                      });
+                                    },
+                                    labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                      color: isSelected
+                                          ? Theme.of(context).colorScheme.onPrimary
+                                          : Theme.of(context).colorScheme.inverseSurface,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    backgroundColor: isSelected
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Theme.of(context).colorScheme.surface,
+                                    side: BorderSide(
+                                      color: isSelected
+                                          ? Theme.of(context).colorScheme.primary
+                                          : Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                                      width: isSelected ? 2 : 1,
+                                    ),
+                                    avatar: isSelected
+                                        ? Icon(Icons.check, size: 18, color: Theme.of(context).colorScheme.onPrimary)
+                                        : null,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 10,),
+                          passwordbox.isNotEmpty
+                              ? CheckboxListTile(
+                              value: widget.hasPassword,
+                              title: Text('Use a password for this card', style: Theme.of(context).textTheme.bodyLarge?.copyWith( //cardTypeText
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  color: Theme.of(context).colorScheme.tertiary
+                              )),
+                              controlAffinity: ListTileControlAffinity.leading,
+                              side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                              onChanged: (bool? checked) {
+                                setState(() {
+                                  widget.hasPassword = checked!;
+                                });
+                              })
+                              : const SizedBox(height: 10,),
+                          const SizedBox(height: 100,),
+                        ],
+                      ),
+                    ),
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        child: TextField(
+                          controller: noteController,
+                          maxLines: 10,
+                          decoration: InputDecoration(
+                            hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 15),
+                            hintText: noteController.text,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
+                            focusColor: Theme.of(context).colorScheme.primary,
+                            enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
+                          ),
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold),
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                  ]),
                 ),
-                const SizedBox(height: 10,),
-                passwordbox.isNotEmpty
-                    ? CheckboxListTile(
-                    value: widget.hasPassword,
-                    title: Text('Use a password for this card', style: Theme.of(context).textTheme.bodyLarge?.copyWith( //cardTypeText
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                        color: Theme.of(context).colorScheme.tertiary
-                    )),
-                    controlAffinity: ListTileControlAffinity.leading,
-                    side: BorderSide(color: Theme.of(context).colorScheme.primary),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                    onChanged: (bool? checked) {
-                      setState(() {
-                        widget.hasPassword = checked!;
-                      });
-                    })
-                    : const SizedBox(height: 10,),
-                const SizedBox(height: 100,),
               ],
             ),
           ),

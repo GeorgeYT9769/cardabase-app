@@ -2,6 +2,7 @@ import 'package:cardabase/pages/settings.dart';
 import 'package:cardabase/util/button_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:barcode_widget/barcode_widget.dart';
+import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'dart:convert';
@@ -19,8 +20,9 @@ class GenerateBarcode extends StatefulWidget {
   int green;
   int blue;
   List tags;
+  String note;
 
-  GenerateBarcode({super.key, required this.cardid, required this.cardtext, required this.cardTileColor, required this.cardType, required this.hasPassword, required this.red, required this.green, required this.blue, required this.tags});
+  GenerateBarcode({super.key, required this.cardid, required this.cardtext, required this.cardTileColor, required this.cardType, required this.hasPassword, required this.red, required this.green, required this.blue, required this.tags, required this.note});
 
   @override
   State<GenerateBarcode> createState() => _GenerateBarcodeState();
@@ -154,38 +156,10 @@ class _GenerateBarcodeState extends State<GenerateBarcode> {
         elevation: 0.0,
         backgroundColor: Theme.of(context).colorScheme.surface,
       ),
-      body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
+      body: ListView(
+          physics: const BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
           children: [
-            //FRONT FACE
-            SizedBox(
-              height: MediaQuery.of(context).size.width / 1.586, //height of button
-              width: MediaQuery.of(context).size.width,
-              child: Container(
-                margin: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-                decoration: BoxDecoration(color: widget.cardTileColor, borderRadius: BorderRadius.circular(15)),
-                child: Center(
-                  child: Wrap(
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.all(20),
-                          child: Text(
-                            widget.cardtext,
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              fontSize: 50,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                            maxLines: 2,
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ]),
-                ),
-              )
-            ),
-            const SizedBox(height: 10,),
+            Container(padding: EdgeInsetsGeometry.fromLTRB(20, 0, 20, 0), child: Text(widget.cardtext, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 50))),
             //BACK FACE
             SizedBox(
                 height: MediaQuery.of(context).size.width / 1.586, //height of button
@@ -217,11 +191,52 @@ class _GenerateBarcodeState extends State<GenerateBarcode> {
                   ),
                 )
             ),
-            const SizedBox(height: 30,),
-            ButtonTile(buttonText: 'DONE', buttonAction: () => Navigator.pop(context),),
-            const SizedBox(height: 30,),
+            Container(
+              padding: const EdgeInsets.all(20),
+              child: TextField(
+                enabled: false,
+                maxLines: 10,
+                decoration: InputDecoration(
+                  hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 15),
+                  hintText: widget.note.isEmpty ? 'Card notes are displayed here...' : widget.note,
+                  disabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
+                  focusColor: Theme.of(context).colorScheme.primary,
+                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
+                ),
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(height: 100,)
             ]
       ),
+        floatingActionButton: Bounceable(
+            onTap: () {},
+            child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                child: SizedBox(
+                  height: 60,
+                  width: double.infinity,
+                  child: FloatingActionButton.extended(
+                    elevation: 0.0,
+                    heroTag: 'saveFAB',
+                    onPressed: () => Navigator.pop(context),
+                    tooltip: 'SAVE',
+                    backgroundColor: Colors.green.shade700,
+                    icon: Icon(Icons.check, color: Colors.white,),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    label: Text('SAVE', style: Theme.of(context).textTheme.bodyLarge?.copyWith( //cardTypeText
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.white
+                    ),),
+                  ),
+                )
+            )
+        ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

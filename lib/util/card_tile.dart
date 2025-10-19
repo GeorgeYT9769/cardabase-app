@@ -23,6 +23,8 @@ class CardTile extends StatefulWidget {
   final Widget? dragHandle;
   final List<dynamic> tags;
   final bool reorderMode;
+  final String note;
+  final String uniqueId;
 
   int red;
   int green;
@@ -48,6 +50,8 @@ class CardTile extends StatefulWidget {
     this.dragHandle,
     required this.tags,
     required this.reorderMode,
+    required this.note,
+    required this.uniqueId,
   });
 
   @override
@@ -56,7 +60,7 @@ class CardTile extends StatefulWidget {
 
 class _CardTileState extends State<CardTile> {
   final passwordbox = Hive.box('password');
-  cardabase_db cdb = cardabase_db();
+  final settingsbox = Hive.box('settingsBox');
 
   Barcode getBarcodeType(String cardType) {
     switch (cardType) {
@@ -161,6 +165,7 @@ class _CardTileState extends State<CardTile> {
                               green: widget.green,
                               blue: widget.blue,
                               tags: [],
+                              note: widget.note,
                             ),
                           ),
                         );
@@ -231,6 +236,7 @@ class _CardTileState extends State<CardTile> {
               green: widget.green,
               blue: widget.blue,
               tags: [],
+              note: widget.note,
             ),
           ),
         );

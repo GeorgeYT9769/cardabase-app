@@ -230,6 +230,8 @@ class _QRBarReaderState extends State<QRBarReader> {
     if (!p) {
       if (!_permissionDeniedShown) {
         VibrationProvider.vibrateError();
+        controller?.pauseCamera();
+        Navigator.of(context).pop();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(

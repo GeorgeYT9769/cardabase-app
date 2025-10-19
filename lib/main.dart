@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:cardabase/theme/color_schemes.g.dart';
 import 'package:flutter/services.dart';
-import 'package:package_info_plus/package_info_plus.dart'; // NEW: Import package_info_plus
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
-import 'package:url_launcher/url_launcher.dart'; // NEW: Import your welcome screen
+import 'package:url_launcher/url_launcher.dart';
+import 'package:cardabase/util/export_data.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -19,13 +20,14 @@ void main() async {
   }
 
   FlutterError.onError = (FlutterErrorDetails details) {
-    FlutterError.presentError(details);
+
+   FlutterError.presentError(details);
     if (navigatorKey.currentState != null && navigatorKey.currentContext != null && navigatorKey.currentContext!.mounted) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (navigatorKey.currentContext != null && navigatorKey.currentContext!.mounted) {
           bool isDialogOpen = false;
           navigatorKey.currentState!.popUntil((route) {
-            if (route is PopupRoute && route.isActive) { // Check for any active popup route
+            if (route is PopupRoute && route.isActive) {
               isDialogOpen = true;
               return false;
             }
@@ -81,6 +83,10 @@ void main() async {
   final PackageInfo packageInfo = await PackageInfo.fromPlatform();
   String currentAppVersion = packageInfo.version;
   String? lastSeenAppVersion = Hive.box('settingsBox').get('lastSeenAppVersion');
+  // Read auto-backup settings safely
+  bool autoBackups = Hive.box('settingsBox').get('autoBackups') ?? false;
+  String? lastAutoUpdate = Hive.box('settingsBox').get('lastAutoUpdate');
+  int autoBackupInterval = Hive.box('settingsBox').get('autoBackupInterval') ?? 7;
 
   Widget initialScreen;
 
@@ -90,9 +96,27 @@ void main() async {
     initialScreen = Homepage();
   }
 
+
   runApp(
     Main(initialScreen: initialScreen),
   );
+
+  if (autoBackups && lastAutoUpdate != null) {
+    try {
+      final DateTime lastDt = DateTime.parse(lastAutoUpdate);
+      final int daysSince = DateTime.now().difference(lastDt).inDays;
+      if (daysSince >= autoBackupInterval) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (navigatorKey.currentContext != null && navigatorKey.currentContext!.mounted) {
+            exportCardList(navigatorKey.currentContext!);
+            Hive.box('settingsBox').put('lastAutoUpdate', DateTime.now().toString());
+          }
+        });
+      }
+    } catch (e) {
+      // If parsing fails, ignore and do not attempt export
+    }
+  }
 }
 
 

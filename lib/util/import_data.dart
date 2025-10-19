@@ -100,7 +100,7 @@ Future<bool> showImportDialog(BuildContext context) async {
                       'cardType': cardMap['cardType'] ?? '',
                       'hasPassword': (cardMap['hasPassword']?.toLowerCase() == 'true'),
                       'uniqueId': uniqueId + importedCount.toString(),
-                      'tags': cardMap['tags']?.split(',').map((e) => e.trim()).toList() ?? [],
+                      'note': cardMap['note'] ?? '',
                     };
                     newCards.add(newMap);
                     importedCount++;

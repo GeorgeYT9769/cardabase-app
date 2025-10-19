@@ -8,9 +8,10 @@ class MySetting extends StatelessWidget {
   final IconData settingIcon;
   final void Function() settingAction;
   final Color iconColor;
+  final Color borderColor;
 
 
-  const MySetting({super.key, required this.aboutSettingHeader, required this.settingAction, required this.settingHeader, required this.settingIcon, required this.iconColor});
+  const MySetting({super.key, required this.aboutSettingHeader, required this.settingAction, required this.settingHeader, required this.settingIcon, required this.iconColor, required this.borderColor});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,7 @@ class MySetting extends StatelessWidget {
         child: OutlinedButton(
           style: OutlinedButton.styleFrom(
             padding: const EdgeInsets.all(15),
-            side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
+            side: BorderSide(color: borderColor, width: 2),
             backgroundColor: Colors.transparent,
             elevation: 0.0,
             shape: RoundedRectangleBorder(

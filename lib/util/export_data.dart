@@ -70,6 +70,7 @@ Future<void> exportCardList(BuildContext context) async {
             'cardType: ${card['cardType'] ?? ''}, '
             'hasPassword: ${card['hasPassword'] ?? ''}, '
             'uniqueId: ${card['uniqueId'] ?? ''}, '
+            'note: ${card['note'] ?? ''}, '
             '}',
           );
         }

@@ -84,6 +84,7 @@ class _NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin
           labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 18),
           unselectedLabelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontSize: 18),
           indicatorColor: Theme.of(context).colorScheme.inverseSurface,
+          splashFactory: NoSplash.splashFactory,
           tabs: const [
             Tab(text: 'Online'),
             Tab(text: 'Local'),
