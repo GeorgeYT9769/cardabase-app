@@ -31,18 +31,18 @@ enum CardType {
 
 class EditCard extends StatefulWidget {
 
-  Color cardColorPreview;
-  int redValue;
-  int greenValue;
-  int blueValue;
-  bool hasPassword;
-  int index;
-  String cardTextPreview;
-  String cardName;
-  String cardId;
-  String cardType;
-  List<dynamic> tags;
-  String notes;
+  final Color cardColorPreview;
+  final int redValue;
+  final int greenValue;
+  final int blueValue;
+  final bool hasPassword;
+  final int index;
+  final String cardTextPreview;
+  final String cardName;
+  final String cardId;
+  final String cardType;
+  final List<dynamic> tags;
+  final String notes;
 
   EditCard({super.key, required this.cardColorPreview, required this.redValue, required this.greenValue, required this.blueValue, required this.hasPassword, required this.index, required this.cardTextPreview, required this.cardName, required this.cardId, required this.cardType, required this.tags, required this.notes});
 
@@ -55,6 +55,19 @@ class _EditCardState extends State<EditCard> {
   final passwordbox = Hive.box('password');
 
   cardabase_db cdb = cardabase_db();
+
+  // Return black for light backgrounds and white for dark backgrounds
+  Color getContrastingTextColor(Color bg) {
+    return bg.computeLuminance() > 0.5 ? Colors.black : Colors.white;
+  }
+
+  // Mutable copies of widget data (keep widget immutable)
+  late Color cardColorPreview;
+  late int redValue;
+  late int greenValue;
+  late int blueValue;
+  late bool hasPassword;
+  late String cardTextPreview;
 
   TextEditingController controller = TextEditingController();
   TextEditingController controllercardid = TextEditingController();
@@ -109,16 +122,16 @@ class _EditCardState extends State<EditCard> {
       context: context,
       builder: (context) {
         return ColorPickerSecondDialog(
-          cardColor: widget.cardColorPreview,
+          cardColor: cardColorPreview,
         );
       },
     ).then((value) {
       if (value != null) {
         setState(() {
-          widget.cardColorPreview = value;
-          widget.redValue = (widget.cardColorPreview.r * 255.0).round();
-          widget.greenValue = (widget.cardColorPreview.g * 255.0).round();
-          widget.blueValue = (widget.cardColorPreview.b * 255.0).round();
+          cardColorPreview = value;
+          redValue = (cardColorPreview.r * 255.0).round();
+          greenValue = (cardColorPreview.g * 255.0).round();
+          blueValue = (cardColorPreview.b * 255.0).round();
         });
       }
     });
@@ -135,11 +148,11 @@ class _EditCardState extends State<EditCard> {
             {
               'cardName': controller.text,
               'cardId': controllercardid.text,
-              'redValue': widget.redValue,
-              'greenValue': widget.greenValue,
-              'blueValue': widget.blueValue,
+              'redValue': redValue,
+              'greenValue': greenValue,
+              'blueValue': blueValue,
               'cardType': cardTypeText,
-              'hasPassword': widget.hasPassword,
+              'hasPassword': hasPassword,
               'uniqueId': uniqueId,
               'tags': selectedTags.toList(),
               'note': noteController.text,
@@ -152,11 +165,11 @@ class _EditCardState extends State<EditCard> {
       controller.text = '';
       controllercardid.text = '';
       noteController.text = '';
-      widget.redValue = 158;
-      widget.blueValue = 158;
-      widget.greenValue = 158;
+      redValue = 158;
+      blueValue = 158;
+      greenValue = 158;
       cardTypeText = 'Card Type';
-      widget.hasPassword = false;
+      hasPassword = false;
     } else if (controller.text.isEmpty == true ) {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -268,9 +281,9 @@ class _EditCardState extends State<EditCard> {
     controller.text = '';
     controllercardid.text = '';
     noteController.text = '';
-    widget.redValue = 158;
-    widget.blueValue = 158;
-    widget.greenValue = 158;
+    redValue = 158;
+    blueValue = 158;
+    greenValue = 158;
   }
 
   //CHECKING IF THE CARD CAN BE DISPLAYED
@@ -449,21 +462,23 @@ class _EditCardState extends State<EditCard> {
   void initState() {
     cdb.loadData();
     super.initState();
+    // initialize mutable local state from widget (keep widget immutable)
     controller.text = widget.cardName;
-    widget.cardTextPreview = widget.cardName;
-    widget.cardColorPreview = Color.fromARGB(255, widget.redValue, widget.greenValue, widget.blueValue);
+    cardTextPreview = widget.cardName;
+    cardColorPreview = Color.fromARGB(255, widget.redValue, widget.greenValue, widget.blueValue);
     controllercardid.text = widget.cardId;
-    widget.redValue = widget.redValue;
-    widget.greenValue = widget.greenValue;
-    widget.blueValue = widget.blueValue;
+    redValue = widget.redValue;
+    greenValue = widget.greenValue;
+    blueValue = widget.blueValue;
     cardTypeText = widget.cardType;
-    widget.hasPassword = widget.hasPassword;
+    hasPassword = widget.hasPassword;
     selectedTags = Set<String>.from(widget.tags.map((e) => e.toString()));
     noteController.text = widget.notes;
   }
 
   @override
   Widget build(BuildContext context) {
+    final Color contentTextColor = getContrastingTextColor(cardColorPreview);
     return Scaffold(
       //resizeToAvoidBottomInset: false,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -493,14 +508,15 @@ class _EditCardState extends State<EditCard> {
 
                   setState(() {
                     controller.text = name;
-                    widget.cardTextPreview = name;
-                    widget.cardColorPreview = Color.fromARGB(255, red, green, blue);
+                    cardTextPreview = name;
+                    cardColorPreview = Color.fromARGB(255, red, green, blue);
                     controllercardid.text = number;
-                    widget.redValue = red;
-                    widget.greenValue = green;
-                    widget.blueValue = blue;
+                    redValue = red;
+                    greenValue = green;
+                    blueValue = blue;
                     cardTypeText = cardType;
-                    widget.hasPassword = hasPwd;
+                    hasPassword = hasPwd;
+                    selectedTags = Set<String>.from(tags.map((e) => e.toString()));
                   });
                 }
               }
@@ -528,18 +544,18 @@ class _EditCardState extends State<EditCard> {
               width: MediaQuery.of(context).size.width,
               child: Container(
                 margin: const EdgeInsets.all(20),
-                decoration: BoxDecoration(color: widget.cardColorPreview, borderRadius: BorderRadius.circular(15)),
+                decoration: BoxDecoration(color: cardColorPreview, borderRadius: BorderRadius.circular(15)),
                 child: Center(
                   child: Wrap(
                       children: [
                         Container(
                           margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
                           child: Text(
-                            widget.cardTextPreview,
+                            cardTextPreview,
                             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                               fontSize: 50,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: contentTextColor,
                             ),
                             maxLines: 2,
                             textAlign: TextAlign.center,
@@ -575,10 +591,10 @@ class _EditCardState extends State<EditCard> {
                           TextFormField(
                             onChanged: (String value) {
                               setState(() {
-                                widget.cardTextPreview = value;
-                                widget.redValue = (widget.cardColorPreview.r * 255.0).round();
-                                widget.greenValue = (widget.cardColorPreview.g * 255.0).round();
-                                widget.blueValue = (widget.cardColorPreview.b * 255.0).round();
+                                cardTextPreview = value;
+                                redValue = (cardColorPreview.r * 255.0).round();
+                                greenValue = (cardColorPreview.g * 255.0).round();
+                                blueValue = (cardColorPreview.b * 255.0).round();
                               });
                             },
                             //maxLength: 20,
@@ -717,7 +733,7 @@ class _EditCardState extends State<EditCard> {
                                     side: BorderSide(
                                       color: isSelected
                                           ? Theme.of(context).colorScheme.primary
-                                          : Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                                          : Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                                       width: isSelected ? 2 : 1,
                                     ),
                                     avatar: isSelected
@@ -731,7 +747,7 @@ class _EditCardState extends State<EditCard> {
                           const SizedBox(height: 10,),
                           passwordbox.isNotEmpty
                               ? CheckboxListTile(
-                              value: widget.hasPassword,
+                              value: hasPassword,
                               title: Text('Use a password for this card', style: Theme.of(context).textTheme.bodyLarge?.copyWith( //cardTypeText
                                   fontWeight: FontWeight.bold,
                                   fontSize: 15,
@@ -742,7 +758,7 @@ class _EditCardState extends State<EditCard> {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
                               onChanged: (bool? checked) {
                                 setState(() {
-                                  widget.hasPassword = checked!;
+                                  hasPassword = checked!;
                                 });
                               })
                               : const SizedBox(height: 10,),

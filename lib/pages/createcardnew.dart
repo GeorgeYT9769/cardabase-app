@@ -53,6 +53,11 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
   int greenValue = 158;
 
   Color cardColorPreview = Colors.grey;
+  // Return black for light backgrounds and white for dark backgrounds
+  Color getContrastingTextColor(Color bg) {
+    // computeLuminance returns a value between 0 (dark) and 1 (light)
+    return bg.computeLuminance() > 0.5 ? Colors.black : Colors.white;
+  }
   String cardTextPreview = 'Card';
   TextEditingController controller = TextEditingController();
   TextEditingController controllercardid = TextEditingController();
@@ -560,7 +565,7 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           fontSize: 50,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: getContrastingTextColor(cardColorPreview),
                         ),
                         maxLines: 2,
                         textAlign: TextAlign.center,

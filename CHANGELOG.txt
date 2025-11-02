@@ -1,11 +1,15 @@
 LATEST CHANGELOG:
 
+02.11.2025:
+1.6.1:
+- Fixed a bug where the name of the card would not be visible due to card's colour being too light,
+- Small improvements and bug fixes.
+
 19.10.2025:
 1.6.0::
 - You can now add notes to your cards,
 - There are now auto backups meaning you can turn it on and set a duration how often you want the app to back up your cards automatically,
-- Small impovements and bug fixes.
-
+- Small improvements and bug fixes.
 
 11.09.2025:
 1.5.4:
@@ -32,7 +36,7 @@ LATEST CHANGELOG:
 - Cards can now be sorted by name and date,
 - Introducing tags: Tags are Strings that categorize your cards however you like,
 - Welcome back screen with a quick summary what was changed,
-- Info page with informations about app; this also serves a update check,
+- Info page with information about app; this also serves a update check,
 - You can now switch into using system font of your phone instead of Cardabase font pack (xirod + Roboto),
 - When creating a card, you can now select an image to automatically apply its data and barcode type,
 - New page transitions,

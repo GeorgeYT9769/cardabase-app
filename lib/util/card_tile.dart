@@ -3,7 +3,6 @@ import 'package:cardabase/pages/generate_barcode_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import '../data/cardabase_db.dart';
 import 'vibration_provider.dart';
 
 
@@ -26,9 +25,9 @@ class CardTile extends StatefulWidget {
   final String note;
   final String uniqueId;
 
-  int red;
-  int green;
-  int blue;
+  final int red;
+  final int green;
+  final int blue;
 
   CardTile({
     super.key,
@@ -61,6 +60,11 @@ class CardTile extends StatefulWidget {
 class _CardTileState extends State<CardTile> {
   final passwordbox = Hive.box('password');
   final settingsbox = Hive.box('settingsBox');
+
+  // Return black for light backgrounds and white for dark backgrounds
+  Color getContrastingTextColor(Color bg) {
+    return bg.computeLuminance() > 0.5 ? Colors.black : Colors.white;
+  }
 
   Barcode getBarcodeType(String cardType) {
     switch (cardType) {
@@ -103,6 +107,8 @@ class _CardTileState extends State<CardTile> {
 
   @override
   Widget build(BuildContext context) {
+    // compute the best text/foreground color for the tile based on its background
+    final Color contentTextColor = getContrastingTextColor(widget.cardTileColor);
     void showUnlockDialog(BuildContext context) {
       final TextEditingController controller = TextEditingController();
 
@@ -259,7 +265,7 @@ class _CardTileState extends State<CardTile> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: widget.cardTileColor,
-                      foregroundColor: Colors.white,
+                      foregroundColor: contentTextColor,
                       elevation: 0.0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(widget.borderSize),
@@ -271,7 +277,7 @@ class _CardTileState extends State<CardTile> {
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontSize: widget.labelSize,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: contentTextColor,
                       ),
                       textAlign: TextAlign.center,
                       maxLines: 2,
