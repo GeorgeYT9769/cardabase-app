@@ -1,5 +1,9 @@
 LATEST CHANGELOG:
 
+05.11.2025:
+1.6.2:
+- Disable baseline profiles (for F-Droid build, completely optional update).
+
 02.11.2025:
 1.6.1:
 - Fixed a bug where the name of the card would not be visible due to card's colour being too light,
