@@ -14,11 +14,6 @@
     <div align="center">
       <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Stars">
       <img alt="GitHub forks" src="https://img.shields.io/github/forks/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Forks">
-      <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/y/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Commit Activity">
-      <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Last Commit">
-      <img alt="GitHub issues" src="https://img.shields.io/github/issues/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Issues Opened">
-      <img alt="GitHub closed issues" src="https://img.shields.io/github/issues-closed/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Issues Closed">
-      <img alt="GitHub closed pull requests" src="https://img.shields.io/github/issues-pr-closed/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Pull Requests">
       <img alt="GitHub license" src="https://img.shields.io/github/license/GeorgeYT9769/cardabase-app?style=for-the-badge&label=License">
       <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/GeorgeYT9769/cardabase-app/total?style=for-the-badge&label=Downloads">
       <br />
@@ -54,7 +49,9 @@ OR
 2. Locate the "cardabase-(version you got).apk" file (usually in the Internal storage/Downloads folder).
 3. Allow installing apps from unknown sources.
 4. Install it by clicking on the "Install" button.
-- Note: If any error occurred while installing or using the app, please open a new issue.
+
+> [!NOTE]
+> F-Droid releases might not be in sync with those from GitHub.
 
 ## ❗ Acknowledgments
 
@@ -70,6 +67,7 @@ By downloading the app you agree:
 - add a counter to every card, so when card is clicked, it would add a point, then this could be used to sort by the most used cards
 - custom color theme, custom theme builder
 - images for the cards
+- anonymous bug reporting (to Discord issue tracker)
 - idk, let me know via issues ;)
 
 ## 📦 Storage System
@@ -117,12 +115,13 @@ This is how the structure of the data in the QR Code looks like:
 - `<R value>` - Value of Red color, 0 - 255 (int)
 - `<G value>` - Value of Green color, 0 - 255 (int)
 - `<B value>` - Value of Blue color, 0 - 255 (int)
-- `<Card Type>` - Type of the card, they can be [THESE](https://github.com/GeorgeYT9769/cardabase-app/blob/2e86905c4fb4f861cd3008506a681aab96ea9b38/lib/pages/createcardnew.dart#L9-L27) or [THESE](https://github.com/GeorgeYT9769/cardabase-app/blob/2e86905c4fb4f861cd3008506a681aab96ea9b38/lib/pages/createcardnew.dart#L58-L89), (same types) (CardType)
+- `<Card Type>` - Type of the card, they can be [THESE](https://github.com/GeorgeYT9769/cardabase-app/blob/2e86905c4fb4f861cd3008506a681aab96ea9b38/lib/pages/createcardnew.dart#L9-L27) or [THESE](https://github.com/GeorgeYT9769/cardabase-app/blob/2e86905c4fb4f861cd3008506a681aab96ea9b38/lib/pages/createcardnew.dart#L58-L89), (same types) (String)
 - `<Password>` - If the card has a password or not (bool)
 
 ## 🤝 Thanks to
 
 - [Edin Divović](https://www.youtube.com/@NotEdin_)
+- All the bug reporters that make the app even better.
 
 ## 🙌 Support
 
@@ -138,16 +137,19 @@ If your phone does not have issues with the app, you can add your device into th
 3. `flutter pub get` to download the dependencies,
 4. `flutter build apk` in Terminal (you can add `--split-per-abi` if you want to get multiple versions).
 
+> [!NOTE]
+> Signing the app is ON. You need a singature key and a key.properties in the /cardabase-app/android folder or else the build will fail. You can change [THIS LINE](https://github.com/GeorgeYT9769/cardabase-app/blob/1daf9c7244a081fe847b499cc55509c10772668d/android/app/build.gradle#L86) to debug to sign it with a debug key.
+
 Used versions:
 - Flutter: 3.32.0 (or newer, used Flutter version is always added as a submodule, so you can use that one)
-- Java: JDK-24
+- Java: JDK-21
 - Gradle: 8.14.2
 
 Note: Java and Gradle versions must be compatible with each other. [See this Compatibility Matrix](https://docs.gradle.org/current/userguide/compatibility.html).
 
 You may need to:
 - Specify JAVA_HOME in gradle.properties = `android/gradle.properties`, add a line `org.gradle.java.home="C:\\path\\to\\the\\jdk"`, where you have to specify your path, (<- in case of multiple/no versions or JAVA_HOME environment variable not specified)
-- Change Gradle version in gradle-wrapper.properties = `android\gradle\wrapper\gradle-wrapper.properties`, last line "distributionUrl" (change the "8.5" number). (<- in case of different Gradle installation)
+- Change Gradle version in gradle-wrapper.properties = `android\gradle\wrapper\gradle-wrapper.properties`, last line "distributionUrl" (change the "X.X" or "X.X.X" number). (<- in case of different Gradle installation)
 
 ## 📸 Screenshots
 
