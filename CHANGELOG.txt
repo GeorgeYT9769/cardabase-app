@@ -1,5 +1,9 @@
 LATEST CHANGELOG:
 
+16.11.2025:
+1.6.3:
+- Fixed exporting legacy cards.
+
 05.11.2025:
 1.6.2:
 - Disable baseline profiles (for F-Droid build, completely optional update).

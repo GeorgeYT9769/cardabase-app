@@ -673,6 +673,7 @@ class _SettingsState extends State<Settings> {
             //  settingHeader: 'DEV Options',
             //  settingIcon:Icons.developer_mode,
             //  iconColor: devOptions ? Colors.green : Colors.red,
+            //  borderColor: Theme.of(context).colorScheme.primary,
             //),
           ],
         ),

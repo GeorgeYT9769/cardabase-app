@@ -55,11 +55,24 @@ Future<void> exportCardList(BuildContext context) async {
         return;
       }
 
+      // Generate timestamp in yyyymmddhhmmss format
+      final now = DateTime.now();
+      final timestamp = '${now.year.toString().padLeft(4, '0')}'
+          '${now.month.toString().padLeft(2, '0')}'
+          '${now.day.toString().padLeft(2, '0')}'
+          '${now.hour.toString().padLeft(2, '0')}'
+          '${now.minute.toString().padLeft(2, '0')}'
+          '${now.second.toString().padLeft(2, '0')}';
+
       final StringBuffer txtBuffer = StringBuffer();
-      txtBuffer.writeln('If you do not know what are you doing, please do not touch this file. One mistake and you can lose all your data!');
+      txtBuffer.writeln('If you do not know what are you doing, please do not touch this file. One mistake and you can lose all your data! Copy everything under === line and paste them into import window.');
+      txtBuffer.writeln('Timestamp: $timestamp');
       txtBuffer.writeln('=======================================================================');
+      // Export each card as a list or map, matching its type
       for (var card in cardList) {
-        if (card is Map) {
+        if (card is List) {
+          txtBuffer.writeln('[${card.map((e) => e.toString()).join(', ')}]');
+        } else if (card is Map) {
           txtBuffer.writeln(
             '{'
             'cardName: ${card['cardName'] ?? ''}, '
@@ -71,12 +84,11 @@ Future<void> exportCardList(BuildContext context) async {
             'hasPassword: ${card['hasPassword'] ?? ''}, '
             'uniqueId: ${card['uniqueId'] ?? ''}, '
             'note: ${card['note'] ?? ''}, '
-            '}',
-          );
+            '}');
         }
       }
 
-      final filePath = '${directory.path}/Cardabase_backup.txt';
+      final filePath = '${directory.path}/Cardabase_backup_$timestamp.txt';
       final file = File(filePath);
       await file.writeAsString(txtBuffer.toString());
 
