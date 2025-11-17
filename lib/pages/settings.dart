@@ -207,7 +207,7 @@ class _SettingsState extends State<Settings> {
     Navigator.of(context).pop(true);
   }
 
-  showUnlockDialogExport(BuildContext context) {
+  void showUnlockDialogExport(BuildContext context) {
     final TextEditingController controller = TextEditingController();
 
     showDialog(
@@ -253,10 +253,9 @@ class _SettingsState extends State<Settings> {
                 onPressed: () {
                   if (controller.text == passwordbox.get('PW')) {
                     FocusScope.of(context).unfocus();
-
                     Future.delayed(const Duration(milliseconds: 100), () {
                       Navigator.pop(context);
-                      exportCardList(context);
+                      showExportTypeDialog(context);
                     });
                   } else {
                     VibrationProvider.vibrateSuccess();
@@ -311,7 +310,7 @@ class _SettingsState extends State<Settings> {
       showUnlockDialogExport(context);
     } else {
       VibrationProvider.vibrateSuccess();
-      exportCardList(context);
+      showExportTypeDialog(context);
     }
   }
 

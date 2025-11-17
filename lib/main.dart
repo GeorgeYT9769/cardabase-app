@@ -108,7 +108,7 @@ void main() async {
       if (daysSince >= autoBackupInterval) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (navigatorKey.currentContext != null && navigatorKey.currentContext!.mounted) {
-            exportCardList(navigatorKey.currentContext!);
+            exportCardList(navigatorKey.currentContext!, toFile: true);
             Hive.box('settingsBox').put('lastAutoUpdate', DateTime.now().toString());
           }
         });
