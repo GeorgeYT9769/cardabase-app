@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:flutter/services.dart';
 
 final cardBox = Hive.box('mybox');
 
@@ -98,6 +99,28 @@ Future<void> exportCardList(BuildContext context, {required bool toFile}) async 
                 Icon(Icons.check, size: 15, color: Colors.white,),
                 SizedBox(width: 10,),
                 Text('Exported to Downloads!', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            duration: const Duration(milliseconds: 3000),
+            padding: const EdgeInsets.all(5.0),
+            margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+            behavior: SnackBarBehavior.floating,
+            dismissDirection: DismissDirection.vertical,
+            backgroundColor: const Color.fromARGB(255, 92, 184, 92),
+          ));
+      } else {
+        // Copy to clipboard when toFile is false
+        await Clipboard.setData(ClipboardData(text: txtBuffer.toString()));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10)
+            ),
+            content: Row(
+              children: [
+                Icon(Icons.copy, size: 15, color: Colors.white,),
+                SizedBox(width: 10,),
+                Text('Copied to clipboard!', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
               ],
             ),
             duration: const Duration(milliseconds: 3000),
