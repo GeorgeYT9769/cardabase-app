@@ -1,3 +1,4 @@
+import 'package:cardabase/pages/createcardnew.dart';
 import 'package:cardabase/pages/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -5,8 +6,11 @@ import 'package:cardabase/theme/color_schemes.g.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
+import 'package:quick_actions/quick_actions.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cardabase/util/export_data.dart';
+import 'dart:async';
+import 'package:cardabase/pages/settings.dart'; // Import Settings page
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -120,10 +124,51 @@ void main() async {
 }
 
 
-class Main extends StatelessWidget {
+class Main extends StatefulWidget {
   final Widget initialScreen;
 
   Main({super.key, required this.initialScreen});
+
+  @override
+  _MainState createState() => _MainState();
+}
+
+class _MainState extends State<Main> {
+  // Removed AppLinks and StreamSubscription for uni_links/app_links
+  // StreamSubscription? _sub; // Removed
+
+  final QuickActions quickActions = QuickActions();
+  String shortcut = 'nothing set';
+
+  @override
+  void initState() {
+    super.initState();
+    // Removed _handleIncomingLinks() and _handleInitialUri()
+
+    quickActions.initialize((shortcutType) {
+      // Ensure the navigatorKey context is available before navigating
+      if (navigatorKey.currentState != null && navigatorKey.currentContext != null) {
+        if (shortcutType == 'add_card') {
+          navigatorKey.currentState!.push(MaterialPageRoute(builder: (context) => const CreateCard()));
+        }
+        if (shortcutType == 'info') {
+          navigatorKey.currentState!.push(MaterialPageRoute(builder: (context) => const Settings()));
+        }
+        // You can add more shortcut types here
+      }
+    });
+
+    quickActions.setShortcutItems(<ShortcutItem>[
+      const ShortcutItem(type: 'add_card', localizedTitle: 'Add card', icon: 'ic_add_card'), // Added icon
+      const ShortcutItem(type: 'info', localizedTitle: 'Info', localizedSubtitle: 'See info', icon: 'ic_info') // Added icon
+    ]);
+  }
+
+  @override
+  void dispose() {
+    // _sub?.cancel(); // Removed
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -135,11 +180,21 @@ class Main extends StatelessWidget {
 
     return ValueListenableBuilder(
       valueListenable: Hive.box('settingsBox').listenable(),
-      builder: (context, box, widget) {
+      builder: (context, box, child) {
 
         bool isDarkMode = box.get('isDarkMode', defaultValue: false);
         bool useSystemFont = box.get('useSystemFont', defaultValue: false);
-        final String? textFont = useSystemFont ? null : 'Roboto-Regular.ttf';
+        bool useExtraDark = box.get('useExtraDark', defaultValue: false); // Retrieve new setting
+
+        // Define the extra dark color scheme
+        ColorScheme extraDarkColorScheme = darkColorScheme.copyWith(
+          surface: Colors.black,
+          background: Colors.black,
+          // You might want to adjust other colors like onSurface, onBackground
+          // to ensure good contrast with a black background.
+        );
+
+        final String? textFont = useSystemFont ? null : 'Roboto'; // Corrected family name
 
         return MaterialApp(
           navigatorKey: navigatorKey,
@@ -170,7 +225,7 @@ class Main extends StatelessWidget {
           ),
           darkTheme: ThemeData(
               useMaterial3: true,
-              colorScheme: darkColorScheme,
+              colorScheme: useExtraDark ? extraDarkColorScheme : darkColorScheme, // Apply conditionally
               pageTransitionsTheme: const PageTransitionsTheme(
                   builders: <TargetPlatform, PageTransitionsBuilder>{
                     TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
@@ -191,7 +246,7 @@ class Main extends StatelessWidget {
                 ),
               ),
           ),
-          home: initialScreen,
+          home: widget.initialScreen,
         );
       },
     );

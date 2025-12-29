@@ -66,7 +66,7 @@ class _NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin
     return Scaffold(
       appBar: AppBar(
         title: Text(
-            'News',
+            'Changelog',
             style: Theme.of(context).textTheme.titleLarge?.copyWith()
         ),
         centerTitle: true,

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cardabase</string>
+    <string name="shortcut_add_card_short">New Card</string>
+    <string name="shortcut_add_card_long">Add a new card</string>
+</resources>

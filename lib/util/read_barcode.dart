@@ -35,7 +35,6 @@ class _QRBarReaderState extends State<QRBarReader> {
   void initState() {
     super.initState();
     _permissionDeniedShown = false;
-    log('QRBarReader initState called.');
   }
 
   @override
@@ -116,25 +115,19 @@ class _QRBarReaderState extends State<QRBarReader> {
 
   void _onQRViewCreated(QRViewController controller) {
     if (!mounted) {
-      log('QRView created, but widget not mounted. Skipping controller assignment.');
       return;
     }
     setState(() {
       this.controller = controller;
     });
-    log('QRView controller assigned.');
-
     controller.scannedDataStream.listen((scanData) async {
       if (!mounted) {
-        log('Scanned data received, but widget not mounted. Skipping.');
         return;
       }
 
       setState(() {
         result = scanData;
       });
-      log('QR code scanned: ${scanData.code}');
-
       await this.controller?.pauseCamera();
 
       if (mounted) {
@@ -169,7 +162,6 @@ class _QRBarReaderState extends State<QRBarReader> {
         return null;
       }
     } catch (e) {
-      log('Error decoding image from gallery: $e');
       return null;
     }
   }
@@ -182,12 +174,10 @@ class _QRBarReaderState extends State<QRBarReader> {
     final decodedResult = await decodeImage(bytes);
 
     if (!mounted) {
-      log('Image picked and decoded, but widget not mounted. Skipping navigation/snackbar.');
       return;
     }
 
     if (decodedResult != null) {
-      log('Image decoded successfully: $decodedResult');
       Navigator.pop(context, {
         "code": decodedResult,
         "format": "QR_CODE",
@@ -225,8 +215,6 @@ class _QRBarReaderState extends State<QRBarReader> {
   }
 
   void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
-    log('onPermissionSet called: permission = $p, _permissionDeniedShown = $_permissionDeniedShown, mounted = $mounted');
-
     if (!p) {
       if (!_permissionDeniedShown) {
         VibrationProvider.vibrateError();
@@ -263,37 +251,27 @@ class _QRBarReaderState extends State<QRBarReader> {
           setState(() {
             _permissionDeniedShown = true;
           });
-          log('Permission denied message shown. _permissionDeniedShown set to true.');
-
           if (mounted) {
-            log('Permission denied, closing scanner.');
           }
-        } else {
-          log('Widget not mounted, skipping snackbar for permission denial.');
-        }
-      } else {
-        log('Permission denied, but message already shown. Skipping duplicate snackbar.');
-      }
+        } else {}
+      } else {}
     } else {
       if (_permissionDeniedShown) {
         if (mounted) {
           setState(() {
             _permissionDeniedShown = false;
           });
-          log('Permission granted. _permissionDeniedShown reset to false.');
         } else {
-          log('Widget not mounted, skipping _permissionDeniedShown reset.');
+
         }
       } else {
-        log('Permission granted, and message was not previously shown. No action needed.');
+
       }
     }
   }
 
   @override
   void dispose() {
-    log('QRBarReader dispose called. Disposing controller.');
-    controller?.dispose();
     super.dispose();
   }
 }

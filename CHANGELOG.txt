@@ -1,5 +1,19 @@
 LATEST CHANGELOG:
 
+29.12.2025:
+1.7.0:
+- App now supports pictures of your cards - simply go to Others tab and add a picture, either by making one or picking one from your Gallery,
+- You can now hide the title of the card to make the picture stand out,
+- Card pictures are available for you by the sides of the card, so when looking at the barcode of the card, just swipe left for back picture and right for front picture,
+- Photos and barcodes have preview screen, so you can see what they look like better (mainly for barcodes if the reader has troubles),
+- App now supports full dark theme for OLED screens,
+- Setting tiles are now slimmer, the details are hidde and can be shown by holding on the setting tile,
+- You can now export your Cardabase into clipboard and paste/send/save it however you like,
+- App bar (the top bar of the page) at the Homepage and Settings hide when you scroll down and show up when you scroll up,
+- You can now duplicate your cards (was removed somehow, my fault),
+- App now supports app shortcuts, so when you hold the icon, a menu pops up with different options (if you have an idea what to put there, let me know),
+- Fixed a bug where auto updates could be turned on without entering a password (if one was set up).
+
 16.11.2025:
 1.6.3:
 - Fixed exporting legacy cards.

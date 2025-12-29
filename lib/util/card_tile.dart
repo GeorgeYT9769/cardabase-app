@@ -1,5 +1,6 @@
+import 'dart:io';
 import 'package:barcode_widget/barcode_widget.dart';
-import 'package:cardabase/pages/generate_barcode_page.dart';
+import 'package:cardabase/pages/card_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -16,6 +17,7 @@ class CardTile extends StatefulWidget {
   final Function(BuildContext) editFunction;
   final Function(BuildContext) moveUpFunction;
   final Function(BuildContext) moveDownFunction;
+  final Function(BuildContext) duplicateFunction;
   final double labelSize;
   final double borderSize;
   final double marginSize;
@@ -24,6 +26,10 @@ class CardTile extends StatefulWidget {
   final bool reorderMode;
   final String note;
   final String uniqueId;
+  final String imagePathFront;
+  final String imagePathBack;
+  final bool useFrontFaceOverlay;
+  final bool hideTitle;
 
   final int red;
   final int green;
@@ -51,6 +57,11 @@ class CardTile extends StatefulWidget {
     required this.reorderMode,
     required this.note,
     required this.uniqueId,
+    required this.duplicateFunction,
+    required this.imagePathFront,
+    required this.imagePathBack,
+    required this.useFrontFaceOverlay,
+    required this.hideTitle
   });
 
   @override
@@ -63,7 +74,7 @@ class _CardTileState extends State<CardTile> {
 
   // Return black for light backgrounds and white for dark backgrounds
   Color getContrastingTextColor(Color bg) {
-    return bg.computeLuminance() > 0.5 ? Colors.black : Colors.white;
+    return bg.computeLuminance() > 0.7 ? Colors.black : Colors.white;
   }
 
   Barcode getBarcodeType(String cardType) {
@@ -161,7 +172,7 @@ class _CardTileState extends State<CardTile> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => GenerateBarcode(
+                            builder: (context) => CardDetails(
                               cardid: widget.cardnumber,
                               cardtext: widget.shopName,
                               cardTileColor: widget.cardTileColor,
@@ -172,6 +183,8 @@ class _CardTileState extends State<CardTile> {
                               blue: widget.blue,
                               tags: [],
                               note: widget.note,
+                              imagePathFront: widget.imagePathFront,
+                              imagePathBack: widget.imagePathBack,
                             ),
                           ),
                         );
@@ -232,7 +245,7 @@ class _CardTileState extends State<CardTile> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => GenerateBarcode(
+            builder: (context) => CardDetails(
               cardid: widget.cardnumber,
               cardtext: widget.shopName,
               cardTileColor: widget.cardTileColor,
@@ -243,6 +256,8 @@ class _CardTileState extends State<CardTile> {
               blue: widget.blue,
               tags: [],
               note: widget.note,
+              imagePathFront: widget.imagePathFront,
+              imagePathBack: widget.imagePathBack,
             ),
           ),
         );
@@ -267,20 +282,41 @@ class _CardTileState extends State<CardTile> {
                       backgroundColor: widget.cardTileColor,
                       foregroundColor: contentTextColor,
                       elevation: 0.0,
+                      padding: EdgeInsets.zero, // Added this line
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(widget.borderSize),
                       ),
                     ),
                     onPressed: askForPassword,
-                    child: Text(
-                      widget.shopName,
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontSize: widget.labelSize,
-                        fontWeight: FontWeight.bold,
-                        color: contentTextColor,
-                      ),
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        if (widget.useFrontFaceOverlay && widget.imagePathFront.isNotEmpty)
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(widget.borderSize),
+                            child: Image.file(
+                              File(widget.imagePathFront),
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
+                          ),
+                        Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Center(
+                            child: Text(
+                              widget.hideTitle ? '' : widget.shopName,
+                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                fontSize: widget.labelSize,
+                                fontWeight: FontWeight.bold,
+                                color: contentTextColor,
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -312,6 +348,14 @@ class _CardTileState extends State<CardTile> {
                 onTap: () {
                   Navigator.pop(context);
                   widget.editFunction(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.copy, color: Theme.of(context).colorScheme.tertiary),
+                title: Text('Duplicate', style: Theme.of(context).textTheme.bodyLarge?.copyWith()),
+                onTap: () {
+                  Navigator.pop(context);
+                  widget.duplicateFunction(context);
                 },
               ),
               ListTile(

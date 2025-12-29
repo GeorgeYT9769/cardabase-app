@@ -64,7 +64,7 @@ android {
     defaultConfig {
         applicationId "com.georgeyt9769.cardabase"
         minSdkVersion 25
-        targetSdkVersion 35
+        targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true

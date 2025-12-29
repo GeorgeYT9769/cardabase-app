@@ -4,9 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../data/cardabase_db.dart';
+import '../util/camera_controller.dart';
+import '../util/dashedRect.dart';
 import '../util/color_picker.dart';
 import '../util/devoptions.dart';
 import '../util/vibration_provider.dart';
+import 'dart:io'; // Import for File
 
 bool devOptions = DeveloperOptionsProvider.developerOptions;
 
@@ -56,7 +59,7 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
   // Return black for light backgrounds and white for dark backgrounds
   Color getContrastingTextColor(Color bg) {
     // computeLuminance returns a value between 0 (dark) and 1 (light)
-    return bg.computeLuminance() > 0.5 ? Colors.black : Colors.white;
+    return bg.computeLuminance() > 0.7 ? Colors.black : Colors.white;
   }
   String cardTextPreview = 'Card';
   TextEditingController controller = TextEditingController();
@@ -64,11 +67,16 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
   TextEditingController noteController = TextEditingController();
 
   bool hasPassword = false;
+  bool useFrontFaceOverlay = false;
+  bool hideTitle = false;
 
   Set<String> selectedTags = {};
 
   late final FocusNode cardNameFocusNode;
   late final FocusNode cardIdFocusNode;
+
+  String? _imagePathFront; // State variable to hold the image path
+  String? _imagePathBack; // State variable to hold the image path
 
   String getBarcodeTypeText(String cardTypeText) {
     switch (cardTypeText) {
@@ -148,6 +156,10 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
           'uniqueId': uniqueId,
           'tags': selectedTags.toList(),
           'note': noteController.text,
+          'imagePathFront': _imagePathFront, // Save the image path
+          'imagePathBack': _imagePathBack, // Save the image path
+          'useFrontFaceOverlay': useFrontFaceOverlay, // Save the overlay setting'
+          'hideTitle': hideTitle // Save the overlay setting'
         });
       });
       cdb.updateDataBase();
@@ -160,6 +172,11 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
       greenValue = 158;
       cardTypeText = 'Barcode Type';
       hasPassword = false;
+      _imagePathFront = null; // Clear image path after saving
+      _imagePathBack = null; // Clear image path after saving
+      useFrontFaceOverlay = false;
+      selectedTags.clear();
+      hideTitle = false;
     } else if (controller.text.isEmpty == true ) {
       VibrationProvider.vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -279,6 +296,8 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
     redValue = 158;
     blueValue = 158;
     greenValue = 158;
+    _imagePathFront = null;// Clear image path on cancel
+    _imagePathBack = null;// Clear image path on cancel
   }
 
   void addLegacyCard() {
@@ -288,6 +307,31 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
     cdb.updateDataBase();
     Navigator.pop(context);
   }
+
+  void takeFrontPicture() async {
+    final String? imagePathFront = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CameraControllerScreen()),
+    );
+    if (imagePathFront != null) {
+      setState(() {
+        _imagePathFront = imagePathFront;
+      });
+    }
+  }
+
+  void takeBackPicture() async {
+    final String? imagePathBack = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CameraControllerScreen()),
+    );
+    if (imagePathBack != null) {
+      setState(() {
+        _imagePathBack = imagePathBack;
+      });
+    }
+  }
+
 
   //CHECKING IF THE CARD CAN BE SAVED (AND ALSO DISPLAYED)
   //P.S. WRITTEN BY CHAT-GPT CUZ GOT NO IDEA HOW TO CHECK THEM MYSELF :)
@@ -550,29 +594,43 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
         physics: BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
         children: [
           SizedBox(
-            height: MediaQuery.of(context).size.width / 1.50, //height of button
+            height: MediaQuery.of(context).size.width / 1.586, //height of button
             width: MediaQuery.of(context).size.width,
             child: Container(
               margin: const EdgeInsets.all(20),
               decoration: BoxDecoration(color: cardColorPreview, borderRadius: BorderRadius.circular(15)),
-              child: Center(
-                child: Wrap(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-                      child: Text(
-                        cardTextPreview,
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontSize: 50,
-                          fontWeight: FontWeight.bold,
-                          color: getContrastingTextColor(cardColorPreview),
-                        ),
-                        maxLines: 2,
-                        textAlign: TextAlign.center,
+              child: Stack(
+                children: [
+                  if (useFrontFaceOverlay && _imagePathFront != null)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: Image.file(
+                        File(_imagePathFront!),
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
                       ),
                     ),
-                  ],
-                ),
+                  Center(
+                    child: Wrap(
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                          child: Text(
+                            hideTitle ? '' : cardTextPreview,
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              fontSize: 50,
+                              fontWeight: FontWeight.bold,
+                              color: getContrastingTextColor(cardColorPreview),
+                            ),
+                            maxLines: 2,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -590,7 +648,7 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                   splashFactory: NoSplash.splashFactory,
                 ),
                 SizedBox(
-                  height: 600, // Set a fixed height for TabBarView to avoid unbounded height error
+                  height: 1000, // Set a fixed height for TabBarView to avoid unbounded height error
                   child: TabBarView(
                     children: [
                       Container(
@@ -791,56 +849,236 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                               ),
                             ),
                             const SizedBox(height: 15,),
-                            SizedBox(
-                              height: 40,
-                              child: ListView.builder(
-                                physics: const BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
-                                scrollDirection: Axis.horizontal,
-                                itemCount: allTags.length,
-                                itemBuilder: (context, chipIndex) {
-                                  final tag = allTags[chipIndex];
-                                  final isSelected = selectedTags.contains(tag);
-                                  return Padding(
-                                    padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-                                    child: ActionChip(
-                                      label: Text(tag),
-                                      onPressed: () {
-                                        setState(() {
-                                          if (isSelected) {
-                                            selectedTags.remove(tag);
-                                          } else {
-                                            selectedTags.add(tag);
-                                          }
-                                        });
-                                      },
-                                      labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                        color: isSelected
-                                            ? Theme.of(context).colorScheme.onPrimary
-                                            : Theme.of(context).colorScheme.inverseSurface,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      backgroundColor: isSelected
-                                          ? Theme.of(context).colorScheme.primary
-                                          : Theme.of(context).colorScheme.surface,
-                                      side: BorderSide(
-                                        color: isSelected
-                                            ? Theme.of(context).colorScheme.primary
-                                            : Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
-                                        width: isSelected ? 2 : 1,
-                                      ),
-                                      avatar: isSelected
-                                          ? Icon(Icons.check, size: 18, color: Theme.of(context).colorScheme.onPrimary)
-                                          : null,
-                                    ),
-                                  );
-                                },
+                            Container(
+                              child: TextField(
+                                controller: noteController,
+                                maxLines: 10,
+                                decoration: InputDecoration(
+                                  hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 15),
+                                  hintText: 'Some notes...',
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
+                                  focusColor: Theme.of(context).colorScheme.primary,
+                                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
+                                ),
+                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold),
                               ),
                             ),
-                            const SizedBox(height: 10,),
+                          ],
+                        ),
+                      ),
+                      // Second tab: custom widget placeholder
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          children: [
+                            allTags.isEmpty
+                                ? const SizedBox.shrink()
+                                : Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Tags:',
+                                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                          color: Theme.of(context).colorScheme.inverseSurface,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: SizedBox(
+                                          height: 40,
+                                          child: ListView.builder(
+                                            physics: const BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount: allTags.length,
+                                            itemBuilder: (context, chipIndex) {
+                                              final tag = allTags[chipIndex];
+                                              final isSelected = selectedTags.contains(tag);
+                                              return Padding(
+                                                padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                                                child: ActionChip(
+                                                  label: Text(tag),
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      if (isSelected) {
+                                                        selectedTags.remove(tag);
+                                                      } else {
+                                                        selectedTags.add(tag);
+                                                      }
+                                                    });
+                                                  },
+                                                  labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                                    color: isSelected
+                                                        ? Theme.of(context).colorScheme.onPrimary
+                                                        : Theme.of(context).colorScheme.inverseSurface,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                  backgroundColor: isSelected
+                                                      ? Theme.of(context).colorScheme.primary
+                                                      : Theme.of(context).colorScheme.surface,
+                                                  side: BorderSide(
+                                                    color: isSelected
+                                                        ? Theme.of(context).colorScheme.primary
+                                                        : Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                                                    width: isSelected ? 2 : 1,
+                                                  ),
+                                                  avatar: isSelected
+                                                      ? Icon(Icons.check, size: 18, color: Theme.of(context).colorScheme.onPrimary)
+                                                      : null,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                            const SizedBox(height: 15,),
+                            Bounceable(
+                              onTap: () {},
+                              child: Container(
+                                alignment: Alignment.center,
+                                child: SizedBox(
+                                  height: (MediaQuery.of(context).size.width - 40) / 1.586,
+                                  width: double.infinity,
+                                  child: CustomPaint(
+                                    painter: DashedRect(color: Theme.of(context).colorScheme.primary),
+                                    child: GestureDetector(
+                                      onLongPress: () {
+                                        setState(() {
+                                          _imagePathFront = null;
+                                        });
+                                      },
+                                      child: OutlinedButton(
+                                        onPressed: takeFrontPicture,
+                                        style: OutlinedButton.styleFrom(
+                                          side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2, style: BorderStyle.none),
+                                          backgroundColor: Colors.transparent,
+                                          elevation: 0.0,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(15),
+                                          ),
+                                          minimumSize: const Size.fromHeight(100),
+                                          padding: EdgeInsets.zero, // Remove internal padding
+                                        ),
+                                        child: _imagePathFront != null
+                                            ? ClipRRect(
+                                          borderRadius: BorderRadius.circular(15),
+                                          child: Image.file(
+                                            File(_imagePathFront!),
+                                            fit: BoxFit.cover,
+                                            width: double.infinity,
+                                            height: double.infinity,
+                                          ),
+                                        )
+                                            : Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(Icons.camera_alt, color: Theme.of(context).colorScheme.secondary),
+                                            Text('Front face picture', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15,
+                                                color: Theme.of(context).colorScheme.inverseSurface
+                                            )),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 15,),
+                            Bounceable(
+                              onTap: () {},
+                              child: Container(
+                                alignment: Alignment.center,
+                                child: SizedBox(
+                                  height: (MediaQuery.of(context).size.width - 40) / 1.586,
+                                  width: double.infinity,
+                                  child: CustomPaint(
+                                    painter: DashedRect(color: Theme.of(context).colorScheme.primary),
+                                    child: GestureDetector(
+                                      onLongPress: () {
+                                        setState(() {
+                                          _imagePathBack = null;
+                                        });
+                                      },
+                                      child: OutlinedButton(
+                                        onPressed: takeBackPicture,
+                                        style: OutlinedButton.styleFrom(
+                                          side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2, style: BorderStyle.none),
+                                          backgroundColor: Colors.transparent,
+                                          elevation: 0.0,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(15),
+                                          ),
+                                          minimumSize: const Size.fromHeight(100),
+                                          padding: EdgeInsets.zero, // Remove internal padding
+                                        ),
+                                        child: _imagePathBack != null
+                                            ? ClipRRect(
+                                          borderRadius: BorderRadius.circular(15),
+                                          child: Image.file(
+                                            File(_imagePathBack!),
+                                            fit: BoxFit.contain,
+                                            width: double.infinity,
+                                            height: double.infinity,
+                                          )
+                                        )
+                                            : Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(Icons.camera_alt, color: Theme.of(context).colorScheme.secondary),
+                                            Text('Back face picture', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15,
+                                                color: Theme.of(context).colorScheme.inverseSurface
+                                            )),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 15,),
+                            CheckboxListTile(
+                                value: useFrontFaceOverlay,
+                                title: Text('Use front face picture as a card thumbnail', style: Theme.of(context).textTheme.bodyLarge?.copyWith( //cardTypeText
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                    color: Theme.of(context).colorScheme.inverseSurface
+                                )),
+                                controlAffinity: ListTileControlAffinity.leading,
+                                side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                                onChanged: (bool? checked) {
+                                  setState(() {
+                                    useFrontFaceOverlay = checked!;
+                                  });
+                                }),
+                            CheckboxListTile(
+                                value: hideTitle,
+                                title: Text('Hide card title', style: Theme.of(context).textTheme.bodyLarge?.copyWith( //cardTypeText
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                    color: Theme.of(context).colorScheme.inverseSurface
+                                )),
+                                controlAffinity: ListTileControlAffinity.leading,
+                                side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                                onChanged: (bool? checked) {
+                                  setState(() {
+                                    hideTitle = checked!;
+                                  });
+                                }),
                             passwordbox.isNotEmpty
-                            ? CheckboxListTile(
+                                ? CheckboxListTile(
                                 value: hasPassword,
-                                title: Text('Use a password for this card', style: Theme.of(context).textTheme.bodyLarge?.copyWith( //cardTypeText
+                                title: Text('Use the password for this card', style: Theme.of(context).textTheme.bodyLarge?.copyWith( //cardTypeText
                                     fontWeight: FontWeight.bold,
                                     fontSize: 15,
                                     color: Theme.of(context).colorScheme.inverseSurface
@@ -852,26 +1090,10 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                                   setState(() {
                                     hasPassword = checked!;
                                   });
-                                })
-                            : const SizedBox(height: 10,),
+                               })
+                                : const SizedBox(height: 10,),
                             const SizedBox(height: 100,),
                           ],
-                        ),
-                      ),
-                      // Second tab: custom widget placeholder
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        child: TextField(
-                          controller: noteController,
-                          maxLines: 10,
-                          decoration: InputDecoration(
-                            hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 15),
-                            hintText: 'Card notes...',
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
-                            focusColor: Theme.of(context).colorScheme.primary,
-                            enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
-                          ),
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],

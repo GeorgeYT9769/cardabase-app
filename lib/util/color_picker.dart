@@ -28,7 +28,6 @@ class _ColorPickerSecondDialogState extends State<ColorPickerSecondDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Theme.of(context).colorScheme.surface,
       title: Text(
         'Pick a color!',
         style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface,fontSize: 30),

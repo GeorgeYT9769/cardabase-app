@@ -1,34 +1,37 @@
 import 'package:cardabase/pages/settings.dart';
-import 'package:cardabase/util/button_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'dart:convert';
+import 'dart:io';
 
-class GenerateBarcode extends StatefulWidget {
+import 'image_preview_screen.dart';
+
+class CardDetails extends StatefulWidget {
 
   final settingsbox = Hive.box('settingsBox');
 
-  String cardid;
-  String cardtext;
-  Color cardTileColor;
-  String cardType;
-  bool hasPassword;
-  int red;
-  int green;
-  int blue;
-  List tags;
-  String note;
+  final String cardid;
+  final String cardtext;
+  final Color cardTileColor;
+  final String cardType;
+  final bool hasPassword;
+  final int red;
+  final int green;
+  final int blue;
+  final List tags;
+  final String note;
+  final String imagePathFront;
+  final String imagePathBack;
 
-  GenerateBarcode({super.key, required this.cardid, required this.cardtext, required this.cardTileColor, required this.cardType, required this.hasPassword, required this.red, required this.green, required this.blue, required this.tags, required this.note});
+  CardDetails({super.key, required this.cardid, required this.cardtext, required this.cardTileColor, required this.cardType, required this.hasPassword, required this.red, required this.green, required this.blue, required this.tags, required this.note, required this.imagePathFront,required this.imagePathBack});
 
   @override
-  State<GenerateBarcode> createState() => _GenerateBarcodeState();
+  State<CardDetails> createState() => _CardDetailsState();
 }
 
-class _GenerateBarcodeState extends State<GenerateBarcode> {
+class _CardDetailsState extends State<CardDetails> {
 
   double? _previousBrightness;
   bool setBrightness = settingsbox.get('setBrightness', defaultValue: true);
@@ -160,45 +163,118 @@ class _GenerateBarcodeState extends State<GenerateBarcode> {
           physics: const BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
           children: [
             Container(padding: EdgeInsetsGeometry.fromLTRB(20, 0, 20, 0), child: Text(widget.cardtext, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 50))),
-            //BACK FACE
+            // Swipable Row: front image | barcode | back image
             SizedBox(
-                height: MediaQuery.of(context).size.width / 1.586, //height of button
-                width: MediaQuery.of(context).size.width,
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  margin: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-                  decoration: BoxDecoration(color: widget.cardTileColor, borderRadius: BorderRadius.circular(15)),
-                  child: Container(
-                    height: 120,
-                    padding: const EdgeInsets.all(15),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        color: Colors.white),
-                    child: BarcodeWidget(
-                      padding: const EdgeInsets.all(10),
-                      data: widget.cardid,
-                      barcode: getBarcodeType(widget.cardType), //Barcode.ean13(drawEndChar: true)
-                      drawText: true,
-                      style: const TextStyle(color: Colors.black),
-                      errorBuilder: (context, error) => Center(
-                        child: Text(
-                          'Invalid barcode data',
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red),
-                          textAlign: TextAlign.center,
+              height: MediaQuery.of(context).size.width / 1.586,
+              width: MediaQuery.of(context).size.width,
+              child: Builder(
+                builder: (context) {
+                  final hasFront = widget.imagePathFront != '';
+                  final hasBack = widget.imagePathBack != '';
+                  final pages = <Widget>[];
+                  if (hasFront) {
+                    pages.add(
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => ImagePreviewScreen(imagePath: widget.imagePathFront,)));
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          margin: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+                          decoration: BoxDecoration(
+                            color: widget.cardTileColor,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.file(
+                              File(widget.imagePathFront),
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                  // Barcode widget (center)
+                  pages.add(
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => ImagePreviewScreen(barcodeData: widget.cardid, barcodeType: widget.cardType,)));
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        margin: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+                        decoration: BoxDecoration(color: widget.cardTileColor, borderRadius: BorderRadius.circular(15)),
+                        child: Container(
+                          height: 120,
+                          padding: const EdgeInsets.all(15),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10.0),
+                            color: Colors.white,
+                          ),
+                          child: BarcodeWidget(
+                            padding: const EdgeInsets.all(10),
+                            data: widget.cardid,
+                            barcode: getBarcodeType(widget.cardType),
+                            drawText: true,
+                            style: const TextStyle(color: Colors.black),
+                            errorBuilder: (context, error) => Center(
+                              child: Text(
+                                'Invalid barcode data',
+                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                )
+                  );
+                  if (hasBack) {
+                    pages.add(
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => ImagePreviewScreen(imagePath: widget.imagePathBack,)));
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          margin: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+                          decoration: BoxDecoration(
+                            color: widget.cardTileColor,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.file(
+                              File(widget.imagePathBack),
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                  final initialPage = hasFront ? 1 : 0;
+                  return PageView(
+                    controller: PageController(initialPage: initialPage),
+                    children: pages,
+                  );
+                },
+              ),
             ),
-            Container(
+            widget.note.isEmpty ? Container() : Container(
               padding: const EdgeInsets.all(20),
               child: TextField(
                 enabled: false,
                 maxLines: 10,
                 decoration: InputDecoration(
                   hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 15),
-                  hintText: widget.note.isEmpty ? 'Card notes are displayed here...' : widget.note,
+                  hintText: widget.note,
                   disabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
                   focusColor: Theme.of(context).colorScheme.primary,
