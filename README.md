@@ -138,10 +138,10 @@ If your phone does not have issues with the app, you can add your device into th
 4. `flutter build apk` in Terminal (you can add `--split-per-abi` if you want to get multiple versions).
 
 > [!NOTE]
-> Signing the app is ON. You need a singature key and a key.properties in the /cardabase-app/android folder or else the build will fail. You can change [THIS LINE](https://github.com/GeorgeYT9769/cardabase-app/blob/1daf9c7244a081fe847b499cc55509c10772668d/android/app/build.gradle#L86) to debug to sign it with a debug key.
+> Signing of the app is ON. You need a singature key and a key.properties in the /cardabase-app/android folder or else the build will fail. You can change [THIS LINE](https://github.com/GeorgeYT9769/cardabase-app/blob/1daf9c7244a081fe847b499cc55509c10772668d/android/app/build.gradle#L86) to debug to sign it with a debug key.
 
 Used versions:
-- Flutter: 3.32.0 (or newer, used Flutter version is always added as a submodule, so you can use that one)
+- Flutter: 3.38.5 (or newer, used Flutter version is always added as a submodule, so you can use that one)
 - Java: JDK-21
 - Gradle: 8.14.2
 

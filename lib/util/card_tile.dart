@@ -292,14 +292,23 @@ class _CardTileState extends State<CardTile> {
                       fit: StackFit.expand,
                       children: [
                         if (widget.useFrontFaceOverlay && widget.imagePathFront.isNotEmpty)
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(widget.borderSize),
-                            child: Image.file(
-                              File(widget.imagePathFront),
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: double.infinity,
-                            ),
+                          FutureBuilder<bool>(
+                            future: File(widget.imagePathFront).exists(),
+                            builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                              if (snapshot.connectionState == ConnectionState.done && snapshot.data == true) {
+                                return ClipRRect(
+                                  borderRadius: BorderRadius.circular(widget.borderSize),
+                                  child: Image.file(
+                                    File(widget.imagePathFront),
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                  ),
+                                );
+                              } else {
+                                return const SizedBox.shrink(); // Show nothing if the file doesn't exist or is still loading
+                              }
+                            },
                           ),
                         Padding(
                           padding: const EdgeInsets.all(5.0),
