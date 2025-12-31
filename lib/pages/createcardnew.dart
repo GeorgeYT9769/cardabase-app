@@ -9,7 +9,7 @@ import '../util/dashedRect.dart';
 import '../util/color_picker.dart';
 import '../util/devoptions.dart';
 import '../util/vibration_provider.dart';
-import 'dart:io'; // Import for File
+import 'dart:io';
 
 bool devOptions = DeveloperOptionsProvider.developerOptions;
 
@@ -56,9 +56,7 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
   int greenValue = 158;
 
   Color cardColorPreview = Colors.grey;
-  // Return black for light backgrounds and white for dark backgrounds
   Color getContrastingTextColor(Color bg) {
-    // computeLuminance returns a value between 0 (dark) and 1 (light)
     return bg.computeLuminance() > 0.7 ? Colors.black : Colors.white;
   }
   String cardTextPreview = 'Card';
@@ -75,8 +73,8 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
   late final FocusNode cardNameFocusNode;
   late final FocusNode cardIdFocusNode;
 
-  String? _imagePathFront; // State variable to hold the image path
-  String? _imagePathBack; // State variable to hold the image path
+  String? _imagePathFront;
+  String? _imagePathBack;
 
   String getBarcodeTypeText(String cardTypeText) {
     switch (cardTypeText) {
@@ -156,10 +154,10 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
           'uniqueId': uniqueId,
           'tags': selectedTags.toList(),
           'note': noteController.text,
-          'imagePathFront': _imagePathFront, // Save the image path
-          'imagePathBack': _imagePathBack, // Save the image path
-          'useFrontFaceOverlay': useFrontFaceOverlay, // Save the overlay setting'
-          'hideTitle': hideTitle // Save the overlay setting'
+          'imagePathFront': _imagePathFront,
+          'imagePathBack': _imagePathBack,
+          'useFrontFaceOverlay': useFrontFaceOverlay,
+          'hideTitle': hideTitle
         });
       });
       cdb.updateDataBase();
@@ -172,8 +170,8 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
       greenValue = 158;
       cardTypeText = 'Barcode Type';
       hasPassword = false;
-      _imagePathFront = null; // Clear image path after saving
-      _imagePathBack = null; // Clear image path after saving
+      _imagePathFront = null;
+      _imagePathBack = null;
       useFrontFaceOverlay = false;
       selectedTags.clear();
       hideTitle = false;
@@ -567,7 +565,7 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
         ),
         actions: [
           ValueListenableBuilder(
-            valueListenable: Hive.box('settingsBox').listenable(), // Listen to the settingsBox
+            valueListenable: Hive.box('settingsBox').listenable(),
             builder: (context, settingsBox, child) {
               final bool showLegacyCardButton = settingsBox.get('developerOptions', defaultValue: false);
               return showLegacyCardButton
@@ -648,7 +646,7 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                   splashFactory: NoSplash.splashFactory,
                 ),
                 SizedBox(
-                  height: 1000, // Set a fixed height for TabBarView to avoid unbounded height error
+                  height: 1000,
                   child: TabBarView(
                     children: [
                       Container(
@@ -707,7 +705,6 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                                         var format = result["format"].toString();
                                         if (code != "-1") {
                                           controllercardid.text = code;
-                                          // Update selectedCardType and cardTypeText consistently
                                           switch (format) {
                                             case 'BarcodeFormat.code39':
                                               selectedCardType = CardType.code39;
@@ -763,7 +760,7 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                                             List<String> rawList = code.replaceAll(
                                                 "[", "").replaceAll("]", "").split(", ");
 
-                                            // Convert values into correct types
+
                                             String name = rawList[0];
                                             String number = rawList[1];
                                             int red = int.parse(rawList[2]);
@@ -866,7 +863,7 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                           ],
                         ),
                       ),
-                      // Second tab: custom widget placeholder
+
                       Container(
                         padding: const EdgeInsets.all(20),
                         child: Column(
@@ -1015,7 +1012,7 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                                             borderRadius: BorderRadius.circular(15),
                                           ),
                                           minimumSize: const Size.fromHeight(100),
-                                          padding: EdgeInsets.zero, // Remove internal padding
+                                          padding: EdgeInsets.zero,
                                         ),
                                         child: _imagePathBack != null
                                             ? ClipRRect(

@@ -24,7 +24,6 @@ class _NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin
 
   Future<void> fetchOnlineContent() async {
     try {
-      // Replace with your actual URL
       final response = await http.get(Uri.parse('https://raw.githubusercontent.com/GeorgeYT9769/cardabase-app/refs/heads/main/CHANGELOG.txt'));
       if (response.statusCode == 200) {
         setState(() {

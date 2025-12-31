@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:flutter/services.dart';
 
 final cardBox = Hive.box('mybox');
@@ -109,7 +108,6 @@ Future<void> exportCardList(BuildContext context, {required bool toFile}) async 
             backgroundColor: const Color.fromARGB(255, 92, 184, 92),
           ));
       } else {
-        // Copy to clipboard when toFile is false
         await Clipboard.setData(ClipboardData(text: txtBuffer.toString()));
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

@@ -12,7 +12,7 @@ class DashedRect extends CustomPainter {
     required this.color,
     this.strokeWidth = 2,
     this.gap = 6,
-    this.radius = 15, // Set your desired corner radius
+    this.radius = 15,
   });
 
   @override

@@ -96,7 +96,7 @@ class _CardDetailsState extends State<CardDetails> {
       case 'CardType.aztec':
         return Barcode.aztec();
       default:
-        return Barcode.ean13(drawEndChar: true); // Fallback barcode
+        return Barcode.ean13(drawEndChar: true);
     }
   }
 
@@ -123,7 +123,7 @@ class _CardDetailsState extends State<CardDetails> {
                         child: BarcodeWidget(
                           padding: const EdgeInsets.all(10),
                           data: '[${widget.cardtext}, ${widget.cardid}, ${widget.red}, ${widget.green}, ${widget.blue}, ${widget.cardType}, ${widget.hasPassword},${widget.tags}]',
-                          barcode: Barcode.qrCode(), //Barcode.ean13(drawEndChar: true)
+                          barcode: Barcode.qrCode(),
                           drawText: true,
                           style: const TextStyle(color: Colors.black),
                         ),
@@ -163,7 +163,6 @@ class _CardDetailsState extends State<CardDetails> {
           physics: const BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
           children: [
             Container(padding: EdgeInsetsGeometry.fromLTRB(20, 0, 20, 0), child: Text(widget.cardtext, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 50))),
-            // Swipable Row: front image | barcode | back image
             SizedBox(
               height: MediaQuery.of(context).size.width / 1.586,
               width: MediaQuery.of(context).size.width,
@@ -198,7 +197,6 @@ class _CardDetailsState extends State<CardDetails> {
                       ),
                     );
                   }
-                  // Barcode widget (center)
                   pages.add(
                     GestureDetector(
                       onTap: () {

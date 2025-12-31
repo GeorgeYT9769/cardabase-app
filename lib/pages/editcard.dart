@@ -63,7 +63,6 @@ class _EditCardState extends State<EditCard> {
 
   cardabase_db cdb = cardabase_db();
 
-  // Mutable copies of widget data (keep widget immutable)
   late Color cardColorPreview;
   late int redValue;
   late int greenValue;
@@ -305,7 +304,7 @@ class _EditCardState extends State<EditCard> {
     );
     if (resultPath != null) {
       setState(() {
-        imagePathFront = resultPath; // Correctly assigning to state variable
+        imagePathFront = resultPath;
       });
     }
   }
@@ -317,7 +316,7 @@ class _EditCardState extends State<EditCard> {
     );
     if (resultPath != null) {
       setState(() {
-        imagePathBack = resultPath; // Correctly assigning to state variable
+        imagePathBack = resultPath;
       });
     }
   }
@@ -498,7 +497,7 @@ class _EditCardState extends State<EditCard> {
   @override
   void initState() {
     super.initState();
-    cdb.loadData(); // Ensure card list is loaded
+    cdb.loadData();
     cardColorPreview = widget.cardColorPreview;
     redValue = widget.redValue;
     greenValue = widget.greenValue;
@@ -516,7 +515,6 @@ class _EditCardState extends State<EditCard> {
     hideTitle = widget.hideTitle;
   }
 
-  // Return black for light backgrounds and white for dark backgrounds
   Color getContrastingTextColor(Color bg) {
     return bg.computeLuminance() > 0.7 ? Colors.black : Colors.white;
   }
@@ -524,7 +522,6 @@ class _EditCardState extends State<EditCard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //resizeToAvoidBottomInset: false,
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(
@@ -537,8 +534,6 @@ class _EditCardState extends State<EditCard> {
             setState(() {
               if (result is String) {
                 if (result != "-1") {
-                  //controllercardid.text = result;
-
                   List<String> rawList = result.replaceAll("[", "").replaceAll("]", "").split(", ");
 
                   String name = rawList[0];
@@ -583,7 +578,6 @@ class _EditCardState extends State<EditCard> {
       body: ListView(
         physics: BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
         children: [
-          // Swipable Row: front image | barcode | back image
           SizedBox(
             height: MediaQuery.of(context).size.width / 1.50,
             width: MediaQuery.of(context).size.width,
@@ -650,7 +644,6 @@ class _EditCardState extends State<EditCard> {
                                     blueValue = (cardColorPreview.b * 255.0).round();
                                   });
                                 },
-                                //maxLength: 20,
                                 controller: controller,
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),

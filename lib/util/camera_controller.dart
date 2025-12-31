@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' show join;
-import 'package:image_picker/image_picker.dart'; // Import for image_picker
-import 'package:image/image.dart' as img; // Import for image cropping
-import 'dart:math';
+import 'package:image_picker/image_picker.dart';
+import 'package:image/image.dart' as img;
 
-import 'package:screenshot/screenshot.dart'; // Import for min function
+
+import 'package:screenshot/screenshot.dart';
 
 class CameraControllerScreen extends StatefulWidget {
   final Color cutoutColor;
@@ -45,10 +45,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen> with Wi
 
   Future<void> _initializeCamera() async {
     _cameras = await availableCameras();
-    // Check if there are cameras available before proceeding
     if (_cameras == null || _cameras!.isEmpty) {
-      // Handle case where no cameras are available, e.g., show an error or disable camera features.
-      print("No cameras available.");
       return;
     }
     _cameraController = CameraController(
@@ -71,14 +68,12 @@ class _CameraControllerScreenState extends State<CameraControllerScreen> with Wi
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // App state changed before we got the chance to initialize.
     if (_cameraController == null || !_cameraController!.value.isInitialized) {
       return;
     }
     if (state == AppLifecycleState.inactive) {
       _cameraController?.dispose();
     } else if (state == AppLifecycleState.resumed) {
-      // Reinitialize the camera when the app resumes
       _initializeCamera();
     }
   }
@@ -93,7 +88,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen> with Wi
         _capturedImageFile = file;
       });
     } catch (e) {
-      print(e);
+      // Handle error
     }
   }
 
@@ -107,22 +102,20 @@ class _CameraControllerScreenState extends State<CameraControllerScreen> with Wi
     }
   }
 
-  // Simplified cropping using ScreenshotController
   Future<String> _cropAndSaveAdjustedImage() async {
     if (_capturedImageFile == null) return _capturedImageFile!.path;
     setState(() { hideCutoutBorder = true; });
-    await Future.delayed(const Duration(milliseconds: 50)); // Ensure UI updates
+    await Future.delayed(const Duration(milliseconds: 50));
     final RenderBox box = context.findRenderObject() as RenderBox;
     final Size screenSize = box.size;
     final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
     final double cutoutWidth = screenSize.width * widget.cutoutWidthPercentage;
     final double cutoutHeight = cutoutWidth / widget.cardAspectRatio;
-    final double cutoutYOffset = (screenSize.height - cutoutHeight) / 2 - 70; // Move up by 24px
+    final double cutoutYOffset = (screenSize.height - cutoutHeight) / 2 - 70;
     final Offset cutoutOffset = Offset(
       (screenSize.width - cutoutWidth) / 2,
       cutoutYOffset,
     );
-    // Capture screenshot at device pixel ratio
     final typed_data.Uint8List? imageBytes = await _screenshotController.capture(
       pixelRatio: devicePixelRatio,
     );
@@ -130,7 +123,6 @@ class _CameraControllerScreenState extends State<CameraControllerScreen> with Wi
     if (imageBytes == null) return _capturedImageFile!.path;
     img.Image? fullImage = img.decodeImage(imageBytes);
     if (fullImage == null) return _capturedImageFile!.path;
-    // Adjust crop coordinates for pixel ratio
     final int cropX = (cutoutOffset.dx * devicePixelRatio).round();
     final int cropY = (cutoutOffset.dy * devicePixelRatio).round();
     final int cropWidth = (cutoutWidth * devicePixelRatio).round();
@@ -158,7 +150,6 @@ class _CameraControllerScreenState extends State<CameraControllerScreen> with Wi
         Navigator.pop(context, croppedPath);
       }
     } catch (e) {
-      print(e);
       if (mounted) {
         Navigator.pop(context);
       }
@@ -167,7 +158,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen> with Wi
 
   void _retakePicture() {
     setState(() {
-      _capturedImageFile = null; // Clear the captured image to go back to camera preview
+      _capturedImageFile = null;
     });
   }
 
@@ -180,7 +171,6 @@ class _CameraControllerScreenState extends State<CameraControllerScreen> with Wi
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (_capturedImageFile == null) {
-              // Show live camera preview with darkened overlay and border
               return Stack(
                 children: [
                   Positioned.fill(
@@ -195,14 +185,13 @@ class _CameraControllerScreenState extends State<CameraControllerScreen> with Wi
                         cutoutColor: widget.cutoutColor,
                         cutoutWidthPercentage: widget.cutoutWidthPercentage,
                         cardAspectRatio: widget.cardAspectRatio,
-                        shouldDrawDarkOverlay: true, // Draw darkened overlay for live camera
+                        shouldDrawDarkOverlay: true,
                       ),
                     ),
                   ),
                 ],
               );
             } else {
-              // Show captured image with only border (no darkened overlay)
               return Screenshot(
                 controller: _screenshotController,
                 child: Stack(
@@ -259,8 +248,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen> with Wi
                       await _initializeControllerFuture;
                       await _takePicture();
                     } catch (e) {
-                      print(e);
-                      Navigator.pop(context); // Pop on error as well
+                      Navigator.pop(context);
                     }
                   },
                   child: const Icon(Icons.camera_alt),

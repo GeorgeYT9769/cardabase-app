@@ -49,7 +49,6 @@ dependencies:
   image: ^4.5.4
   flutter_launcher_icons: ^0.14.4
   package_info_plus: ^9.0.0
-  share_plus: ^12.0.1
   camera: ^0.11.3
   screenshot: ^3.0.0
   quick_actions: ^1.1.0

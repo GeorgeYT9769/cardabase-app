@@ -38,9 +38,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 
   String? _extractChangelogForVersion(String changelogText, String version) {
-    // Example entry: 06.09.2025\n1.5.3:\n- Set minifyEnabled ...
     final lines = changelogText.split('\n');
-    final versionPattern = RegExp(r'^\d{1,2}\.\d{1,2}\.\d{4}\s*\n' + RegExp.escape(version) + r':');
     int start = -1;
     for (int i = 0; i < lines.length; i++) {
       if (lines[i].contains(version + ':')) {
@@ -50,7 +48,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     }
     if (start == -1) return null;
 
-    // Collect lines until next version or end of file
     final buffer = StringBuffer();
     for (int i = start; i < lines.length; i++) {
       if (i != start && RegExp(r'^\d{1,2}\.\d{1,2}\.\d{4}').hasMatch(lines[i])) break;

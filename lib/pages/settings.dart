@@ -26,7 +26,7 @@ bool devOptions = DeveloperOptionsProvider.developerOptions;
 bool useSystemFontEverywhere = SystemFontProvider.useSystemFont;
 bool autoUpdates = settingsbox.get('autoBackups') ?? false;
 int autoUpdateInterval = settingsbox.get('autoBackupInterval') ?? 7;
-bool useExtraDark = settingsbox.get('useExtraDark') ?? false; // New: extra dark mode setting
+bool useExtraDark = settingsbox.get('useExtraDark') ?? false;
 
 class Settings extends StatefulWidget {
   const Settings({super.key,});
@@ -40,10 +40,6 @@ class _SettingsState extends State<Settings> {
   bool didReset = false;
   double columnAmountDouble = 1;
   int columnAmount = 1;
-
-  // Password verification controller and state
-  final TextEditingController _passwordVerifyController = TextEditingController();
-  bool _isPasswordCorrect = true; // Assume correct until proven otherwise, or if no password
 
   @override
   void initState() {
@@ -91,7 +87,6 @@ class _SettingsState extends State<Settings> {
     });
   }
 
-  // Refactored autoBackups to be a setter for clarity, now used within dialog
   void setAutoBackupsState(bool newValue, int interval) {
     setState(() {
       autoUpdates = newValue;
@@ -105,11 +100,10 @@ class _SettingsState extends State<Settings> {
   }
 
   void showAutoUpdateDialog() {
-    // Use local variables to manage the switch state within the dialog
-    bool _tempAutoUpdates = autoUpdates; // Initialize with current app setting
-    int _tempAutoUpdateInterval = autoUpdateInterval; // Initialize with current app setting
-    final TextEditingController _passwordVerifyControllerDialog = TextEditingController(); // New controller for dialog scope
-    bool _isPasswordCorrectDialog = true; // Local password correctness state for the dialog
+    bool _tempAutoUpdates = autoUpdates;
+    int _tempAutoUpdateInterval = autoUpdateInterval;
+    final TextEditingController _passwordVerifyControllerDialog = TextEditingController();
+    bool _isPasswordCorrectDialog = true;
 
     showDialog(
       context: context,
@@ -126,9 +120,9 @@ class _SettingsState extends State<Settings> {
                   onChanged: (value) {
                     setState2(() {
                       _tempAutoUpdates = value;
-                      if (!value) { // If turning off, no password needed
+                      if (!value) {
                         _isPasswordCorrectDialog = true;
-                        _passwordVerifyControllerDialog.clear(); // Clear password if turning off
+                        _passwordVerifyControllerDialog.clear();
                       }
                     });
                   },
@@ -144,7 +138,7 @@ class _SettingsState extends State<Settings> {
                     setState2(() {
                       _tempAutoUpdateInterval = value.toInt();
                     });
-                  } : null, // Disable slider if _tempAutoUpdates is false
+                  } : null,
                 ),
                 // Password verification field (only if password exists and _tempAutoUpdates is true)
                 if (_tempAutoUpdates && passwordbox.isNotEmpty && (passwordbox.get('PW') != null && passwordbox.get('PW').toString().isNotEmpty)) ...[

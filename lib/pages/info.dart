@@ -20,7 +20,6 @@ class _InfoScreenState extends State<InfoScreen> {
   bool _isLoading = true;
   bool _hasError = false;
   bool? _isUpdateAvailable;
-  String? _latestReleaseHtmlUrl;
 
   final String _githubApiUrl = 'https://api.github.com/repos/GeorgeYT9769/cardabase-app/releases/latest';
   final String _githubReleasesUrl = 'https://github.com/GeorgeYT9769/cardabase-app/releases/latest';
@@ -39,39 +38,32 @@ class _InfoScreenState extends State<InfoScreen> {
     });
 
     try {
-      // 1. Get local app version
       final PackageInfo packageInfo = await PackageInfo.fromPlatform();
       _appVersion = packageInfo.version; //"1.1.0" packageInfo.version
 
-      // 2. Fetch latest version from GitHub API
       final response = await http.get(Uri.parse(_githubApiUrl));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-        String githubTag = data['tag_name'] ?? ''; // e.g., "v1.0.0"
-        _latestReleaseHtmlUrl = data['html_url']; // e.g., "https://github.com/.../releases/tag/v1.0.0"
+        String githubTag = data['tag_name'] ?? '';
 
-        // Remove 'v' prefix if present for clean comparison (e.g., v1.2.3 -> 1.2.3)
         _latestGitHubVersion = githubTag.startsWith('v') ? githubTag.substring(1) : githubTag;
 
-        // 3. Compare versions (robust for MAJOR.MINOR.PATCH)
         List<int> localParts = _appVersion.split('.').map(int.parse).toList();
         List<int> githubParts = _latestGitHubVersion!.split('.').map(int.parse).toList();
 
-        _isUpdateAvailable = false; // Assume up to date initially
+        _isUpdateAvailable = false;
 
-        // Compare parts numerically
         for (int i = 0; i < localParts.length && i < githubParts.length; i++) {
           if (githubParts[i] > localParts[i]) {
-            _isUpdateAvailable = true; // GitHub version is newer
+            _isUpdateAvailable = true;
             break;
           } else if (localParts[i] > githubParts[i]) {
-            _isUpdateAvailable = false; // Local version is newer or equal, no update needed
+            _isUpdateAvailable = false;
             break;
           }
         }
 
-        // Handle cases where GitHub version has more parts and is newer (e.g., local 1.0, github 1.0.1)
         if (!(_isUpdateAvailable ?? false) && githubParts.length > localParts.length) {
           _isUpdateAvailable = true;
         }
@@ -92,7 +84,6 @@ class _InfoScreenState extends State<InfoScreen> {
 
   Future<void> _launchUrl(String url) async {
     if (!await launchUrl(Uri.parse(url))) {
-      // Handle error if URL can't be launched
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Could not open $url')),
       );
@@ -111,7 +102,6 @@ class _InfoScreenState extends State<InfoScreen> {
             color: Colors.black,
           ),
         ),
-        // Add a back button
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
@@ -166,7 +156,7 @@ class _InfoScreenState extends State<InfoScreen> {
               ),
               const SizedBox(height: 30),
               _isLoading
-                  ? const CircularProgressIndicator() // Show loading spinner
+                  ? const CircularProgressIndicator()
                   : _hasError
                   ? Column(
                 children: [
@@ -177,7 +167,7 @@ class _InfoScreenState extends State<InfoScreen> {
                   ),
                   const SizedBox(height: 20),
                   OutlinedButton.icon(
-                    onPressed: _fetchAppAndLatestVersion, // Retry button
+                    onPressed: _fetchAppAndLatestVersion,
                     icon: const Icon(Icons.refresh),
                     label: const Text('Retry'),
                     style: OutlinedButton.styleFrom(

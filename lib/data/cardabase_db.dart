@@ -21,7 +21,6 @@ class cardabase_db {
       myShops = [];
       _myBox.put('CARDLIST', []);
     }
-    //myShops = _myBox.get('CARDLIST');
   }
 
   //update the data

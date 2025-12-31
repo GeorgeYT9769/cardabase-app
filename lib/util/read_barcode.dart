@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';

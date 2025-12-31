@@ -2,7 +2,7 @@ import 'package:cardabase/pages/settings.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
 import 'package:cardabase/util/setting_tile.dart';
 import 'package:flutter/material.dart';
-import 'package:cardabase/data/cardabase_db.dart'; //card database
+import 'package:cardabase/data/cardabase_db.dart';
 import 'package:cardabase/util/card_tile.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -455,8 +455,8 @@ class _HomePageState extends State<Homepage> {
                                     ),
                                     backgroundColor: selectedTag == allTags[chipIndex]
                                         ? Theme.of(context).colorScheme.primary
-                                        : Theme.of(context).colorScheme.onInverseSurface, // Use surface color for unselected
-                                    elevation: selectedTag == allTags[chipIndex] ? null : 0.0, // Remove elevation when unselected
+                                        : Theme.of(context).colorScheme.onInverseSurface,
+                                    elevation: selectedTag == allTags[chipIndex] ? null : 0.0,
                                     side: BorderSide(
                                       color: selectedTag == allTags[chipIndex]
                                           ? Theme.of(context).colorScheme.primary
@@ -720,13 +720,11 @@ class _HomePageState extends State<Homepage> {
           ),
         );
       }
-      // Always use SliverGrid or ReorderableSliverGridView.count
       final int itemCount = cdb.myShops.length;
       final int crossAxisCount = columnAmount;
       final double childAspectRatio = 1.4;
       final double gridPadding = 8.0;
       if (reorderMode) {
-        // Build children list for ReorderableSliverGridView.count
         final List<Widget> children = List.generate(itemCount, (index) {
           if (index >= cdb.myShops.length) return const SizedBox.shrink();
           final card = cdb.myShops[index];
@@ -750,9 +748,9 @@ class _HomePageState extends State<Homepage> {
             moveUpFunction: (context) => moveUp(index),
             moveDownFunction: (context) => moveDown(index),
             duplicateFunction: (context) => duplicateCard(index),
-            labelSize: 45, // Fixed size for better visibility
-            borderSize: 10, // Fixed border radius
-            marginSize: 10, // Fixed margin for all cards
+            labelSize: columnAmount == 1 ? 50 : 50 / columnAmount,
+            borderSize: columnAmount == 1 ? 15 : 20 / columnAmount,
+            marginSize: columnAmount == 1 ? 10 : 20 / columnAmount,
             tags: card['tags'] ?? [],
             reorderMode: reorderMode,
             note: card['note'] ?? 'Card notes are displayed here...',
@@ -774,7 +772,6 @@ class _HomePageState extends State<Homepage> {
             children: children,
             onReorder: (oldIndex, newIndex) {
               setState(() {
-                if (newIndex > oldIndex) newIndex -= 1;
                 final item = cdb.myShops.removeAt(oldIndex);
                 cdb.myShops.insert(newIndex, item);
                 cdb.updateDataBase();
@@ -783,7 +780,6 @@ class _HomePageState extends State<Homepage> {
           ),
         );
       } else {
-        // Use SliverGrid for all column counts
         return SliverPadding(
           padding: EdgeInsets.all(gridPadding),
           sliver: SliverGrid(
@@ -811,9 +807,9 @@ class _HomePageState extends State<Homepage> {
                   moveUpFunction: (context) => moveUp(index),
                   moveDownFunction: (context) => moveDown(index),
                   duplicateFunction: (context) => duplicateCard(index),
-                  labelSize: columnAmount == 1 ? 50 : 50 / columnAmount, // Fixed size for better visibility
-                  borderSize: columnAmount == 1 ? 15 : 20 / columnAmount, // Fixed border radius
-                  marginSize: columnAmount == 1 ? 10 : 20 / columnAmount, // Fixed margin for all cards
+                  labelSize: columnAmount == 1 ? 50 : 50 / columnAmount,
+                  borderSize: columnAmount == 1 ? 15 : 20 / columnAmount,
+                  marginSize: columnAmount == 1 ? 10 : 20 / columnAmount,
                   tags: card['tags'] ?? [],
                   reorderMode: reorderMode,
                   note: card['note'] ?? 'Card notes are displayed here...',

@@ -7,8 +7,6 @@ cardabase_db cdb = cardabase_db();
 Future<bool> showImportDialog(BuildContext context) async {
   final TextEditingController textController = TextEditingController();
 
-  bool imported = false;
-
   final result = await showDialog(
     context: context,
     builder: (context) => AlertDialog(

@@ -10,7 +10,7 @@ import 'package:quick_actions/quick_actions.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cardabase/util/export_data.dart';
 import 'dart:async';
-import 'package:cardabase/pages/settings.dart'; // Import Settings page
+import 'package:cardabase/pages/settings.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -127,15 +127,13 @@ void main() async {
 class Main extends StatefulWidget {
   final Widget initialScreen;
 
-  Main({super.key, required this.initialScreen});
+  const Main({super.key, required this.initialScreen});
 
   @override
   _MainState createState() => _MainState();
 }
 
 class _MainState extends State<Main> {
-  // Removed AppLinks and StreamSubscription for uni_links/app_links
-  // StreamSubscription? _sub; // Removed
 
   final QuickActions quickActions = QuickActions();
   String shortcut = 'nothing set';
@@ -143,10 +141,8 @@ class _MainState extends State<Main> {
   @override
   void initState() {
     super.initState();
-    // Removed _handleIncomingLinks() and _handleInitialUri()
 
     quickActions.initialize((shortcutType) {
-      // Ensure the navigatorKey context is available before navigating
       if (navigatorKey.currentState != null && navigatorKey.currentContext != null) {
         if (shortcutType == 'add_card') {
           navigatorKey.currentState!.push(MaterialPageRoute(builder: (context) => const CreateCard()));
@@ -154,7 +150,6 @@ class _MainState extends State<Main> {
         if (shortcutType == 'info') {
           navigatorKey.currentState!.push(MaterialPageRoute(builder: (context) => const Settings()));
         }
-        // You can add more shortcut types here
       }
     });
 
@@ -166,7 +161,6 @@ class _MainState extends State<Main> {
 
   @override
   void dispose() {
-    // _sub?.cancel(); // Removed
     super.dispose();
   }
 
@@ -186,15 +180,11 @@ class _MainState extends State<Main> {
         bool useSystemFont = box.get('useSystemFont', defaultValue: false);
         bool useExtraDark = box.get('useExtraDark', defaultValue: false); // Retrieve new setting
 
-        // Define the extra dark color scheme
         ColorScheme extraDarkColorScheme = darkColorScheme.copyWith(
           surface: Colors.black,
-          background: Colors.black,
-          // You might want to adjust other colors like onSurface, onBackground
-          // to ensure good contrast with a black background.
         );
 
-        final String? textFont = useSystemFont ? null : 'Roboto'; // Corrected family name
+        final String? textFont = useSystemFont ? null : 'Roboto';
 
         return MaterialApp(
           navigatorKey: navigatorKey,
@@ -225,7 +215,7 @@ class _MainState extends State<Main> {
           ),
           darkTheme: ThemeData(
               useMaterial3: true,
-              colorScheme: useExtraDark ? extraDarkColorScheme : darkColorScheme, // Apply conditionally
+              colorScheme: useExtraDark ? extraDarkColorScheme : darkColorScheme,
               pageTransitionsTheme: const PageTransitionsTheme(
                   builders: <TargetPlatform, PageTransitionsBuilder>{
                     TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),

@@ -72,7 +72,6 @@ class _CardTileState extends State<CardTile> {
   final passwordbox = Hive.box('password');
   final settingsbox = Hive.box('settingsBox');
 
-  // Return black for light backgrounds and white for dark backgrounds
   Color getContrastingTextColor(Color bg) {
     return bg.computeLuminance() > 0.7 ? Colors.black : Colors.white;
   }
@@ -118,7 +117,6 @@ class _CardTileState extends State<CardTile> {
 
   @override
   Widget build(BuildContext context) {
-    // compute the best text/foreground color for the tile based on its background
     final Color contentTextColor = getContrastingTextColor(widget.cardTileColor);
     void showUnlockDialog(BuildContext context) {
       final TextEditingController controller = TextEditingController();
@@ -282,7 +280,7 @@ class _CardTileState extends State<CardTile> {
                       backgroundColor: widget.cardTileColor,
                       foregroundColor: contentTextColor,
                       elevation: 0.0,
-                      padding: EdgeInsets.zero, // Added this line
+                      padding: EdgeInsets.zero,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(widget.borderSize),
                       ),
@@ -306,7 +304,7 @@ class _CardTileState extends State<CardTile> {
                                   ),
                                 );
                               } else {
-                                return const SizedBox.shrink(); // Show nothing if the file doesn't exist or is still loading
+                                return const SizedBox.shrink();
                               }
                             },
                           ),
