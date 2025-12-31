@@ -129,6 +129,7 @@ class _SettingsState extends State<Settings> {
                 ),
                 SizedBox(height: 10,),
                 Slider(
+                  year2023: false,
                   value: _tempAutoUpdateInterval.toDouble(),
                   min: 1,
                   max: 365,
