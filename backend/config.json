@@ -1,0 +1,12 @@
+{
+  "db": {
+    "connectionString": "user=postgres password=postgres host=localhost port=5432 dbname=postgres sslmode=disable"
+  },
+  "http": {
+    "port": 5054
+  },
+  "auth": {
+    "issuer": "http://localhost:8080",
+    "audience": "354543460709105667"
+  }
+}

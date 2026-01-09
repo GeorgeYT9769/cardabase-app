@@ -1,0 +1,17 @@
+### PUT card
+PUT http://{{host}}/cards/{{cardId}}
+Authorization: bearer {{$auth.token("local")}}
+Content-Type: application/json
+
+{
+  "text": "test shop",
+  "type": "ean13"
+}
+
+### GET card by id
+GET http://{{host}}/cards/{{cardId}}
+Authorization: bearer {{$auth.token("local")}}
+
+### GET all cards
+GET http://{{host}}/cards
+Authorization: bearer {{$auth.token("local")}}
