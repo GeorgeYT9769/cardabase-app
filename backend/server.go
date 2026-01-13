@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,6 +11,9 @@ import (
 )
 
 const cardIdPathParam = "cardId"
+
+// DatabaseFactory is a factory function which creates instances of a database.
+type DatabaseFactory func(ctx context.Context) (*Database, error)
 
 type HttpServer struct {
 	logger         *slog.Logger
@@ -33,6 +37,8 @@ func (serv *HttpServer) RegisterRoutes() {
 				return serv.getCard(res, req)
 			case http.MethodPut:
 				return serv.putCard(res, req)
+			case http.MethodDelete:
+				return serv.deleteCard(res, req)
 			default:
 				http.Error(res, "", http.StatusMethodNotAllowed)
 				return nil
@@ -126,10 +132,37 @@ func (serv *HttpServer) putCard(res http.ResponseWriter, req *http.Request) erro
 		return fmt.Errorf("failed to read request body: %v", err)
 	}
 
-	err = db.AddOrUpdateCard(req.Context(), cardId, card)
+	err = db.UpsertCard(req.Context(), cardId, card)
 	if err != nil {
 		http.Error(res, "failed to save card", http.StatusInternalServerError)
 		return fmt.Errorf("failed to save card to the database: %v", err)
+	}
+
+	// RETURN RESULT
+	res.WriteHeader(http.StatusOK)
+	return nil
+}
+
+func (serv *HttpServer) deleteCard(res http.ResponseWriter, req *http.Request) error {
+	// VALIDATE INPUT
+	cardId := req.PathValue(cardIdPathParam)
+	if cardId == "" {
+		http.NotFound(res, req)
+		return nil
+	}
+
+	// DO QUERY
+	db, err := serv.db(req.Context())
+	if err != nil {
+		http.Error(res, "failed to get card", http.StatusInternalServerError)
+		return fmt.Errorf("failed to connect to the database: %v", err)
+	}
+	defer db.Dispose()
+
+	err = db.RemoveCard(req.Context(), cardId)
+	if err != nil {
+		http.Error(res, "failed to delete card", http.StatusInternalServerError)
+		return fmt.Errorf("failed to delete card from the database: %v", err)
 	}
 
 	// RETURN RESULT

@@ -10,15 +10,17 @@ import (
 	"github.com/pkg/errors"
 )
 
+// ErrCardNotFound is the error which is returned when a card was not found.
 var ErrCardNotFound = errors.New("no card found with the given id")
 
-type DatabaseFactory func(ctx context.Context) (*Database, error)
-
+// Database provides functionality to save/retrieve data from the database. It
+// is a wrapper around the database.
 type Database struct {
 	logger *slog.Logger
 	conn   *pgxpool.Conn
 }
 
+// NewDatabase create a new instance of Database.
 func NewDatabase(logger *slog.Logger, conn *pgxpool.Conn) *Database {
 	return &Database{
 		logger: logger,
@@ -26,6 +28,8 @@ func NewDatabase(logger *slog.Logger, conn *pgxpool.Conn) *Database {
 	}
 }
 
+// Dispose ensures all resources are released. E.g.: the database connection is
+// released.
 func (db *Database) Dispose() {
 	db.conn.Release()
 }
@@ -34,18 +38,20 @@ func (db *Database) Dispose() {
 //	MUTATING FUNCTIONS
 // ------------------------------------
 
-func (db *Database) AddOrUpdateCard(ctx context.Context, cardId string, data map[string]any) error {
+// UpsertCard ensures a card exists in the database with the given cardId and
+// data. If an entry already exists with the given cardId, it is overwritten.
+func (db *Database) UpsertCard(ctx context.Context, cardId string, data map[string]any) error {
 	db.logger.Info("adding/updating card", slog.String("cardId", cardId))
 
 	now := time.Now().UTC()
+
+	// add the `id` and `lastModifiedAt` properties to the data. This ensures
+	// they are correctly set in the data and the columns to keep things consistent.
 	data["id"] = cardId
 	data["lastModifiedAt"] = now
-	//jsonData, err := json.Marshal(data)
-	//if err != nil {
-	//	return errors.Wrap(err, "failed to convert card data to json to save in db")
-	//}
 
-	const insertCardQuery = `
+	// define the SQL query which will upsert the card in the database.
+	const upsertCardQuery = `
 		INSERT INTO cards ( id, last_modified_at, data )
 		VALUES ( @id, @last_modified_at, @data::jsonb )
 		ON CONFLICT (id) DO UPDATE SET 
@@ -53,7 +59,8 @@ func (db *Database) AddOrUpdateCard(ctx context.Context, cardId string, data map
 			data = EXCLUDED.data
     `
 
-	_, err := db.conn.Exec(ctx, insertCardQuery, pgx.NamedArgs{
+	// execute the query with the parameters.
+	_, err := db.conn.Exec(ctx, upsertCardQuery, pgx.NamedArgs{
 		"id":               cardId,
 		"last_modified_at": time.Now().UTC(),
 		"data":             data,
