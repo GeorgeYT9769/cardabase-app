@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"time"
 )
 
 const cardIdPathParam = "cardId"
@@ -117,16 +118,15 @@ func (serv *HttpServer) putCard(res http.ResponseWriter, req *http.Request) erro
 	}
 	defer db.Dispose()
 
-	var card CardDetails
+	var card map[string]any
 	dec := json.NewDecoder(req.Body)
 	err = dec.Decode(&card)
 	if err != nil {
 		http.Error(res, "failed to read request body", http.StatusInternalServerError)
 		return fmt.Errorf("failed to read request body: %v", err)
 	}
-	card.Id = cardId
 
-	err = db.AddOrUpdateCard(req.Context(), card)
+	err = db.AddOrUpdateCard(req.Context(), cardId, card)
 	if err != nil {
 		http.Error(res, "failed to save card", http.StatusInternalServerError)
 		return fmt.Errorf("failed to save card to the database: %v", err)
@@ -138,6 +138,18 @@ func (serv *HttpServer) putCard(res http.ResponseWriter, req *http.Request) erro
 }
 
 func (serv *HttpServer) getCards(res http.ResponseWriter, req *http.Request) error {
+	// PARSE REQUEST
+	changesSince, err := getChangesSinceParam(req)
+	if err != nil {
+		http.Error(res, err.Error(), http.StatusBadRequest)
+		return err
+	}
+	changesUntil, err := getChangesUntilParam(req)
+	if err != nil {
+		http.Error(res, err.Error(), http.StatusBadRequest)
+		return err
+	}
+
 	// DO QUERY
 	db, err := serv.db(req.Context())
 	if err != nil {
@@ -146,7 +158,7 @@ func (serv *HttpServer) getCards(res http.ResponseWriter, req *http.Request) err
 	}
 	defer db.Dispose()
 
-	cards, err := db.GetCards(req.Context())
+	cards, err := db.GetCards(req.Context(), changesSince, changesUntil)
 
 	if err != nil {
 		http.Error(res, "failed to get cards", http.StatusInternalServerError)
@@ -185,4 +197,36 @@ func cors(handler http.HandlerFunc) http.HandlerFunc {
 		}
 		handler(res, req)
 	}
+}
+
+func getChangesSinceParam(req *http.Request) (time.Time, error) {
+	s := req.URL.Query().Get("Changes-Since")
+	if s == "" {
+		return time.Time{}, errors.New("a Changes-Since query param must be provided")
+	}
+
+	t, err := time.Parse("20060102T150405", s)
+	if err != nil {
+		return time.Time{}, errors.New("failed to parse Changes-Since as date-time (YYMMDDThhmmss)")
+	}
+	if t.UnixNano() == 0 {
+		return time.Time{}, errors.New("a Changes-Since query param cannot be empty")
+	}
+	return t, nil
+}
+
+func getChangesUntilParam(req *http.Request) (time.Time, error) {
+	s := req.URL.Query().Get("Changes-Until")
+	if s == "" {
+		return time.Time{}, errors.New("a Changes-Until query param must be provided")
+	}
+
+	t, err := time.Parse("20060102T150405", s)
+	if err != nil {
+		return time.Time{}, errors.New("failed to parse Changes-Until as date-time (YYMMDDThhmmss)")
+	}
+	if t.UnixNano() == 0 {
+		return time.Time{}, errors.New("a Changes-Until query param cannot be empty")
+	}
+	return t, nil
 }

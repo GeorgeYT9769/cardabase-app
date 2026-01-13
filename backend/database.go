@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/pkg/errors"
 )
@@ -35,74 +34,45 @@ func (db *Database) Dispose() {
 //	MUTATING FUNCTIONS
 // ------------------------------------
 
-func (db *Database) AddOrUpdateCard(ctx context.Context, card CardDetails) error {
-	db.logger.Info("adding/updating card",
-		slog.String("id", card.Id))
+func (db *Database) AddOrUpdateCard(ctx context.Context, cardId string, data map[string]any) error {
+	db.logger.Info("adding/updating card", slog.String("cardId", cardId))
+
+	now := time.Now().UTC()
+	data["id"] = cardId
+	data["lastModifiedAt"] = now
+	//jsonData, err := json.Marshal(data)
+	//if err != nil {
+	//	return errors.Wrap(err, "failed to convert card data to json to save in db")
+	//}
 
 	const insertCardQuery = `
-		INSERT INTO cards (
-			id,
-			text,
-			title_color,
-			type,
-			password,
-			red, green, blue,
-			tags, note,
-			image_front, image_back,
-			last_modified_at)
-		VALUES (
-			@id,
-            @text,
-            @title_color,
-            @type,
-            @password,
-            @red,
-            @green,
-            @blue,
-            @tags,
-            @note,
-            @image_front,
-            @image_back,
-            @last_modified_at)
+		INSERT INTO cards ( id, last_modified_at, data )
+		VALUES ( @id, @last_modified_at, @data::jsonb )
 		ON CONFLICT (id) DO UPDATE SET 
-			id = EXCLUDED.id,
-			text = EXCLUDED.text,
-			title_color = EXCLUDED.title_color,
-			type = EXCLUDED.type,
-			password = EXCLUDED.password,
-			red = EXCLUDED.red,
-			green = EXCLUDED.green,
-			blue = EXCLUDED.blue,
-			tags = EXCLUDED.tags,
-			image_front = EXCLUDED.image_front,
-			image_back = EXCLUDED.image_back,
-			last_modified_at = EXCLUDED.last_modified_at`
+			last_modified_at = EXCLUDED.last_modified_at,
+			data = EXCLUDED.data
+    `
 
 	_, err := db.conn.Exec(ctx, insertCardQuery, pgx.NamedArgs{
-		"id":               card.Id,
-		"text":             card.Text,
-		"title_color":      card.TitleColor,
-		"type":             card.Type,
-		"password":         card.Password,
-		"red":              card.Red,
-		"green":            card.Green,
-		"blue":             card.Blue,
-		"tags":             card.Tags,
-		"image_front":      card.ImageFront,
-		"image_back":       card.ImageBack,
+		"id":               cardId,
 		"last_modified_at": time.Now().UTC(),
+		"data":             data,
 	})
+
 	return err
 }
 
-func (db *Database) RemoveCard(ctx context.Context, id string) error {
-	db.logger.Info("removing card", slog.String("id", id))
+func (db *Database) RemoveCard(ctx context.Context, cardId string) error {
+	db.logger.Info("removing card", slog.String("cardId", cardId))
 
 	const query = `
 		DELETE FROM cards AS card
-		WHERE card.id = $id
+		WHERE card.id = @id
 	`
-	_, err := db.conn.Exec(ctx, query, pgx.NamedArgs{"id": id})
+	_, err := db.conn.Exec(ctx, query, pgx.NamedArgs{
+		"id": cardId,
+	})
+
 	return err
 }
 
@@ -110,51 +80,22 @@ func (db *Database) RemoveCard(ctx context.Context, id string) error {
 //	QUERY FUNCTIONS
 // ------------------------------------
 
-func (db *Database) GetCard(ctx context.Context, cardId string) (*CardDetails, error) {
+func (db *Database) GetCard(ctx context.Context, cardId string) (map[string]any, error) {
 	db.logger.Info("getting card", slog.String("cardId", cardId))
 
 	const getCardQuery = `
-		SELECT
-			card.id,
-			card.text,
-			card.title_color,
-			card.type,
-			card.password,
-			card.red,
-			card.green,
-			card.blue,
-			card.tags,
-			card.note,
-			card.image_front,
-			card.image_back,
-			card.last_modified_at
+		SELECT card.id, card.data
 		FROM cards AS card
-		WHERE card.id = $1`
+		WHERE card.id = @id`
 
-	rows := db.conn.QueryRow(ctx, getCardQuery, cardId)
+	rows := db.conn.QueryRow(ctx, getCardQuery, pgx.NamedArgs{"id": cardId})
 
 	var (
-		id             string
-		text           string
-		titleColor     Color
-		tp             string
-		password       *string
-		red            int
-		green          int
-		blue           int
-		tags           pgtype.Array[string]
-		note           *string
-		imageFront     []byte
-		imageBack      []byte
-		lastModifiedAt time.Time
+		id   string
+		data map[string]interface{}
 	)
 
-	err := rows.Scan(
-		&id, &text, &titleColor, &tp, &password,
-		&red, &green, &blue,
-		&tags, &note,
-		&imageFront, &imageBack,
-		&lastModifiedAt)
+	err := rows.Scan(&id, &data)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -163,73 +104,46 @@ func (db *Database) GetCard(ctx context.Context, cardId string) (*CardDetails, e
 		return nil, err
 	}
 
-	return &CardDetails{
-		Id:             id,
-		Text:           text,
-		TitleColor:     titleColor,
-		Type:           tp,
-		Password:       password,
-		Red:            red,
-		Green:          green,
-		Blue:           blue,
-		Tags:           tags.Elements,
-		Note:           note,
-		ImageFront:     imageFront,
-		ImageBack:      imageBack,
-		LastModifiedAt: lastModifiedAt,
-	}, nil
+	return data, nil
 }
 
-func (db *Database) GetCards(ctx context.Context) ([]*CardSummary, error) {
+func (db *Database) GetCards(ctx context.Context, changesSince time.Time, changesUntil time.Time) ([]map[string]any, error) {
 	db.logger.Info("getting cards")
 
 	const getCardsQuery = `
 		SELECT
-			card.id,
-			card.text,
-			card.type,
-			card.password,
-			card.last_modified_at
+			card.last_modified_at,
+			card.data
 		FROM cards AS card
+		WHERE card.last_modified_at >= @changes_since AND card.last_modified_at <= @changes_until
 		ORDER BY card.last_modified_at DESC
 	`
 
-	rows, err := db.conn.Query(ctx, getCardsQuery)
+	rows, err := db.conn.Query(ctx, getCardsQuery, pgx.NamedArgs{
+		"changes_since": changesSince,
+		"changes_until": changesUntil,
+	})
 
 	if err != nil {
 		return nil, err
 	}
 
-	var cards = make([]*CardSummary, 0)
+	var cards = make([]map[string]any, 0)
 
 	defer rows.Close()
 	for rows.Next() {
 		var (
-			id             string
-			text           string
-			tp             string
-			password       *string
 			lastModifiedAt time.Time
+			data           map[string]any
 		)
 
-		err := rows.Scan(
-			&id,
-			&text,
-			&tp,
-			&password,
-			&lastModifiedAt)
+		err := rows.Scan(&lastModifiedAt, &data)
 
 		if err != nil {
 			return cards, err
 		}
 
-		cards = append(cards, &CardSummary{
-			Id:             id,
-			Text:           text,
-			Type:           tp,
-			Password:       password,
-			LastModifiedAt: lastModifiedAt,
-		})
+		cards = append(cards, data)
 	}
 
 	return cards, err

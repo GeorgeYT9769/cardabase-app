@@ -4,7 +4,7 @@ Authorization: bearer {{$auth.token("local")}}
 Content-Type: application/json
 
 {
-  "text": "test shop",
+  "text": "test shop2",
   "type": "ean13"
 }
 
@@ -13,5 +13,5 @@ GET http://{{host}}/cards/{{cardId}}
 Authorization: bearer {{$auth.token("local")}}
 
 ### GET all cards
-GET http://{{host}}/cards
+GET http://{{host}}/cards?Changes-Since={{changesSince}}&Changes-Until={{changesUntil}}
 Authorization: bearer {{$auth.token("local")}}
