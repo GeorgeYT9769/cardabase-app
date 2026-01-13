@@ -40,6 +40,9 @@ func (db *Database) Dispose() {
 
 // UpsertCard ensures a card exists in the database with the given cardId and
 // data. If an entry already exists with the given cardId, it is overwritten.
+//
+// The data is a map[string]any. This represents a dynamic object so that the
+// backend does not need to know the schema of the frontend.
 func (db *Database) UpsertCard(ctx context.Context, cardId string, data map[string]any) error {
 	db.logger.Info("adding/updating card", slog.String("cardId", cardId))
 
@@ -69,13 +72,17 @@ func (db *Database) UpsertCard(ctx context.Context, cardId string, data map[stri
 	return err
 }
 
+// RemoveCard removes the card with the given id from the database.
 func (db *Database) RemoveCard(ctx context.Context, cardId string) error {
 	db.logger.Info("removing card", slog.String("cardId", cardId))
 
+	// define the quer which will remove the card from the database
 	const query = `
 		DELETE FROM cards AS card
 		WHERE card.id = @id
 	`
+
+	// execute the query with the parameters
 	_, err := db.conn.Exec(ctx, query, pgx.NamedArgs{
 		"id": cardId,
 	})
@@ -87,14 +94,18 @@ func (db *Database) RemoveCard(ctx context.Context, cardId string) error {
 //	QUERY FUNCTIONS
 // ------------------------------------
 
+// GetCard retrieves the card with the given cardId from the database. If the
+// card does not exist a ErrCardNotFound is returned.
 func (db *Database) GetCard(ctx context.Context, cardId string) (map[string]any, error) {
 	db.logger.Info("getting card", slog.String("cardId", cardId))
 
+	// define the query which will retrieve the card from the database
 	const getCardQuery = `
 		SELECT card.id, card.data
 		FROM cards AS card
 		WHERE card.id = @id`
 
+	// execute the query with the parameters
 	rows := db.conn.QueryRow(ctx, getCardQuery, pgx.NamedArgs{"id": cardId})
 
 	var (
@@ -102,6 +113,7 @@ func (db *Database) GetCard(ctx context.Context, cardId string) (map[string]any,
 		data map[string]interface{}
 	)
 
+	// read the first row of the received result-set.
 	err := rows.Scan(&id, &data)
 
 	if err != nil {
@@ -114,9 +126,12 @@ func (db *Database) GetCard(ctx context.Context, cardId string) (map[string]any,
 	return data, nil
 }
 
+// GetCards retrieves all cards from the database which have been change within
+// a given time-window.
 func (db *Database) GetCards(ctx context.Context, changesSince time.Time, changesUntil time.Time) ([]map[string]any, error) {
 	db.logger.Info("getting cards")
 
+	// define the query which will retrieve the cards from the database
 	const getCardsQuery = `
 		SELECT
 			card.last_modified_at,
@@ -126,6 +141,7 @@ func (db *Database) GetCards(ctx context.Context, changesSince time.Time, change
 		ORDER BY card.last_modified_at DESC
 	`
 
+	// execute the query with the parameters
 	rows, err := db.conn.Query(ctx, getCardsQuery, pgx.NamedArgs{
 		"changes_since": changesSince,
 		"changes_until": changesUntil,
@@ -135,15 +151,19 @@ func (db *Database) GetCards(ctx context.Context, changesSince time.Time, change
 		return nil, err
 	}
 
+	// ensure w close the result stream in the end
+	defer rows.Close()
+
+	// define a list of results. Each result is a dynamic object so that the
+	// backend does not need to know the schema of the frontend.
 	var cards = make([]map[string]any, 0)
 
-	defer rows.Close()
+	// iterate over all the results and ad them to the cards
 	for rows.Next() {
 		var (
 			lastModifiedAt time.Time
 			data           map[string]any
 		)
-
 		err := rows.Scan(&lastModifiedAt, &data)
 
 		if err != nil {
