@@ -9,7 +9,6 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -34,11 +33,6 @@ var pgPool *pgxpool.Pool
 // configPath is the file-path at which the server will search for a
 // configuration file. This parameter is passed through the cli.
 var configPath string
-
-// keySetProvider is used to get signing keys from. These keys are used to
-// verify the authenticity of the users which make the requests. Each key-set
-// should be refreshed every 2 hours.
-var keySetProvider = NewCachedKeySetProvider(2 * time.Hour)
 
 // main is the entrypoint of the application.
 func main() {
@@ -115,11 +109,8 @@ func runDatabaseMigrations() {
 func serveHttp() {
 	logger.Info("starting http server")
 
-	// create middleware which requires a request to be authenticated
-	authMiddleware := NewAuthMiddleware(cfg.Auth.Issuer, cfg.Auth.Audience, keySetProvider)
-
 	// create the server
-	cardServ := NewHttpServer(logger, createCardsDb, authMiddleware)
+	cardServ := NewHttpServer(logger, createCardsDb)
 	cardServ.RegisterRoutes()
 
 	// start listening for http request

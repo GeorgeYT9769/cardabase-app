@@ -1,6 +1,5 @@
 ### PUT card
 PUT http://{{host}}/cards/{{cardId}}
-Authorization: bearer {{$auth.token("local")}}
 Content-Type: application/json
 
 {
@@ -10,12 +9,9 @@ Content-Type: application/json
 
 ### GET card by id
 GET http://{{host}}/cards/{{cardId}}
-Authorization: bearer {{$auth.token("local")}}
 
 ### GET all cards
 GET http://{{host}}/cards?Changes-Since={{changesSince}}&Changes-Until={{changesUntil}}
-Authorization: bearer {{$auth.token("local")}}
 
 ### DELETE card by id
 DELETE http://{{host}}/cards/{{cardId}}
-Authorization: bearer {{$auth.token("local")}}

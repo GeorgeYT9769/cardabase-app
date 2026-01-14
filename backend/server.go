@@ -22,15 +22,12 @@ type HttpServer struct {
 	logger *slog.Logger
 	// db is a factory function to get a database connection per request.
 	db DatabaseFactory
-	// authMiddleware intercepts some requests and ensures they are authenticated.
-	authMiddleware *AuthMiddleware
 }
 
-func NewHttpServer(logger *slog.Logger, db DatabaseFactory, auth *AuthMiddleware) *HttpServer {
+func NewHttpServer(logger *slog.Logger, db DatabaseFactory) *HttpServer {
 	return &HttpServer{
-		logger:         logger,
-		db:             db,
-		authMiddleware: auth,
+		logger: logger,
+		db:     db,
 	}
 }
 
@@ -38,7 +35,7 @@ func NewHttpServer(logger *slog.Logger, db DatabaseFactory, auth *AuthMiddleware
 // to them.
 func (serv *HttpServer) RegisterRoutes() {
 	// the route http://my-server.com/cards resembles the collection of all cards
-	serv.handleFunc("/cards", serv.authMiddleware.Authenticate(func(res http.ResponseWriter, req *http.Request) error {
+	serv.handleFunc("/cards", func(res http.ResponseWriter, req *http.Request) error {
 		switch req.Method {
 		case http.MethodGet:
 			// a GET request on /cards returns all cards in the database. Two
@@ -50,34 +47,34 @@ func (serv *HttpServer) RegisterRoutes() {
 			http.Error(res, "", http.StatusMethodNotAllowed)
 		}
 		return nil
-	}))
+	})
 
-	serv.handleFunc("/cards/{"+cardIdPathParam+"}",
-		// the route http://my-server.com/cards/my-card-id resembles the collection of all cards
-		serv.authMiddleware.Authenticate(func(res http.ResponseWriter, req *http.Request) error {
-			switch req.Method {
-			case http.MethodGet:
-				// a GET request on /cards/my-card-id returns the card with id
-				// "my-card-id".
-				return serv.getCard(res, req)
-			case http.MethodPut:
-				// a PUT request on /cards/my-card-id saves the card with id
-				// "my-card-id" in the database.
-				return serv.putCard(res, req)
-			case http.MethodDelete:
-				// a DELETE request on /cards/my-card-id removes the card with id
-				// "my-card-id" from the database.
-				return serv.deleteCard(res, req)
-			default:
-				// all other http-methods are not allowed
-				http.Error(res, "", http.StatusMethodNotAllowed)
-				return nil
-			}
-		}))
+	// the route http://my-server.com/cards/my-card-id resembles the collection of all cards
+	serv.handleFunc("/cards/{"+cardIdPathParam+"}", func(res http.ResponseWriter, req *http.Request) error {
+		switch req.Method {
+		case http.MethodGet:
+			// a GET request on /cards/my-card-id returns the card with id
+			// "my-card-id".
+			return serv.getCard(res, req)
+		case http.MethodPut:
+			// a PUT request on /cards/my-card-id saves the card with id
+			// "my-card-id" in the database.
+			return serv.putCard(res, req)
+		case http.MethodDelete:
+			// a DELETE request on /cards/my-card-id removes the card with id
+			// "my-card-id" from the database.
+			return serv.deleteCard(res, req)
+		default:
+			// all other http-methods are not allowed
+			http.Error(res, "", http.StatusMethodNotAllowed)
+			return nil
+		}
+	})
+
+	// the http://my-server.com/healthz route is a standardized route with
+	// which it is possible to see whether the server is healthy and the
+	// application running. It only returns ok.
 	serv.handleFunc("/healthz", func(res http.ResponseWriter, req *http.Request) error {
-		// the http://my-server.com/healthz route is a standardized route with
-		// which it is possible to see whether the server is healthy and the
-		// application running. It only returns ok.
 		res.WriteHeader(200)
 		_, _ = res.Write([]byte("OK"))
 		return nil
