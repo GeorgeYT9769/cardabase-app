@@ -119,21 +119,21 @@ func serveHttp() {
 	authMiddleware := NewAuthMiddleware(cfg.Auth.Issuer, cfg.Auth.Audience, keySetProvider)
 
 	// create the server
-	scoreServ := NewHttpServer(logger, createScoresDb, authMiddleware)
-	scoreServ.RegisterRoutes()
+	cardServ := NewHttpServer(logger, createCardsDb, authMiddleware)
+	cardServ.RegisterRoutes()
 
 	// start listening for http request
 	addr := fmt.Sprintf(":%d", cfg.Http.Port)
 	logger.Info("start listening for http requests", slog.String("addr", addr))
 	if err := http.ListenAndServe(addr, nil); err != nil {
-		logger.Error("failed to serve score scoresIndex",
+		logger.Error("failed to serve cards",
 			slog.Any("error", err))
 	}
 }
 
-// createScoresDb uses the pgPool to create an instance of the Database. This
+// createCardsDb uses the pgPool to create an instance of the Database. This
 // function is used as a factory function which is required for the HttpServer.
-func createScoresDb(ctx context.Context) (*Database, error) {
+func createCardsDb(ctx context.Context) (*Database, error) {
 	pgConn, err := pgPool.Acquire(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create database connection")
