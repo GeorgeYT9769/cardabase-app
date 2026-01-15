@@ -1,0 +1,44 @@
+services:
+  cardabase:
+    restart: 'always'
+    image: cardabase:latest
+    depends_on:
+      - db
+    ports:
+      - "5054:5054"
+    secrets:
+      - cardabase_api_secrets
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    deploy:
+      resources:
+        limits:
+          pids: 99
+
+  db:
+    restart: 'always'
+    image: postgres:latest
+    environment:
+      PGUSER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      PGDATA: /data/postgres
+    secrets:
+      - db_password
+    volumes:
+      - /docker-volumes/db/data:/data/postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "zitadel", "-U", "postgres"]
+      interval: '10s'
+      timeout: '30s'
+      retries: 5
+      start_period: '20s'
+
+secrets:
+  cardabase_api_secrets:
+    file: /path/to/cardabase_api_secrets.json
+  db_password:
+    file: /path/to/db_password.txt

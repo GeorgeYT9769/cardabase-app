@@ -1,0 +1,17 @@
+### PUT card
+PUT http://{{host}}/cards/{{cardId}}
+Content-Type: application/json
+
+{
+  "text": "test shop2",
+  "type": "ean13"
+}
+
+### GET card by id
+GET http://{{host}}/cards/{{cardId}}
+
+### GET all cards
+GET http://{{host}}/cards?Changes-Since={{changesSince}}&Changes-Until={{changesUntil}}
+
+### DELETE card by id
+DELETE http://{{host}}/cards/{{cardId}}

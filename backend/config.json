@@ -1,0 +1,8 @@
+{
+  "db": {
+    "connectionString": "user=postgres password=postgres host=localhost port=5432 dbname=postgres sslmode=disable"
+  },
+  "http": {
+    "port": 5054
+  }
+}
