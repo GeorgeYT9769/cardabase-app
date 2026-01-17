@@ -1,12 +1,11 @@
-name: Release
+name: Release Backend
 
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
   workflow_dispatch:
-  
+  push:
+    tags: 
+    - 'v*'
+
 
 jobs:
   build:
@@ -25,7 +24,7 @@ jobs:
       - name: Build and Push backend image
         uses: docker/build-push-action@v6
         with:
-          file: Dockerfile
+          file: backend/Dockerfile
           context: backend
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/cardabase-backend:${{ github.ref_name }} , ${{ secrets.DOCKER_USERNAME }}/cardabase-backend:latest
