@@ -1,0 +1,33 @@
+name: Release Backend
+
+on:
+  workflow_dispatch:
+  push:
+    tags: 
+    - 'v*'
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PAT }}
+
+      - name: Build and Push backend image
+        uses: docker/build-push-action@v6
+        with:
+          file: backend/Dockerfile
+          context: backend
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/cardabase-backend:${{ github.ref_name }} , ${{ secrets.DOCKER_USERNAME }}/cardabase-backend:latest
+
+      - name: Create release
+        uses: ncipollo/release-action@v1
