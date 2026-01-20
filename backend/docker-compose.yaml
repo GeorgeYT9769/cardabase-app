@@ -1,7 +1,7 @@
 services:
   cardabase:
     restart: 'always'
-    image: cardabase:latest
+    image: cardabase-backend:latest
     depends_on:
       - db
     ports:
