@@ -93,13 +93,13 @@ void main() async {
   await Hive.openBox('password'); // storage for password
 
   final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-  String currentAppVersion = packageInfo.version;
-  String? lastSeenAppVersion =
+  final String currentAppVersion = packageInfo.version;
+  final String? lastSeenAppVersion =
       Hive.box('settingsBox').get('lastSeenAppVersion');
   // Read auto-backup settings safely
-  bool autoBackups = Hive.box('settingsBox').get('autoBackups') ?? false;
-  String? lastAutoUpdate = Hive.box('settingsBox').get('lastAutoUpdate');
-  int autoBackupInterval =
+  final bool autoBackups = Hive.box('settingsBox').get('autoBackups') ?? false;
+  final String? lastAutoUpdate = Hive.box('settingsBox').get('lastAutoUpdate');
+  final int autoBackupInterval =
       Hive.box('settingsBox').get('autoBackupInterval') ?? 7;
 
   Widget initialScreen;
@@ -193,12 +193,13 @@ class _MainState extends State<Main> {
     return ValueListenableBuilder(
       valueListenable: Hive.box('settingsBox').listenable(),
       builder: (context, box, child) {
-        bool isDarkMode = box.get('isDarkMode', defaultValue: false);
-        bool useSystemFont = box.get('useSystemFont', defaultValue: false);
-        bool useExtraDark = box.get('useExtraDark',
+        final bool isDarkMode = box.get('isDarkMode', defaultValue: false);
+        final bool useSystemFont =
+            box.get('useSystemFont', defaultValue: false);
+        final bool useExtraDark = box.get('useExtraDark',
             defaultValue: false); // Retrieve new setting
 
-        ColorScheme extraDarkColorScheme = darkColorScheme.copyWith(
+        final ColorScheme extraDarkColorScheme = darkColorScheme.copyWith(
           surface: Colors.black,
         );
 

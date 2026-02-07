@@ -78,7 +78,7 @@ Future<void> exportCardList(BuildContext context,
       txtBuffer.writeln('Timestamp: $timestamp');
       txtBuffer.writeln(
           '=======================================================================');
-      for (var card in cardList) {
+      for (final card in cardList) {
         if (card is List) {
           txtBuffer.writeln('[${card.map((e) => e.toString()).join(', ')}]');
         } else if (card is Map) {

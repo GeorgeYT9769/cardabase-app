@@ -402,15 +402,15 @@ class _CreateCardState extends State<CreateCard>
       int oddSum = 0;
       int evenSum = 0;
       for (int i = 0; i < 12; i++) {
-        int digit = int.parse(eanCode[i]);
+        final int digit = int.parse(eanCode[i]);
         if (i % 2 == 0) {
           oddSum += digit;
         } else {
           evenSum += digit;
         }
       }
-      int totalSum = oddSum + evenSum * 3;
-      int checkDigit = (10 - totalSum % 10) % 10;
+      final int totalSum = oddSum + evenSum * 3;
+      final int checkDigit = (10 - totalSum % 10) % 10;
       return checkDigit == int.parse(eanCode[12]);
     } else if (cardTypeText == 'CardType.ean8') {
       if (eanCode.length != 8 || int.tryParse(eanCode) == null) {
@@ -419,15 +419,15 @@ class _CreateCardState extends State<CreateCard>
       int oddSum = 0;
       int evenSum = 0;
       for (int i = 0; i < 7; i++) {
-        int digit = int.parse(eanCode[i]);
+        final int digit = int.parse(eanCode[i]);
         if (i % 2 == 0) {
           evenSum += digit;
         } else {
           oddSum += digit;
         }
       }
-      int totalSum = oddSum + evenSum * 3;
-      int checkDigit = (10 - totalSum % 10) % 10;
+      final int totalSum = oddSum + evenSum * 3;
+      final int checkDigit = (10 - totalSum % 10) % 10;
       return checkDigit == int.parse(eanCode[7]);
     } else if (cardTypeText == 'CardType.ean5') {
       if (eanCode.length != 5) {
@@ -450,7 +450,7 @@ class _CreateCardState extends State<CreateCard>
 
       int sum = 0;
       for (int i = 0; i < 13; i++) {
-        int digit = int.parse(eanCode[i]);
+        final int digit = int.parse(eanCode[i]);
         if (i % 2 == 0) {
           sum += digit * 3; // Even position from left = odd from right
         } else {
@@ -458,7 +458,7 @@ class _CreateCardState extends State<CreateCard>
         }
       }
 
-      int checkDigit = (10 - (sum % 10)) % 10;
+      final int checkDigit = (10 - (sum % 10)) % 10;
       return checkDigit == int.parse(eanCode[13]);
     } else if (cardTypeText == 'CardType.itf16') {
       if (eanCode.length != 16 || int.tryParse(eanCode) == null) {
@@ -467,7 +467,7 @@ class _CreateCardState extends State<CreateCard>
 
       int sum = 0;
       for (int i = 0; i < 15; i++) {
-        int digit = int.parse(eanCode[i]);
+        final int digit = int.parse(eanCode[i]);
         if (i % 2 == 0) {
           sum += digit * 3;
         } else {
@@ -475,7 +475,7 @@ class _CreateCardState extends State<CreateCard>
         }
       }
 
-      int checkDigit = (10 - (sum % 10)) % 10;
+      final int checkDigit = (10 - (sum % 10)) % 10;
       return checkDigit == int.parse(eanCode[15]);
     } else if (cardTypeText == 'CardType.upca') {
       if (eanCode.length != 12 || int.tryParse(eanCode) == null) {
@@ -484,15 +484,15 @@ class _CreateCardState extends State<CreateCard>
       int oddSum = 0;
       int evenSum = 0;
       for (int i = 0; i < 11; i++) {
-        int digit = int.parse(eanCode[i]);
+        final int digit = int.parse(eanCode[i]);
         if (i % 2 == 0) {
           evenSum += digit;
         } else {
           oddSum += digit;
         }
       }
-      int totalSum = oddSum + evenSum * 3;
-      int checkDigit = (10 - totalSum % 10) % 10;
+      final int totalSum = oddSum + evenSum * 3;
+      final int checkDigit = (10 - totalSum % 10) % 10;
       return checkDigit == int.parse(eanCode[11]);
     } else if (cardTypeText == 'CardType.upce') {
       if (eanCode.length != 8 || int.tryParse(eanCode) == null) {
@@ -501,15 +501,15 @@ class _CreateCardState extends State<CreateCard>
       int oddSum = 0;
       int evenSum = 0;
       for (int i = 0; i < 7; i++) {
-        int digit = int.parse(eanCode[i]);
+        final int digit = int.parse(eanCode[i]);
         if (i % 2 == 0) {
           evenSum += digit;
         } else {
           oddSum += digit;
         }
       }
-      int totalSum = oddSum + evenSum * 3;
-      int checkDigit = (10 - totalSum % 10) % 10;
+      final int totalSum = oddSum + evenSum * 3;
+      final int checkDigit = (10 - totalSum % 10) % 10;
       return checkDigit == int.parse(eanCode[7]);
     } else {
       return true;
@@ -520,7 +520,7 @@ class _CreateCardState extends State<CreateCard>
   String cardTypeText = 'Barcode Type';
 
   Future<void> _showBarcodeSelectorDialog(ThemeData theme) async {
-    CardType? result = await showDialog<CardType>(
+    final CardType? result = await showDialog<CardType>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -537,7 +537,7 @@ class _CreateCardState extends State<CreateCard>
                 shrinkWrap: true,
                 itemCount: CardType.values.length,
                 itemBuilder: (BuildContext context, int index) {
-                  CardType cardType = CardType.values[index];
+                  final CardType cardType = CardType.values[index];
                   return ListTile(
                     title: Text(cardType.label),
                     onTap: () {
@@ -586,27 +586,27 @@ class _CreateCardState extends State<CreateCard>
             color: theme.colorScheme.secondary,
           ),
           onPressed: () async {
-            var result = await Navigator.push(
+            final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const QRBarReader(),
                 ));
             setState(() {
               if (result is Map<String, dynamic>) {
-                String code = result["code"];
+                final String code = result["code"];
 
                 if (code != "-1") {
-                  List<String> rawList =
+                  final List<String> rawList =
                       code.replaceAll("[", "").replaceAll("]", "").split(", ");
 
                   // Convert values into correct types
-                  String name = rawList[0];
-                  String number = rawList[1];
-                  int red = int.parse(rawList[2]);
-                  int green = int.parse(rawList[3]);
-                  int blue = int.parse(rawList[4]);
-                  String cardType = rawList[5];
-                  bool hasPwd = rawList[6] == "true";
+                  final String name = rawList[0];
+                  final String number = rawList[1];
+                  final int red = int.parse(rawList[2]);
+                  final int green = int.parse(rawList[3]);
+                  final int blue = int.parse(rawList[4]);
+                  final String cardType = rawList[5];
+                  final bool hasPwd = rawList[6] == "true";
 
                   setState(() {
                     controller.text = name;
@@ -795,7 +795,7 @@ class _CreateCardState extends State<CreateCard>
                                   icon: Icon(Icons.photo_camera_rounded,
                                       color: theme.colorScheme.secondary),
                                   onPressed: () async {
-                                    var result = await Navigator.push(
+                                    final result = await Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
@@ -804,8 +804,8 @@ class _CreateCardState extends State<CreateCard>
                                     );
                                     setState(() {
                                       if (result is Map<String, dynamic>) {
-                                        String code = result["code"];
-                                        var format =
+                                        final String code = result["code"];
+                                        final format =
                                             result["format"].toString();
                                         if (code != "-1") {
                                           controllercardid.text = code;
@@ -878,18 +878,22 @@ class _CreateCardState extends State<CreateCard>
                                           }
                                           if (code.startsWith("[") &&
                                               code.endsWith("]")) {
-                                            List<String> rawList = code
+                                            final List<String> rawList = code
                                                 .replaceAll("[", "")
                                                 .replaceAll("]", "")
                                                 .split(", ");
 
-                                            String name = rawList[0];
-                                            String number = rawList[1];
-                                            int red = int.parse(rawList[2]);
-                                            int green = int.parse(rawList[3]);
-                                            int blue = int.parse(rawList[4]);
-                                            String cardType = rawList[5];
-                                            bool hasPwd = rawList[6] == "true";
+                                            final String name = rawList[0];
+                                            final String number = rawList[1];
+                                            final int red =
+                                                int.parse(rawList[2]);
+                                            final int green =
+                                                int.parse(rawList[3]);
+                                            final int blue =
+                                                int.parse(rawList[4]);
+                                            final String cardType = rawList[5];
+                                            final bool hasPwd =
+                                                rawList[6] == "true";
 
                                             setState(() {
                                               controller.text = name;

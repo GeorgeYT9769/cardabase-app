@@ -105,7 +105,7 @@ class _QRBarReaderState extends State<QRBarReader> {
   }
 
   Widget _buildQrView(BuildContext context) {
-    var scanArea = (MediaQuery.of(context).size.width < 400 ||
+    final scanArea = (MediaQuery.of(context).size.width < 400 ||
             MediaQuery.of(context).size.height < 400)
         ? 200.0
         : 400.0;
@@ -153,7 +153,7 @@ class _QRBarReaderState extends State<QRBarReader> {
     try {
       final image = img.decodeImage(Uint8List.fromList(bytes));
       if (image != null) {
-        LuminanceSource source = RGBLuminanceSource(
+        final LuminanceSource source = RGBLuminanceSource(
           image.width,
           image.height,
           image
@@ -163,9 +163,9 @@ class _QRBarReaderState extends State<QRBarReader> {
               .asInt32List(),
         );
 
-        var bitmap = BinaryBitmap(GlobalHistogramBinarizer(source));
-        var reader = QRCodeReader();
-        var result = reader.decode(bitmap);
+        final bitmap = BinaryBitmap(GlobalHistogramBinarizer(source));
+        final reader = QRCodeReader();
+        final result = reader.decode(bitmap);
         return result.text;
       } else {
         return null;

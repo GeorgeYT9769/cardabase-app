@@ -92,7 +92,7 @@ Future<bool> showImportDialog(BuildContext context) async {
             }
 
             final lines = input.split('\n');
-            List<Map<String, dynamic>> newCards = [];
+            final List<Map<String, dynamic>> newCards = [];
             int importedCount = 0;
 
             for (final line in lines) {
@@ -102,7 +102,7 @@ Future<bool> showImportDialog(BuildContext context) async {
                 final cleaned =
                     trimmed.substring(1, trimmed.length - 1); // remove { }
                 final fields = cleaned.split(',').map((e) => e.trim()).toList();
-                Map<String, dynamic> cardMap = {};
+                final Map<String, dynamic> cardMap = {};
                 for (final field in fields) {
                   final kv = field.split(':');
                   if (kv.length >= 2) {

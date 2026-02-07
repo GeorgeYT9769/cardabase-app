@@ -128,7 +128,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
       hideCutoutBorder = false;
     });
     if (imageBytes == null) return _capturedImageFile!.path;
-    img.Image? fullImage = img.decodeImage(imageBytes);
+    final fullImage = img.decodeImage(imageBytes);
     if (fullImage == null) return _capturedImageFile!.path;
     final int cropX = (cutoutOffset.dx * devicePixelRatio).round();
     final int cropY = (cutoutOffset.dy * devicePixelRatio).round();

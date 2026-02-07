@@ -47,13 +47,14 @@ class _InfoScreenState extends State<InfoScreen> {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-        String githubTag = data['tag_name'] ?? '';
+        final String githubTag = data['tag_name'] ?? '';
 
         _latestGitHubVersion =
             githubTag.startsWith('v') ? githubTag.substring(1) : githubTag;
 
-        List<int> localParts = _appVersion.split('.').map(int.parse).toList();
-        List<int> githubParts =
+        final List<int> localParts =
+            _appVersion.split('.').map(int.parse).toList();
+        final List<int> githubParts =
             _latestGitHubVersion!.split('.').map(int.parse).toList();
 
         _isUpdateAvailable = false;
