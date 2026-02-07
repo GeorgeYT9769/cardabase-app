@@ -1,13 +1,12 @@
 import 'dart:io';
 import 'dart:typed_data' as typed_data;
-import 'package:flutter/material.dart';
+
 import 'package:camera/camera.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' show join;
-import 'package:image_picker/image_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
-
-
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' show join;
+import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 
 class CameraControllerScreen extends StatefulWidget {
@@ -19,20 +18,23 @@ class CameraControllerScreen extends StatefulWidget {
     super.key,
     this.cutoutColor = const Color(0xFF1960A5),
     this.cutoutWidthPercentage = 0.9,
-    this.cardAspectRatio = 1.586, // Common aspect ratio for credit cards (85.60 mm × 53.98 mm)
+    this.cardAspectRatio =
+        1.586, // Common aspect ratio for credit cards (85.60 mm × 53.98 mm)
   });
 
   @override
   State<CameraControllerScreen> createState() => _CameraControllerScreenState();
 }
 
-class _CameraControllerScreenState extends State<CameraControllerScreen> with WidgetsBindingObserver {
+class _CameraControllerScreenState extends State<CameraControllerScreen>
+    with WidgetsBindingObserver {
   CameraController? _cameraController;
   List<CameraDescription>? _cameras;
   Future<void>? _initializeControllerFuture;
   XFile? _capturedImageFile;
 
-  final TransformationController _transformationController = TransformationController();
+  final TransformationController _transformationController =
+      TransformationController();
   final ScreenshotController _screenshotController = ScreenshotController();
   bool hideCutoutBorder = false;
 
@@ -104,7 +106,9 @@ class _CameraControllerScreenState extends State<CameraControllerScreen> with Wi
 
   Future<String> _cropAndSaveAdjustedImage() async {
     if (_capturedImageFile == null) return _capturedImageFile!.path;
-    setState(() { hideCutoutBorder = true; });
+    setState(() {
+      hideCutoutBorder = true;
+    });
     await Future.delayed(const Duration(milliseconds: 50));
     final RenderBox box = context.findRenderObject() as RenderBox;
     final Size screenSize = box.size;
@@ -116,10 +120,13 @@ class _CameraControllerScreenState extends State<CameraControllerScreen> with Wi
       (screenSize.width - cutoutWidth) / 2,
       cutoutYOffset,
     );
-    final typed_data.Uint8List? imageBytes = await _screenshotController.capture(
+    final typed_data.Uint8List? imageBytes =
+        await _screenshotController.capture(
       pixelRatio: devicePixelRatio,
     );
-    setState(() { hideCutoutBorder = false; });
+    setState(() {
+      hideCutoutBorder = false;
+    });
     if (imageBytes == null) return _capturedImageFile!.path;
     img.Image? fullImage = img.decodeImage(imageBytes);
     if (fullImage == null) return _capturedImageFile!.path;
@@ -177,9 +184,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen> with Wi
                   Positioned.fill(
                       child: AspectRatio(
                           aspectRatio: widget.cardAspectRatio,
-                          child: CameraPreview(_cameraController!)
-                      )
-                  ),
+                          child: CameraPreview(_cameraController!))),
                   Positioned.fill(
                     child: CustomPaint(
                       painter: _CutoutPainter(
@@ -307,7 +312,8 @@ class _CutoutPainter extends CustomPainter {
     }
     final double offsetX = (screenWidth - cutoutWidth) / 2;
     final double offsetY = (screenHeight - cutoutHeight) / 2 + cutoutYOffset;
-    final Rect cutoutRect = Rect.fromLTWH(offsetX, offsetY, cutoutWidth, cutoutHeight);
+    final Rect cutoutRect =
+        Rect.fromLTWH(offsetX, offsetY, cutoutWidth, cutoutHeight);
     if (shouldDrawDarkOverlay) {
       final Paint backgroundPaint = Paint()
         ..color = Colors.black.withValues(alpha: .5)
@@ -316,7 +322,9 @@ class _CutoutPainter extends CustomPainter {
         Path.combine(
           PathOperation.difference,
           Path()..addRect(Rect.fromLTWH(0, 0, screenWidth, screenHeight)),
-          Path()..addRRect(RRect.fromRectAndRadius(cutoutRect, const Radius.circular(15))),
+          Path()
+            ..addRRect(
+                RRect.fromRectAndRadius(cutoutRect, const Radius.circular(15))),
         ),
         backgroundPaint,
       );
@@ -326,17 +334,19 @@ class _CutoutPainter extends CustomPainter {
         ..color = cutoutColor
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2.0;
-      canvas.drawRRect(RRect.fromRectAndRadius(cutoutRect, const Radius.circular(15)), borderPaint);
+      canvas.drawRRect(
+          RRect.fromRectAndRadius(cutoutRect, const Radius.circular(15)),
+          borderPaint);
     }
   }
 
   @override
   bool shouldRepaint(covariant _CutoutPainter oldDelegate) {
     return oldDelegate.cutoutColor != cutoutColor ||
-           oldDelegate.cutoutWidthPercentage != cutoutWidthPercentage ||
-           oldDelegate.cardAspectRatio != cardAspectRatio ||
-           oldDelegate.shouldDrawDarkOverlay != shouldDrawDarkOverlay ||
-           oldDelegate.hideBorder != hideBorder ||
-           oldDelegate.cutoutYOffset != cutoutYOffset;
+        oldDelegate.cutoutWidthPercentage != cutoutWidthPercentage ||
+        oldDelegate.cardAspectRatio != cardAspectRatio ||
+        oldDelegate.shouldDrawDarkOverlay != shouldDrawDarkOverlay ||
+        oldDelegate.hideBorder != hideBorder ||
+        oldDelegate.cutoutYOffset != cutoutYOffset;
   }
 }

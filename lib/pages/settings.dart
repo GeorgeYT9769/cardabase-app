@@ -1,20 +1,19 @@
+import 'package:cardabase/data/cardabase_db.dart';
+import 'package:cardabase/pages/info.dart';
+import 'package:cardabase/pages/password.dart';
 import 'package:cardabase/pages/tags_page.dart';
+import 'package:cardabase/theme/theme_provider.dart';
+import 'package:cardabase/util/brightness_provider.dart';
+import 'package:cardabase/util/devoptions.dart';
+import 'package:cardabase/util/export_data.dart';
+import 'package:cardabase/util/import_data.dart';
 import 'package:cardabase/util/setting_tile.dart';
+import 'package:cardabase/util/systemfont_provider.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '../data/cardabase_db.dart';
-import '../theme/theme_provider.dart';
-import '../util/brightness_provider.dart';
-import '../util/devoptions.dart';
-import '../util/export_data.dart';
-import '../util/import_data.dart';
-import '../util/systemfont_provider.dart';
-import 'info.dart';
-import 'password.dart';
 
 final settingsbox = Hive.box('settingsBox');
 final passwordbox = Hive.box('password');

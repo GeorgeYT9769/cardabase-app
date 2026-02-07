@@ -2,11 +2,10 @@ import 'dart:io';
 
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:cardabase/pages/card_details.dart';
+import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
-
-import 'vibration_provider.dart';
 
 class CardTile extends StatefulWidget {
   final String shopName;

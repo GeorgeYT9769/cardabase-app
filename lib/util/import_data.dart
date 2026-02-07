@@ -1,7 +1,6 @@
+import 'package:cardabase/data/cardabase_db.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';
-
-import '../data/cardabase_db.dart';
 
 cardabase_db cdb = cardabase_db();
 

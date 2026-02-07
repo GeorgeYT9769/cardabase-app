@@ -1,13 +1,12 @@
 import 'dart:io';
 
 import 'package:barcode_widget/barcode_widget.dart';
+import 'package:cardabase/pages/image_preview_screen.dart';
 import 'package:cardabase/pages/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:screen_brightness/screen_brightness.dart';
-
-import 'image_preview_screen.dart';
 
 class CardDetails extends StatefulWidget {
   final settingsbox = Hive.box('settingsBox');
