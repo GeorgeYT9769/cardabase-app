@@ -365,7 +365,7 @@ class _CreateCardState extends State<CreateCard>
     Navigator.pop(context);
   }
 
-  void takeFrontPicture() async {
+  Future<void> takeFrontPicture() async {
     final String? imagePathFront = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const CameraControllerScreen()),
@@ -377,7 +377,7 @@ class _CreateCardState extends State<CreateCard>
     }
   }
 
-  void takeBackPicture() async {
+  Future<void> takeBackPicture() async {
     final String? imagePathBack = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const CameraControllerScreen()),
@@ -519,7 +519,7 @@ class _CreateCardState extends State<CreateCard>
   CardType? selectedCardType;
   String cardTypeText = 'Barcode Type';
 
-  void _showBarcodeSelectorDialog(ThemeData theme) async {
+  Future<void> _showBarcodeSelectorDialog(ThemeData theme) async {
     CardType? result = await showDialog<CardType>(
       context: context,
       builder: (BuildContext context) {

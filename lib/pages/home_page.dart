@@ -405,7 +405,7 @@ class _HomePageState extends State<Homepage> {
     }
   }
 
-  void columnAmountDialog(ThemeData theme) async {
+  Future<void> columnAmountDialog(ThemeData theme) async {
     final box = Hive.box('settingsBox');
     final List<dynamic> allTags =
         box.get('tags', defaultValue: <dynamic>[]) as List<dynamic>;
@@ -446,7 +446,7 @@ class _HomePageState extends State<Homepage> {
                                   const EdgeInsets.symmetric(horizontal: 4.0),
                               child: ActionChip(
                                 label: Text(allTags[chipIndex]),
-                                onPressed: () async {
+                                onPressed: () {
                                   setState2(() {
                                     setState(() {
                                       final tag = allTags[chipIndex];

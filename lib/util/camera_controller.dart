@@ -150,7 +150,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     return path;
   }
 
-  void _confirmAndSavePicture() async {
+  Future<void> _confirmAndSavePicture() async {
     if (_capturedImageFile == null) return;
     try {
       final String croppedPath = await _cropAndSaveAdjustedImage();

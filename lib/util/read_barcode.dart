@@ -175,7 +175,7 @@ class _QRBarReaderState extends State<QRBarReader> {
     }
   }
 
-  void _pickImage() async {
+  Future<void> _pickImage() async {
     final imageFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (imageFile == null) return;

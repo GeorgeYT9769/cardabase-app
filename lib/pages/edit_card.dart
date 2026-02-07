@@ -357,7 +357,7 @@ class _EditCardState extends State<EditCard> {
     greenValue = 158;
   }
 
-  void takeFrontPicture() async {
+  Future<void> takeFrontPicture() async {
     String? resultPath = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const CameraControllerScreen()),
@@ -369,7 +369,7 @@ class _EditCardState extends State<EditCard> {
     }
   }
 
-  void takeBackPicture() async {
+  Future<void> takeBackPicture() async {
     String? resultPath = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const CameraControllerScreen()),
@@ -511,7 +511,7 @@ class _EditCardState extends State<EditCard> {
   CardType? selectedCardType;
   String cardTypeText = 'Card Type';
 
-  void _showBarcodeSelectorDialog(ThemeData theme) async {
+  Future<void> _showBarcodeSelectorDialog(ThemeData theme) async {
     CardType? result = await showDialog<CardType>(
       context: context,
       builder: (BuildContext context) {
@@ -989,7 +989,7 @@ class _EditCardState extends State<EditCard> {
                                     ),
                                     Center(
                                       child: GestureDetector(
-                                        onLongPress: () async {
+                                        onLongPress: () {
                                           setState(() {
                                             imagePathFront = '';
                                           });

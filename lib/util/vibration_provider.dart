@@ -6,67 +6,67 @@ class VibrationProvider {
 
   static bool get vibrate => _bbox.get('setVibration', defaultValue: true);
 
-  static void toggleVibration() {
-    _bbox.put('setVibration', !vibrate);
+  static Future<void> toggleVibration() {
+    return _bbox.put('setVibration', !vibrate);
   }
 
-  static void vibrateSelection() async {
+  static Future<void> vibrateSelection() async {
     final canVibrate = await Haptics.canVibrate();
     if (canVibrate && _bbox.get('setVibration', defaultValue: true) == true) {
       await Haptics.vibrate(HapticsType.selection);
     }
   }
 
-  static void vibrateError() async {
+  static Future<void> vibrateError() async {
     final canVibrate = await Haptics.canVibrate();
     if (canVibrate && _bbox.get('setVibration', defaultValue: true) == true) {
       await Haptics.vibrate(HapticsType.error);
     }
   }
 
-  static void vibrateSuccess() async {
+  static Future<void> vibrateSuccess() async {
     final canVibrate = await Haptics.canVibrate();
     if (canVibrate && _bbox.get('setVibration', defaultValue: true) == true) {
       await Haptics.vibrate(HapticsType.success);
     }
   }
 
-  static void vibrateWarning() async {
+  static Future<void> vibrateWarning() async {
     final canVibrate = await Haptics.canVibrate();
     if (canVibrate && _bbox.get('setVibration', defaultValue: true) == true) {
       await Haptics.vibrate(HapticsType.warning);
     }
   }
 
-  static void vibrateHeavy() async {
+  static Future<void> vibrateHeavy() async {
     final canVibrate = await Haptics.canVibrate();
     if (canVibrate && _bbox.get('setVibration', defaultValue: true) == true) {
       await Haptics.vibrate(HapticsType.heavy);
     }
   }
 
-  static void vibrateMedium() async {
+  static Future<void> vibrateMedium() async {
     final canVibrate = await Haptics.canVibrate();
     if (canVibrate && _bbox.get('setVibration', defaultValue: true) == true) {
       await Haptics.vibrate(HapticsType.medium);
     }
   }
 
-  static void vibrateLight() async {
+  static Future<void> vibrateLight() async {
     final canVibrate = await Haptics.canVibrate();
     if (canVibrate && _bbox.get('setVibration', defaultValue: true) == true) {
       await Haptics.vibrate(HapticsType.light);
     }
   }
 
-  static void vibrateRigid() async {
+  static Future<void> vibrateRigid() async {
     final canVibrate = await Haptics.canVibrate();
     if (canVibrate && _bbox.get('setVibration', defaultValue: true) == true) {
       await Haptics.vibrate(HapticsType.rigid);
     }
   }
 
-  static void vibrateSoft() async {
+  static Future<void> vibrateSoft() async {
     final canVibrate = await Haptics.canVibrate();
     if (canVibrate && _bbox.get('setVibration', defaultValue: true) == true) {
       await Haptics.vibrate(HapticsType.soft);
