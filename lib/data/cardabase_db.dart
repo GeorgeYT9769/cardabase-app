@@ -1,7 +1,6 @@
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
 class cardabase_db {
-
   List myShops = [];
 
   final _myBox = Hive.box('mybox');
@@ -31,5 +30,4 @@ class cardabase_db {
   void sortType() {
     myShops.sort((a, b) => a['cardType'].compareTo(b['cardType']));
   }
-
 }

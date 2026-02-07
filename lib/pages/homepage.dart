@@ -1,19 +1,18 @@
+import 'package:cardabase/data/cardabase_db.dart';
 import 'package:cardabase/pages/settings.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
+import 'package:cardabase/util/card_tile.dart';
 import 'package:cardabase/util/setting_tile.dart';
 import 'package:flutter/material.dart';
-import 'package:cardabase/data/cardabase_db.dart';
-import 'package:cardabase/util/card_tile.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
+import 'package:reorderable_grid_view/reorderable_grid_view.dart';
+
 import '../util/vibration_provider.dart';
 import 'createcardnew.dart';
 import 'editcard.dart';
-import 'package:hive/hive.dart';
-import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 
 class Homepage extends StatefulWidget {
-
   const Homepage({super.key});
 
   @override
@@ -42,7 +41,10 @@ class _HomePageState extends State<Homepage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Enter Password', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 30)),
+        title: Text('Enter Password',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Theme.of(context).colorScheme.inverseSurface,
+                fontSize: 30)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -63,8 +65,8 @@ class _HomePageState extends State<Homepage> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
                 prefixIcon: Icon(
                   Icons.password,
                   color: Theme.of(context).colorScheme.secondary,
@@ -72,9 +74,9 @@ class _HomePageState extends State<Homepage> {
                 labelText: 'Password',
               ),
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.tertiary,
-                fontWeight: FontWeight.bold,
-              ),
+                    color: Theme.of(context).colorScheme.tertiary,
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
             const SizedBox(height: 20),
             Center(
@@ -100,11 +102,14 @@ class _HomePageState extends State<Homepage> {
                             SizedBox(width: 10),
                             Text(
                               'Incorrect password!',
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                fontSize: 18,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge
+                                  ?.copyWith(
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                           ],
                         ),
@@ -118,13 +123,19 @@ class _HomePageState extends State<Homepage> {
                     );
                   }
                 },
-                style: OutlinedButton.styleFrom(elevation: 0.0, side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11))),
+                style: OutlinedButton.styleFrom(
+                    elevation: 0.0,
+                    side: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 2.0),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(11))),
                 child: Text(
                   'DELETE',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                  ),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
                 ),
               ),
             ),
@@ -140,7 +151,10 @@ class _HomePageState extends State<Homepage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Enter Password', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 30) ),
+        title: Text('Enter Password',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Theme.of(context).colorScheme.inverseSurface,
+                fontSize: 30)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -161,8 +175,8 @@ class _HomePageState extends State<Homepage> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
                 prefixIcon: Icon(
                   Icons.password,
                   color: Theme.of(context).colorScheme.secondary,
@@ -170,9 +184,9 @@ class _HomePageState extends State<Homepage> {
                 labelText: 'Password',
               ),
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.tertiary,
-                fontWeight: FontWeight.bold,
-              ),
+                    color: Theme.of(context).colorScheme.tertiary,
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
             const SizedBox(height: 20),
             Center(
@@ -190,30 +204,41 @@ class _HomePageState extends State<Homepage> {
                           builder: (context) => EditCard(
                               index: index,
                               cardColorPreview: Color.fromARGB(
-                                  255, cdb.myShops[index]['redValue'], cdb.myShops[index]['greenValue'], cdb.myShops[index]['blueValue']
-                              ),
+                                  255,
+                                  cdb.myShops[index]['redValue'],
+                                  cdb.myShops[index]['greenValue'],
+                                  cdb.myShops[index]['blueValue']),
                               redValue: cdb.myShops[index]['redValue'] ?? 158,
-                              greenValue: cdb.myShops[index]['greenValue'] ?? 158,
+                              greenValue:
+                                  cdb.myShops[index]['greenValue'] ?? 158,
                               blueValue: cdb.myShops[index]['blueValue'] ?? 158,
-                              hasPassword: cdb.myShops[index]['hasPassword'] ?? false,
-                              cardTextPreview: (cdb.myShops[index]['cardName'] ?? '').toString(),
+                              hasPassword:
+                                  cdb.myShops[index]['hasPassword'] ?? false,
+                              cardTextPreview:
+                                  (cdb.myShops[index]['cardName'] ?? '')
+                                      .toString(),
                               cardName: cdb.myShops[index]['cardName'] ?? '',
-                              cardId: (cdb.myShops[index]['cardId'] ?? '').toString(),
-                              cardType: (cdb.myShops[index]['cardType'] ?? 'CardType.ean13').toString(),
+                              cardId: (cdb.myShops[index]['cardId'] ?? '')
+                                  .toString(),
+                              cardType: (cdb.myShops[index]['cardType'] ??
+                                      'CardType.ean13')
+                                  .toString(),
                               tags: cdb.myShops[index]['tags'] ?? [],
-                              notes: (cdb.myShops[index]['note'] ?? 'Card notes are displayed here...'),
-                              frontFacePath: cdb.myShops[index]['imagePathFront'] ?? '',
-                              backFacePath: cdb.myShops[index]['imagePathBack'] ?? '',
-                              useFrontFaceOverlay: cdb.myShops[index]['useFrontFaceOverlay'] ?? false,
-                              hideTitle: cdb.myShops[index]['hideTitle'] ?? false
-                          ),
+                              notes: (cdb.myShops[index]['note'] ??
+                                  'Card notes are displayed here...'),
+                              frontFacePath:
+                                  cdb.myShops[index]['imagePathFront'] ?? '',
+                              backFacePath:
+                                  cdb.myShops[index]['imagePathBack'] ?? '',
+                              useFrontFaceOverlay:
+                                  cdb.myShops[index]['useFrontFaceOverlay'] ?? false,
+                              hideTitle: cdb.myShops[index]['hideTitle'] ?? false),
                         ),
                       ).then((value) {
                         setState(() {
                           cdb.loadData();
                         });
                       });
-
                     });
                   } else {
                     VibrationProvider.vibrateSuccess();
@@ -228,11 +253,14 @@ class _HomePageState extends State<Homepage> {
                             SizedBox(width: 10),
                             Text(
                               'Incorrect password!',
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                fontSize: 18,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge
+                                  ?.copyWith(
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                           ],
                         ),
@@ -246,13 +274,19 @@ class _HomePageState extends State<Homepage> {
                     );
                   }
                 },
-                style: OutlinedButton.styleFrom(elevation: 0.0, side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11))),
+                style: OutlinedButton.styleFrom(
+                    elevation: 0.0,
+                    side: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 2.0),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(11))),
                 child: Text(
                   'EDIT',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                  ),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
                 ),
               ),
             ),
@@ -266,12 +300,10 @@ class _HomePageState extends State<Homepage> {
     if (cdb.myShops[index]['hasPassword'] == true) {
       if (passwordbox.isNotEmpty) {
         showUnlockDialogDelete(context, index);
-      }
-      else {
+      } else {
         deleteCard(index);
       }
-    }
-    else {
+    } else {
       deleteCard(index);
     }
   }
@@ -300,17 +332,14 @@ class _HomePageState extends State<Homepage> {
     if (cdb.myShops[index]['hasPassword'] == true) {
       if (passwordbox.isNotEmpty) {
         showUnlockDialogEdit(context, index);
-      }
-      else {
-
+      } else {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => EditCard(
                 index: index,
-                cardColorPreview: Color.fromARGB(
-                    255, card['redValue'], card['greenValue'], card['blueValue']
-                ),
+                cardColorPreview: Color.fromARGB(255, card['redValue'],
+                    card['greenValue'], card['blueValue']),
                 redValue: card['redValue'],
                 greenValue: card['greenValue'],
                 blueValue: card['blueValue'],
@@ -323,9 +352,9 @@ class _HomePageState extends State<Homepage> {
                 notes: (card['note'] ?? 'Card notes are displayed here...'),
                 frontFacePath: cdb.myShops[index]['imagePathFront'] ?? '',
                 backFacePath: cdb.myShops[index]['imagePathBack'] ?? '',
-                useFrontFaceOverlay: cdb.myShops[index]['useFrontFaceOverlay'] ?? false,
-                hideTitle: cdb.myShops[index]['hideTitle'] ?? false
-            ),
+                useFrontFaceOverlay:
+                    cdb.myShops[index]['useFrontFaceOverlay'] ?? false,
+                hideTitle: cdb.myShops[index]['hideTitle'] ?? false),
           ),
         ).then((value) {
           setState(() {
@@ -333,17 +362,14 @@ class _HomePageState extends State<Homepage> {
           });
         });
       }
-    }
-    else {
-
+    } else {
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => EditCard(
               index: index,
               cardColorPreview: Color.fromARGB(
-                  255, card['redValue'], card['greenValue'], card['blueValue']
-              ),
+                  255, card['redValue'], card['greenValue'], card['blueValue']),
               redValue: card['redValue'],
               greenValue: card['greenValue'],
               blueValue: card['blueValue'],
@@ -356,9 +382,9 @@ class _HomePageState extends State<Homepage> {
               notes: (card['note'] ?? 'Card notes are displayed here...'),
               frontFacePath: cdb.myShops[index]['imagePathFront'] ?? '',
               backFacePath: cdb.myShops[index]['imagePathBack'] ?? '',
-              useFrontFaceOverlay: cdb.myShops[index]['useFrontFaceOverlay'] ?? false,
-              hideTitle: cdb.myShops[index]['hideTitle'] ?? false
-          ),
+              useFrontFaceOverlay:
+                  cdb.myShops[index]['useFrontFaceOverlay'] ?? false,
+              hideTitle: cdb.myShops[index]['hideTitle'] ?? false),
         ),
       ).then((value) {
         setState(() {
@@ -366,7 +392,6 @@ class _HomePageState extends State<Homepage> {
         });
       });
     }
-
   }
 
   void moveUp(int index) {
@@ -390,222 +415,293 @@ class _HomePageState extends State<Homepage> {
   }
 
   void columnAmountDialog() async {
-
     final box = Hive.box('settingsBox');
-    final List<dynamic> allTags = box.get('tags', defaultValue: <dynamic>[]) as List<dynamic>;
+    final List<dynamic> allTags =
+        box.get('tags', defaultValue: <dynamic>[]) as List<dynamic>;
 
     await showDialog(
         context: context,
         builder: (BuildContext context) {
-          return StatefulBuilder(
-              builder: (context, setState2) {
-                return AlertDialog(
-                  title: Text('Sort', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+          return StatefulBuilder(builder: (context, setState2) {
+            return AlertDialog(
+              title: Text('Sort',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Theme.of(context).colorScheme.inverseSurface,
-                      fontSize: 30
-                  )),
-                  content: SizedBox(
-                    height: 400,
-                    width: double.maxFinite,
-                    child: SingleChildScrollView(
-                      physics: BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
-                      child: Column(
-                        children: <Widget>[
-                          Text('Tags:', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              fontSize: 17,
-                              color: Theme.of(context).colorScheme.inverseSurface,
-                              fontWeight: FontWeight.w900
-                          )),
-                          SizedBox(height: 10,),
-                          SingleChildScrollView(
-                            physics: BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: List.generate(
-                                allTags.length,
-                                    (chipIndex) => Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                                  child: ActionChip(
-                                    label: Text(allTags[chipIndex]),
-                                    onPressed: () async {
-                                      setState2 (() {
-                                        setState(() {
-                                          final tag = allTags[chipIndex];
-                                          if (selectedTag == tag) {
-                                            selectedTag = null;
-                                            cdb.loadData();
-                                          } else {
-                                            selectedTag = tag;
-                                            cdb.loadData();
-                                            cdb.myShops = cdb.myShops.where((shop) {
-                                              final tags = shop['tags'];
-                                              if (tags is List) {
-                                                return tags.contains(tag);
-                                              }
-                                              return false;
-                                            }).toList();
-                                          }
-                                        });
-                                      });
-                                    },
-                                    labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      color: selectedTag == allTags[chipIndex]
-                                          ? Theme.of(context).colorScheme.onPrimary
-                                          : Theme.of(context).colorScheme.inverseSurface,
-                                    ),
-                                    backgroundColor: selectedTag == allTags[chipIndex]
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Theme.of(context).colorScheme.onInverseSurface,
-                                    elevation: selectedTag == allTags[chipIndex] ? null : 0.0,
-                                    side: BorderSide(
-                                      color: selectedTag == allTags[chipIndex]
-                                          ? Theme.of(context).colorScheme.primary
-                                          : Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
-                                      width: selectedTag == allTags[chipIndex] ? 2 : 1,
-                                    ),
-                                    avatar: selectedTag == allTags[chipIndex]
-                                        ? Icon(Icons.check, size: 18, color: Theme.of(context).colorScheme.onPrimary)
-                                        : null,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 5,),
-                          Divider(
-                            color: Theme.of(context).colorScheme.primary,
-                            thickness: 1.0,
-                          ),
-                          SizedBox(height: 10,),
-                          Text('Sort by:', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              fontSize: 17,
-                              color: Theme.of(context).colorScheme.inverseSurface,
-                              fontWeight: FontWeight.w900
-                          )),
-                          SizedBox(height: 10,),
-                          DropdownMenu(
-                            dropdownMenuEntries: [
-                              DropdownMenuEntry<String>(
-                                  value: 'nameaz',
-                                  label: 'Name 0-Z',
-                                  style: ButtonStyle(
-                                    elevation: WidgetStateProperty.all(0.0),
-                                  )
-                              ),
-                              DropdownMenuEntry<String>(
-                                  value: 'nameza',
-                                  label: 'Name Z-0',
-                                  style: ButtonStyle(
-                                    elevation: WidgetStateProperty.all(0.0),
-                                  )
-                              ),
-                              DropdownMenuEntry<String>(
-                                  value: 'latest',
-                                  label: 'Latest',
-                                  style: ButtonStyle(
-                                    elevation: WidgetStateProperty.all(0.0),)
-                              ),
-                              DropdownMenuEntry<String>(
-                                  value: 'oldest',
-                                  label: 'Oldest',
-                                  style: ButtonStyle(
-                                    elevation: WidgetStateProperty.all(0.0),
-                                  )
-                              ),
-                            ],
-                            initialSelection: Hive.box('settingsBox').get('sort', defaultValue: 'oldest'),
-                            inputDecorationTheme: InputDecorationTheme(
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
-                              focusColor: Theme.of(context).colorScheme.primary,
-                              enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
-                              labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.secondary),
-                              iconColor: Theme.of(context).colorScheme.primary,
-                            ),
-                            onSelected: (value) {
-                              setState(() {
-                                if (value == 'nameaz') {
-                                  cdb.myShops.sort((a, b) => a['cardName'].compareTo(b['cardName']));
-                                } else if (value == 'nameza') {
-                                  cdb.myShops.sort((a, b) => b['cardName'].compareTo(a['cardName']));
-                                } else if (value == 'latest') {
-                                  cdb.myShops.sort((a, b) => b['uniqueId'].compareTo(a['uniqueId']));
-                                } else if (value == 'oldest') {
-                                  cdb.myShops.sort((a, b) => a['uniqueId'].compareTo(b['uniqueId']));
-                                }
-                                Hive.box('settingsBox').put('sort', value);
-                                cdb.updateDataBase();
-                              });
-                            }
-                            ,
-                          ),
-                          SizedBox(height: 10,),
-                          Divider(
-                            color: Theme.of(context).colorScheme.primary,
-                            thickness: 1.0,
-                          ),
-                          MySetting(
-                            aboutSettingHeader: 'Reorder Cards',
-                            settingAction: () {
-                              setState2(() {
-                                VibrationProvider.vibrateSuccess();
-                                toggleReorderMode();
-                              });
-                            },
-                            settingHeader: 'Reorder',
-                            settingIcon: Icons.reorder,
-                            iconColor: reorderMode ? Colors.green : Colors.red,
-                            borderColor: Theme.of(context).colorScheme.primary,
-                          ),
-                          Divider(
-                            color: Theme.of(context).colorScheme.primary,
-                            thickness: 1.0,
-                          ),
-                          SizedBox(height: 10,),
-                          Text('Columns: $columnAmount', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w900,
-                            color: Theme.of(context).colorScheme.inverseSurface,
-                          )),
-                          SizedBox(height: 10,),
-                          Slider(
-                            year2023: false,
-                            value: columnAmountDouble,
-                            min: 1,
-                            max: 5,
-                            divisions: 4,
-                            onChanged: (double newValue) {
-                              setState2(() {
-                                setState(() {
-                                  VibrationProvider.vibrateSuccess();
-                                  columnAmountDouble = newValue;
-                                  columnAmount = columnAmountDouble.round().toInt();
-                                  Hive.box('settingsBox').put('columnAmount', columnAmount);
-                                });
-                              });
-                            },
-                          ),
-                        ],
+                      fontSize: 30)),
+              content: SizedBox(
+                height: 400,
+                width: double.maxFinite,
+                child: SingleChildScrollView(
+                  physics: BouncingScrollPhysics(
+                      decelerationRate: ScrollDecelerationRate.fast),
+                  child: Column(
+                    children: <Widget>[
+                      Text('Tags:',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge
+                              ?.copyWith(
+                                  fontSize: 17,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .inverseSurface,
+                                  fontWeight: FontWeight.w900)),
+                      SizedBox(
+                        height: 10,
                       ),
+                      SingleChildScrollView(
+                        physics: BouncingScrollPhysics(
+                            decelerationRate: ScrollDecelerationRate.fast),
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: List.generate(
+                            allTags.length,
+                            (chipIndex) => Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4.0),
+                              child: ActionChip(
+                                label: Text(allTags[chipIndex]),
+                                onPressed: () async {
+                                  setState2(() {
+                                    setState(() {
+                                      final tag = allTags[chipIndex];
+                                      if (selectedTag == tag) {
+                                        selectedTag = null;
+                                        cdb.loadData();
+                                      } else {
+                                        selectedTag = tag;
+                                        cdb.loadData();
+                                        cdb.myShops = cdb.myShops.where((shop) {
+                                          final tags = shop['tags'];
+                                          if (tags is List) {
+                                            return tags.contains(tag);
+                                          }
+                                          return false;
+                                        }).toList();
+                                      }
+                                    });
+                                  });
+                                },
+                                labelStyle: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.copyWith(
+                                      color: selectedTag == allTags[chipIndex]
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .inverseSurface,
+                                    ),
+                                backgroundColor:
+                                    selectedTag == allTags[chipIndex]
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Theme.of(context)
+                                            .colorScheme
+                                            .onInverseSurface,
+                                elevation: selectedTag == allTags[chipIndex]
+                                    ? null
+                                    : 0.0,
+                                side: BorderSide(
+                                  color: selectedTag == allTags[chipIndex]
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Theme.of(context)
+                                          .colorScheme
+                                          .primary
+                                          .withValues(alpha: 0.3),
+                                  width:
+                                      selectedTag == allTags[chipIndex] ? 2 : 1,
+                                ),
+                                avatar: selectedTag == allTags[chipIndex]
+                                    ? Icon(Icons.check,
+                                        size: 18,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onPrimary)
+                                    : null,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Divider(
+                        color: Theme.of(context).colorScheme.primary,
+                        thickness: 1.0,
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text('Sort by:',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge
+                              ?.copyWith(
+                                  fontSize: 17,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .inverseSurface,
+                                  fontWeight: FontWeight.w900)),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      DropdownMenu(
+                        dropdownMenuEntries: [
+                          DropdownMenuEntry<String>(
+                              value: 'nameaz',
+                              label: 'Name 0-Z',
+                              style: ButtonStyle(
+                                elevation: WidgetStateProperty.all(0.0),
+                              )),
+                          DropdownMenuEntry<String>(
+                              value: 'nameza',
+                              label: 'Name Z-0',
+                              style: ButtonStyle(
+                                elevation: WidgetStateProperty.all(0.0),
+                              )),
+                          DropdownMenuEntry<String>(
+                              value: 'latest',
+                              label: 'Latest',
+                              style: ButtonStyle(
+                                elevation: WidgetStateProperty.all(0.0),
+                              )),
+                          DropdownMenuEntry<String>(
+                              value: 'oldest',
+                              label: 'Oldest',
+                              style: ButtonStyle(
+                                elevation: WidgetStateProperty.all(0.0),
+                              )),
+                        ],
+                        initialSelection: Hive.box('settingsBox')
+                            .get('sort', defaultValue: 'oldest'),
+                        inputDecorationTheme: InputDecorationTheme(
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: const BorderSide(width: 2.0)),
+                          focusColor: Theme.of(context).colorScheme.primary,
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 1.0),
+                              borderRadius: BorderRadius.circular(10)),
+                          labelStyle: Theme.of(context)
+                              .textTheme
+                              .bodyLarge
+                              ?.copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.secondary),
+                          iconColor: Theme.of(context).colorScheme.primary,
+                        ),
+                        onSelected: (value) {
+                          setState(() {
+                            if (value == 'nameaz') {
+                              cdb.myShops.sort((a, b) =>
+                                  a['cardName'].compareTo(b['cardName']));
+                            } else if (value == 'nameza') {
+                              cdb.myShops.sort((a, b) =>
+                                  b['cardName'].compareTo(a['cardName']));
+                            } else if (value == 'latest') {
+                              cdb.myShops.sort((a, b) =>
+                                  b['uniqueId'].compareTo(a['uniqueId']));
+                            } else if (value == 'oldest') {
+                              cdb.myShops.sort((a, b) =>
+                                  a['uniqueId'].compareTo(b['uniqueId']));
+                            }
+                            Hive.box('settingsBox').put('sort', value);
+                            cdb.updateDataBase();
+                          });
+                        },
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Divider(
+                        color: Theme.of(context).colorScheme.primary,
+                        thickness: 1.0,
+                      ),
+                      MySetting(
+                        aboutSettingHeader: 'Reorder Cards',
+                        settingAction: () {
+                          setState2(() {
+                            VibrationProvider.vibrateSuccess();
+                            toggleReorderMode();
+                          });
+                        },
+                        settingHeader: 'Reorder',
+                        settingIcon: Icons.reorder,
+                        iconColor: reorderMode ? Colors.green : Colors.red,
+                        borderColor: Theme.of(context).colorScheme.primary,
+                      ),
+                      Divider(
+                        color: Theme.of(context).colorScheme.primary,
+                        thickness: 1.0,
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text('Columns: $columnAmount',
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w900,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .inverseSurface,
+                                  )),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Slider(
+                        year2023: false,
+                        value: columnAmountDouble,
+                        min: 1,
+                        max: 5,
+                        divisions: 4,
+                        onChanged: (double newValue) {
+                          setState2(() {
+                            setState(() {
+                              VibrationProvider.vibrateSuccess();
+                              columnAmountDouble = newValue;
+                              columnAmount = columnAmountDouble.round().toInt();
+                              Hive.box('settingsBox')
+                                  .put('columnAmount', columnAmount);
+                            });
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                Center(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                        elevation: 0.0,
+                        side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary,
+                            width: 2.0),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(11))),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      'SELECT',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: Theme.of(context).colorScheme.inverseSurface,
+                          ),
                     ),
                   ),
-                  actions: [
-                    Center(
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(elevation: 0.0, side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11))),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text('SELECT', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                          color: Theme.of(context).colorScheme.inverseSurface,
-                        ),),
-                      ),
-                    ),
-                  ],
-                );
-              }
-          );
+                ),
+              ],
+            );
+          });
         });
   }
 
@@ -618,7 +714,10 @@ class _HomePageState extends State<Homepage> {
           return Center(
             child: Text(
               'Storage error: ${snapshot.error}',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.red, fontSize: 18),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge
+                  ?.copyWith(color: Colors.red, fontSize: 18),
               textAlign: TextAlign.center,
             ),
           );
@@ -641,10 +740,12 @@ class _HomePageState extends State<Homepage> {
                   onPressed: () {
                     Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (builder) => const CreateCard(), )
-                    ).then((value) => setState(() {
-                      cdb.loadData();
-                    }));},
+                        MaterialPageRoute(
+                          builder: (builder) => const CreateCard(),
+                        )).then((value) => setState(() {
+                          cdb.loadData();
+                        }));
+                  },
                   child: const Icon(Icons.add_card),
                 ),
               ),
@@ -652,33 +753,49 @@ class _HomePageState extends State<Homepage> {
           ),
           floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
           body: CustomScrollView(
-            physics: const BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
+            physics: const BouncingScrollPhysics(
+                decelerationRate: ScrollDecelerationRate.fast),
             slivers: [
               SliverAppBar(
-                leading: IconButton(icon: Icon(Icons.sort, color: Theme.of(context).colorScheme.secondary,), onPressed: columnAmountDialog),
+                leading: IconButton(
+                    icon: Icon(
+                      Icons.sort,
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                    onPressed: columnAmountDialog),
                 actions: [
                   ValueListenableBuilder(
                     valueListenable: Hive.box('settingsBox').listenable(),
                     builder: (context, settingsBox, child) {
-                      final bool showLegacyCardButton = settingsBox.get('developerOptions', defaultValue: false);
+                      final bool showLegacyCardButton = settingsBox
+                          .get('developerOptions', defaultValue: false);
                       return showLegacyCardButton
                           ? IconButton(
-                          icon: Icon(Icons.web_stories, color: Theme.of(context).colorScheme.secondary,),
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (builder) => const WelcomeScreen(currentAppVersion: "1.5.0"),)
-                            );
-                          })
+                              icon: Icon(
+                                Icons.web_stories,
+                                color: Theme.of(context).colorScheme.secondary,
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (builder) => const WelcomeScreen(
+                                          currentAppVersion: "1.5.0"),
+                                    ));
+                              })
                           : const SizedBox.shrink();
                     },
                   ),
                   IconButton(
-                    icon: Icon(Icons.settings, color: Theme.of(context).colorScheme.secondary,),
+                    icon: Icon(
+                      Icons.settings,
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
                     onPressed: () async {
                       final result = await Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const Settings()),
+                        MaterialPageRoute(
+                            builder: (context) => const Settings()),
                       );
                       if (result == true && mounted) {
                         setState(() {
@@ -688,10 +805,8 @@ class _HomePageState extends State<Homepage> {
                     },
                   ),
                 ],
-                title: Text(
-                    'Cardabase',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith()
-                ),
+                title: Text('Cardabase',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith()),
                 centerTitle: true,
                 elevation: 0.0,
                 backgroundColor: Theme.of(context).colorScheme.surface,
@@ -715,7 +830,10 @@ class _HomePageState extends State<Homepage> {
           child: Center(
             child: Text(
               'Your Cardabase is empty',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge
+                  ?.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
         );
@@ -838,7 +956,10 @@ class _HomePageState extends State<Homepage> {
         child: Center(
           child: Text(
             'Error: $e',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.red, fontSize: 18),
+            style: Theme.of(context)
+                .textTheme
+                .bodyLarge
+                ?.copyWith(color: Colors.red, fontSize: 18),
             textAlign: TextAlign.center,
           ),
         ),

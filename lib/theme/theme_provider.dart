@@ -1,4 +1,4 @@
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 
 class ThemeProvider {
   static final _box = Hive.box('settingsBox');

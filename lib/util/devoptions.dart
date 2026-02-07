@@ -1,9 +1,10 @@
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 
 class DeveloperOptionsProvider {
   static final _bbox = Hive.box('settingsBox');
 
-  static bool get developerOptions => _bbox.get('developerOptions', defaultValue: false);
+  static bool get developerOptions =>
+      _bbox.get('developerOptions', defaultValue: false);
 
   static void toggleDeveloperOptions() {
     _bbox.put('developerOptions', !developerOptions);
