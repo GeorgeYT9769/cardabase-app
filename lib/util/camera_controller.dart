@@ -191,7 +191,6 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                         cutoutColor: widget.cutoutColor,
                         cutoutWidthPercentage: widget.cutoutWidthPercentage,
                         cardAspectRatio: widget.cardAspectRatio,
-                        shouldDrawDarkOverlay: true,
                       ),
                     ),
                   ),

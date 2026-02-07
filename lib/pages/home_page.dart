@@ -58,7 +58,6 @@ class _HomePageState extends State<Homepage> {
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
                     color: theme.colorScheme.primary,
-                    width: 1.0,
                   ),
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -164,7 +163,6 @@ class _HomePageState extends State<Homepage> {
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
                     color: theme.colorScheme.primary,
-                    width: 1.0,
                   ),
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -550,8 +548,8 @@ class _HomePageState extends State<Homepage> {
                               borderSide: const BorderSide(width: 2.0)),
                           focusColor: theme.colorScheme.primary,
                           enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: theme.colorScheme.primary, width: 1.0),
+                              borderSide:
+                                  BorderSide(color: theme.colorScheme.primary),
                               borderRadius: BorderRadius.circular(10)),
                           labelStyle: theme.textTheme.bodyLarge
                               ?.copyWith(color: theme.colorScheme.secondary),
@@ -770,7 +768,6 @@ class _HomePageState extends State<Homepage> {
                 backgroundColor: theme.colorScheme.surface,
                 floating: true,
                 snap: true,
-                toolbarHeight: kToolbarHeight,
               ),
               _buildContentSliver(context, theme),
             ],
@@ -833,15 +830,12 @@ class _HomePageState extends State<Homepage> {
             imagePathBack: card['imagePathBack'] ?? '',
             useFrontFaceOverlay: card['useFrontFaceOverlay'] ?? false,
             hideTitle: card['hideTitle'] ?? false,
-            dragHandle: null,
           );
         });
         return SliverPadding(
           padding: const EdgeInsets.all(gridPadding),
           sliver: ReorderableSliverGridView.count(
             crossAxisCount: crossAxisCount,
-            mainAxisSpacing: 0,
-            crossAxisSpacing: 0,
             childAspectRatio: childAspectRatio,
             children: children,
             onReorder: (oldIndex, newIndex) {
@@ -897,15 +891,12 @@ class _HomePageState extends State<Homepage> {
                   imagePathBack: card['imagePathBack'] ?? '',
                   useFrontFaceOverlay: card['useFrontFaceOverlay'] ?? false,
                   hideTitle: card['hideTitle'] ?? false,
-                  dragHandle: null,
                 );
               },
               childCount: itemCount,
             ),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: crossAxisCount,
-              crossAxisSpacing: 0,
-              mainAxisSpacing: 0,
               childAspectRatio: childAspectRatio,
             ),
           ),

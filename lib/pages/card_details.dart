@@ -145,7 +145,6 @@ class _CardDetailsState extends State<CardDetails> {
                           data:
                               '[${widget.cardtext}, ${widget.cardid}, ${widget.red}, ${widget.green}, ${widget.blue}, ${widget.cardType}, ${widget.hasPassword},${widget.tags}]',
                           barcode: Barcode.qrCode(),
-                          drawText: true,
                           style: const TextStyle(color: Colors.black),
                         ),
                       ),
@@ -268,7 +267,6 @@ class _CardDetailsState extends State<CardDetails> {
                             padding: const EdgeInsets.all(10),
                             data: widget.cardid,
                             barcode: getBarcodeType(widget.cardType),
-                            drawText: true,
                             style: const TextStyle(color: Colors.black),
                             errorBuilder: (context, error) => Center(
                               child: Text(
@@ -337,16 +335,16 @@ class _CardDetailsState extends State<CardDetails> {
                         color: theme.colorScheme.inverseSurface, fontSize: 15),
                     hintText: widget.note,
                     disabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: theme.colorScheme.primary, width: 1.0),
+                        borderSide:
+                            BorderSide(color: theme.colorScheme.primary),
                         borderRadius: BorderRadius.circular(10)),
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: const BorderSide(width: 2.0)),
                     focusColor: theme.colorScheme.primary,
                     enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: theme.colorScheme.primary, width: 1.0),
+                        borderSide:
+                            BorderSide(color: theme.colorScheme.primary),
                         borderRadius: BorderRadius.circular(10)),
                   ),
                   style: theme.textTheme.bodyLarge?.copyWith(

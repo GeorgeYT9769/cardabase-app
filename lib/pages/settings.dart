@@ -168,8 +168,8 @@ class _SettingsState extends State<Settings> {
                           borderSide: const BorderSide(width: 2.0)),
                       focusColor: theme.colorScheme.primary,
                       enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: theme.colorScheme.primary, width: 1.0),
+                          borderSide:
+                              BorderSide(color: theme.colorScheme.primary),
                           borderRadius: BorderRadius.circular(10)),
                       labelText: 'Password',
                       labelStyle: theme.textTheme.bodyLarge
@@ -314,7 +314,6 @@ class _SettingsState extends State<Settings> {
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
                     color: theme.colorScheme.primary,
-                    width: 1.0,
                   ),
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -434,7 +433,6 @@ class _SettingsState extends State<Settings> {
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(
                       color: theme.colorScheme.primary,
-                      width: 1.0,
                     ),
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -526,7 +524,6 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return PopScope(
-      canPop: true,
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop) {
           Navigator.of(context).pop(didImport || didReset);
@@ -560,10 +557,6 @@ class _SettingsState extends State<Settings> {
               backgroundColor: theme.colorScheme.surface,
               floating: true,
               snap: true,
-              // Removed: pinned: true,
-              // Removed: expandedHeight: kToolbarHeight * 2,
-              // Removed: flexibleSpace: FlexibleSpaceBar( ... ),
-              toolbarHeight: kToolbarHeight, // Default height when collapsed
             ),
             SliverList(
               delegate: SliverChildListDelegate(

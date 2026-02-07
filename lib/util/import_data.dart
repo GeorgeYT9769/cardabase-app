@@ -31,8 +31,7 @@ Future<bool> showImportDialog(BuildContext context) async {
                 borderSide: const BorderSide(width: 2.0)),
             focusColor: theme.colorScheme.primary,
             enabledBorder: OutlineInputBorder(
-                borderSide:
-                    BorderSide(color: theme.colorScheme.primary, width: 1.0),
+                borderSide: BorderSide(color: theme.colorScheme.primary),
                 borderRadius: BorderRadius.circular(10)),
           ),
           style: theme.textTheme.bodyLarge?.copyWith(

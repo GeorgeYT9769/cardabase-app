@@ -114,7 +114,6 @@ class ImagePreviewScreen extends StatelessWidget {
         child: BarcodeWidget(
           barcode: barcode, // Use the determined barcode object
           data: data,
-          color: Colors.black, // Barcode color
           backgroundColor: Colors.white, // Background color
           style: const TextStyle(
               color: Colors.black,

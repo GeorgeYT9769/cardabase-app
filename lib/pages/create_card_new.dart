@@ -741,8 +741,7 @@ class _CreateCardState extends State<CreateCard>
                                 focusColor: theme.colorScheme.primary,
                                 enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                        color: theme.colorScheme.primary,
-                                        width: 1.0),
+                                        color: theme.colorScheme.primary),
                                     borderRadius: BorderRadius.circular(10)),
                                 labelText: 'Card Name',
                                 labelStyle: theme.textTheme.bodyLarge?.copyWith(
@@ -776,8 +775,7 @@ class _CreateCardState extends State<CreateCard>
                                 focusColor: theme.colorScheme.primary,
                                 enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                        color: theme.colorScheme.primary,
-                                        width: 1.0),
+                                        color: theme.colorScheme.primary),
                                     borderRadius: BorderRadius.circular(10)),
                                 labelText: 'Card ID',
                                 labelStyle: theme.textTheme.bodyLarge?.copyWith(
@@ -967,8 +965,7 @@ class _CreateCardState extends State<CreateCard>
                                 focusColor: theme.colorScheme.primary,
                                 enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                        color: theme.colorScheme.primary,
-                                        width: 1.0),
+                                        color: theme.colorScheme.primary),
                                     borderRadius: BorderRadius.circular(10)),
                               ),
                               style: theme.textTheme.bodyLarge?.copyWith(
@@ -986,7 +983,6 @@ class _CreateCardState extends State<CreateCard>
                               const SizedBox.shrink()
                             else
                               Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Text(
                                     'Tags:',

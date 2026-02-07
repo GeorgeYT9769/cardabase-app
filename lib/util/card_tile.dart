@@ -143,7 +143,6 @@ class _CardTileState extends State<CardTile> {
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(
                       color: theme.colorScheme.primary,
-                      width: 1.0,
                     ),
                     borderRadius: BorderRadius.circular(10),
                   ),

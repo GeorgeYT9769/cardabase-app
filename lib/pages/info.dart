@@ -130,7 +130,6 @@ class _InfoScreenState extends State<InfoScreen> {
           padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Image.asset('assets/icons/ic_launcher_foreground.png',
                   height: MediaQuery.of(context).size.width / 2,

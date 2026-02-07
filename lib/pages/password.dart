@@ -282,8 +282,8 @@ class _PasswordScreenState extends State<PasswordScreen> {
                             borderSide: const BorderSide(width: 2.0)),
                         focusColor: theme.colorScheme.primary,
                         enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: theme.colorScheme.primary, width: 1.0),
+                            borderSide:
+                                BorderSide(color: theme.colorScheme.primary),
                             borderRadius: BorderRadius.circular(10)),
                         labelText: 'Password',
                         labelStyle: theme.textTheme.bodyLarge
@@ -319,8 +319,8 @@ class _PasswordScreenState extends State<PasswordScreen> {
                             borderSide: const BorderSide(width: 2.0)),
                         focusColor: theme.colorScheme.primary,
                         enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: theme.colorScheme.primary, width: 1.0),
+                            borderSide:
+                                BorderSide(color: theme.colorScheme.primary),
                             borderRadius: BorderRadius.circular(10)),
                         labelText: 'Password again',
                         labelStyle: theme.textTheme.bodyLarge?.copyWith(
@@ -424,8 +424,8 @@ class _PasswordScreenState extends State<PasswordScreen> {
                             borderSide: const BorderSide(width: 2.0)),
                         focusColor: theme.colorScheme.primary,
                         enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: theme.colorScheme.primary, width: 1.0),
+                            borderSide:
+                                BorderSide(color: theme.colorScheme.primary),
                             borderRadius: BorderRadius.circular(10)),
                         labelText: 'Password',
                         labelStyle: theme.textTheme.bodyLarge
