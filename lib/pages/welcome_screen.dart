@@ -7,8 +7,7 @@ import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 class WelcomeScreen extends StatefulWidget {
   final String currentAppVersion;
 
-  const WelcomeScreen({Key? key, required this.currentAppVersion})
-      : super(key: key);
+  const WelcomeScreen({super.key, required this.currentAppVersion});
 
   @override
   State<WelcomeScreen> createState() => _WelcomeScreenState();
