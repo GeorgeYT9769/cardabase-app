@@ -362,12 +362,12 @@ class _CreateCardState extends State<CreateCard>
   void addLegacyCard() {
     setState(() {
       cdb.myShops.add([
-        "Legacy Card",
-        "9780201379624",
+        'Legacy Card',
+        '9780201379624',
         158,
         158,
         158,
-        "CardType.ean13",
+        'CardType.ean13',
         false,
       ]);
     });
@@ -601,11 +601,11 @@ class _CreateCardState extends State<CreateCard>
             );
             setState(() {
               if (result is Map<String, dynamic>) {
-                final String code = result["code"];
+                final String code = result['code'];
 
-                if (code != "-1") {
+                if (code != '-1') {
                   final List<String> rawList =
-                      code.replaceAll("[", "").replaceAll("]", "").split(", ");
+                      code.replaceAll('[', '').replaceAll(']', '').split(', ');
 
                   // Convert values into correct types
                   final String name = rawList[0];
@@ -614,7 +614,7 @@ class _CreateCardState extends State<CreateCard>
                   final int green = int.parse(rawList[3]);
                   final int blue = int.parse(rawList[4]);
                   final String cardType = rawList[5];
-                  final bool hasPwd = rawList[6] == "true";
+                  final bool hasPwd = rawList[6] == 'true';
 
                   setState(() {
                     controller.text = name;
@@ -826,10 +826,10 @@ class _CreateCardState extends State<CreateCard>
                                     );
                                     setState(() {
                                       if (result is Map<String, dynamic>) {
-                                        final String code = result["code"];
+                                        final String code = result['code'];
                                         final format =
-                                            result["format"].toString();
-                                        if (code != "-1") {
+                                            result['format'].toString();
+                                        if (code != '-1') {
                                           controllercardid.text = code;
 
                                           selectedCardType = switch (format) {
@@ -866,12 +866,12 @@ class _CreateCardState extends State<CreateCard>
                                           cardTypeText = selectedCardType
                                                   ?.toString() ??
                                               'Barcode Type'; //controllercardid.text = "";
-                                          if (code.startsWith("[") &&
-                                              code.endsWith("]")) {
+                                          if (code.startsWith('[') &&
+                                              code.endsWith(']')) {
                                             final List<String> rawList = code
-                                                .replaceAll("[", "")
-                                                .replaceAll("]", "")
-                                                .split(", ");
+                                                .replaceAll('[', '')
+                                                .replaceAll(']', '')
+                                                .split(', ');
 
                                             final String name = rawList[0];
                                             final String number = rawList[1];
@@ -883,7 +883,7 @@ class _CreateCardState extends State<CreateCard>
                                                 int.parse(rawList[4]);
                                             final String cardType = rawList[5];
                                             final bool hasPwd =
-                                                rawList[6] == "true";
+                                                rawList[6] == 'true';
 
                                             setState(() {
                                               controller.text = name;
@@ -903,7 +903,7 @@ class _CreateCardState extends State<CreateCard>
                                             });
                                           }
                                         } else {
-                                          controllercardid.text = "";
+                                          controllercardid.text = '';
                                         }
                                       }
                                     });

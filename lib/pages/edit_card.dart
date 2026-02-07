@@ -611,11 +611,11 @@ class _EditCardState extends State<EditCard> {
             );
             setState(() {
               if (result is String) {
-                if (result != "-1") {
+                if (result != '-1') {
                   final List<String> rawList = result
-                      .replaceAll("[", "")
-                      .replaceAll("]", "")
-                      .split(", ");
+                      .replaceAll('[', '')
+                      .replaceAll(']', '')
+                      .split(', ');
 
                   final String name = rawList[0];
                   final String number = rawList[1];
@@ -623,7 +623,7 @@ class _EditCardState extends State<EditCard> {
                   final int green = int.parse(rawList[3]);
                   final int blue = int.parse(rawList[4]);
                   final String cardType = rawList[5];
-                  final bool hasPwd = rawList[6] == "true";
+                  final bool hasPwd = rawList[6] == 'true';
                   final List<String> tags = rawList.sublist(7);
 
                   setState(() {
@@ -809,10 +809,10 @@ class _EditCardState extends State<EditCard> {
                                     );
                                     setState(() {
                                       if (result is String) {
-                                        if (result != "-1") {
+                                        if (result != '-1') {
                                           controllercardid.text = result;
                                         } else {
-                                          controllercardid.text = "";
+                                          controllercardid.text = '';
                                         }
                                       }
                                     });

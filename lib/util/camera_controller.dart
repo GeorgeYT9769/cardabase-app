@@ -242,14 +242,14 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 FloatingActionButton(
-                  heroTag: "selectFromGallery",
+                  heroTag: 'selectFromGallery',
                   onPressed: () async {
                     await _pickImageFromGallery();
                   },
                   child: const Icon(Icons.photo_library),
                 ),
                 FloatingActionButton(
-                  heroTag: "takePhoto",
+                  heroTag: 'takePhoto',
                   onPressed: () async {
                     try {
                       await _initializeControllerFuture;
@@ -266,13 +266,13 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 FloatingActionButton.extended(
-                  heroTag: "retakePhoto",
+                  heroTag: 'retakePhoto',
                   onPressed: _retakePicture,
                   label: const Text('Retake'),
                   icon: const Icon(Icons.refresh),
                 ),
                 FloatingActionButton.extended(
-                  heroTag: "usePhoto",
+                  heroTag: 'usePhoto',
                   onPressed: _confirmAndSavePicture,
                   label: const Text('Use Photo'),
                   icon: const Icon(Icons.check),

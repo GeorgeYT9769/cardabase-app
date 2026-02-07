@@ -153,8 +153,8 @@ class _QRBarReaderState extends State<QRBarReader> {
 
       if (mounted) {
         Navigator.pop(context, {
-          "code": result?.code,
-          "format": result?.format.toString(),
+          'code': result?.code,
+          'format': result?.format.toString(),
         });
       }
     });
@@ -200,8 +200,8 @@ class _QRBarReaderState extends State<QRBarReader> {
 
     if (decodedResult != null) {
       Navigator.pop(context, {
-        "code": decodedResult,
-        "format": "QR_CODE",
+        'code': decodedResult,
+        'format': 'QR_CODE',
       });
     } else {
       VibrationProvider.vibrateError();

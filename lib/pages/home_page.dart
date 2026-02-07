@@ -805,7 +805,7 @@ class _HomePageState extends State<Homepage> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (builder) => const WelcomeScreen(
-                                      currentAppVersion: "1.5.0",
+                                      currentAppVersion: '1.5.0',
                                     ),
                                   ),
                                 );

@@ -684,7 +684,7 @@ class _SettingsState extends State<Settings> {
                     borderColor: theme.colorScheme.primary,
                   ),
                   MySetting(
-                    aboutSettingHeader: "Use System font everywhere",
+                    aboutSettingHeader: 'Use System font everywhere',
                     settingAction: toggleSystemFontEverywhere,
                     settingHeader: 'Use System Font',
                     iconColor:

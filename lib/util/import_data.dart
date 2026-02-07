@@ -180,7 +180,7 @@ Future<bool> showImportDialog(BuildContext context) async {
               cdb.myShops.addAll(newCards);
               cdb.updateDataBase();
             }
-            textController.text = "";
+            textController.text = '';
 
             Navigator.of(context).pop(true);
             ScaffoldMessenger.of(context).showSnackBar(
