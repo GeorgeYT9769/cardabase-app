@@ -134,8 +134,9 @@ class _CameraControllerScreenState extends State<CameraControllerScreen> with Wi
       width: cropWidth,
       height: cropHeight,
     );
+    // Save to permanent storage
     final String path = join(
-      (await getTemporaryDirectory()).path,
+      (await getApplicationDocumentsDirectory()).path,
       '${DateTime.now().millisecondsSinceEpoch}.png',
     );
     await File(path).writeAsBytes(img.encodePng(cropped));
