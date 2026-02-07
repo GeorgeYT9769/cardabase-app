@@ -144,7 +144,7 @@ class Main extends StatefulWidget {
 }
 
 class _MainState extends State<Main> {
-  const QuickActions quickActions = QuickActions();
+  static const QuickActions quickActions = QuickActions();
   String shortcut = 'nothing set';
 
   @override
