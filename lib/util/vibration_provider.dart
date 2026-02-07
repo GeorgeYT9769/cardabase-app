@@ -1,8 +1,7 @@
-import 'package:hive/hive.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
+import 'package:hive_ce/hive.dart';
 
 class VibrationProvider {
-
   static final _bbox = Hive.box('settingsBox');
 
   static bool get vibrate => _bbox.get('setVibration', defaultValue: true);

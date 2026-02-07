@@ -1,15 +1,17 @@
+import 'dart:io';
+
 import 'package:cardabase/util/read_barcode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
+
 import '../data/cardabase_db.dart';
 import '../util/camera_controller.dart';
-import '../util/dashedRect.dart';
 import '../util/color_picker.dart';
+import '../util/dashedRect.dart';
 import '../util/devoptions.dart';
 import '../util/vibration_provider.dart';
-import 'dart:io';
 
 bool devOptions = DeveloperOptionsProvider.developerOptions;
 
@@ -37,15 +39,14 @@ enum CardType {
 }
 
 class CreateCard extends StatefulWidget {
-
   const CreateCard({super.key});
 
   @override
   State<CreateCard> createState() => _CreateCardState();
 }
 
-class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateMixin {
-
+class _CreateCardState extends State<CreateCard>
+    with SingleTickerProviderStateMixin {
   final passwordbox = Hive.box('password');
 
   cardabase_db cdb = cardabase_db();
@@ -59,6 +60,7 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
   Color getContrastingTextColor(Color bg) {
     return bg.computeLuminance() > 0.7 ? Colors.black : Colors.white;
   }
+
   String cardTextPreview = 'Card';
   TextEditingController controller = TextEditingController();
   TextEditingController controllercardid = TextEditingController();
@@ -115,7 +117,8 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
     }
   }
 
-  final List<dynamic> allTags = Hive.box('settingsBox').get('tags', defaultValue: <dynamic>[]) as List<dynamic>;
+  final List<dynamic> allTags = Hive.box('settingsBox')
+      .get('tags', defaultValue: <dynamic>[]) as List<dynamic>;
 
 //functions
   Future<void> openColorPickerDialog() async {
@@ -138,10 +141,14 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
     });
   }
 
-  void saveNewCard() { //x;
-    if (controller.text.isNotEmpty && verifyEan(controllercardid.text) == true && cardTypeText != 'Barcode Type') {
+  void saveNewCard() {
+    //x;
+    if (controller.text.isNotEmpty &&
+        verifyEan(controllercardid.text) == true &&
+        cardTypeText != 'Barcode Type') {
       final now = DateTime.now();
-      final uniqueId = '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
+      final uniqueId =
+          '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
       setState(() {
         cdb.myShops.add({
           'cardName': controller.text,
@@ -175,60 +182,85 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
       useFrontFaceOverlay = false;
       selectedTags.clear();
       hideTitle = false;
-    } else if (controller.text.isEmpty == true ) {
+    } else if (controller.text.isEmpty == true) {
       VibrationProvider.vibrateSuccess();
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10)
-            )  ,
-            content: Row(
-              children: [
-                Icon(Icons.error, size: 15, color: Colors.white,),
-                SizedBox(width: 10,),
-                Text('Card Name cannot be empty!', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
-              ],
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        content: Row(
+          children: [
+            Icon(
+              Icons.error,
+              size: 15,
+              color: Colors.white,
             ),
-            duration: const Duration(milliseconds: 3000),
-            padding: const EdgeInsets.all(5.0),
-            margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-            behavior: SnackBarBehavior.floating,
-            dismissDirection: DismissDirection.vertical,
-            backgroundColor: const Color.fromARGB(255, 237, 67, 55),
-          ));
-    } else if (controllercardid.text.isEmpty == true ) {
+            SizedBox(
+              width: 10,
+            ),
+            Text('Card Name cannot be empty!',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    fontSize: 18,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold)),
+          ],
+        ),
+        duration: const Duration(milliseconds: 3000),
+        padding: const EdgeInsets.all(5.0),
+        margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+        behavior: SnackBarBehavior.floating,
+        dismissDirection: DismissDirection.vertical,
+        backgroundColor: const Color.fromARGB(255, 237, 67, 55),
+      ));
+    } else if (controllercardid.text.isEmpty == true) {
       VibrationProvider.vibrateSuccess();
-      ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        content: Row(
+          children: [
+            Icon(
+              Icons.error,
+              size: 15,
+              color: Colors.white,
             ),
-            content: Row(
-              children: [
-                Icon(Icons.error, size: 15, color: Colors.white,),
-                SizedBox(width: 10,),
-                Text('Card ID cannot be empty!', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
-              ],
+            SizedBox(
+              width: 10,
             ),
-            duration: const Duration(milliseconds: 3000),
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-            behavior: SnackBarBehavior.floating,
-            dismissDirection: DismissDirection.vertical,
-            backgroundColor: const Color.fromARGB(255, 237, 67, 55),
-          ));
+            Text('Card ID cannot be empty!',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    fontSize: 18,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold)),
+          ],
+        ),
+        duration: const Duration(milliseconds: 3000),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+        behavior: SnackBarBehavior.floating,
+        dismissDirection: DismissDirection.vertical,
+        backgroundColor: const Color.fromARGB(255, 237, 67, 55),
+      ));
     } else if (verifyEan(controllercardid.text) == false) {
       VibrationProvider.vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10)
-          ),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           content: Row(
             children: [
-              Icon(Icons.error, size: 15, color: Colors.white,),
-              SizedBox(width: 10,),
-              Text('Card ID contains a mistake!', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+              Icon(
+                Icons.error,
+                size: 15,
+                color: Colors.white,
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Text('Card ID contains a mistake!',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontSize: 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold)),
             ],
           ),
           duration: const Duration(milliseconds: 3000),
@@ -243,14 +275,23 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
       VibrationProvider.vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10)
-          ),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           content: Row(
             children: [
-              Icon(Icons.error, size: 15, color: Colors.white,),
-              SizedBox(width: 10,),
-              Text('Barcode Type missing!', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+              Icon(
+                Icons.error,
+                size: 15,
+                color: Colors.white,
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Text('Barcode Type missing!',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontSize: 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold)),
             ],
           ),
           duration: const Duration(milliseconds: 3000),
@@ -265,14 +306,23 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
       VibrationProvider.vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10)
-          ),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           content: Row(
             children: [
-              Icon(Icons.error, size: 15, color: Colors.white,),
-              SizedBox(width: 10,),
-              Text('Unknown error', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+              Icon(
+                Icons.error,
+                size: 15,
+                color: Colors.white,
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Text('Unknown error',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontSize: 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold)),
             ],
           ),
           duration: const Duration(milliseconds: 3000),
@@ -294,13 +344,21 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
     redValue = 158;
     blueValue = 158;
     greenValue = 158;
-    _imagePathFront = null;// Clear image path on cancel
-    _imagePathBack = null;// Clear image path on cancel
+    _imagePathFront = null; // Clear image path on cancel
+    _imagePathBack = null; // Clear image path on cancel
   }
 
   void addLegacyCard() {
     setState(() {
-      cdb.myShops.add(["Legacy Card", "9780201379624", 158, 158, 158, "CardType.ean13", false]);
+      cdb.myShops.add([
+        "Legacy Card",
+        "9780201379624",
+        158,
+        158,
+        158,
+        "CardType.ean13",
+        false
+      ]);
     });
     cdb.updateDataBase();
     Navigator.pop(context);
@@ -329,7 +387,6 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
       });
     }
   }
-
 
   //CHECKING IF THE CARD CAN BE SAVED (AND ALSO DISPLAYED)
   //P.S. WRITTEN BY CHAT-GPT CUZ GOT NO IDEA HOW TO CHECK THEM MYSELF :)
@@ -386,7 +443,6 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
     } else if (cardTypeText == 'CardType.itf') {
       return int.tryParse(eanCode) != null;
     } else if (cardTypeText == 'CardType.itf14') {
-
       if (eanCode.length != 14 || int.tryParse(eanCode) == null) {
         return false;
       }
@@ -403,9 +459,7 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
 
       int checkDigit = (10 - (sum % 10)) % 10;
       return checkDigit == int.parse(eanCode[13]);
-
     } else if (cardTypeText == 'CardType.itf16') {
-
       if (eanCode.length != 16 || int.tryParse(eanCode) == null) {
         return false;
       }
@@ -469,7 +523,12 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Barcode Type', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 30),),
+          title: Text(
+            'Barcode Type',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Theme.of(context).colorScheme.inverseSurface,
+                fontSize: 30),
+          ),
           content: SizedBox(
             height: 300, // Custom height for the dialog
             width: double.maxFinite,
@@ -494,7 +553,6 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
     );
 
     if (result != null) {
-
       setState(() {
         selectedCardType = result;
         cardTypeText = result.toString();
@@ -517,26 +575,28 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
 //structure of the page
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       //resizeToAvoidBottomInset: false,
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.qr_code_2, color: Theme.of(context).colorScheme.secondary,),
+          icon: Icon(
+            Icons.qr_code_2,
+            color: Theme.of(context).colorScheme.secondary,
+          ),
           onPressed: () async {
             var result = await Navigator.push(
-                context, MaterialPageRoute(
-              builder: (context) => const QRBarReader(),
-            ));
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const QRBarReader(),
+                ));
             setState(() {
               if (result is Map<String, dynamic>) {
-
                 String code = result["code"];
 
                 if (code != "-1") {
-
-                  List<String> rawList = code.replaceAll("[", "").replaceAll("]", "").split(", ");
+                  List<String> rawList =
+                      code.replaceAll("[", "").replaceAll("]", "").split(", ");
 
                   // Convert values into correct types
                   String name = rawList[0];
@@ -567,21 +627,29 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
           ValueListenableBuilder(
             valueListenable: Hive.box('settingsBox').listenable(),
             builder: (context, settingsBox, child) {
-              final bool showLegacyCardButton = settingsBox.get('developerOptions', defaultValue: false);
+              final bool showLegacyCardButton =
+                  settingsBox.get('developerOptions', defaultValue: false);
               return showLegacyCardButton
                   ? IconButton(
-                icon: Icon(Icons.credit_card_off, color: Theme.of(context).colorScheme.secondary,),
-                onPressed: addLegacyCard,
-              )
+                      icon: Icon(
+                        Icons.credit_card_off,
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                      onPressed: addLegacyCard,
+                    )
                   : const SizedBox.shrink();
             },
           ),
-          IconButton(icon: Icon(Icons.arrow_back_ios_new, color: Theme.of(context).colorScheme.secondary,), onPressed: cancelCard,),
+          IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios_new,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
+            onPressed: cancelCard,
+          ),
         ],
-        title: Text(
-            'New card',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith()
-        ),
+        title: Text('New card',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith()),
         centerTitle: true,
         elevation: 0.0,
         backgroundColor: Theme.of(context).colorScheme.surface,
@@ -589,14 +657,18 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
 //structure of all widgets
 //card widget
       body: ListView(
-        physics: BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
+        physics: BouncingScrollPhysics(
+            decelerationRate: ScrollDecelerationRate.fast),
         children: [
           SizedBox(
-            height: MediaQuery.of(context).size.width / 1.586, //height of button
+            height:
+                MediaQuery.of(context).size.width / 1.586, //height of button
             width: MediaQuery.of(context).size.width,
             child: Container(
               margin: const EdgeInsets.all(20),
-              decoration: BoxDecoration(color: cardColorPreview, borderRadius: BorderRadius.circular(15)),
+              decoration: BoxDecoration(
+                  color: cardColorPreview,
+                  borderRadius: BorderRadius.circular(15)),
               child: Stack(
                 children: [
                   if (useFrontFaceOverlay && _imagePathFront != null)
@@ -616,11 +688,15 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                           margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                           child: Text(
                             hideTitle ? '' : cardTextPreview,
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              fontSize: 50,
-                              fontWeight: FontWeight.bold,
-                              color: getContrastingTextColor(cardColorPreview),
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge
+                                ?.copyWith(
+                                  fontSize: 50,
+                                  fontWeight: FontWeight.bold,
+                                  color:
+                                      getContrastingTextColor(cardColorPreview),
+                                ),
                             maxLines: 2,
                             textAlign: TextAlign.center,
                           ),
@@ -658,108 +734,185 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                               onChanged: (String value) {
                                 setState(() {
                                   cardTextPreview = value;
-                                  redValue = (cardColorPreview.r * 255.0).round();
-                                  greenValue = (cardColorPreview.g * 255.0).round();
-                                  blueValue = (cardColorPreview.b * 255.0).round();
+                                  redValue =
+                                      (cardColorPreview.r * 255.0).round();
+                                  greenValue =
+                                      (cardColorPreview.g * 255.0).round();
+                                  blueValue =
+                                      (cardColorPreview.b * 255.0).round();
                                 });
                               },
                               controller: controller,
                               decoration: InputDecoration(
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
-                                focusColor: Theme.of(context).colorScheme.primary,
-                                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: const BorderSide(width: 2.0)),
+                                focusColor:
+                                    Theme.of(context).colorScheme.primary,
+                                enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        width: 1.0),
+                                    borderRadius: BorderRadius.circular(10)),
                                 labelText: 'Card Name',
-                                labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontWeight: FontWeight.bold, fontSize: 17),
-                                prefixIcon: Icon(Icons.abc, color: Theme.of(context).colorScheme.secondary),
+                                labelStyle: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .inverseSurface,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 17),
+                                prefixIcon: Icon(Icons.abc,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary),
                               ),
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge
+                                  ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .tertiary,
+                                      fontWeight: FontWeight.bold),
                             ),
-                            const SizedBox(height: 15,),
+                            const SizedBox(
+                              height: 15,
+                            ),
                             //text field card id
                             TextFormField(
                               controller: controllercardid,
-                              inputFormatters:  selectedCardType == CardType.qrcode
-                                  ? null
-                                  : [
-                                FilteringTextInputFormatter.deny(RegExp(r'[ \.,\-]')),
-                              ],
+                              inputFormatters:
+                                  selectedCardType == CardType.qrcode
+                                      ? null
+                                      : [
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(r'[ \.,\-]')),
+                                        ],
                               decoration: InputDecoration(
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
-                                focusColor: Theme.of(context).colorScheme.primary,
-                                enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: const BorderSide(width: 2.0)),
+                                focusColor:
+                                    Theme.of(context).colorScheme.primary,
+                                enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        width: 1.0),
+                                    borderRadius: BorderRadius.circular(10)),
                                 labelText: 'Card ID',
-                                labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontWeight: FontWeight.bold, fontSize: 17),
-                                prefixIcon: Icon(Icons.numbers, color: Theme.of(context).colorScheme.secondary),
+                                labelStyle: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .inverseSurface,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 17),
+                                prefixIcon: Icon(Icons.numbers,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary),
                                 suffixIcon: IconButton(
-                                  icon: Icon(Icons.photo_camera_rounded, color: Theme.of(context).colorScheme.secondary),
+                                  icon: Icon(Icons.photo_camera_rounded,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary),
                                   onPressed: () async {
                                     var result = await Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => const QRBarReader(),
+                                        builder: (context) =>
+                                            const QRBarReader(),
                                       ),
                                     );
                                     setState(() {
                                       if (result is Map<String, dynamic>) {
                                         String code = result["code"];
-                                        var format = result["format"].toString();
+                                        var format =
+                                            result["format"].toString();
                                         if (code != "-1") {
                                           controllercardid.text = code;
                                           switch (format) {
                                             case 'BarcodeFormat.code39':
-                                              selectedCardType = CardType.code39;
-                                              cardTypeText = selectedCardType.toString();
+                                              selectedCardType =
+                                                  CardType.code39;
+                                              cardTypeText =
+                                                  selectedCardType.toString();
                                               break;
                                             case 'BarcodeFormat.code93':
-                                              selectedCardType = CardType.code93;
-                                              cardTypeText = selectedCardType.toString();
+                                              selectedCardType =
+                                                  CardType.code93;
+                                              cardTypeText =
+                                                  selectedCardType.toString();
                                               break;
                                             case 'BarcodeFormat.code128':
-                                              selectedCardType = CardType.code128;
-                                              cardTypeText = selectedCardType.toString();
+                                              selectedCardType =
+                                                  CardType.code128;
+                                              cardTypeText =
+                                                  selectedCardType.toString();
                                               break;
                                             case 'BarcodeFormat.ean13':
                                               selectedCardType = CardType.ean13;
-                                              cardTypeText = selectedCardType.toString();
+                                              cardTypeText =
+                                                  selectedCardType.toString();
                                               break;
                                             case 'BarcodeFormat.ean8':
                                               selectedCardType = CardType.ean8;
-                                              cardTypeText = selectedCardType.toString();
+                                              cardTypeText =
+                                                  selectedCardType.toString();
                                               break;
                                             case 'BarcodeFormat.upcA':
                                               selectedCardType = CardType.upca;
-                                              cardTypeText = selectedCardType.toString();
+                                              cardTypeText =
+                                                  selectedCardType.toString();
                                               break;
                                             case 'BarcodeFormat.upcE':
                                               selectedCardType = CardType.upce;
-                                              cardTypeText = selectedCardType.toString();
+                                              cardTypeText =
+                                                  selectedCardType.toString();
                                               break;
                                             case 'BarcodeFormat.codabar':
-                                              selectedCardType = CardType.codabar;
-                                              cardTypeText = selectedCardType.toString();
+                                              selectedCardType =
+                                                  CardType.codabar;
+                                              cardTypeText =
+                                                  selectedCardType.toString();
                                               break;
                                             case 'BarcodeFormat.qrcode':
-                                              selectedCardType = CardType.qrcode;
-                                              cardTypeText = selectedCardType.toString();
+                                              selectedCardType =
+                                                  CardType.qrcode;
+                                              cardTypeText =
+                                                  selectedCardType.toString();
                                               break;
                                             case 'BarcodeFormat.dataMatrix':
-                                              selectedCardType = CardType.datamatrix;
-                                              cardTypeText = selectedCardType.toString();
+                                              selectedCardType =
+                                                  CardType.datamatrix;
+                                              cardTypeText =
+                                                  selectedCardType.toString();
                                               break;
                                             case 'BarcodeFormat.aztec':
                                               selectedCardType = CardType.aztec;
-                                              cardTypeText = selectedCardType.toString();
+                                              cardTypeText =
+                                                  selectedCardType.toString();
                                               break;
                                             default:
                                               selectedCardType = null;
                                               cardTypeText =
-                                              'Barcode Type'; //controllercardid.text = "";
+                                                  'Barcode Type'; //controllercardid.text = "";
                                           }
                                           if (code.startsWith("[") &&
                                               code.endsWith("]")) {
-                                            List<String> rawList = code.replaceAll(
-                                                "[", "").replaceAll("]", "").split(", ");
-
+                                            List<String> rawList = code
+                                                .replaceAll("[", "")
+                                                .replaceAll("]", "")
+                                                .split(", ");
 
                                             String name = rawList[0];
                                             String number = rawList[1];
@@ -772,8 +925,8 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                                             setState(() {
                                               controller.text = name;
                                               cardTextPreview = name;
-                                              cardColorPreview =
-                                                  Color.fromARGB(255, red, green, blue);
+                                              cardColorPreview = Color.fromARGB(
+                                                  255, red, green, blue);
                                               controllercardid.text = number;
                                               redValue = red;
                                               greenValue = green;
@@ -791,9 +944,18 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                                 ),
                               ),
                               keyboardType: TextInputType.number,
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge
+                                  ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .tertiary,
+                                      fontWeight: FontWeight.bold),
                             ),
-                            const SizedBox(height: 15,),
+                            const SizedBox(
+                              height: 15,
+                            ),
                             Bounceable(
                               onTap: () {},
                               child: SizedBox(
@@ -801,7 +963,10 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                                 child: OutlinedButton(
                                   style: OutlinedButton.styleFrom(
                                     padding: const EdgeInsets.all(15),
-                                    side: BorderSide(color: Theme.of(context).colorScheme.primary,),
+                                    side: BorderSide(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
                                     backgroundColor: Colors.transparent,
                                     elevation: 0.0,
                                     shape: RoundedRectangleBorder(
@@ -810,16 +975,25 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                                     minimumSize: const Size.fromHeight(100),
                                   ),
                                   onPressed: _showBarcodeSelectorDialog,
-                                  child: Text(getBarcodeTypeText(cardTypeText), style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    color: Theme.of(context).colorScheme.inverseSurface,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 17,
-                                  ),
+                                  child: Text(
+                                    getBarcodeTypeText(cardTypeText),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge
+                                        ?.copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .inverseSurface,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 17,
+                                        ),
                                   ),
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 15,),
+                            const SizedBox(
+                              height: 15,
+                            ),
                             Bounceable(
                               onTap: () {},
                               child: SizedBox(
@@ -827,7 +1001,10 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                                 child: OutlinedButton(
                                   style: OutlinedButton.styleFrom(
                                     padding: const EdgeInsets.all(15),
-                                    side: BorderSide(color: Theme.of(context).colorScheme.primary,),
+                                    side: BorderSide(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
                                     backgroundColor: Colors.transparent,
                                     elevation: 0.0,
                                     shape: RoundedRectangleBorder(
@@ -836,34 +1013,65 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                                     minimumSize: const Size.fromHeight(100),
                                   ),
                                   onPressed: openColorPickerDialog,
-                                  child: Text('Card Color', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    color: Theme.of(context).colorScheme.inverseSurface,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 17,
-                                  ),
+                                  child: Text(
+                                    'Card Color',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge
+                                        ?.copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .inverseSurface,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 17,
+                                        ),
                                   ),
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 15,),
+                            const SizedBox(
+                              height: 15,
+                            ),
                             Container(
                               child: TextField(
                                 controller: noteController,
                                 maxLines: 10,
                                 decoration: InputDecoration(
-                                  hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 15),
+                                  hintStyle: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .inverseSurface,
+                                          fontSize: 15),
                                   hintText: 'Some notes...',
-                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(width: 2.0)),
-                                  focusColor: Theme.of(context).colorScheme.primary,
-                                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.0), borderRadius: BorderRadius.circular(10)),
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: const BorderSide(width: 2.0)),
+                                  focusColor:
+                                      Theme.of(context).colorScheme.primary,
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                          width: 1.0),
+                                      borderRadius: BorderRadius.circular(10)),
                                 ),
-                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontWeight: FontWeight.bold),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .tertiary,
+                                        fontWeight: FontWeight.bold),
                               ),
                             ),
                           ],
                         ),
                       ),
-
                       Container(
                         padding: const EdgeInsets.all(20),
                         child: Column(
@@ -871,57 +1079,94 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                             allTags.isEmpty
                                 ? const SizedBox.shrink()
                                 : Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Text(
                                         'Tags:',
-                                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                          color: Theme.of(context).colorScheme.inverseSurface,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge
+                                            ?.copyWith(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .inverseSurface,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                            ),
                                       ),
                                       const SizedBox(width: 10),
                                       Expanded(
                                         child: SizedBox(
                                           height: 40,
                                           child: ListView.builder(
-                                            physics: const BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
+                                            physics:
+                                                const BouncingScrollPhysics(
+                                                    decelerationRate:
+                                                        ScrollDecelerationRate
+                                                            .fast),
                                             scrollDirection: Axis.horizontal,
                                             itemCount: allTags.length,
                                             itemBuilder: (context, chipIndex) {
                                               final tag = allTags[chipIndex];
-                                              final isSelected = selectedTags.contains(tag);
+                                              final isSelected =
+                                                  selectedTags.contains(tag);
                                               return Padding(
-                                                padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        0, 0, 10, 0),
                                                 child: ActionChip(
                                                   label: Text(tag),
                                                   onPressed: () {
                                                     setState(() {
                                                       if (isSelected) {
-                                                        selectedTags.remove(tag);
+                                                        selectedTags
+                                                            .remove(tag);
                                                       } else {
                                                         selectedTags.add(tag);
                                                       }
                                                     });
                                                   },
-                                                  labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                                    color: isSelected
-                                                        ? Theme.of(context).colorScheme.onPrimary
-                                                        : Theme.of(context).colorScheme.inverseSurface,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                                                  labelStyle: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyLarge
+                                                      ?.copyWith(
+                                                        color: isSelected
+                                                            ? Theme.of(context)
+                                                                .colorScheme
+                                                                .onPrimary
+                                                            : Theme.of(context)
+                                                                .colorScheme
+                                                                .inverseSurface,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
                                                   backgroundColor: isSelected
-                                                      ? Theme.of(context).colorScheme.primary
-                                                      : Theme.of(context).colorScheme.surface,
+                                                      ? Theme.of(context)
+                                                          .colorScheme
+                                                          .primary
+                                                      : Theme.of(context)
+                                                          .colorScheme
+                                                          .surface,
                                                   side: BorderSide(
                                                     color: isSelected
-                                                        ? Theme.of(context).colorScheme.primary
-                                                        : Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                                                        ? Theme.of(context)
+                                                            .colorScheme
+                                                            .primary
+                                                        : Theme.of(context)
+                                                            .colorScheme
+                                                            .primary
+                                                            .withValues(
+                                                                alpha: 0.3),
                                                     width: isSelected ? 2 : 1,
                                                   ),
                                                   avatar: isSelected
-                                                      ? Icon(Icons.check, size: 18, color: Theme.of(context).colorScheme.onPrimary)
+                                                      ? Icon(Icons.check,
+                                                          size: 18,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .onPrimary)
                                                       : null,
                                                 ),
                                               );
@@ -931,16 +1176,23 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                                       ),
                                     ],
                                   ),
-                            const SizedBox(height: 15,),
+                            const SizedBox(
+                              height: 15,
+                            ),
                             Bounceable(
                               onTap: () {},
                               child: Container(
                                 alignment: Alignment.center,
                                 child: SizedBox(
-                                  height: (MediaQuery.of(context).size.width - 40) / 1.586,
+                                  height:
+                                      (MediaQuery.of(context).size.width - 40) /
+                                          1.586,
                                   width: double.infinity,
                                   child: CustomPaint(
-                                    painter: DashedRect(color: Theme.of(context).colorScheme.primary),
+                                    painter: DashedRect(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary),
                                     child: GestureDetector(
                                       onLongPress: () {
                                         setState(() {
@@ -950,52 +1202,80 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                                       child: OutlinedButton(
                                         onPressed: takeFrontPicture,
                                         style: OutlinedButton.styleFrom(
-                                          side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2, style: BorderStyle.none),
+                                          side: BorderSide(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                              width: 2,
+                                              style: BorderStyle.none),
                                           backgroundColor: Colors.transparent,
                                           elevation: 0.0,
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(15),
+                                            borderRadius:
+                                                BorderRadius.circular(15),
                                           ),
-                                          minimumSize: const Size.fromHeight(100),
-                                          padding: EdgeInsets.zero, // Remove internal padding
+                                          minimumSize:
+                                              const Size.fromHeight(100),
+                                          padding: EdgeInsets
+                                              .zero, // Remove internal padding
                                         ),
                                         child: _imagePathFront != null
                                             ? ClipRRect(
-                                          borderRadius: BorderRadius.circular(15),
-                                          child: Image.file(
-                                            File(_imagePathFront!),
-                                            fit: BoxFit.cover,
-                                            width: double.infinity,
-                                            height: double.infinity,
-                                          ),
-                                        )
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                                child: Image.file(
+                                                  File(_imagePathFront!),
+                                                  fit: BoxFit.cover,
+                                                  width: double.infinity,
+                                                  height: double.infinity,
+                                                ),
+                                              )
                                             : Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Icon(Icons.camera_alt, color: Theme.of(context).colorScheme.secondary),
-                                            Text('Front face picture', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 15,
-                                                color: Theme.of(context).colorScheme.inverseSurface
-                                            )),
-                                          ],
-                                        ),
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(Icons.camera_alt,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .secondary),
+                                                  Text('Front face picture',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodyLarge
+                                                          ?.copyWith(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 15,
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .colorScheme
+                                                                  .inverseSurface)),
+                                                ],
+                                              ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 15,),
+                            const SizedBox(
+                              height: 15,
+                            ),
                             Bounceable(
                               onTap: () {},
                               child: Container(
                                 alignment: Alignment.center,
                                 child: SizedBox(
-                                  height: (MediaQuery.of(context).size.width - 40) / 1.586,
+                                  height:
+                                      (MediaQuery.of(context).size.width - 40) /
+                                          1.586,
                                   width: double.infinity,
                                   child: CustomPaint(
-                                    painter: DashedRect(color: Theme.of(context).colorScheme.primary),
+                                    painter: DashedRect(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary),
                                     child: GestureDetector(
                                       onLongPress: () {
                                         setState(() {
@@ -1005,53 +1285,85 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                                       child: OutlinedButton(
                                         onPressed: takeBackPicture,
                                         style: OutlinedButton.styleFrom(
-                                          side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2, style: BorderStyle.none),
+                                          side: BorderSide(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                              width: 2,
+                                              style: BorderStyle.none),
                                           backgroundColor: Colors.transparent,
                                           elevation: 0.0,
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(15),
+                                            borderRadius:
+                                                BorderRadius.circular(15),
                                           ),
-                                          minimumSize: const Size.fromHeight(100),
+                                          minimumSize:
+                                              const Size.fromHeight(100),
                                           padding: EdgeInsets.zero,
                                         ),
                                         child: _imagePathBack != null
                                             ? ClipRRect(
-                                          borderRadius: BorderRadius.circular(15),
-                                          child: Image.file(
-                                            File(_imagePathBack!),
-                                            fit: BoxFit.contain,
-                                            width: double.infinity,
-                                            height: double.infinity,
-                                          )
-                                        )
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                                child: Image.file(
+                                                  File(_imagePathBack!),
+                                                  fit: BoxFit.contain,
+                                                  width: double.infinity,
+                                                  height: double.infinity,
+                                                ))
                                             : Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Icon(Icons.camera_alt, color: Theme.of(context).colorScheme.secondary),
-                                            Text('Back face picture', style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 15,
-                                                color: Theme.of(context).colorScheme.inverseSurface
-                                            )),
-                                          ],
-                                        ),
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(Icons.camera_alt,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .secondary),
+                                                  Text('Back face picture',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodyLarge
+                                                          ?.copyWith(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 15,
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .colorScheme
+                                                                  .inverseSurface)),
+                                                ],
+                                              ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 15,),
+                            const SizedBox(
+                              height: 15,
+                            ),
                             CheckboxListTile(
                                 value: useFrontFaceOverlay,
-                                title: Text('Use front face picture as a card thumbnail', style: Theme.of(context).textTheme.bodyLarge?.copyWith( //cardTypeText
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color: Theme.of(context).colorScheme.inverseSurface
-                                )),
-                                controlAffinity: ListTileControlAffinity.leading,
-                                side: BorderSide(color: Theme.of(context).colorScheme.primary),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                                title: Text(
+                                    'Use front face picture as a card thumbnail',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge
+                                        ?.copyWith(
+                                            //cardTypeText
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .inverseSurface)),
+                                controlAffinity:
+                                    ListTileControlAffinity.leading,
+                                side: BorderSide(
+                                    color:
+                                        Theme.of(context).colorScheme.primary),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5)),
                                 onChanged: (bool? checked) {
                                   setState(() {
                                     useFrontFaceOverlay = checked!;
@@ -1059,14 +1371,24 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                                 }),
                             CheckboxListTile(
                                 value: hideTitle,
-                                title: Text('Hide card title', style: Theme.of(context).textTheme.bodyLarge?.copyWith( //cardTypeText
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color: Theme.of(context).colorScheme.inverseSurface
-                                )),
-                                controlAffinity: ListTileControlAffinity.leading,
-                                side: BorderSide(color: Theme.of(context).colorScheme.primary),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                                title: Text('Hide card title',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge
+                                        ?.copyWith(
+                                            //cardTypeText
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .inverseSurface)),
+                                controlAffinity:
+                                    ListTileControlAffinity.leading,
+                                side: BorderSide(
+                                    color:
+                                        Theme.of(context).colorScheme.primary),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5)),
                                 onChanged: (bool? checked) {
                                   setState(() {
                                     hideTitle = checked!;
@@ -1074,22 +1396,38 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
                                 }),
                             passwordbox.isNotEmpty
                                 ? CheckboxListTile(
-                                value: hasPassword,
-                                title: Text('Use the password for this card', style: Theme.of(context).textTheme.bodyLarge?.copyWith( //cardTypeText
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color: Theme.of(context).colorScheme.inverseSurface
-                                )),
-                                controlAffinity: ListTileControlAffinity.leading,
-                                side: BorderSide(color: Theme.of(context).colorScheme.primary),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                                onChanged: (bool? checked) {
-                                  setState(() {
-                                    hasPassword = checked!;
-                                  });
-                               })
-                                : const SizedBox(height: 10,),
-                            const SizedBox(height: 100,),
+                                    value: hasPassword,
+                                    title: Text(
+                                        'Use the password for this card',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge
+                                            ?.copyWith(
+                                                //cardTypeText
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .inverseSurface)),
+                                    controlAffinity:
+                                        ListTileControlAffinity.leading,
+                                    side: BorderSide(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(5)),
+                                    onChanged: (bool? checked) {
+                                      setState(() {
+                                        hasPassword = checked!;
+                                      });
+                                    })
+                                : const SizedBox(
+                                    height: 10,
+                                  ),
+                            const SizedBox(
+                              height: 100,
+                            ),
                           ],
                         ),
                       ),
@@ -1114,15 +1452,21 @@ class _CreateCardState extends State<CreateCard> with SingleTickerProviderStateM
               onPressed: saveNewCard,
               tooltip: 'SAVE',
               backgroundColor: Colors.green.shade700,
-              icon: Icon(Icons.check, color: Colors.white,),
+              icon: Icon(
+                Icons.check,
+                color: Colors.white,
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
-              label: Text('SAVE', style: Theme.of(context).textTheme.bodyLarge?.copyWith( //cardTypeText
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: Colors.white
-              ),),
+              label: Text(
+                'SAVE',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    //cardTypeText
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: Colors.white),
+              ),
             ),
           ),
         ),

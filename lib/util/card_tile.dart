@@ -1,11 +1,12 @@
 import 'dart:io';
+
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:cardabase/pages/card_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'vibration_provider.dart';
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
+import 'vibration_provider.dart';
 
 class CardTile extends StatefulWidget {
   final String shopName;
@@ -35,34 +36,33 @@ class CardTile extends StatefulWidget {
   final int green;
   final int blue;
 
-  CardTile({
-    super.key,
-    required this.shopName,
-    required this.deleteFunction,
-    required this.cardnumber,
-    required this.cardTileColor,
-    required this.cardType,
-    required this.hasPassword,
-    required this.red,
-    required this.green,
-    required this.blue,
-    required this.editFunction,
-    required this.moveUpFunction,
-    required this.moveDownFunction,
-    required this.labelSize,
-    required this.borderSize,
-    required this.marginSize,
-    this.dragHandle,
-    required this.tags,
-    required this.reorderMode,
-    required this.note,
-    required this.uniqueId,
-    required this.duplicateFunction,
-    required this.imagePathFront,
-    required this.imagePathBack,
-    required this.useFrontFaceOverlay,
-    required this.hideTitle
-  });
+  CardTile(
+      {super.key,
+      required this.shopName,
+      required this.deleteFunction,
+      required this.cardnumber,
+      required this.cardTileColor,
+      required this.cardType,
+      required this.hasPassword,
+      required this.red,
+      required this.green,
+      required this.blue,
+      required this.editFunction,
+      required this.moveUpFunction,
+      required this.moveDownFunction,
+      required this.labelSize,
+      required this.borderSize,
+      required this.marginSize,
+      this.dragHandle,
+      required this.tags,
+      required this.reorderMode,
+      required this.note,
+      required this.uniqueId,
+      required this.duplicateFunction,
+      required this.imagePathFront,
+      required this.imagePathBack,
+      required this.useFrontFaceOverlay,
+      required this.hideTitle});
 
   @override
   State<CardTile> createState() => _CardTileState();
@@ -117,14 +117,18 @@ class _CardTileState extends State<CardTile> {
 
   @override
   Widget build(BuildContext context) {
-    final Color contentTextColor = getContrastingTextColor(widget.cardTileColor);
+    final Color contentTextColor =
+        getContrastingTextColor(widget.cardTileColor);
     void showUnlockDialog(BuildContext context) {
       final TextEditingController controller = TextEditingController();
 
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Enter Password', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 30) ),
+          title: Text('Enter Password',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.inverseSurface,
+                  fontSize: 30)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -145,8 +149,8 @@ class _CardTileState extends State<CardTile> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.secondary,
-                  ),
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
                   prefixIcon: Icon(
                     Icons.password,
                     color: Theme.of(context).colorScheme.secondary,
@@ -154,9 +158,9 @@ class _CardTileState extends State<CardTile> {
                   labelText: 'Password',
                 ),
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.tertiary,
-                  fontWeight: FontWeight.bold,
-                ),
+                      color: Theme.of(context).colorScheme.tertiary,
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
               const SizedBox(height: 20),
               Center(
@@ -200,11 +204,14 @@ class _CardTileState extends State<CardTile> {
                               SizedBox(width: 10),
                               Text(
                                 'Incorrect password!',
-                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.copyWith(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                               ),
                             ],
                           ),
@@ -213,20 +220,27 @@ class _CardTileState extends State<CardTile> {
                           margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
                           behavior: SnackBarBehavior.floating,
                           dismissDirection: DismissDirection.vertical,
-                          backgroundColor: const Color.fromARGB(255, 237, 67, 55),
+                          backgroundColor:
+                              const Color.fromARGB(255, 237, 67, 55),
                           elevation: 0.0,
                         ),
                       );
                     }
                   },
-                  style: OutlinedButton.styleFrom(elevation: 0.0, side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11))),
+                  style: OutlinedButton.styleFrom(
+                      elevation: 0.0,
+                      side: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 2.0),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(11))),
                   child: Text(
                     'Unlock',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: Theme.of(context).colorScheme.tertiary,
-                    ),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: Theme.of(context).colorScheme.tertiary,
+                        ),
                   ),
                 ),
               ),
@@ -271,7 +285,8 @@ class _CardTileState extends State<CardTile> {
           children: [
             Expanded(
               child: GestureDetector(
-                onLongPress: widget.reorderMode ? null : () => _showBottomSheet(context),
+                onLongPress:
+                    widget.reorderMode ? null : () => _showBottomSheet(context),
                 child: SizedBox(
                   height: (MediaQuery.of(context).size.width - 40) / 1.586,
                   width: double.infinity,
@@ -289,13 +304,18 @@ class _CardTileState extends State<CardTile> {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        if (widget.useFrontFaceOverlay && widget.imagePathFront.isNotEmpty)
+                        if (widget.useFrontFaceOverlay &&
+                            widget.imagePathFront.isNotEmpty)
                           FutureBuilder<bool>(
                             future: File(widget.imagePathFront).exists(),
-                            builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-                              if (snapshot.connectionState == ConnectionState.done && snapshot.data == true) {
+                            builder: (BuildContext context,
+                                AsyncSnapshot<bool> snapshot) {
+                              if (snapshot.connectionState ==
+                                      ConnectionState.done &&
+                                  snapshot.data == true) {
                                 return ClipRRect(
-                                  borderRadius: BorderRadius.circular(widget.borderSize),
+                                  borderRadius:
+                                      BorderRadius.circular(widget.borderSize),
                                   child: Image.file(
                                     File(widget.imagePathFront),
                                     fit: BoxFit.cover,
@@ -313,11 +333,14 @@ class _CardTileState extends State<CardTile> {
                           child: Center(
                             child: Text(
                               widget.hideTitle ? '' : widget.shopName,
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                fontSize: widget.labelSize,
-                                fontWeight: FontWeight.bold,
-                                color: contentTextColor,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge
+                                  ?.copyWith(
+                                    fontSize: widget.labelSize,
+                                    fontWeight: FontWeight.bold,
+                                    color: contentTextColor,
+                                  ),
                               textAlign: TextAlign.center,
                               maxLines: 2,
                             ),
@@ -350,32 +373,40 @@ class _CardTileState extends State<CardTile> {
           child: Wrap(
             children: [
               ListTile(
-                leading: Icon(Icons.edit, color: Theme.of(context).colorScheme.tertiary),
-                title: Text('Edit', style: Theme.of(context).textTheme.bodyLarge?.copyWith()),
+                leading: Icon(Icons.edit,
+                    color: Theme.of(context).colorScheme.tertiary),
+                title: Text('Edit',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith()),
                 onTap: () {
                   Navigator.pop(context);
                   widget.editFunction(context);
                 },
               ),
               ListTile(
-                leading: Icon(Icons.copy, color: Theme.of(context).colorScheme.tertiary),
-                title: Text('Duplicate', style: Theme.of(context).textTheme.bodyLarge?.copyWith()),
+                leading: Icon(Icons.copy,
+                    color: Theme.of(context).colorScheme.tertiary),
+                title: Text('Duplicate',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith()),
                 onTap: () {
                   Navigator.pop(context);
                   widget.duplicateFunction(context);
                 },
               ),
               ListTile(
-                leading: Icon(Icons.arrow_upward, color: Theme.of(context).colorScheme.tertiary),
-                title: Text('Move UP', style: Theme.of(context).textTheme.bodyLarge?.copyWith()),
+                leading: Icon(Icons.arrow_upward,
+                    color: Theme.of(context).colorScheme.tertiary),
+                title: Text('Move UP',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith()),
                 onTap: () {
                   Navigator.pop(context);
                   widget.moveUpFunction(context);
                 },
               ),
               ListTile(
-                leading: Icon(Icons.arrow_downward, color: Theme.of(context).colorScheme.tertiary),
-                title: Text('Move DOWN', style: Theme.of(context).textTheme.bodyLarge?.copyWith()),
+                leading: Icon(Icons.arrow_downward,
+                    color: Theme.of(context).colorScheme.tertiary),
+                title: Text('Move DOWN',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith()),
                 onTap: () {
                   Navigator.pop(context);
                   widget.moveDownFunction(context);
@@ -383,7 +414,8 @@ class _CardTileState extends State<CardTile> {
               ),
               ListTile(
                 leading: Icon(Icons.delete, color: Colors.red),
-                title: Text('DELETE', style: Theme.of(context).textTheme.bodyLarge?.copyWith()),
+                title: Text('DELETE',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith()),
                 onTap: () {
                   Navigator.pop(context);
                   widget.deleteFunction(context);
