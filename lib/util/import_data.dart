@@ -2,7 +2,7 @@ import 'package:cardabase/data/cardabase_db.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';
 
-cardabase_db cdb = cardabase_db();
+CardabaseDb cdb = CardabaseDb();
 
 Future<bool> showImportDialog(BuildContext context) async {
   final theme = Theme.of(context);

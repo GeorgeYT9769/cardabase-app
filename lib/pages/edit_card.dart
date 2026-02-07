@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:cardabase/data/cardabase_db.dart';
 import 'package:cardabase/util/camera_controller.dart';
 import 'package:cardabase/util/color_picker.dart';
-import 'package:cardabase/util/dashedRect.dart';
+import 'package:cardabase/util/dashed_rect.dart';
 import 'package:cardabase/util/read_barcode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -78,7 +78,7 @@ class EditCard extends StatefulWidget {
 class _EditCardState extends State<EditCard> {
   final passwordbox = Hive.box('password');
 
-  cardabase_db cdb = cardabase_db();
+  CardabaseDb cdb = CardabaseDb();
 
   late Color cardColorPreview;
   late int redValue;

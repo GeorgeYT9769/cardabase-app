@@ -1,6 +1,6 @@
 import 'package:cardabase/data/cardabase_db.dart';
-import 'package:cardabase/pages/createcardnew.dart';
-import 'package:cardabase/pages/editcard.dart';
+import 'package:cardabase/pages/create_card_new.dart';
+import 'package:cardabase/pages/edit_card.dart';
 import 'package:cardabase/pages/settings.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
 import 'package:cardabase/util/card_tile.dart';
@@ -19,7 +19,7 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomePageState extends State<Homepage> {
-  cardabase_db cdb = cardabase_db();
+  CardabaseDb cdb = CardabaseDb();
   final passwordbox = Hive.box('password');
   int columnAmount = 1;
   double columnAmountDouble = 1.0;

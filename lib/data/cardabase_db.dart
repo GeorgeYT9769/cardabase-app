@@ -1,6 +1,6 @@
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
-class cardabase_db {
+class CardabaseDb {
   List myShops = [];
 
   final _myBox = Hive.box('mybox');

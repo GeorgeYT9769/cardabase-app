@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:cardabase/pages/createcardnew.dart';
-import 'package:cardabase/pages/homepage.dart';
+import 'package:cardabase/pages/create_card_new.dart';
+import 'package:cardabase/pages/home_page.dart';
 import 'package:cardabase/pages/settings.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
 import 'package:cardabase/theme/color_schemes.g.dart';

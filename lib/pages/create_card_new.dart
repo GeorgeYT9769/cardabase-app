@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:cardabase/data/cardabase_db.dart';
 import 'package:cardabase/util/camera_controller.dart';
 import 'package:cardabase/util/color_picker.dart';
-import 'package:cardabase/util/dashedRect.dart';
-import 'package:cardabase/util/devoptions.dart';
+import 'package:cardabase/util/dashed_rect.dart';
+import 'package:cardabase/util/dev_options.dart';
 import 'package:cardabase/util/read_barcode.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +49,7 @@ class _CreateCardState extends State<CreateCard>
     with SingleTickerProviderStateMixin {
   final passwordbox = Hive.box('password');
 
-  cardabase_db cdb = cardabase_db();
+  CardabaseDb cdb = CardabaseDb();
   String cardType = 'ean-13';
 
   int redValue = 158;
