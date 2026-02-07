@@ -37,12 +37,12 @@ class _PasswordScreenState extends State<PasswordScreen> {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           content: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.check,
                 size: 15,
                 color: Colors.white,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Text('Success!',
@@ -66,12 +66,12 @@ class _PasswordScreenState extends State<PasswordScreen> {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           content: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.error,
                 size: 15,
                 color: Colors.white,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Text('Passwords does not match!',
@@ -95,12 +95,12 @@ class _PasswordScreenState extends State<PasswordScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         content: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.error,
               size: 15,
               color: Colors.white,
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
             Text('Password cannot be empty!',
@@ -133,12 +133,12 @@ class _PasswordScreenState extends State<PasswordScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         content: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.check,
               size: 15,
               color: Colors.white,
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
             Text('Success!',
@@ -161,12 +161,12 @@ class _PasswordScreenState extends State<PasswordScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         content: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.error,
               size: 15,
               color: Colors.white,
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
             Text('Incorrect password!',

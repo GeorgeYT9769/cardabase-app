@@ -107,7 +107,7 @@ void main() async {
   if (lastSeenAppVersion == null || lastSeenAppVersion != currentAppVersion) {
     initialScreen = WelcomeScreen(currentAppVersion: currentAppVersion);
   } else {
-    initialScreen = Homepage();
+    initialScreen = const Homepage();
   }
 
   runApp(
@@ -144,7 +144,7 @@ class Main extends StatefulWidget {
 }
 
 class _MainState extends State<Main> {
-  final QuickActions quickActions = QuickActions();
+  const QuickActions quickActions = QuickActions();
   String shortcut = 'nothing set';
 
   @override
@@ -223,10 +223,10 @@ class _MainState extends State<Main> {
                 letterSpacing: useSystemFont ? 3 : 5,
                 fontSize: useSystemFont ? 25 : 17,
                 fontWeight: FontWeight.w900,
-                color: Color(0xFF0062A1), //tertiary
+                color: const Color(0xFF0062A1), //tertiary
               ),
-              bodyLarge:
-                  TextStyle(fontFamily: textFont, color: Color(0xFF003062)),
+              bodyLarge: TextStyle(
+                  fontFamily: textFont, color: const Color(0xFF003062)),
             ),
           ),
           darkTheme: ThemeData(
@@ -244,11 +244,11 @@ class _MainState extends State<Main> {
                 letterSpacing: useSystemFont ? 3 : 5,
                 fontSize: useSystemFont ? 25 : 17,
                 fontWeight: FontWeight.w900,
-                color: Color(0xFF9CCAFF), //tertiary
+                color: const Color(0xFF9CCAFF), //tertiary
               ),
               bodyLarge: TextStyle(
                   fontFamily: textFont,
-                  color: Color(0xFFD6E3FF) //inverseSurface
+                  color: const Color(0xFFD6E3FF) //inverseSurface
                   ),
             ),
           ),

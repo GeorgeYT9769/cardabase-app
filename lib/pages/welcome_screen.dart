@@ -160,7 +160,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       await Hive.box('settingsBox')
                           .put('lastSeenAppVersion', widget.currentAppVersion);
                       Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => Homepage()),
+                        MaterialPageRoute(
+                            builder: (context) => const Homepage()),
                       );
                     },
                     style: OutlinedButton.styleFrom(
@@ -170,7 +171,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           horizontal: 40, vertical: 15),
                       backgroundColor: Colors.transparent,
                       elevation: 0.0,
-                      shape: RoundedRectangleBorder(
+                      shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(15),
                             topRight: Radius.circular(15)),
@@ -195,7 +196,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       await Hive.box('settingsBox')
                           .put('lastSeenAppVersion', widget.currentAppVersion);
                       Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => Homepage()),
+                        MaterialPageRoute(
+                            builder: (context) => const Homepage()),
                       );
                     },
                     style: OutlinedButton.styleFrom(
@@ -205,7 +207,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             horizontal: 40, vertical: 15),
                         backgroundColor: Colors.transparent,
                         elevation: 0.0,
-                        shape: RoundedRectangleBorder(
+                        shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(
                               bottomLeft: Radius.circular(15),
                               bottomRight: Radius.circular(15)),

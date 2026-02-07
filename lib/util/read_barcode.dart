@@ -50,7 +50,7 @@ class _QRBarReaderState extends State<QRBarReader> {
             margin: const EdgeInsets.all(10),
             child: IconButton(
               style: ButtonStyle(
-                  iconSize: WidgetStatePropertyAll(30),
+                  iconSize: const WidgetStatePropertyAll(30),
                   iconColor:
                       WidgetStatePropertyAll(theme.colorScheme.inverseSurface)),
               icon: const Icon(Icons.cameraswitch),
@@ -64,7 +64,7 @@ class _QRBarReaderState extends State<QRBarReader> {
             margin: const EdgeInsets.all(10),
             child: IconButton(
               style: ButtonStyle(
-                  iconSize: WidgetStatePropertyAll(30),
+                  iconSize: const WidgetStatePropertyAll(30),
                   iconColor:
                       WidgetStatePropertyAll(theme.colorScheme.inverseSurface)),
               icon: const Icon(Icons.flash_on),
@@ -78,7 +78,7 @@ class _QRBarReaderState extends State<QRBarReader> {
             margin: const EdgeInsets.all(10),
             child: IconButton(
               style: ButtonStyle(
-                  iconSize: WidgetStatePropertyAll(30),
+                  iconSize: const WidgetStatePropertyAll(30),
                   iconColor:
                       WidgetStatePropertyAll(theme.colorScheme.inverseSurface)),
               icon: const Icon(Icons.photo),
@@ -89,7 +89,7 @@ class _QRBarReaderState extends State<QRBarReader> {
             margin: const EdgeInsets.all(10),
             child: IconButton(
               style: ButtonStyle(
-                  iconSize: WidgetStatePropertyAll(30),
+                  iconSize: const WidgetStatePropertyAll(30),
                   iconColor:
                       WidgetStatePropertyAll(theme.colorScheme.inverseSurface)),
               icon: const Icon(Icons.arrow_back_ios_new),

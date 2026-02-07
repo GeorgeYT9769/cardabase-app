@@ -52,7 +52,7 @@ class EditCard extends StatefulWidget {
   final bool useFrontFaceOverlay;
   final bool hideTitle;
 
-  EditCard(
+  const EditCard(
       {super.key,
       required this.cardColorPreview,
       required this.redValue,
@@ -203,12 +203,12 @@ class _EditCardState extends State<EditCard> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         content: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.error,
               size: 15,
               color: Colors.white,
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
             Text('Card Name cannot be empty!',
@@ -232,12 +232,12 @@ class _EditCardState extends State<EditCard> {
         ),
         content: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.error,
               size: 15,
               color: Colors.white,
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
             Text('Card ID cannot be empty!',
@@ -261,12 +261,12 @@ class _EditCardState extends State<EditCard> {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           content: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.error,
                 size: 15,
                 color: Colors.white,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Text('Card ID contains a mistake!',
@@ -291,12 +291,12 @@ class _EditCardState extends State<EditCard> {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           content: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.error,
                 size: 15,
                 color: Colors.white,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Text('Card Type was not selected!',
@@ -321,12 +321,12 @@ class _EditCardState extends State<EditCard> {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           content: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.error,
                 size: 15,
                 color: Colors.white,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Text('Unknown error',
@@ -645,7 +645,7 @@ class _EditCardState extends State<EditCard> {
 //structure of all widgets
 //card widget
       body: ListView(
-        physics: BouncingScrollPhysics(
+        physics: const BouncingScrollPhysics(
             decelerationRate: ScrollDecelerationRate.fast),
         children: [
           SizedBox(
@@ -689,7 +689,7 @@ class _EditCardState extends State<EditCard> {
             child: Column(
               children: [
                 TabBar(
-                  tabs: [
+                  tabs: const [
                     Tab(text: 'Card Details'),
                     Tab(text: 'Others'),
                   ],
@@ -1178,7 +1178,7 @@ class _EditCardState extends State<EditCard> {
               onPressed: () => saveNewCard(theme),
               tooltip: 'SAVE',
               backgroundColor: Colors.green.shade700,
-              icon: Icon(
+              icon: const Icon(
                 Icons.check,
                 color: Colors.white,
               ),

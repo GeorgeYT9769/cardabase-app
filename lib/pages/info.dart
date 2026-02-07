@@ -192,7 +192,7 @@ class _InfoScreenState extends State<InfoScreen> {
                                     horizontal: 40, vertical: 15),
                                 backgroundColor: Colors.transparent,
                                 elevation: 0.0,
-                                shape: RoundedRectangleBorder(
+                                shape: const RoundedRectangleBorder(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(15)),
                                 ),
@@ -231,7 +231,7 @@ class _InfoScreenState extends State<InfoScreen> {
                                           horizontal: 40, vertical: 15),
                                       backgroundColor: Colors.transparent,
                                       elevation: 0.0,
-                                      shape: RoundedRectangleBorder(
+                                      shape: const RoundedRectangleBorder(
                                         borderRadius: BorderRadius.only(
                                             topLeft: Radius.circular(15),
                                             topRight: Radius.circular(15)),
@@ -264,7 +264,7 @@ class _InfoScreenState extends State<InfoScreen> {
                                           horizontal: 40, vertical: 15),
                                       backgroundColor: Colors.transparent,
                                       elevation: 0.0,
-                                      shape: RoundedRectangleBorder(
+                                      shape: const RoundedRectangleBorder(
                                         borderRadius: BorderRadius.only(
                                             bottomLeft: Radius.circular(15),
                                             bottomRight: Radius.circular(15)),

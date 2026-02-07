@@ -189,12 +189,12 @@ class _CreateCardState extends State<CreateCard>
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         content: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.error,
               size: 15,
               color: Colors.white,
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
             Text('Card Name cannot be empty!',
@@ -219,12 +219,12 @@ class _CreateCardState extends State<CreateCard>
         ),
         content: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.error,
               size: 15,
               color: Colors.white,
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
             Text('Card ID cannot be empty!',
@@ -249,12 +249,12 @@ class _CreateCardState extends State<CreateCard>
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           content: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.error,
                 size: 15,
                 color: Colors.white,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Text('Card ID contains a mistake!',
@@ -280,12 +280,12 @@ class _CreateCardState extends State<CreateCard>
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           content: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.error,
                 size: 15,
                 color: Colors.white,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Text('Barcode Type missing!',
@@ -311,12 +311,12 @@ class _CreateCardState extends State<CreateCard>
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           content: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.error,
                 size: 15,
                 color: Colors.white,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Text('Unknown error',
@@ -657,7 +657,7 @@ class _CreateCardState extends State<CreateCard>
 //structure of all widgets
 //card widget
       body: ListView(
-        physics: BouncingScrollPhysics(
+        physics: const BouncingScrollPhysics(
             decelerationRate: ScrollDecelerationRate.fast),
         children: [
           SizedBox(
@@ -709,7 +709,7 @@ class _CreateCardState extends State<CreateCard>
             child: Column(
               children: [
                 TabBar(
-                  tabs: [
+                  tabs: const [
                     Tab(text: 'Card Details'),
                     Tab(text: 'Others'),
                   ],
@@ -1354,7 +1354,7 @@ class _CreateCardState extends State<CreateCard>
               onPressed: () => saveNewCard(theme),
               tooltip: 'SAVE',
               backgroundColor: Colors.green.shade700,
-              icon: Icon(
+              icon: const Icon(
                 Icons.check,
                 color: Colors.white,
               ),

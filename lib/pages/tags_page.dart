@@ -95,12 +95,12 @@ class _TagsPageState extends State<TagsPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         content: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.error,
               size: 15,
               color: Colors.white,
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
             Text('Tag already exists!',
@@ -132,12 +132,12 @@ class _TagsPageState extends State<TagsPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         content: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.error,
               size: 15,
               color: Colors.white,
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
             Text('Tag does not exist!',

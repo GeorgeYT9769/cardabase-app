@@ -135,7 +135,7 @@ class _SettingsState extends State<Settings> {
                     });
                   },
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 Slider(
@@ -158,7 +158,7 @@ class _SettingsState extends State<Settings> {
                     passwordbox.isNotEmpty &&
                     (passwordbox.get('PW') != null &&
                         passwordbox.get('PW').toString().isNotEmpty)) ...[
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   TextFormField(
                     controller: _passwordVerifyControllerDialog,
                     obscureText: true,
@@ -185,8 +185,8 @@ class _SettingsState extends State<Settings> {
                   ),
                   if (!_isPasswordCorrectDialog &&
                       _passwordVerifyControllerDialog.text.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 8.0),
                       child: Text(
                         'Incorrect password!',
                         style: TextStyle(
@@ -265,12 +265,12 @@ class _SettingsState extends State<Settings> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       content: Row(
         children: [
-          Icon(
+          const Icon(
             Icons.check,
             size: 15,
             color: Colors.white,
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
           Text('Cardabase was reset!',
@@ -351,8 +351,9 @@ class _SettingsState extends State<Settings> {
                         ),
                         content: Row(
                           children: [
-                            Icon(Icons.error, size: 15, color: Colors.white),
-                            SizedBox(width: 10),
+                            const Icon(Icons.error,
+                                size: 15, color: Colors.white),
+                            const SizedBox(width: 10),
                             Text(
                               'Incorrect password!',
                               style: theme.textTheme.bodyLarge?.copyWith(
@@ -471,8 +472,9 @@ class _SettingsState extends State<Settings> {
                           ),
                           content: Row(
                             children: [
-                              Icon(Icons.error, size: 15, color: Colors.white),
-                              SizedBox(width: 10),
+                              const Icon(Icons.error,
+                                  size: 15, color: Colors.white),
+                              const SizedBox(width: 10),
                               Text(
                                 'Incorrect password!',
                                 style: theme.textTheme.bodyLarge?.copyWith(
@@ -533,7 +535,7 @@ class _SettingsState extends State<Settings> {
       child: Scaffold(
         backgroundColor: theme.colorScheme.surface,
         body: CustomScrollView(
-          physics: BouncingScrollPhysics(
+          physics: const BouncingScrollPhysics(
               decelerationRate: ScrollDecelerationRate.fast),
           slivers: [
             SliverAppBar(
@@ -658,7 +660,7 @@ class _SettingsState extends State<Settings> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => PasswordScreen()));
+                              builder: (context) => const PasswordScreen()));
                     },
                     settingHeader: 'Password',
                     settingIcon: Icons.password,
@@ -668,8 +670,10 @@ class _SettingsState extends State<Settings> {
                   MySetting(
                     aboutSettingHeader: 'Categorize your cards by using tags',
                     settingAction: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => TagsPage()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const TagsPage()));
                     },
                     settingHeader: 'Tags',
                     settingIcon: Icons.label,

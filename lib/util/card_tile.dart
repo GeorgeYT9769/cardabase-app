@@ -35,7 +35,7 @@ class CardTile extends StatefulWidget {
   final int green;
   final int blue;
 
-  CardTile(
+  const CardTile(
       {super.key,
       required this.shopName,
       required this.deleteFunction,
@@ -182,7 +182,7 @@ class _CardTileState extends State<CardTile> {
                               red: widget.red,
                               green: widget.green,
                               blue: widget.blue,
-                              tags: [],
+                              tags: const [],
                               note: widget.note,
                               imagePathFront: widget.imagePathFront,
                               imagePathBack: widget.imagePathBack,
@@ -199,8 +199,9 @@ class _CardTileState extends State<CardTile> {
                           ),
                           content: Row(
                             children: [
-                              Icon(Icons.error, size: 15, color: Colors.white),
-                              SizedBox(width: 10),
+                              const Icon(Icons.error,
+                                  size: 15, color: Colors.white),
+                              const SizedBox(width: 10),
                               Text(
                                 'Incorrect password!',
                                 style: theme.textTheme.bodyLarge?.copyWith(
@@ -261,7 +262,7 @@ class _CardTileState extends State<CardTile> {
               red: widget.red,
               green: widget.green,
               blue: widget.blue,
-              tags: [],
+              tags: const [],
               note: widget.note,
               imagePathFront: widget.imagePathFront,
               imagePathBack: widget.imagePathBack,
@@ -357,7 +358,7 @@ class _CardTileState extends State<CardTile> {
     showModalBottomSheet(
       context: context,
       elevation: 0.0,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (BuildContext context) {
@@ -404,7 +405,7 @@ class _CardTileState extends State<CardTile> {
                 },
               ),
               ListTile(
-                leading: Icon(Icons.delete, color: Colors.red),
+                leading: const Icon(Icons.delete, color: Colors.red),
                 title: Text('DELETE',
                     style: theme.textTheme.bodyLarge?.copyWith()),
                 onTap: () {
@@ -412,7 +413,7 @@ class _CardTileState extends State<CardTile> {
                   widget.deleteFunction(context);
                 },
               ),
-              SizedBox(
+              const SizedBox(
                 height: 70,
               )
             ],

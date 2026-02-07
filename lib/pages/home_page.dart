@@ -96,8 +96,9 @@ class _HomePageState extends State<Homepage> {
                         ),
                         content: Row(
                           children: [
-                            Icon(Icons.error, size: 15, color: Colors.white),
-                            SizedBox(width: 10),
+                            const Icon(Icons.error,
+                                size: 15, color: Colors.white),
+                            const SizedBox(width: 10),
                             Text(
                               'Incorrect password!',
                               style: theme.textTheme.bodyLarge?.copyWith(
@@ -242,8 +243,9 @@ class _HomePageState extends State<Homepage> {
                         ),
                         content: Row(
                           children: [
-                            Icon(Icons.error, size: 15, color: Colors.white),
-                            SizedBox(width: 10),
+                            const Icon(Icons.error,
+                                size: 15, color: Colors.white),
+                            const SizedBox(width: 10),
                             Text(
                               'Incorrect password!',
                               style: theme.textTheme.bodyLarge?.copyWith(
@@ -420,7 +422,7 @@ class _HomePageState extends State<Homepage> {
                 height: 400,
                 width: double.maxFinite,
                 child: SingleChildScrollView(
-                  physics: BouncingScrollPhysics(
+                  physics: const BouncingScrollPhysics(
                       decelerationRate: ScrollDecelerationRate.fast),
                   child: Column(
                     children: <Widget>[
@@ -429,11 +431,11 @@ class _HomePageState extends State<Homepage> {
                               fontSize: 17,
                               color: theme.colorScheme.inverseSurface,
                               fontWeight: FontWeight.w900)),
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
                       SingleChildScrollView(
-                        physics: BouncingScrollPhysics(
+                        physics: const BouncingScrollPhysics(
                             decelerationRate: ScrollDecelerationRate.fast),
                         scrollDirection: Axis.horizontal,
                         child: Row(
@@ -495,14 +497,14 @@ class _HomePageState extends State<Homepage> {
                           ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
                       Divider(
                         color: theme.colorScheme.primary,
                         thickness: 1.0,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
                       Text('Sort by:',
@@ -510,7 +512,7 @@ class _HomePageState extends State<Homepage> {
                               fontSize: 17,
                               color: theme.colorScheme.inverseSurface,
                               fontWeight: FontWeight.w900)),
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
                       DropdownMenu(
@@ -575,7 +577,7 @@ class _HomePageState extends State<Homepage> {
                           });
                         },
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
                       Divider(
@@ -599,7 +601,7 @@ class _HomePageState extends State<Homepage> {
                         color: theme.colorScheme.primary,
                         thickness: 1.0,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
                       Text('Columns: $columnAmount',
@@ -608,7 +610,7 @@ class _HomePageState extends State<Homepage> {
                             fontWeight: FontWeight.w900,
                             color: theme.colorScheme.inverseSurface,
                           )),
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
                       Slider(
@@ -794,8 +796,8 @@ class _HomePageState extends State<Homepage> {
       }
       final int itemCount = cdb.myShops.length;
       final int crossAxisCount = columnAmount;
-      final double childAspectRatio = 1.4;
-      final double gridPadding = 8.0;
+      const double childAspectRatio = 1.4;
+      const double gridPadding = 8.0;
       if (reorderMode) {
         final List<Widget> children = List.generate(itemCount, (index) {
           if (index >= cdb.myShops.length) return const SizedBox.shrink();
@@ -835,7 +837,7 @@ class _HomePageState extends State<Homepage> {
           );
         });
         return SliverPadding(
-          padding: EdgeInsets.all(gridPadding),
+          padding: const EdgeInsets.all(gridPadding),
           sliver: ReorderableSliverGridView.count(
             crossAxisCount: crossAxisCount,
             mainAxisSpacing: 0,
@@ -853,7 +855,7 @@ class _HomePageState extends State<Homepage> {
         );
       } else {
         return SliverPadding(
-          padding: EdgeInsets.all(gridPadding),
+          padding: const EdgeInsets.all(gridPadding),
           sliver: SliverGrid(
             delegate: SliverChildBuilderDelegate(
               (context, index) {

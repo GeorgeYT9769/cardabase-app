@@ -36,7 +36,7 @@ class MySetting extends StatelessWidget {
                 ),
                 content: Row(
                   children: [
-                    SizedBox(
+                    const SizedBox(
                       width: 5,
                     ),
                     Icon(
@@ -44,7 +44,7 @@ class MySetting extends StatelessWidget {
                       size: 15,
                       color: theme.colorScheme.inverseSurface,
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 10,
                     ),
                     Flexible(

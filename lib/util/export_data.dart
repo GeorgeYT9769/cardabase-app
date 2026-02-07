@@ -38,12 +38,12 @@ Future<void> exportCardList(BuildContext context,
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           content: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.error,
                 size: 15,
                 color: Colors.white,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Text('No data!',
@@ -105,12 +105,12 @@ Future<void> exportCardList(BuildContext context,
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           content: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.check,
                 size: 15,
                 color: Colors.white,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Text('Exported to Downloads!',
@@ -134,12 +134,12 @@ Future<void> exportCardList(BuildContext context,
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           content: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.copy,
                 size: 15,
                 color: Colors.white,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Text('Copied to clipboard!',
@@ -163,12 +163,12 @@ Future<void> exportCardList(BuildContext context,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         content: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.error,
               size: 15,
               color: Colors.white,
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
             Text('Error!',
@@ -192,12 +192,12 @@ Future<void> exportCardList(BuildContext context,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       content: Row(
         children: [
-          Icon(
+          const Icon(
             Icons.error,
             size: 15,
             color: Colors.white,
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
           Text('No permission!',
@@ -244,8 +244,8 @@ Future<void> showExportTypeDialog(BuildContext context) async {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.text_fields),
-                    SizedBox(width: 10),
+                    const Icon(Icons.text_fields),
+                    const SizedBox(width: 10),
                     Text(
                       'TEXT',
                       style: theme.textTheme.bodyLarge?.copyWith(
@@ -256,7 +256,7 @@ Future<void> showExportTypeDialog(BuildContext context) async {
                   ],
                 ),
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               OutlinedButton(
                 onPressed: () {
                   Navigator.of(dialogContext).pop();
@@ -271,8 +271,8 @@ Future<void> showExportTypeDialog(BuildContext context) async {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.file_copy),
-                    SizedBox(width: 10),
+                    const Icon(Icons.file_copy),
+                    const SizedBox(width: 10),
                     Text(
                       'FILE',
                       style: theme.textTheme.bodyLarge?.copyWith(

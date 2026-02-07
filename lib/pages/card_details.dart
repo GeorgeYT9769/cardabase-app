@@ -195,7 +195,7 @@ class _CardDetailsState extends State<CardDetails> {
               decelerationRate: ScrollDecelerationRate.fast),
           children: [
             Container(
-                padding: EdgeInsetsGeometry.fromLTRB(20, 0, 20, 0),
+                padding: const EdgeInsetsGeometry.fromLTRB(20, 0, 20, 0),
                 child: Text(widget.cardtext,
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyLarge?.copyWith(
@@ -354,7 +354,7 @@ class _CardDetailsState extends State<CardDetails> {
                           fontWeight: FontWeight.bold),
                     ),
                   ),
-            SizedBox(
+            const SizedBox(
               height: 100,
             )
           ]),
@@ -371,7 +371,7 @@ class _CardDetailsState extends State<CardDetails> {
                   onPressed: () => Navigator.pop(context),
                   tooltip: 'SAVE',
                   backgroundColor: Colors.green.shade700,
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.check,
                     color: Colors.white,
                   ),
