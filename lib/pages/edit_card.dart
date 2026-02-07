@@ -395,7 +395,7 @@ class _EditCardState extends State<EditCard> {
       int evenSum = 0;
       for (int i = 0; i < 12; i++) {
         final int digit = int.parse(eanCode[i]);
-        if (i % 2 == 0) {
+        if (i.isEven) {
           oddSum += digit;
         } else {
           evenSum += digit;
@@ -412,7 +412,7 @@ class _EditCardState extends State<EditCard> {
       int evenSum = 0;
       for (int i = 0; i < 7; i++) {
         final int digit = int.parse(eanCode[i]);
-        if (i % 2 == 0) {
+        if (i.isEven) {
           evenSum += digit;
         } else {
           oddSum += digit;
@@ -443,7 +443,7 @@ class _EditCardState extends State<EditCard> {
       int sum = 0;
       for (int i = 0; i < 13; i++) {
         final int digit = int.parse(eanCode[i]);
-        if (i % 2 == 0) {
+        if (i.isEven) {
           sum += digit * 3;
         } else {
           sum += digit;
@@ -460,7 +460,7 @@ class _EditCardState extends State<EditCard> {
       int sum = 0;
       for (int i = 0; i < 15; i++) {
         final int digit = int.parse(eanCode[i]);
-        if (i % 2 == 0) {
+        if (i.isEven) {
           sum += digit * 3;
         } else {
           sum += digit;
@@ -477,7 +477,7 @@ class _EditCardState extends State<EditCard> {
       int evenSum = 0;
       for (int i = 0; i < 11; i++) {
         final int digit = int.parse(eanCode[i]);
-        if (i % 2 == 0) {
+        if (i.isEven) {
           evenSum += digit;
         } else {
           oddSum += digit;
@@ -494,7 +494,7 @@ class _EditCardState extends State<EditCard> {
       int evenSum = 0;
       for (int i = 0; i < 7; i++) {
         final int digit = int.parse(eanCode[i]);
-        if (i % 2 == 0) {
+        if (i.isEven) {
           evenSum += digit;
         } else {
           oddSum += digit;
@@ -620,8 +620,7 @@ class _EditCardState extends State<EditCard> {
                     blueValue = blue;
                     cardTypeText = cardType;
                     hasPassword = hasPwd;
-                    selectedTags =
-                        Set<String>.from(tags.map((e) => e.toString()));
+                    selectedTags = Set<String>.from(tags.map((e) => e));
                   });
                 }
               }
@@ -862,31 +861,29 @@ class _EditCardState extends State<EditCard> {
                           const SizedBox(
                             height: 15,
                           ),
-                          Container(
-                            child: TextField(
-                              controller: noteController,
-                              maxLines: 10,
-                              decoration: InputDecoration(
-                                hintStyle: theme.textTheme.bodyLarge?.copyWith(
-                                    color: theme.colorScheme.inverseSurface,
-                                    fontSize: 15),
-                                hintText: widget.notes.isEmpty
-                                    ? 'Some notes...'
-                                    : widget.notes,
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: const BorderSide(width: 2.0)),
-                                focusColor: theme.colorScheme.primary,
-                                enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: theme.colorScheme.primary,
-                                        width: 1.0),
-                                    borderRadius: BorderRadius.circular(10)),
-                              ),
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                  color: theme.colorScheme.tertiary,
-                                  fontWeight: FontWeight.bold),
+                          TextField(
+                            controller: noteController,
+                            maxLines: 10,
+                            decoration: InputDecoration(
+                              hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                                  color: theme.colorScheme.inverseSurface,
+                                  fontSize: 15),
+                              hintText: widget.notes.isEmpty
+                                  ? 'Some notes...'
+                                  : widget.notes,
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: const BorderSide(width: 2.0)),
+                              focusColor: theme.colorScheme.primary,
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: theme.colorScheme.primary,
+                                      width: 1.0),
+                                  borderRadius: BorderRadius.circular(10)),
                             ),
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                                color: theme.colorScheme.tertiary,
+                                fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
@@ -895,63 +892,62 @@ class _EditCardState extends State<EditCard> {
                       padding: const EdgeInsets.all(20),
                       child: Column(
                         children: [
-                          allTags.isEmpty
-                              ? const SizedBox.shrink()
-                              : SizedBox(
-                                  height: 40,
-                                  child: ListView.builder(
-                                    physics: const BouncingScrollPhysics(
-                                        decelerationRate:
-                                            ScrollDecelerationRate.fast),
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: allTags.length,
-                                    itemBuilder: (context, chipIndex) {
-                                      final tag = allTags[chipIndex];
-                                      final isSelected =
-                                          selectedTags.contains(tag);
-                                      return Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            0, 0, 10, 0),
-                                        child: ActionChip(
-                                          label: Text(tag),
-                                          onPressed: () {
-                                            setState(() {
-                                              if (isSelected) {
-                                                selectedTags.remove(tag);
-                                              } else {
-                                                selectedTags.add(tag);
-                                              }
-                                            });
-                                          },
-                                          labelStyle: theme.textTheme.bodyLarge
-                                              ?.copyWith(
-                                            color: isSelected
-                                                ? theme.colorScheme.onPrimary
-                                                : theme
-                                                    .colorScheme.inverseSurface,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          backgroundColor: isSelected
-                                              ? theme.colorScheme.primary
-                                              : theme.colorScheme.surface,
-                                          side: BorderSide(
-                                            color: isSelected
-                                                ? theme.colorScheme.primary
-                                                : theme.colorScheme.primary
-                                                    .withValues(alpha: 0.3),
-                                            width: isSelected ? 2 : 1,
-                                          ),
-                                          avatar: isSelected
-                                              ? Icon(Icons.check,
-                                                  size: 18,
-                                                  color: theme
-                                                      .colorScheme.onPrimary)
-                                              : null,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
+                          if (allTags.isEmpty)
+                            const SizedBox.shrink()
+                          else
+                            SizedBox(
+                              height: 40,
+                              child: ListView.builder(
+                                physics: const BouncingScrollPhysics(
+                                    decelerationRate:
+                                        ScrollDecelerationRate.fast),
+                                scrollDirection: Axis.horizontal,
+                                itemCount: allTags.length,
+                                itemBuilder: (context, chipIndex) {
+                                  final tag = allTags[chipIndex];
+                                  final isSelected = selectedTags.contains(tag);
+                                  return Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                                    child: ActionChip(
+                                      label: Text(tag),
+                                      onPressed: () {
+                                        setState(() {
+                                          if (isSelected) {
+                                            selectedTags.remove(tag);
+                                          } else {
+                                            selectedTags.add(tag);
+                                          }
+                                        });
+                                      },
+                                      labelStyle:
+                                          theme.textTheme.bodyLarge?.copyWith(
+                                        color: isSelected
+                                            ? theme.colorScheme.onPrimary
+                                            : theme.colorScheme.inverseSurface,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      backgroundColor: isSelected
+                                          ? theme.colorScheme.primary
+                                          : theme.colorScheme.surface,
+                                      side: BorderSide(
+                                        color: isSelected
+                                            ? theme.colorScheme.primary
+                                            : theme.colorScheme.primary
+                                                .withValues(alpha: 0.3),
+                                        width: isSelected ? 2 : 1,
+                                      ),
+                                      avatar: isSelected
+                                          ? Icon(Icons.check,
+                                              size: 18,
+                                              color:
+                                                  theme.colorScheme.onPrimary)
+                                          : null,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
                           const SizedBox(
                             height: 15,
                           ),
@@ -1127,31 +1123,31 @@ class _EditCardState extends State<EditCard> {
                                   hideTitle = checked!;
                                 });
                               }),
-                          passwordbox.isNotEmpty
-                              ? CheckboxListTile(
-                                  value: hasPassword,
-                                  title: Text('Use the password for this card',
-                                      style: theme.textTheme.bodyLarge
-                                          ?.copyWith(
-                                              //cardTypeText
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 15,
-                                              color: theme
-                                                  .colorScheme.inverseSurface)),
-                                  controlAffinity:
-                                      ListTileControlAffinity.leading,
-                                  side: BorderSide(
-                                      color: theme.colorScheme.primary),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(5)),
-                                  onChanged: (bool? checked) {
-                                    setState(() {
-                                      hasPassword = checked!;
-                                    });
-                                  })
-                              : const SizedBox(
-                                  height: 10,
-                                ),
+                          if (passwordbox.isNotEmpty)
+                            CheckboxListTile(
+                                value: hasPassword,
+                                title: Text('Use the password for this card',
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                        //cardTypeText
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                        color:
+                                            theme.colorScheme.inverseSurface)),
+                                controlAffinity:
+                                    ListTileControlAffinity.leading,
+                                side: BorderSide(
+                                    color: theme.colorScheme.primary),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5)),
+                                onChanged: (bool? checked) {
+                                  setState(() {
+                                    hasPassword = checked!;
+                                  });
+                                })
+                          else
+                            const SizedBox(
+                              height: 10,
+                            ),
                           const SizedBox(
                             height: 100,
                           ),

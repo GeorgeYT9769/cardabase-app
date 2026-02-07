@@ -218,8 +218,8 @@ class _HomePageState extends State<Homepage> {
                                       'CardType.ean13')
                                   .toString(),
                               tags: cdb.myShops[index]['tags'] ?? [],
-                              notes: (cdb.myShops[index]['note'] ??
-                                  'Card notes are displayed here...'),
+                              notes: cdb.myShops[index]['note'] ??
+                                  'Card notes are displayed here...',
                               frontFacePath:
                                   cdb.myShops[index]['imagePathFront'] ?? '',
                               backFacePath:
@@ -340,7 +340,7 @@ class _HomePageState extends State<Homepage> {
                 cardId: (card['cardId'] ?? '').toString(),
                 cardType: (card['cardType'] ?? 'CardType.ean13').toString(),
                 tags: card['tags'] ?? [],
-                notes: (card['note'] ?? 'Card notes are displayed here...'),
+                notes: card['note'] ?? 'Card notes are displayed here...',
                 frontFacePath: cdb.myShops[index]['imagePathFront'] ?? '',
                 backFacePath: cdb.myShops[index]['imagePathBack'] ?? '',
                 useFrontFaceOverlay:
@@ -370,7 +370,7 @@ class _HomePageState extends State<Homepage> {
               cardId: (card['cardId'] ?? '').toString(),
               cardType: (card['cardType'] ?? 'CardType.ean13').toString(),
               tags: card['tags'] ?? [],
-              notes: (card['note'] ?? 'Card notes are displayed here...'),
+              notes: card['note'] ?? 'Card notes are displayed here...',
               frontFacePath: cdb.myShops[index]['imagePathFront'] ?? '',
               backFacePath: cdb.myShops[index]['imagePathBack'] ?? '',
               useFrontFaceOverlay:
@@ -624,7 +624,7 @@ class _HomePageState extends State<Homepage> {
                             setState(() {
                               VibrationProvider.vibrateSuccess();
                               columnAmountDouble = newValue;
-                              columnAmount = columnAmountDouble.round().toInt();
+                              columnAmount = columnAmountDouble.round();
                               Hive.box('settingsBox')
                                   .put('columnAmount', columnAmount);
                             });

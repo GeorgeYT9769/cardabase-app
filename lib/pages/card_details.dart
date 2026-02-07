@@ -324,36 +324,36 @@ class _CardDetailsState extends State<CardDetails> {
                 },
               ),
             ),
-            widget.note.isEmpty
-                ? Container()
-                : Container(
-                    padding: const EdgeInsets.all(20),
-                    child: TextField(
-                      enabled: false,
-                      maxLines: 10,
-                      decoration: InputDecoration(
-                        hintStyle: theme.textTheme.bodyLarge?.copyWith(
-                            color: theme.colorScheme.inverseSurface,
-                            fontSize: 15),
-                        hintText: widget.note,
-                        disabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: theme.colorScheme.primary, width: 1.0),
-                            borderRadius: BorderRadius.circular(10)),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(width: 2.0)),
-                        focusColor: theme.colorScheme.primary,
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: theme.colorScheme.primary, width: 1.0),
-                            borderRadius: BorderRadius.circular(10)),
-                      ),
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                          color: theme.colorScheme.tertiary,
-                          fontWeight: FontWeight.bold),
-                    ),
+            if (widget.note.isEmpty)
+              Container()
+            else
+              Container(
+                padding: const EdgeInsets.all(20),
+                child: TextField(
+                  enabled: false,
+                  maxLines: 10,
+                  decoration: InputDecoration(
+                    hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                        color: theme.colorScheme.inverseSurface, fontSize: 15),
+                    hintText: widget.note,
+                    disabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: theme.colorScheme.primary, width: 1.0),
+                        borderRadius: BorderRadius.circular(10)),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(width: 2.0)),
+                    focusColor: theme.colorScheme.primary,
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: theme.colorScheme.primary, width: 1.0),
+                        borderRadius: BorderRadius.circular(10)),
                   ),
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.tertiary,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
             const SizedBox(
               height: 100,
             )

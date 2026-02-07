@@ -170,120 +170,119 @@ class _InfoScreenState extends State<InfoScreen> {
                 ),
               ),
               const SizedBox(height: 30),
-              _isLoading
-                  ? const CircularProgressIndicator()
-                  : _hasError
-                      ? Column(
-                          children: [
-                            Text(
-                              'Failed to check for updates. Please check your internet connection and try again.',
-                              style: theme.textTheme.bodyLarge
-                                  ?.copyWith(color: Colors.red, fontSize: 16),
-                              textAlign: TextAlign.center,
+              if (_isLoading)
+                const CircularProgressIndicator()
+              else
+                _hasError
+                    ? Column(
+                        children: [
+                          Text(
+                            'Failed to check for updates. Please check your internet connection and try again.',
+                            style: theme.textTheme.bodyLarge
+                                ?.copyWith(color: Colors.red, fontSize: 16),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 20),
+                          OutlinedButton.icon(
+                            onPressed: _fetchAppAndLatestVersion,
+                            icon: const Icon(Icons.refresh),
+                            label: const Text('Retry'),
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(
+                                  color: theme.colorScheme.primary, width: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 40, vertical: 15),
+                              backgroundColor: Colors.transparent,
+                              elevation: 0.0,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                              ),
                             ),
-                            const SizedBox(height: 20),
-                            OutlinedButton.icon(
-                              onPressed: _fetchAppAndLatestVersion,
-                              icon: const Icon(Icons.refresh),
-                              label: const Text('Retry'),
-                              style: OutlinedButton.styleFrom(
-                                side: BorderSide(
-                                    color: theme.colorScheme.primary, width: 2),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 40, vertical: 15),
-                                backgroundColor: Colors.transparent,
-                                elevation: 0.0,
-                                shape: const RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15)),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        children: [
+                          Text(
+                            _isUpdateAvailable!
+                                ? '🚀 New update available! (v$_latestGitHubVersion)'
+                                : '🎉 App is up to date!',
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: _isUpdateAvailable!
+                                  ? Colors.green
+                                  : theme.colorScheme.onSurface,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          if (_isUpdateAvailable!) ...[
+                            const SizedBox(height: 30),
+                            Bounceable(
+                              onTap: () {},
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                height: MediaQuery.of(context).size.width / 5,
+                                child: OutlinedButton(
+                                  onPressed: () =>
+                                      _launchUrl(_githubReleasesUrl),
+                                  style: OutlinedButton.styleFrom(
+                                    side: BorderSide(
+                                        color: theme.colorScheme.primary,
+                                        width: 2),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 40, vertical: 15),
+                                    backgroundColor: Colors.transparent,
+                                    elevation: 0.0,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(15),
+                                          topRight: Radius.circular(15)),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'GitHub',
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                        fontSize: 18,
+                                        color: theme.colorScheme.primary),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Bounceable(
+                              onTap: () {},
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                height: MediaQuery.of(context).size.width / 5,
+                                child: OutlinedButton(
+                                  onPressed: () => _launchUrl(
+                                      'https://f-droid.org/en/packages/com.georgeyt9769.cardabase/'),
+                                  style: OutlinedButton.styleFrom(
+                                    side: BorderSide(
+                                        color: theme.colorScheme.primary,
+                                        width: 2),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 40, vertical: 15),
+                                    backgroundColor: Colors.transparent,
+                                    elevation: 0.0,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.only(
+                                          bottomLeft: Radius.circular(15),
+                                          bottomRight: Radius.circular(15)),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'F-Droid',
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                        fontSize: 18,
+                                        color: theme.colorScheme.primary),
+                                  ),
                                 ),
                               ),
                             ),
                           ],
-                        )
-                      : Column(
-                          children: [
-                            Text(
-                              _isUpdateAvailable!
-                                  ? '🚀 New update available! (v$_latestGitHubVersion)'
-                                  : '🎉 App is up to date!',
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                color: _isUpdateAvailable!
-                                    ? Colors.green
-                                    : theme.colorScheme.onSurface,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            if (_isUpdateAvailable!) ...[
-                              const SizedBox(height: 30),
-                              Bounceable(
-                                onTap: () {},
-                                child: SizedBox(
-                                  width: MediaQuery.of(context).size.width,
-                                  height: MediaQuery.of(context).size.width / 5,
-                                  child: OutlinedButton(
-                                    onPressed: () =>
-                                        _launchUrl(_githubReleasesUrl),
-                                    style: OutlinedButton.styleFrom(
-                                      side: BorderSide(
-                                          color: theme.colorScheme.primary,
-                                          width: 2),
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 40, vertical: 15),
-                                      backgroundColor: Colors.transparent,
-                                      elevation: 0.0,
-                                      shape: const RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(15),
-                                            topRight: Radius.circular(15)),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      'GitHub',
-                                      style: theme.textTheme.bodyLarge
-                                          ?.copyWith(
-                                              fontSize: 18,
-                                              color: theme.colorScheme.primary),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              Bounceable(
-                                onTap: () {},
-                                child: SizedBox(
-                                  width: MediaQuery.of(context).size.width,
-                                  height: MediaQuery.of(context).size.width / 5,
-                                  child: OutlinedButton(
-                                    onPressed: () => _launchUrl(
-                                        'https://f-droid.org/en/packages/com.georgeyt9769.cardabase/'),
-                                    style: OutlinedButton.styleFrom(
-                                      side: BorderSide(
-                                          color: theme.colorScheme.primary,
-                                          width: 2),
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 40, vertical: 15),
-                                      backgroundColor: Colors.transparent,
-                                      elevation: 0.0,
-                                      shape: const RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.only(
-                                            bottomLeft: Radius.circular(15),
-                                            bottomRight: Radius.circular(15)),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      'F-Droid',
-                                      style: theme.textTheme.bodyLarge
-                                          ?.copyWith(
-                                              fontSize: 18,
-                                              color: theme.colorScheme.primary),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
+                        ],
+                      ),
               const SizedBox(height: 50),
             ],
           ),

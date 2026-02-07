@@ -42,7 +42,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     final lines = changelogText.split('\n');
     int start = -1;
     for (int i = 0; i < lines.length; i++) {
-      if (lines[i].contains(version + ':')) {
+      if (lines[i].contains('$version:')) {
         start = i;
         break;
       }
@@ -51,8 +51,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
     final buffer = StringBuffer();
     for (int i = start; i < lines.length; i++) {
-      if (i != start && RegExp(r'^\d{1,2}\.\d{1,2}\.\d{4}').hasMatch(lines[i]))
+      if (i != start &&
+          RegExp(r'^\d{1,2}\.\d{1,2}\.\d{4}').hasMatch(lines[i])) {
         break;
+      }
       buffer.writeln(lines[i]);
     }
     return buffer.toString().trim();
@@ -67,7 +69,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'What\'s new in version ${widget.currentAppVersion}:',
+                "What's new in version ${widget.currentAppVersion}:",
                 style: theme.textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,

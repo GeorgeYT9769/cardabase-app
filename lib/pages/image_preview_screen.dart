@@ -58,67 +58,38 @@ class ImagePreviewScreen extends StatelessWidget {
 
   // Helper method to build the barcode widget based on type
   Widget _buildBarcodeWidget(String data, String type) {
-    Barcode? barcode;
     double? width;
     double? height;
 
     // Map the string representation of CardType to Barcode library types
-    switch (type) {
-      case 'CardType.code39':
-        barcode = Barcode.code39();
-        break;
-      case 'CardType.code93':
-        barcode = Barcode.code93();
-        break;
-      case 'CardType.code128':
-        barcode = Barcode.code128();
-        break;
-      case 'CardType.ean13':
-        barcode = Barcode.ean13();
-        break;
-      case 'CardType.ean8':
-        barcode = Barcode.ean8();
-        break;
-      case 'CardType.ean5':
-        barcode = Barcode.ean5();
-        break;
-      case 'CardType.ean2':
-        barcode = Barcode.ean2();
-        break;
-      case 'CardType.itf':
-        barcode = Barcode.itf();
-        break;
-      case 'CardType.itf14':
-        barcode = Barcode.itf14();
-        break;
-      case 'CardType.itf16':
-        barcode = Barcode.itf();
-        break; // ITF-16 is often treated as generic ITF
-      case 'CardType.upca':
-        barcode = Barcode.upcA();
-        break;
-      case 'CardType.upce':
-        barcode = Barcode.upcE();
-        break;
-      case 'CardType.codabar':
-        barcode = Barcode.codabar();
-        break;
-      case 'CardType.qrcode':
-        barcode = Barcode.qrCode();
-        break;
-      case 'CardType.datamatrix':
-        barcode = Barcode.dataMatrix();
-        break;
-      case 'CardType.aztec':
-        barcode = Barcode.aztec();
-        break;
-      default:
-        // Fallback for unsupported or unknown barcode types
-        return Text(
-          data,
-          style: const TextStyle(color: Colors.black, fontSize: 40),
-          textAlign: TextAlign.center,
-        );
+    final barcode = switch (type) {
+      'CardType.code39' => Barcode.code39(),
+      'CardType.code93' => Barcode.code93(),
+      'CardType.code128' => Barcode.code128(),
+      'CardType.ean13' => Barcode.ean13(),
+      'CardType.ean8' => Barcode.ean8(),
+      'CardType.ean5' => Barcode.ean5(),
+      'CardType.ean2' => Barcode.ean2(),
+      'CardType.itf' => Barcode.itf(),
+      'CardType.itf14' => Barcode.itf14(),
+      // ITF-16 is often treated as generic ITF
+      'CardType.itf16' => Barcode.itf(),
+      'CardType.upca' => Barcode.upcA(),
+      'CardType.upce' => Barcode.upcE(),
+      'CardType.codabar' => Barcode.codabar(),
+      'CardType.qrcode' => Barcode.qrCode(),
+      'CardType.datamatrix' => Barcode.dataMatrix(),
+      'CardType.aztec' => Barcode.aztec(),
+      _ => null,
+    };
+
+    if (barcode == null) {
+      // Fallback for unsupported or unknown barcode types
+      return Text(
+        data,
+        style: const TextStyle(color: Colors.black, fontSize: 40),
+        textAlign: TextAlign.center,
+      );
     }
 
     // Set default dimensions for 1D and 2D barcodes
