@@ -117,6 +117,7 @@ class _CardTileState extends State<CardTile> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final Color contentTextColor =
         getContrastingTextColor(widget.cardTileColor);
     void showUnlockDialog(BuildContext context) {
@@ -126,9 +127,8 @@ class _CardTileState extends State<CardTile> {
         context: context,
         builder: (context) => AlertDialog(
           title: Text('Enter Password',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.inverseSurface,
-                  fontSize: 30)),
+              style: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.inverseSurface, fontSize: 30)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -140,27 +140,27 @@ class _CardTileState extends State<CardTile> {
                     borderRadius: BorderRadius.circular(10),
                     borderSide: const BorderSide(width: 2.0),
                   ),
-                  focusColor: Theme.of(context).colorScheme.primary,
+                  focusColor: theme.colorScheme.primary,
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.primary,
+                      color: theme.colorScheme.primary,
                       width: 1.0,
                     ),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.secondary,
-                      ),
+                  labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                    color: theme.colorScheme.secondary,
+                  ),
                   prefixIcon: Icon(
                     Icons.password,
-                    color: Theme.of(context).colorScheme.secondary,
+                    color: theme.colorScheme.secondary,
                   ),
                   labelText: 'Password',
                 ),
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.tertiary,
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.tertiary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 20),
               Center(
@@ -204,14 +204,11 @@ class _CardTileState extends State<CardTile> {
                               SizedBox(width: 10),
                               Text(
                                 'Incorrect password!',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith(
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                style: theme.textTheme.bodyLarge?.copyWith(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ],
                           ),
@@ -230,17 +227,16 @@ class _CardTileState extends State<CardTile> {
                   style: OutlinedButton.styleFrom(
                       elevation: 0.0,
                       side: BorderSide(
-                          color: Theme.of(context).colorScheme.primary,
-                          width: 2.0),
+                          color: theme.colorScheme.primary, width: 2.0),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(11))),
                   child: Text(
                     'Unlock',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                          color: Theme.of(context).colorScheme.tertiary,
-                        ),
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: theme.colorScheme.tertiary,
+                    ),
                   ),
                 ),
               ),
@@ -285,8 +281,9 @@ class _CardTileState extends State<CardTile> {
           children: [
             Expanded(
               child: GestureDetector(
-                onLongPress:
-                    widget.reorderMode ? null : () => _showBottomSheet(context),
+                onLongPress: widget.reorderMode
+                    ? null
+                    : () => _showBottomSheet(context, theme),
                 child: SizedBox(
                   height: (MediaQuery.of(context).size.width - 40) / 1.586,
                   width: double.infinity,
@@ -333,14 +330,11 @@ class _CardTileState extends State<CardTile> {
                           child: Center(
                             child: Text(
                               widget.hideTitle ? '' : widget.shopName,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(
-                                    fontSize: widget.labelSize,
-                                    fontWeight: FontWeight.bold,
-                                    color: contentTextColor,
-                                  ),
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                fontSize: widget.labelSize,
+                                fontWeight: FontWeight.bold,
+                                color: contentTextColor,
+                              ),
                               textAlign: TextAlign.center,
                               maxLines: 2,
                             ),
@@ -359,7 +353,7 @@ class _CardTileState extends State<CardTile> {
     );
   }
 
-  void _showBottomSheet(BuildContext context) {
+  void _showBottomSheet(BuildContext context, ThemeData theme) {
     VibrationProvider.vibrateSuccess();
     showModalBottomSheet(
       context: context,
@@ -373,30 +367,28 @@ class _CardTileState extends State<CardTile> {
           child: Wrap(
             children: [
               ListTile(
-                leading: Icon(Icons.edit,
-                    color: Theme.of(context).colorScheme.tertiary),
-                title: Text('Edit',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith()),
+                leading: Icon(Icons.edit, color: theme.colorScheme.tertiary),
+                title:
+                    Text('Edit', style: theme.textTheme.bodyLarge?.copyWith()),
                 onTap: () {
                   Navigator.pop(context);
                   widget.editFunction(context);
                 },
               ),
               ListTile(
-                leading: Icon(Icons.copy,
-                    color: Theme.of(context).colorScheme.tertiary),
+                leading: Icon(Icons.copy, color: theme.colorScheme.tertiary),
                 title: Text('Duplicate',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith()),
+                    style: theme.textTheme.bodyLarge?.copyWith()),
                 onTap: () {
                   Navigator.pop(context);
                   widget.duplicateFunction(context);
                 },
               ),
               ListTile(
-                leading: Icon(Icons.arrow_upward,
-                    color: Theme.of(context).colorScheme.tertiary),
+                leading:
+                    Icon(Icons.arrow_upward, color: theme.colorScheme.tertiary),
                 title: Text('Move UP',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith()),
+                    style: theme.textTheme.bodyLarge?.copyWith()),
                 onTap: () {
                   Navigator.pop(context);
                   widget.moveUpFunction(context);
@@ -404,9 +396,9 @@ class _CardTileState extends State<CardTile> {
               ),
               ListTile(
                 leading: Icon(Icons.arrow_downward,
-                    color: Theme.of(context).colorScheme.tertiary),
+                    color: theme.colorScheme.tertiary),
                 title: Text('Move DOWN',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith()),
+                    style: theme.textTheme.bodyLarge?.copyWith()),
                 onTap: () {
                   Navigator.pop(context);
                   widget.moveDownFunction(context);
@@ -415,7 +407,7 @@ class _CardTileState extends State<CardTile> {
               ListTile(
                 leading: Icon(Icons.delete, color: Colors.red),
                 title: Text('DELETE',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith()),
+                    style: theme.textTheme.bodyLarge?.copyWith()),
                 onTap: () {
                   Navigator.pop(context);
                   widget.deleteFunction(context);

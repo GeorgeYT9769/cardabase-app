@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 
 class ButtonTile extends StatelessWidget {
-
   final String buttonText;
   final buttonAction;
 
-
-  const ButtonTile({super.key, required this.buttonText, required this.buttonAction});
+  const ButtonTile(
+      {super.key, required this.buttonText, required this.buttonAction});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Bounceable(
       onTap: () {},
       child: Container(
@@ -19,7 +19,7 @@ class ButtonTile extends StatelessWidget {
           child: OutlinedButton(
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.all(15),
-              side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
+              side: BorderSide(color: theme.colorScheme.primary, width: 2),
               backgroundColor: Colors.transparent,
               elevation: 0.0,
               shape: RoundedRectangleBorder(
@@ -28,9 +28,10 @@ class ButtonTile extends StatelessWidget {
               minimumSize: const Size.fromHeight(65),
             ),
             onPressed: buttonAction,
-            child: Text(buttonText, style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontSize: 20)),
-          )
-      ),
+            child: Text(buttonText,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                    color: theme.colorScheme.tertiary, fontSize: 20)),
+          )),
     );
   }
 }

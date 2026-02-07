@@ -34,6 +34,7 @@ enum CardType {
   aztec('Aztec', 'aztec');
 
   const CardType(this.label, this.type);
+
   final String label;
   final String type;
 }
@@ -57,6 +58,7 @@ class _CreateCardState extends State<CreateCard>
   int greenValue = 158;
 
   Color cardColorPreview = Colors.grey;
+
   Color getContrastingTextColor(Color bg) {
     return bg.computeLuminance() > 0.7 ? Colors.black : Colors.white;
   }
@@ -141,7 +143,7 @@ class _CreateCardState extends State<CreateCard>
     });
   }
 
-  void saveNewCard() {
+  void saveNewCard(ThemeData theme) {
     //x;
     if (controller.text.isNotEmpty &&
         verifyEan(controllercardid.text) == true &&
@@ -197,7 +199,7 @@ class _CreateCardState extends State<CreateCard>
               width: 10,
             ),
             Text('Card Name cannot be empty!',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                style: theme.textTheme.bodyLarge?.copyWith(
                     fontSize: 18,
                     color: Colors.white,
                     fontWeight: FontWeight.bold)),
@@ -227,7 +229,7 @@ class _CreateCardState extends State<CreateCard>
               width: 10,
             ),
             Text('Card ID cannot be empty!',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                style: theme.textTheme.bodyLarge?.copyWith(
                     fontSize: 18,
                     color: Colors.white,
                     fontWeight: FontWeight.bold)),
@@ -257,7 +259,7 @@ class _CreateCardState extends State<CreateCard>
                 width: 10,
               ),
               Text('Card ID contains a mistake!',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  style: theme.textTheme.bodyLarge?.copyWith(
                       fontSize: 18,
                       color: Colors.white,
                       fontWeight: FontWeight.bold)),
@@ -288,7 +290,7 @@ class _CreateCardState extends State<CreateCard>
                 width: 10,
               ),
               Text('Barcode Type missing!',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  style: theme.textTheme.bodyLarge?.copyWith(
                       fontSize: 18,
                       color: Colors.white,
                       fontWeight: FontWeight.bold)),
@@ -319,7 +321,7 @@ class _CreateCardState extends State<CreateCard>
                 width: 10,
               ),
               Text('Unknown error',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  style: theme.textTheme.bodyLarge?.copyWith(
                       fontSize: 18,
                       color: Colors.white,
                       fontWeight: FontWeight.bold)),
@@ -518,16 +520,15 @@ class _CreateCardState extends State<CreateCard>
   CardType? selectedCardType;
   String cardTypeText = 'Barcode Type';
 
-  void _showBarcodeSelectorDialog() async {
+  void _showBarcodeSelectorDialog(ThemeData theme) async {
     CardType? result = await showDialog<CardType>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(
             'Barcode Type',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.inverseSurface,
-                fontSize: 30),
+            style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.inverseSurface, fontSize: 30),
           ),
           content: SizedBox(
             height: 300, // Custom height for the dialog
@@ -575,14 +576,15 @@ class _CreateCardState extends State<CreateCard>
 //structure of the page
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       //resizeToAvoidBottomInset: false,
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(
             Icons.qr_code_2,
-            color: Theme.of(context).colorScheme.secondary,
+            color: theme.colorScheme.secondary,
           ),
           onPressed: () async {
             var result = await Navigator.push(
@@ -633,7 +635,7 @@ class _CreateCardState extends State<CreateCard>
                   ? IconButton(
                       icon: Icon(
                         Icons.credit_card_off,
-                        color: Theme.of(context).colorScheme.secondary,
+                        color: theme.colorScheme.secondary,
                       ),
                       onPressed: addLegacyCard,
                     )
@@ -643,16 +645,15 @@ class _CreateCardState extends State<CreateCard>
           IconButton(
             icon: Icon(
               Icons.arrow_back_ios_new,
-              color: Theme.of(context).colorScheme.secondary,
+              color: theme.colorScheme.secondary,
             ),
             onPressed: cancelCard,
           ),
         ],
-        title: Text('New card',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith()),
+        title: Text('New card', style: theme.textTheme.titleLarge?.copyWith()),
         centerTitle: true,
         elevation: 0.0,
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: theme.colorScheme.surface,
       ),
 //structure of all widgets
 //card widget
@@ -688,15 +689,11 @@ class _CreateCardState extends State<CreateCard>
                           margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                           child: Text(
                             hideTitle ? '' : cardTextPreview,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyLarge
-                                ?.copyWith(
-                                  fontSize: 50,
-                                  fontWeight: FontWeight.bold,
-                                  color:
-                                      getContrastingTextColor(cardColorPreview),
-                                ),
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              fontSize: 50,
+                              fontWeight: FontWeight.bold,
+                              color: getContrastingTextColor(cardColorPreview),
+                            ),
                             maxLines: 2,
                             textAlign: TextAlign.center,
                           ),
@@ -717,8 +714,8 @@ class _CreateCardState extends State<CreateCard>
                     Tab(text: 'Card Details'),
                     Tab(text: 'Others'),
                   ],
-                  labelColor: Theme.of(context).colorScheme.primary,
-                  unselectedLabelColor: Theme.of(context).colorScheme.onSurface,
+                  labelColor: theme.colorScheme.primary,
+                  unselectedLabelColor: theme.colorScheme.onSurface,
                   splashFactory: NoSplash.splashFactory,
                 ),
                 SizedBox(
@@ -747,38 +744,23 @@ class _CreateCardState extends State<CreateCard>
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                     borderSide: const BorderSide(width: 2.0)),
-                                focusColor:
-                                    Theme.of(context).colorScheme.primary,
+                                focusColor: theme.colorScheme.primary,
                                 enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
+                                        color: theme.colorScheme.primary,
                                         width: 1.0),
                                     borderRadius: BorderRadius.circular(10)),
                                 labelText: 'Card Name',
-                                labelStyle: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .inverseSurface,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 17),
+                                labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                                    color: theme.colorScheme.inverseSurface,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17),
                                 prefixIcon: Icon(Icons.abc,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .secondary),
+                                    color: theme.colorScheme.secondary),
                               ),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .tertiary,
-                                      fontWeight: FontWeight.bold),
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                  color: theme.colorScheme.tertiary,
+                                  fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(
                               height: 15,
@@ -797,34 +779,22 @@ class _CreateCardState extends State<CreateCard>
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                     borderSide: const BorderSide(width: 2.0)),
-                                focusColor:
-                                    Theme.of(context).colorScheme.primary,
+                                focusColor: theme.colorScheme.primary,
                                 enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
+                                        color: theme.colorScheme.primary,
                                         width: 1.0),
                                     borderRadius: BorderRadius.circular(10)),
                                 labelText: 'Card ID',
-                                labelStyle: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .inverseSurface,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 17),
+                                labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                                    color: theme.colorScheme.inverseSurface,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17),
                                 prefixIcon: Icon(Icons.numbers,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .secondary),
+                                    color: theme.colorScheme.secondary),
                                 suffixIcon: IconButton(
                                   icon: Icon(Icons.photo_camera_rounded,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .secondary),
+                                      color: theme.colorScheme.secondary),
                                   onPressed: () async {
                                     var result = await Navigator.push(
                                       context,
@@ -944,14 +914,9 @@ class _CreateCardState extends State<CreateCard>
                                 ),
                               ),
                               keyboardType: TextInputType.number,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .tertiary,
-                                      fontWeight: FontWeight.bold),
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                  color: theme.colorScheme.tertiary,
+                                  fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(
                               height: 15,
@@ -964,8 +929,7 @@ class _CreateCardState extends State<CreateCard>
                                   style: OutlinedButton.styleFrom(
                                     padding: const EdgeInsets.all(15),
                                     side: BorderSide(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
+                                      color: theme.colorScheme.primary,
                                     ),
                                     backgroundColor: Colors.transparent,
                                     elevation: 0.0,
@@ -974,19 +938,16 @@ class _CreateCardState extends State<CreateCard>
                                     ),
                                     minimumSize: const Size.fromHeight(100),
                                   ),
-                                  onPressed: _showBarcodeSelectorDialog,
+                                  onPressed: () {
+                                    _showBarcodeSelectorDialog(theme);
+                                  },
                                   child: Text(
                                     getBarcodeTypeText(cardTypeText),
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge
-                                        ?.copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .inverseSurface,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 17,
-                                        ),
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                      color: theme.colorScheme.inverseSurface,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 17,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -1002,8 +963,7 @@ class _CreateCardState extends State<CreateCard>
                                   style: OutlinedButton.styleFrom(
                                     padding: const EdgeInsets.all(15),
                                     side: BorderSide(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
+                                      color: theme.colorScheme.primary,
                                     ),
                                     backgroundColor: Colors.transparent,
                                     elevation: 0.0,
@@ -1015,16 +975,11 @@ class _CreateCardState extends State<CreateCard>
                                   onPressed: openColorPickerDialog,
                                   child: Text(
                                     'Card Color',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge
-                                        ?.copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .inverseSurface,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 17,
-                                        ),
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                      color: theme.colorScheme.inverseSurface,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 17,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -1037,36 +992,25 @@ class _CreateCardState extends State<CreateCard>
                                 controller: noteController,
                                 maxLines: 10,
                                 decoration: InputDecoration(
-                                  hintStyle: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge
+                                  hintStyle: theme.textTheme.bodyLarge
                                       ?.copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .inverseSurface,
+                                          color:
+                                              theme.colorScheme.inverseSurface,
                                           fontSize: 15),
                                   hintText: 'Some notes...',
                                   border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10),
                                       borderSide: const BorderSide(width: 2.0)),
-                                  focusColor:
-                                      Theme.of(context).colorScheme.primary,
+                                  focusColor: theme.colorScheme.primary,
                                   enabledBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
+                                          color: theme.colorScheme.primary,
                                           width: 1.0),
                                       borderRadius: BorderRadius.circular(10)),
                                 ),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .tertiary,
-                                        fontWeight: FontWeight.bold),
+                                style: theme.textTheme.bodyLarge?.copyWith(
+                                    color: theme.colorScheme.tertiary,
+                                    fontWeight: FontWeight.bold),
                               ),
                             ),
                           ],
@@ -1084,16 +1028,13 @@ class _CreateCardState extends State<CreateCard>
                                     children: [
                                       Text(
                                         'Tags:',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge
-                                            ?.copyWith(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .inverseSurface,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                            ),
+                                        style:
+                                            theme.textTheme.bodyLarge?.copyWith(
+                                          color:
+                                              theme.colorScheme.inverseSurface,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
                                       ),
                                       const SizedBox(width: 10),
                                       Expanded(
@@ -1127,35 +1068,27 @@ class _CreateCardState extends State<CreateCard>
                                                       }
                                                     });
                                                   },
-                                                  labelStyle: Theme.of(context)
-                                                      .textTheme
-                                                      .bodyLarge
+                                                  labelStyle: theme
+                                                      .textTheme.bodyLarge
                                                       ?.copyWith(
-                                                        color: isSelected
-                                                            ? Theme.of(context)
-                                                                .colorScheme
-                                                                .onPrimary
-                                                            : Theme.of(context)
-                                                                .colorScheme
-                                                                .inverseSurface,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
+                                                    color: isSelected
+                                                        ? theme.colorScheme
+                                                            .onPrimary
+                                                        : theme.colorScheme
+                                                            .inverseSurface,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                                   backgroundColor: isSelected
-                                                      ? Theme.of(context)
-                                                          .colorScheme
-                                                          .primary
-                                                      : Theme.of(context)
-                                                          .colorScheme
-                                                          .surface,
+                                                      ? theme
+                                                          .colorScheme.primary
+                                                      : theme
+                                                          .colorScheme.surface,
                                                   side: BorderSide(
                                                     color: isSelected
-                                                        ? Theme.of(context)
-                                                            .colorScheme
-                                                            .primary
-                                                        : Theme.of(context)
-                                                            .colorScheme
-                                                            .primary
+                                                        ? theme
+                                                            .colorScheme.primary
+                                                        : theme
+                                                            .colorScheme.primary
                                                             .withValues(
                                                                 alpha: 0.3),
                                                     width: isSelected ? 2 : 1,
@@ -1163,10 +1096,9 @@ class _CreateCardState extends State<CreateCard>
                                                   avatar: isSelected
                                                       ? Icon(Icons.check,
                                                           size: 18,
-                                                          color:
-                                                              Theme.of(context)
-                                                                  .colorScheme
-                                                                  .onPrimary)
+                                                          color: theme
+                                                              .colorScheme
+                                                              .onPrimary)
                                                       : null,
                                                 ),
                                               );
@@ -1190,9 +1122,7 @@ class _CreateCardState extends State<CreateCard>
                                   width: double.infinity,
                                   child: CustomPaint(
                                     painter: DashedRect(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary),
+                                        color: theme.colorScheme.primary),
                                     child: GestureDetector(
                                       onLongPress: () {
                                         setState(() {
@@ -1203,9 +1133,7 @@ class _CreateCardState extends State<CreateCard>
                                         onPressed: takeFrontPicture,
                                         style: OutlinedButton.styleFrom(
                                           side: BorderSide(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary,
+                                              color: theme.colorScheme.primary,
                                               width: 2,
                                               style: BorderStyle.none),
                                           backgroundColor: Colors.transparent,
@@ -1235,20 +1163,17 @@ class _CreateCardState extends State<CreateCard>
                                                     MainAxisAlignment.center,
                                                 children: [
                                                   Icon(Icons.camera_alt,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
+                                                      color: theme.colorScheme
                                                           .secondary),
                                                   Text('Front face picture',
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .bodyLarge
+                                                      style: theme
+                                                          .textTheme.bodyLarge
                                                           ?.copyWith(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
                                                               fontSize: 15,
-                                                              color: Theme.of(
-                                                                      context)
+                                                              color: theme
                                                                   .colorScheme
                                                                   .inverseSurface)),
                                                 ],
@@ -1273,9 +1198,7 @@ class _CreateCardState extends State<CreateCard>
                                   width: double.infinity,
                                   child: CustomPaint(
                                     painter: DashedRect(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary),
+                                        color: theme.colorScheme.primary),
                                     child: GestureDetector(
                                       onLongPress: () {
                                         setState(() {
@@ -1286,9 +1209,7 @@ class _CreateCardState extends State<CreateCard>
                                         onPressed: takeBackPicture,
                                         style: OutlinedButton.styleFrom(
                                           side: BorderSide(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary,
+                                              color: theme.colorScheme.primary,
                                               width: 2,
                                               style: BorderStyle.none),
                                           backgroundColor: Colors.transparent,
@@ -1316,20 +1237,17 @@ class _CreateCardState extends State<CreateCard>
                                                     MainAxisAlignment.center,
                                                 children: [
                                                   Icon(Icons.camera_alt,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
+                                                      color: theme.colorScheme
                                                           .secondary),
                                                   Text('Back face picture',
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .bodyLarge
+                                                      style: theme
+                                                          .textTheme.bodyLarge
                                                           ?.copyWith(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
                                                               fontSize: 15,
-                                                              color: Theme.of(
-                                                                      context)
+                                                              color: theme
                                                                   .colorScheme
                                                                   .inverseSurface)),
                                                 ],
@@ -1347,21 +1265,16 @@ class _CreateCardState extends State<CreateCard>
                                 value: useFrontFaceOverlay,
                                 title: Text(
                                     'Use front face picture as a card thumbnail',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge
-                                        ?.copyWith(
-                                            //cardTypeText
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 15,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .inverseSurface)),
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                        //cardTypeText
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                        color:
+                                            theme.colorScheme.inverseSurface)),
                                 controlAffinity:
                                     ListTileControlAffinity.leading,
                                 side: BorderSide(
-                                    color:
-                                        Theme.of(context).colorScheme.primary),
+                                    color: theme.colorScheme.primary),
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(5)),
                                 onChanged: (bool? checked) {
@@ -1372,21 +1285,16 @@ class _CreateCardState extends State<CreateCard>
                             CheckboxListTile(
                                 value: hideTitle,
                                 title: Text('Hide card title',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge
-                                        ?.copyWith(
-                                            //cardTypeText
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 15,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .inverseSurface)),
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                        //cardTypeText
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                        color:
+                                            theme.colorScheme.inverseSurface)),
                                 controlAffinity:
                                     ListTileControlAffinity.leading,
                                 side: BorderSide(
-                                    color:
-                                        Theme.of(context).colorScheme.primary),
+                                    color: theme.colorScheme.primary),
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(5)),
                                 onChanged: (bool? checked) {
@@ -1399,22 +1307,17 @@ class _CreateCardState extends State<CreateCard>
                                     value: hasPassword,
                                     title: Text(
                                         'Use the password for this card',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge
+                                        style: theme.textTheme.bodyLarge
                                             ?.copyWith(
                                                 //cardTypeText
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 15,
-                                                color: Theme.of(context)
-                                                    .colorScheme
+                                                color: theme.colorScheme
                                                     .inverseSurface)),
                                     controlAffinity:
                                         ListTileControlAffinity.leading,
                                     side: BorderSide(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary),
+                                        color: theme.colorScheme.primary),
                                     shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(5)),
                                     onChanged: (bool? checked) {
@@ -1449,7 +1352,7 @@ class _CreateCardState extends State<CreateCard>
             child: FloatingActionButton.extended(
               elevation: 0.0,
               heroTag: 'saveFAB',
-              onPressed: saveNewCard,
+              onPressed: () => saveNewCard(theme),
               tooltip: 'SAVE',
               backgroundColor: Colors.green.shade700,
               icon: Icon(
@@ -1461,7 +1364,7 @@ class _CreateCardState extends State<CreateCard>
               ),
               label: Text(
                 'SAVE',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                style: theme.textTheme.bodyLarge?.copyWith(
                     //cardTypeText
                     fontWeight: FontWeight.bold,
                     fontSize: 18,

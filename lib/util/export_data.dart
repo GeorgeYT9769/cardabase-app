@@ -26,6 +26,7 @@ Future<bool> requestStoragePermission() async {
 
 Future<void> exportCardList(BuildContext context,
     {required bool toFile}) async {
+  final theme = Theme.of(context);
   if (await requestStoragePermission() || !toFile) {
     try {
       final directory = Directory('/storage/emulated/0/Download');
@@ -46,7 +47,7 @@ Future<void> exportCardList(BuildContext context,
                 width: 10,
               ),
               Text('No data!',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  style: theme.textTheme.bodyLarge?.copyWith(
                       fontSize: 18,
                       color: Colors.white,
                       fontWeight: FontWeight.bold)),
@@ -113,7 +114,7 @@ Future<void> exportCardList(BuildContext context,
                 width: 10,
               ),
               Text('Exported to Downloads!',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  style: theme.textTheme.bodyLarge?.copyWith(
                       fontSize: 18,
                       color: Colors.white,
                       fontWeight: FontWeight.bold)),
@@ -142,7 +143,7 @@ Future<void> exportCardList(BuildContext context,
                 width: 10,
               ),
               Text('Copied to clipboard!',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  style: theme.textTheme.bodyLarge?.copyWith(
                       fontSize: 18,
                       color: Colors.white,
                       fontWeight: FontWeight.bold)),
@@ -171,7 +172,7 @@ Future<void> exportCardList(BuildContext context,
               width: 10,
             ),
             Text('Error!',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                style: theme.textTheme.bodyLarge?.copyWith(
                     fontSize: 18,
                     color: Colors.white,
                     fontWeight: FontWeight.bold)),
@@ -200,7 +201,7 @@ Future<void> exportCardList(BuildContext context,
             width: 10,
           ),
           Text('No permission!',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              style: theme.textTheme.bodyLarge?.copyWith(
                   fontSize: 18,
                   color: Colors.white,
                   fontWeight: FontWeight.bold)),
@@ -220,11 +221,11 @@ Future<void> showExportTypeDialog(BuildContext context) async {
   showDialog(
     context: context,
     builder: (BuildContext dialogContext) {
+      final theme = Theme.of(context);
       return AlertDialog(
         title: Text('Export As:',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.inverseSurface,
-                fontSize: 30)),
+            style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.inverseSurface, fontSize: 30)),
         content: SizedBox(
           height: 150,
           child: ListView(
@@ -237,8 +238,7 @@ Future<void> showExportTypeDialog(BuildContext context) async {
                 style: OutlinedButton.styleFrom(
                     elevation: 0.0,
                     side: BorderSide(
-                        color: Theme.of(context).colorScheme.primary,
-                        width: 2.0),
+                        color: theme.colorScheme.primary, width: 2.0),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(11))),
                 child: Row(
@@ -248,10 +248,10 @@ Future<void> showExportTypeDialog(BuildContext context) async {
                     SizedBox(width: 10),
                     Text(
                       'TEXT',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
                     ),
                   ],
                 ),
@@ -265,8 +265,7 @@ Future<void> showExportTypeDialog(BuildContext context) async {
                 style: OutlinedButton.styleFrom(
                     elevation: 0.0,
                     side: BorderSide(
-                        color: Theme.of(context).colorScheme.primary,
-                        width: 2.0),
+                        color: theme.colorScheme.primary, width: 2.0),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(11))),
                 child: Row(
@@ -276,10 +275,10 @@ Future<void> showExportTypeDialog(BuildContext context) async {
                     SizedBox(width: 10),
                     Text(
                       'FILE',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
                     ),
                   ],
                 ),

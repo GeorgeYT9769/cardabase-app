@@ -61,6 +61,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final changelogWidget = changelog == null
         ? const CircularProgressIndicator()
         : Column(
@@ -68,10 +69,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             children: [
               Text(
                 'What\'s new in version ${widget.currentAppVersion}:',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
               ),
               const SizedBox(height: 10),
               AnimatedCrossFade(
@@ -84,10 +85,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   children: [
                     Text(
                       _getFirstLines(changelog!, 3),
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge
-                          ?.copyWith(fontSize: 16),
+                      style: theme.textTheme.bodyLarge?.copyWith(fontSize: 16),
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -107,9 +105,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         child: SingleChildScrollView(
                           child: Text(
                             changelog!,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyLarge
+                            style: theme.textTheme.bodyLarge
                                 ?.copyWith(fontSize: 16),
                           ),
                         ),
@@ -131,9 +127,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       appBar: AppBar(
         title: Text(
           'Welcome to Cardabase!',
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontSize: 25,
-              ),
+          style: theme.textTheme.bodyLarge?.copyWith(
+            fontSize: 25,
+          ),
         ),
         automaticallyImplyLeading: false,
       ),
@@ -144,15 +140,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.auto_awesome,
-                  size: 80, color: Theme.of(context).colorScheme.primary),
+                  size: 80, color: theme.colorScheme.primary),
               const SizedBox(height: 30),
               changelogWidget,
               Text(
                 'Important: New storage system -> ERRORS. To fix this, export and import all your cards to convert them.',
                 textAlign: TextAlign.center,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyLarge
+                style: theme.textTheme.bodyLarge
                     ?.copyWith(fontSize: 16, color: Colors.red),
               ),
               const SizedBox(height: 40),
@@ -171,8 +165,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     },
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(
-                          color: Theme.of(context).colorScheme.primary,
-                          width: 2),
+                          color: theme.colorScheme.primary, width: 2),
                       padding: const EdgeInsets.symmetric(
                           horizontal: 40, vertical: 15),
                       backgroundColor: Colors.transparent,
@@ -185,9 +178,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     ),
                     child: Text(
                       'Continue',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontSize: 22,
-                          color: Theme.of(context).colorScheme.primary),
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                          fontSize: 22, color: theme.colorScheme.primary),
                     ),
                   ),
                 ),
@@ -208,8 +200,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     },
                     style: OutlinedButton.styleFrom(
                         side: BorderSide(
-                            color: Theme.of(context).colorScheme.inverseSurface,
-                            width: 2),
+                            color: theme.colorScheme.inverseSurface, width: 2),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 40, vertical: 15),
                         backgroundColor: Colors.transparent,
@@ -222,8 +213,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         minimumSize: const Size.square(40)),
                     child: Text(
                       'Skip for now',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.inverseSurface),
+                      style: theme.textTheme.bodyLarge
+                          ?.copyWith(color: theme.colorScheme.inverseSurface),
                     ),
                   ),
                 ),

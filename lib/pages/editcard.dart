@@ -30,6 +30,7 @@ enum CardType {
   aztec('Aztec', 'aztec');
 
   const CardType(this.label, this.type);
+
   final String label;
   final String type;
 }
@@ -161,7 +162,7 @@ class _EditCardState extends State<EditCard> {
     });
   }
 
-  void saveNewCard() {
+  void saveNewCard(ThemeData theme) {
     if (controller.text.isNotEmpty &&
         verifyEan(controllercardid.text) == true &&
         cardTypeText != 'Card Type') {
@@ -212,7 +213,7 @@ class _EditCardState extends State<EditCard> {
               width: 10,
             ),
             Text('Card Name cannot be empty!',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                style: theme.textTheme.bodyLarge?.copyWith(
                     fontSize: 18,
                     color: Colors.white,
                     fontWeight: FontWeight.bold)),
@@ -241,7 +242,7 @@ class _EditCardState extends State<EditCard> {
               width: 10,
             ),
             Text('Card ID cannot be empty!',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                style: theme.textTheme.bodyLarge?.copyWith(
                     fontSize: 18,
                     color: Colors.white,
                     fontWeight: FontWeight.bold)),
@@ -270,7 +271,7 @@ class _EditCardState extends State<EditCard> {
                 width: 10,
               ),
               Text('Card ID contains a mistake!',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  style: theme.textTheme.bodyLarge?.copyWith(
                       fontSize: 18,
                       color: Colors.white,
                       fontWeight: FontWeight.bold)),
@@ -300,7 +301,7 @@ class _EditCardState extends State<EditCard> {
                 width: 10,
               ),
               Text('Card Type was not selected!',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  style: theme.textTheme.bodyLarge?.copyWith(
                       fontSize: 18,
                       color: Colors.white,
                       fontWeight: FontWeight.bold)),
@@ -330,7 +331,7 @@ class _EditCardState extends State<EditCard> {
                 width: 10,
               ),
               Text('Unknown error',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  style: theme.textTheme.bodyLarge?.copyWith(
                       fontSize: 18,
                       color: Colors.white,
                       fontWeight: FontWeight.bold)),
@@ -511,15 +512,14 @@ class _EditCardState extends State<EditCard> {
   CardType? selectedCardType;
   String cardTypeText = 'Card Type';
 
-  void _showBarcodeSelectorDialog() async {
+  void _showBarcodeSelectorDialog(ThemeData theme) async {
     CardType? result = await showDialog<CardType>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Select Barcode Type',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.inverseSurface,
-                  fontSize: 30)),
+              style: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.inverseSurface, fontSize: 30)),
           content: SizedBox(
             height: 300,
             width: double.maxFinite,
@@ -579,13 +579,14 @@ class _EditCardState extends State<EditCard> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(
             Icons.qr_code_2,
-            color: Theme.of(context).colorScheme.secondary,
+            color: theme.colorScheme.secondary,
           ),
           onPressed: () async {
             var result = await Navigator.push(
@@ -632,16 +633,15 @@ class _EditCardState extends State<EditCard> {
           IconButton(
             icon: Icon(
               Icons.arrow_back_ios_new,
-              color: Theme.of(context).colorScheme.secondary,
+              color: theme.colorScheme.secondary,
             ),
             onPressed: cancelCard,
           ),
         ],
-        title: Text('Edit card',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith()),
+        title: Text('Edit card', style: theme.textTheme.titleLarge?.copyWith()),
         centerTitle: true,
         elevation: 0.0,
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: theme.colorScheme.surface,
       ),
 //structure of all widgets
 //card widget
@@ -672,11 +672,11 @@ class _EditCardState extends State<EditCard> {
                   Center(
                     child: Text(
                       hideTitle ? '' : cardTextPreview,
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontSize: 50,
-                            fontWeight: FontWeight.bold,
-                            color: getContrastingTextColor(cardColorPreview),
-                          ),
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontSize: 50,
+                        fontWeight: FontWeight.bold,
+                        color: getContrastingTextColor(cardColorPreview),
+                      ),
                       maxLines: 2,
                       textAlign: TextAlign.center,
                     ),
@@ -694,8 +694,8 @@ class _EditCardState extends State<EditCard> {
                     Tab(text: 'Card Details'),
                     Tab(text: 'Others'),
                   ],
-                  labelColor: Theme.of(context).colorScheme.primary,
-                  unselectedLabelColor: Theme.of(context).colorScheme.onSurface,
+                  labelColor: theme.colorScheme.primary,
+                  unselectedLabelColor: theme.colorScheme.onSurface,
                   splashFactory: NoSplash.splashFactory,
                 ),
                 SizedBox(
@@ -722,32 +722,21 @@ class _EditCardState extends State<EditCard> {
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: const BorderSide(width: 2.0)),
-                              focusColor: Theme.of(context).colorScheme.primary,
+                              focusColor: theme.colorScheme.primary,
                               enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
+                                      color: theme.colorScheme.primary,
                                       width: 1.0),
                                   borderRadius: BorderRadius.circular(10)),
                               labelText: 'Card Name',
-                              labelStyle: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .secondary),
+                              labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                                  color: theme.colorScheme.secondary),
                               prefixIcon: Icon(Icons.abc,
-                                  color:
-                                      Theme.of(context).colorScheme.secondary),
+                                  color: theme.colorScheme.secondary),
                             ),
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyLarge
-                                ?.copyWith(
-                                    color:
-                                        Theme.of(context).colorScheme.tertiary,
-                                    fontWeight: FontWeight.bold),
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                                color: theme.colorScheme.tertiary,
+                                fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(
                             height: 20,
@@ -766,33 +755,21 @@ class _EditCardState extends State<EditCard> {
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                     borderSide: const BorderSide(width: 2.0)),
-                                focusColor:
-                                    Theme.of(context).colorScheme.primary,
+                                focusColor: theme.colorScheme.primary,
                                 enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
+                                        color: theme.colorScheme.primary,
                                         width: 1.0),
                                     borderRadius: BorderRadius.circular(10)),
                                 labelText: 'Card ID',
-                                labelStyle: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .secondary,
-                                    ),
+                                labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                                  color: theme.colorScheme.secondary,
+                                ),
                                 prefixIcon: Icon(Icons.numbers,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .secondary),
+                                    color: theme.colorScheme.secondary),
                                 suffixIcon: IconButton(
                                   icon: Icon(Icons.photo_camera_rounded,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .secondary),
+                                      color: theme.colorScheme.secondary),
                                   onPressed: () async {
                                     var result = await Navigator.push(
                                         context,
@@ -814,14 +791,9 @@ class _EditCardState extends State<EditCard> {
                               ),
                               keyboardType: TextInputType.number,
                               //maxLength: 13,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .tertiary,
-                                      fontWeight: FontWeight.bold)),
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                  color: theme.colorScheme.tertiary,
+                                  fontWeight: FontWeight.bold)),
                           const SizedBox(
                             height: 20,
                           ),
@@ -833,8 +805,7 @@ class _EditCardState extends State<EditCard> {
                                 style: OutlinedButton.styleFrom(
                                   padding: const EdgeInsets.all(15),
                                   side: BorderSide(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
+                                    color: theme.colorScheme.primary,
                                   ),
                                   backgroundColor: Colors.transparent,
                                   elevation: 0.0,
@@ -843,19 +814,16 @@ class _EditCardState extends State<EditCard> {
                                   ),
                                   minimumSize: const Size.fromHeight(100),
                                 ),
-                                onPressed: _showBarcodeSelectorDialog,
+                                onPressed: () {
+                                  _showBarcodeSelectorDialog(theme);
+                                },
                                 child: Text(
                                   getBarcodeTypeText(cardTypeText),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge
-                                      ?.copyWith(
-                                        //cardTypeText
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .tertiary,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                    //cardTypeText
+                                    color: theme.colorScheme.tertiary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ),
@@ -872,8 +840,7 @@ class _EditCardState extends State<EditCard> {
                                 style: OutlinedButton.styleFrom(
                                   padding: const EdgeInsets.all(15),
                                   side: BorderSide(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
+                                    color: theme.colorScheme.primary,
                                   ),
                                   backgroundColor: Colors.transparent,
                                   elevation: 0.0,
@@ -885,15 +852,10 @@ class _EditCardState extends State<EditCard> {
                                 onPressed: openColorPickerDialog,
                                 child: Text(
                                   'Card Color',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge
-                                      ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .tertiary,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                    color: theme.colorScheme.tertiary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ),
@@ -906,38 +868,25 @@ class _EditCardState extends State<EditCard> {
                               controller: noteController,
                               maxLines: 10,
                               decoration: InputDecoration(
-                                hintStyle: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .inverseSurface,
-                                        fontSize: 15),
+                                hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                                    color: theme.colorScheme.inverseSurface,
+                                    fontSize: 15),
                                 hintText: widget.notes.isEmpty
                                     ? 'Some notes...'
                                     : widget.notes,
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                     borderSide: const BorderSide(width: 2.0)),
-                                focusColor:
-                                    Theme.of(context).colorScheme.primary,
+                                focusColor: theme.colorScheme.primary,
                                 enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
+                                        color: theme.colorScheme.primary,
                                         width: 1.0),
                                     borderRadius: BorderRadius.circular(10)),
                               ),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .tertiary,
-                                      fontWeight: FontWeight.bold),
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                  color: theme.colorScheme.tertiary,
+                                  fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],
@@ -975,43 +924,29 @@ class _EditCardState extends State<EditCard> {
                                               }
                                             });
                                           },
-                                          labelStyle: Theme.of(context)
-                                              .textTheme
-                                              .bodyLarge
+                                          labelStyle: theme.textTheme.bodyLarge
                                               ?.copyWith(
-                                                color: isSelected
-                                                    ? Theme.of(context)
-                                                        .colorScheme
-                                                        .onPrimary
-                                                    : Theme.of(context)
-                                                        .colorScheme
-                                                        .inverseSurface,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                            color: isSelected
+                                                ? theme.colorScheme.onPrimary
+                                                : theme
+                                                    .colorScheme.inverseSurface,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                           backgroundColor: isSelected
-                                              ? Theme.of(context)
-                                                  .colorScheme
-                                                  .primary
-                                              : Theme.of(context)
-                                                  .colorScheme
-                                                  .surface,
+                                              ? theme.colorScheme.primary
+                                              : theme.colorScheme.surface,
                                           side: BorderSide(
                                             color: isSelected
-                                                ? Theme.of(context)
-                                                    .colorScheme
-                                                    .primary
-                                                : Theme.of(context)
-                                                    .colorScheme
-                                                    .primary
+                                                ? theme.colorScheme.primary
+                                                : theme.colorScheme.primary
                                                     .withValues(alpha: 0.3),
                                             width: isSelected ? 2 : 1,
                                           ),
                                           avatar: isSelected
                                               ? Icon(Icons.check,
                                                   size: 18,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onPrimary)
+                                                  color: theme
+                                                      .colorScheme.onPrimary)
                                               : null,
                                         ),
                                       );
@@ -1035,9 +970,7 @@ class _EditCardState extends State<EditCard> {
                                   children: [
                                     CustomPaint(
                                       painter: DashedRect(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary),
+                                          color: theme.colorScheme.primary),
                                     ),
                                     // Icons and text behind the photo
                                     Column(
@@ -1045,18 +978,13 @@ class _EditCardState extends State<EditCard> {
                                           MainAxisAlignment.center,
                                       children: [
                                         Icon(Icons.camera_alt,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .secondary),
+                                            color: theme.colorScheme.secondary),
                                         Text('Front face picture',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyLarge
+                                            style: theme.textTheme.bodyLarge
                                                 ?.copyWith(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 15,
-                                                    color: Theme.of(context)
-                                                        .colorScheme
+                                                    color: theme.colorScheme
                                                         .inverseSurface)),
                                       ],
                                     ),
@@ -1100,9 +1028,7 @@ class _EditCardState extends State<EditCard> {
                                 width: double.infinity,
                                 child: CustomPaint(
                                   painter: DashedRect(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary),
+                                      color: theme.colorScheme.primary),
                                   child: GestureDetector(
                                     onLongPress: () {
                                       setState(() {
@@ -1113,15 +1039,13 @@ class _EditCardState extends State<EditCard> {
                                       onPressed: takeBackPicture,
                                       style: OutlinedButton.styleFrom(
                                         side: BorderSide(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
+                                            color: theme.colorScheme.primary,
                                             width: 2,
                                             style: BorderStyle.none),
                                         backgroundColor: Colors.transparent,
                                         elevation: 0.0,
-                                        padding: EdgeInsets
-                                            .zero, // Add this to remove default padding
+                                        padding: EdgeInsets.zero,
+                                        // Add this to remove default padding
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(15),
@@ -1144,19 +1068,16 @@ class _EditCardState extends State<EditCard> {
                                                   MainAxisAlignment.center,
                                               children: [
                                                 Icon(Icons.camera_alt,
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .secondary),
+                                                    color: theme
+                                                        .colorScheme.secondary),
                                                 Text('Back face picture',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .bodyLarge
+                                                    style: theme
+                                                        .textTheme.bodyLarge
                                                         ?.copyWith(
                                                             fontWeight:
                                                                 FontWeight.bold,
                                                             fontSize: 15,
-                                                            color: Theme.of(
-                                                                    context)
+                                                            color: theme
                                                                 .colorScheme
                                                                 .inverseSurface)),
                                               ],
@@ -1174,19 +1095,14 @@ class _EditCardState extends State<EditCard> {
                               value: useFrontFaceOverlay,
                               title: Text(
                                   'Use front face picture as a card thumbnail',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge
-                                      ?.copyWith(
-                                          //cardTypeText
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .inverseSurface)),
+                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                      //cardTypeText
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                      color: theme.colorScheme.inverseSurface)),
                               controlAffinity: ListTileControlAffinity.leading,
-                              side: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary),
+                              side:
+                                  BorderSide(color: theme.colorScheme.primary),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(5)),
                               onChanged: (bool? checked) {
@@ -1197,19 +1113,14 @@ class _EditCardState extends State<EditCard> {
                           CheckboxListTile(
                               value: hideTitle,
                               title: Text('Hide card title',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge
-                                      ?.copyWith(
-                                          //cardTypeText
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .inverseSurface)),
+                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                      //cardTypeText
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                      color: theme.colorScheme.inverseSurface)),
                               controlAffinity: ListTileControlAffinity.leading,
-                              side: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary),
+                              side:
+                                  BorderSide(color: theme.colorScheme.primary),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(5)),
                               onChanged: (bool? checked) {
@@ -1221,22 +1132,17 @@ class _EditCardState extends State<EditCard> {
                               ? CheckboxListTile(
                                   value: hasPassword,
                                   title: Text('Use the password for this card',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyLarge
+                                      style: theme.textTheme.bodyLarge
                                           ?.copyWith(
                                               //cardTypeText
                                               fontWeight: FontWeight.bold,
                                               fontSize: 15,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .inverseSurface)),
+                                              color: theme
+                                                  .colorScheme.inverseSurface)),
                                   controlAffinity:
                                       ListTileControlAffinity.leading,
                                   side: BorderSide(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary),
+                                      color: theme.colorScheme.primary),
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(5)),
                                   onChanged: (bool? checked) {
@@ -1270,7 +1176,7 @@ class _EditCardState extends State<EditCard> {
             child: FloatingActionButton.extended(
               elevation: 0.0,
               heroTag: 'saveFAB',
-              onPressed: saveNewCard,
+              onPressed: () => saveNewCard(theme),
               tooltip: 'SAVE',
               backgroundColor: Colors.green.shade700,
               icon: Icon(
@@ -1282,7 +1188,7 @@ class _EditCardState extends State<EditCard> {
               ),
               label: Text(
                 'SAVE',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                style: theme.textTheme.bodyLarge?.copyWith(
                     //cardTypeText
                     fontWeight: FontWeight.bold,
                     fontSize: 18,

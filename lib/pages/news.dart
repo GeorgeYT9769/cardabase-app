@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 
-class NewsPage  extends StatefulWidget {
+class NewsPage extends StatefulWidget {
   const NewsPage({super.key});
 
   @override
   State<NewsPage> createState() => _NewsPageState();
 }
 
-class _NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin {
+class _NewsPageState extends State<NewsPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String _onlineContent = 'Loading...';
   String _localContent = 'Loading...';
@@ -24,7 +25,8 @@ class _NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin
 
   Future<void> fetchOnlineContent() async {
     try {
-      final response = await http.get(Uri.parse('https://raw.githubusercontent.com/GeorgeYT9769/cardabase-app/refs/heads/main/CHANGELOG.txt'));
+      final response = await http.get(Uri.parse(
+          'https://raw.githubusercontent.com/GeorgeYT9769/cardabase-app/refs/heads/main/CHANGELOG.txt'));
       if (response.statusCode == 200) {
         setState(() {
           _onlineContent = response.body;
@@ -36,7 +38,8 @@ class _NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin
       }
     } catch (e) {
       setState(() {
-        _onlineContent = 'Could not load online content. Please check your internet connection and try again.';
+        _onlineContent =
+            'Could not load online content. Please check your internet connection and try again.';
       });
     }
   }
@@ -62,27 +65,34 @@ class _NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-            'Changelog',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith()
-        ),
+        title: Text('Changelog', style: theme.textTheme.titleLarge?.copyWith()),
         centerTitle: true,
         elevation: 0.0,
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: theme.colorScheme.surface,
         automaticallyImplyLeading: false,
         actions: [
-          IconButton(icon: Icon(Icons.arrow_back_ios_new, color: Theme.of(context).colorScheme.secondary,), onPressed: () {
-            Navigator.pop(context);
-          },),
+          IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios_new,
+              color: theme.colorScheme.secondary,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
         ],
         bottom: TabBar(
-          physics: const BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
+          physics: const BouncingScrollPhysics(
+              decelerationRate: ScrollDecelerationRate.fast),
           controller: _tabController,
-          labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.inverseSurface, fontSize: 18),
-          unselectedLabelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary, fontSize: 18),
-          indicatorColor: Theme.of(context).colorScheme.inverseSurface,
+          labelStyle: theme.textTheme.bodyLarge
+              ?.copyWith(color: theme.colorScheme.inverseSurface, fontSize: 18),
+          unselectedLabelStyle: theme.textTheme.bodyLarge
+              ?.copyWith(color: theme.colorScheme.tertiary, fontSize: 18),
+          indicatorColor: theme.colorScheme.inverseSurface,
           splashFactory: NoSplash.splashFactory,
           tabs: const [
             Tab(text: 'Online'),
@@ -91,7 +101,8 @@ class _NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin
         ),
       ),
       body: TabBarView(
-        physics: const BouncingScrollPhysics(decelerationRate: ScrollDecelerationRate.fast),
+        physics: const BouncingScrollPhysics(
+            decelerationRate: ScrollDecelerationRate.fast),
         controller: _tabController,
         children: [
           RefreshIndicator(
@@ -102,8 +113,8 @@ class _NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin
               children: [
                 Text(
                   _onlineContent,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.inverseSurface,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: theme.colorScheme.inverseSurface,
                     fontSize: 15,
                   ),
                 ),
@@ -118,8 +129,8 @@ class _NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin
               children: [
                 Text(
                   _localContent,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.inverseSurface,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: theme.colorScheme.inverseSurface,
                     fontSize: 15,
                   ),
                 ),

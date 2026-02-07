@@ -115,13 +115,14 @@ class _CardDetailsState extends State<CardDetails> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(
             icon: Icon(
               Icons.qr_code_2,
-              color: Theme.of(context).colorScheme.secondary,
+              color: theme.colorScheme.secondary,
             ),
             onPressed: () {
               showDialog(
@@ -130,8 +131,8 @@ class _CardDetailsState extends State<CardDetails> {
                     return AlertDialog(
                       title: Text(
                         'Share',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: Theme.of(context).colorScheme.inverseSurface,
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.inverseSurface,
                             fontSize: 30),
                       ),
                       content: Container(
@@ -155,8 +156,7 @@ class _CardDetailsState extends State<CardDetails> {
                             style: OutlinedButton.styleFrom(
                                 elevation: 0.0,
                                 side: BorderSide(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
+                                    color: theme.colorScheme.primary,
                                     width: 2.0),
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(11))),
@@ -165,15 +165,11 @@ class _CardDetailsState extends State<CardDetails> {
                             },
                             child: Text(
                               'DONE',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color:
-                                        Theme.of(context).colorScheme.tertiary,
-                                  ),
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                                color: theme.colorScheme.tertiary,
+                              ),
                             ),
                           ),
                         ),
@@ -185,16 +181,15 @@ class _CardDetailsState extends State<CardDetails> {
           IconButton(
             icon: Icon(
               Icons.arrow_back_ios_new,
-              color: Theme.of(context).colorScheme.secondary,
+              color: theme.colorScheme.secondary,
             ),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],
-        title: Text('Details',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith()),
+        title: Text('Details', style: theme.textTheme.titleLarge?.copyWith()),
         centerTitle: true,
         elevation: 0.0,
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: theme.colorScheme.surface,
       ),
       body: ListView(
           physics: const BouncingScrollPhysics(
@@ -204,8 +199,8 @@ class _CardDetailsState extends State<CardDetails> {
                 padding: EdgeInsetsGeometry.fromLTRB(20, 0, 20, 0),
                 child: Text(widget.cardtext,
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.inverseSurface,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                        color: theme.colorScheme.inverseSurface,
                         fontSize: 50))),
             SizedBox(
               height: MediaQuery.of(context).size.width / 1.586,
@@ -279,13 +274,10 @@ class _CardDetailsState extends State<CardDetails> {
                             errorBuilder: (context, error) => Center(
                               child: Text(
                                 'Invalid barcode data',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.red),
+                                style: theme.textTheme.bodyLarge?.copyWith(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -341,32 +333,25 @@ class _CardDetailsState extends State<CardDetails> {
                       enabled: false,
                       maxLines: 10,
                       decoration: InputDecoration(
-                        hintStyle: Theme.of(context)
-                            .textTheme
-                            .bodyLarge
-                            ?.copyWith(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .inverseSurface,
-                                fontSize: 15),
+                        hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.inverseSurface,
+                            fontSize: 15),
                         hintText: widget.note,
                         disabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.primary,
-                                width: 1.0),
+                                color: theme.colorScheme.primary, width: 1.0),
                             borderRadius: BorderRadius.circular(10)),
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: const BorderSide(width: 2.0)),
-                        focusColor: Theme.of(context).colorScheme.primary,
+                        focusColor: theme.colorScheme.primary,
                         enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.primary,
-                                width: 1.0),
+                                color: theme.colorScheme.primary, width: 1.0),
                             borderRadius: BorderRadius.circular(10)),
                       ),
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.tertiary,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                          color: theme.colorScheme.tertiary,
                           fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -396,7 +381,7 @@ class _CardDetailsState extends State<CardDetails> {
                   ),
                   label: Text(
                     'SAVE',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    style: theme.textTheme.bodyLarge?.copyWith(
                         //cardTypeText
                         fontWeight: FontWeight.bold,
                         fontSize: 18,

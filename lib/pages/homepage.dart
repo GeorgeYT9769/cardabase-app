@@ -35,16 +35,15 @@ class _HomePageState extends State<Homepage> {
     columnAmountDouble = columnAmount.toDouble();
   }
 
-  showUnlockDialogDelete(BuildContext context, int index) {
+  showUnlockDialogDelete(BuildContext context, ThemeData theme, int index) {
     final TextEditingController controller = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Enter Password',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.inverseSurface,
-                fontSize: 30)),
+            style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.inverseSurface, fontSize: 30)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -56,27 +55,27 @@ class _HomePageState extends State<Homepage> {
                   borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(width: 2.0),
                 ),
-                focusColor: Theme.of(context).colorScheme.primary,
+                focusColor: theme.colorScheme.primary,
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.primary,
+                    color: theme.colorScheme.primary,
                     width: 1.0,
                   ),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
+                labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.secondary,
+                ),
                 prefixIcon: Icon(
                   Icons.password,
-                  color: Theme.of(context).colorScheme.secondary,
+                  color: theme.colorScheme.secondary,
                 ),
                 labelText: 'Password',
               ),
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.tertiary,
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.tertiary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 20),
             Center(
@@ -102,14 +101,11 @@ class _HomePageState extends State<Homepage> {
                             SizedBox(width: 10),
                             Text(
                               'Incorrect password!',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(
-                                    fontSize: 18,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                fontSize: 18,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
@@ -126,16 +122,15 @@ class _HomePageState extends State<Homepage> {
                 style: OutlinedButton.styleFrom(
                     elevation: 0.0,
                     side: BorderSide(
-                        color: Theme.of(context).colorScheme.primary,
-                        width: 2.0),
+                        color: theme.colorScheme.primary, width: 2.0),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(11))),
                 child: Text(
                   'DELETE',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      ),
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
                 ),
               ),
             ),
@@ -145,16 +140,15 @@ class _HomePageState extends State<Homepage> {
     );
   }
 
-  showUnlockDialogEdit(BuildContext context, int index) {
+  showUnlockDialogEdit(BuildContext context, ThemeData theme, int index) {
     final TextEditingController controller = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Enter Password',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.inverseSurface,
-                fontSize: 30)),
+            style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.inverseSurface, fontSize: 30)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -166,27 +160,27 @@ class _HomePageState extends State<Homepage> {
                   borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(width: 2.0),
                 ),
-                focusColor: Theme.of(context).colorScheme.primary,
+                focusColor: theme.colorScheme.primary,
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.primary,
+                    color: theme.colorScheme.primary,
                     width: 1.0,
                   ),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
+                labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.secondary,
+                ),
                 prefixIcon: Icon(
                   Icons.password,
-                  color: Theme.of(context).colorScheme.secondary,
+                  color: theme.colorScheme.secondary,
                 ),
                 labelText: 'Password',
               ),
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.tertiary,
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.tertiary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 20),
             Center(
@@ -253,14 +247,11 @@ class _HomePageState extends State<Homepage> {
                             SizedBox(width: 10),
                             Text(
                               'Incorrect password!',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(
-                                    fontSize: 18,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                fontSize: 18,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
@@ -277,16 +268,15 @@ class _HomePageState extends State<Homepage> {
                 style: OutlinedButton.styleFrom(
                     elevation: 0.0,
                     side: BorderSide(
-                        color: Theme.of(context).colorScheme.primary,
-                        width: 2.0),
+                        color: theme.colorScheme.primary, width: 2.0),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(11))),
                 child: Text(
                   'EDIT',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      ),
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
                 ),
               ),
             ),
@@ -296,10 +286,10 @@ class _HomePageState extends State<Homepage> {
     );
   }
 
-  askForPasswordDelete(int index) {
+  askForPasswordDelete(ThemeData theme, int index) {
     if (cdb.myShops[index]['hasPassword'] == true) {
       if (passwordbox.isNotEmpty) {
-        showUnlockDialogDelete(context, index);
+        showUnlockDialogDelete(context, theme, index);
       } else {
         deleteCard(index);
       }
@@ -327,11 +317,11 @@ class _HomePageState extends State<Homepage> {
     });
   }
 
-  void editCard(context, int index) {
+  void editCard(context, ThemeData theme, int index) {
     final card = cdb.myShops[index];
     if (cdb.myShops[index]['hasPassword'] == true) {
       if (passwordbox.isNotEmpty) {
-        showUnlockDialogEdit(context, index);
+        showUnlockDialogEdit(context, theme, index);
       } else {
         Navigator.push(
           context,
@@ -414,7 +404,7 @@ class _HomePageState extends State<Homepage> {
     }
   }
 
-  void columnAmountDialog() async {
+  void columnAmountDialog(ThemeData theme) async {
     final box = Hive.box('settingsBox');
     final List<dynamic> allTags =
         box.get('tags', defaultValue: <dynamic>[]) as List<dynamic>;
@@ -425,9 +415,8 @@ class _HomePageState extends State<Homepage> {
           return StatefulBuilder(builder: (context, setState2) {
             return AlertDialog(
               title: Text('Sort',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.inverseSurface,
-                      fontSize: 30)),
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.inverseSurface, fontSize: 30)),
               content: SizedBox(
                 height: 400,
                 width: double.maxFinite,
@@ -437,15 +426,10 @@ class _HomePageState extends State<Homepage> {
                   child: Column(
                     children: <Widget>[
                       Text('Tags:',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyLarge
-                              ?.copyWith(
-                                  fontSize: 17,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .inverseSurface,
-                                  fontWeight: FontWeight.w900)),
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                              fontSize: 17,
+                              color: theme.colorScheme.inverseSurface,
+                              fontWeight: FontWeight.w900)),
                       SizedBox(
                         height: 10,
                       ),
@@ -482,33 +466,22 @@ class _HomePageState extends State<Homepage> {
                                     });
                                   });
                                 },
-                                labelStyle: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith(
-                                      color: selectedTag == allTags[chipIndex]
-                                          ? Theme.of(context)
-                                              .colorScheme
-                                              .onPrimary
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .inverseSurface,
-                                    ),
+                                labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                                  color: selectedTag == allTags[chipIndex]
+                                      ? theme.colorScheme.onPrimary
+                                      : theme.colorScheme.inverseSurface,
+                                ),
                                 backgroundColor:
                                     selectedTag == allTags[chipIndex]
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Theme.of(context)
-                                            .colorScheme
-                                            .onInverseSurface,
+                                        ? theme.colorScheme.primary
+                                        : theme.colorScheme.onInverseSurface,
                                 elevation: selectedTag == allTags[chipIndex]
                                     ? null
                                     : 0.0,
                                 side: BorderSide(
                                   color: selectedTag == allTags[chipIndex]
-                                      ? Theme.of(context).colorScheme.primary
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .primary
+                                      ? theme.colorScheme.primary
+                                      : theme.colorScheme.primary
                                           .withValues(alpha: 0.3),
                                   width:
                                       selectedTag == allTags[chipIndex] ? 2 : 1,
@@ -516,9 +489,7 @@ class _HomePageState extends State<Homepage> {
                                 avatar: selectedTag == allTags[chipIndex]
                                     ? Icon(Icons.check,
                                         size: 18,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary)
+                                        color: theme.colorScheme.onPrimary)
                                     : null,
                               ),
                             ),
@@ -529,22 +500,17 @@ class _HomePageState extends State<Homepage> {
                         height: 5,
                       ),
                       Divider(
-                        color: Theme.of(context).colorScheme.primary,
+                        color: theme.colorScheme.primary,
                         thickness: 1.0,
                       ),
                       SizedBox(
                         height: 10,
                       ),
                       Text('Sort by:',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyLarge
-                              ?.copyWith(
-                                  fontSize: 17,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .inverseSurface,
-                                  fontWeight: FontWeight.w900)),
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                              fontSize: 17,
+                              color: theme.colorScheme.inverseSurface,
+                              fontWeight: FontWeight.w900)),
                       SizedBox(
                         height: 10,
                       ),
@@ -581,19 +547,14 @@ class _HomePageState extends State<Homepage> {
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                               borderSide: const BorderSide(width: 2.0)),
-                          focusColor: Theme.of(context).colorScheme.primary,
+                          focusColor: theme.colorScheme.primary,
                           enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: 1.0),
+                                  color: theme.colorScheme.primary, width: 1.0),
                               borderRadius: BorderRadius.circular(10)),
-                          labelStyle: Theme.of(context)
-                              .textTheme
-                              .bodyLarge
-                              ?.copyWith(
-                                  color:
-                                      Theme.of(context).colorScheme.secondary),
-                          iconColor: Theme.of(context).colorScheme.primary,
+                          labelStyle: theme.textTheme.bodyLarge
+                              ?.copyWith(color: theme.colorScheme.secondary),
+                          iconColor: theme.colorScheme.primary,
                         ),
                         onSelected: (value) {
                           setState(() {
@@ -619,7 +580,7 @@ class _HomePageState extends State<Homepage> {
                         height: 10,
                       ),
                       Divider(
-                        color: Theme.of(context).colorScheme.primary,
+                        color: theme.colorScheme.primary,
                         thickness: 1.0,
                       ),
                       MySetting(
@@ -633,24 +594,21 @@ class _HomePageState extends State<Homepage> {
                         settingHeader: 'Reorder',
                         settingIcon: Icons.reorder,
                         iconColor: reorderMode ? Colors.green : Colors.red,
-                        borderColor: Theme.of(context).colorScheme.primary,
+                        borderColor: theme.colorScheme.primary,
                       ),
                       Divider(
-                        color: Theme.of(context).colorScheme.primary,
+                        color: theme.colorScheme.primary,
                         thickness: 1.0,
                       ),
                       SizedBox(
                         height: 10,
                       ),
                       Text('Columns: $columnAmount',
-                          style:
-                              Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w900,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .inverseSurface,
-                                  )),
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w900,
+                            color: theme.colorScheme.inverseSurface,
+                          )),
                       SizedBox(
                         height: 10,
                       ),
@@ -682,8 +640,7 @@ class _HomePageState extends State<Homepage> {
                     style: OutlinedButton.styleFrom(
                         elevation: 0.0,
                         side: BorderSide(
-                            color: Theme.of(context).colorScheme.primary,
-                            width: 2.0),
+                            color: theme.colorScheme.primary, width: 2.0),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(11))),
                     onPressed: () {
@@ -691,11 +648,11 @@ class _HomePageState extends State<Homepage> {
                     },
                     child: Text(
                       'SELECT',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                            color: Theme.of(context).colorScheme.inverseSurface,
-                          ),
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: theme.colorScheme.inverseSurface,
+                      ),
                     ),
                   ),
                 ),
@@ -707,6 +664,7 @@ class _HomePageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return FutureBuilder(
       future: Hive.isBoxOpen('mybox') ? Future.value() : Hive.openBox('mybox'),
       builder: (context, snapshot) {
@@ -714,9 +672,7 @@ class _HomePageState extends State<Homepage> {
           return Center(
             child: Text(
               'Storage error: ${snapshot.error}',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
+              style: theme.textTheme.bodyLarge
                   ?.copyWith(color: Colors.red, fontSize: 18),
               textAlign: TextAlign.center,
             ),
@@ -726,7 +682,7 @@ class _HomePageState extends State<Homepage> {
           return const Center(child: CircularProgressIndicator());
         }
         return Scaffold(
-          backgroundColor: Theme.of(context).colorScheme.surface,
+          backgroundColor: theme.colorScheme.surface,
           floatingActionButton: Bounceable(
             onTap: () {},
             child: SizedBox(
@@ -758,11 +714,12 @@ class _HomePageState extends State<Homepage> {
             slivers: [
               SliverAppBar(
                 leading: IconButton(
-                    icon: Icon(
-                      Icons.sort,
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
-                    onPressed: columnAmountDialog),
+                  icon: Icon(
+                    Icons.sort,
+                    color: theme.colorScheme.secondary,
+                  ),
+                  onPressed: () => columnAmountDialog(theme),
+                ),
                 actions: [
                   ValueListenableBuilder(
                     valueListenable: Hive.box('settingsBox').listenable(),
@@ -773,7 +730,7 @@ class _HomePageState extends State<Homepage> {
                           ? IconButton(
                               icon: Icon(
                                 Icons.web_stories,
-                                color: Theme.of(context).colorScheme.secondary,
+                                color: theme.colorScheme.secondary,
                               ),
                               onPressed: () {
                                 Navigator.push(
@@ -789,7 +746,7 @@ class _HomePageState extends State<Homepage> {
                   IconButton(
                     icon: Icon(
                       Icons.settings,
-                      color: Theme.of(context).colorScheme.secondary,
+                      color: theme.colorScheme.secondary,
                     ),
                     onPressed: () async {
                       final result = await Navigator.push(
@@ -806,15 +763,15 @@ class _HomePageState extends State<Homepage> {
                   ),
                 ],
                 title: Text('Cardabase',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith()),
+                    style: theme.textTheme.titleLarge?.copyWith()),
                 centerTitle: true,
                 elevation: 0.0,
-                backgroundColor: Theme.of(context).colorScheme.surface,
+                backgroundColor: theme.colorScheme.surface,
                 floating: true,
                 snap: true,
                 toolbarHeight: kToolbarHeight,
               ),
-              _buildContentSliver(context),
+              _buildContentSliver(context, theme),
             ],
           ),
         );
@@ -822,7 +779,7 @@ class _HomePageState extends State<Homepage> {
     );
   }
 
-  Widget _buildContentSliver(BuildContext context) {
+  Widget _buildContentSliver(BuildContext context, ThemeData theme) {
     try {
       if (cdb.myShops.isEmpty) {
         return SliverFillRemaining(
@@ -830,9 +787,7 @@ class _HomePageState extends State<Homepage> {
           child: Center(
             child: Text(
               'Your Cardabase is empty',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
+              style: theme.textTheme.bodyLarge
                   ?.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
@@ -849,7 +804,7 @@ class _HomePageState extends State<Homepage> {
           return CardTile(
             key: ValueKey(card['uniqueId'] ?? index),
             shopName: (card['cardName'] ?? 'No Name').toString(),
-            deleteFunction: (context) => askForPasswordDelete(index),
+            deleteFunction: (context) => askForPasswordDelete(theme, index),
             cardnumber: card['cardId']?.toString() ?? '',
             cardTileColor: Color.fromARGB(
               255,
@@ -862,7 +817,7 @@ class _HomePageState extends State<Homepage> {
             red: card['redValue'] ?? 158,
             green: card['greenValue'] ?? 158,
             blue: card['blueValue'] ?? 158,
-            editFunction: (context) => editCard(context, index),
+            editFunction: (context) => editCard(context, theme, index),
             moveUpFunction: (context) => moveUp(index),
             moveDownFunction: (context) => moveDown(index),
             duplicateFunction: (context) => duplicateCard(index),
@@ -908,7 +863,12 @@ class _HomePageState extends State<Homepage> {
                 return CardTile(
                   key: ValueKey(card['uniqueId'] ?? index),
                   shopName: (card['cardName'] ?? 'No Name').toString(),
-                  deleteFunction: (context) => askForPasswordDelete(index),
+                  deleteFunction: (context) {
+                    return askForPasswordDelete(
+                      theme,
+                      index,
+                    );
+                  },
                   cardnumber: card['cardId']?.toString() ?? '',
                   cardTileColor: Color.fromARGB(
                     255,
@@ -921,7 +881,7 @@ class _HomePageState extends State<Homepage> {
                   red: card['redValue'] ?? 158,
                   green: card['greenValue'] ?? 158,
                   blue: card['blueValue'] ?? 158,
-                  editFunction: (context) => editCard(context, index),
+                  editFunction: (context) => editCard(context, theme, index),
                   moveUpFunction: (context) => moveUp(index),
                   moveDownFunction: (context) => moveDown(index),
                   duplicateFunction: (context) => duplicateCard(index),
@@ -956,9 +916,7 @@ class _HomePageState extends State<Homepage> {
         child: Center(
           child: Text(
             'Error: $e',
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge
+            style: theme.textTheme.bodyLarge
                 ?.copyWith(color: Colors.red, fontSize: 18),
             textAlign: TextAlign.center,
           ),
