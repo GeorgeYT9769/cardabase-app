@@ -140,8 +140,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.auto_awesome,
-                  size: 80, color: theme.colorScheme.primary),
+              Icon(
+                Icons.auto_awesome,
+                size: 80,
+                color: theme.colorScheme.primary,
+              ),
               const SizedBox(height: 30),
               changelogWidget,
               Text(
@@ -162,26 +165,34 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           .put('lastSeenAppVersion', widget.currentAppVersion);
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
-                            builder: (context) => const Homepage()),
+                          builder: (context) => const Homepage(),
+                        ),
                       );
                     },
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(
-                          color: theme.colorScheme.primary, width: 2),
+                        color: theme.colorScheme.primary,
+                        width: 2,
+                      ),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 40, vertical: 15),
+                        horizontal: 40,
+                        vertical: 15,
+                      ),
                       backgroundColor: Colors.transparent,
                       elevation: 0.0,
                       shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(15),
-                            topRight: Radius.circular(15)),
+                          topLeft: Radius.circular(15),
+                          topRight: Radius.circular(15),
+                        ),
                       ),
                     ),
                     child: Text(
                       'Continue',
                       style: theme.textTheme.bodyLarge?.copyWith(
-                          fontSize: 22, color: theme.colorScheme.primary),
+                        fontSize: 22,
+                        color: theme.colorScheme.primary,
+                      ),
                     ),
                   ),
                 ),
@@ -198,22 +209,29 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           .put('lastSeenAppVersion', widget.currentAppVersion);
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
-                            builder: (context) => const Homepage()),
+                          builder: (context) => const Homepage(),
+                        ),
                       );
                     },
                     style: OutlinedButton.styleFrom(
-                        side: BorderSide(
-                            color: theme.colorScheme.inverseSurface, width: 2),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 40, vertical: 15),
-                        backgroundColor: Colors.transparent,
-                        elevation: 0.0,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(15),
-                              bottomRight: Radius.circular(15)),
+                      side: BorderSide(
+                        color: theme.colorScheme.inverseSurface,
+                        width: 2,
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 40,
+                        vertical: 15,
+                      ),
+                      backgroundColor: Colors.transparent,
+                      elevation: 0.0,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(15),
+                          bottomRight: Radius.circular(15),
                         ),
-                        minimumSize: const Size.square(40)),
+                      ),
+                      minimumSize: const Size.square(40),
+                    ),
                     child: Text(
                       'Skip for now',
                       style: theme.textTheme.bodyLarge

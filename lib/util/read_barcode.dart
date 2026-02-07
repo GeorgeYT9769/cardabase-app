@@ -41,67 +41,78 @@ class _QRBarReaderState extends State<QRBarReader> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-        body: Column(children: <Widget>[
-      Expanded(flex: 4, child: _buildQrView(context)),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Container(
-            margin: const EdgeInsets.all(10),
-            child: IconButton(
-              style: ButtonStyle(
-                  iconSize: const WidgetStatePropertyAll(30),
-                  iconColor:
-                      WidgetStatePropertyAll(theme.colorScheme.inverseSurface)),
-              icon: const Icon(Icons.cameraswitch),
-              onPressed: () async {
-                await controller?.flipCamera();
-                if (mounted) setState(() {});
-              },
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.all(10),
-            child: IconButton(
-              style: ButtonStyle(
-                  iconSize: const WidgetStatePropertyAll(30),
-                  iconColor:
-                      WidgetStatePropertyAll(theme.colorScheme.inverseSurface)),
-              icon: const Icon(Icons.flash_on),
-              onPressed: () async {
-                await controller?.toggleFlash();
-                if (mounted) setState(() {});
-              },
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.all(10),
-            child: IconButton(
-              style: ButtonStyle(
-                  iconSize: const WidgetStatePropertyAll(30),
-                  iconColor:
-                      WidgetStatePropertyAll(theme.colorScheme.inverseSurface)),
-              icon: const Icon(Icons.photo),
-              onPressed: _pickImage,
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.all(10),
-            child: IconButton(
-              style: ButtonStyle(
-                  iconSize: const WidgetStatePropertyAll(30),
-                  iconColor:
-                      WidgetStatePropertyAll(theme.colorScheme.inverseSurface)),
-              icon: const Icon(Icons.arrow_back_ios_new),
-              onPressed: () {
-                controller?.pauseCamera();
-                Navigator.of(context).pop();
-              },
-            ),
+      body: Column(
+        children: <Widget>[
+          Expanded(flex: 4, child: _buildQrView(context)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Container(
+                margin: const EdgeInsets.all(10),
+                child: IconButton(
+                  style: ButtonStyle(
+                    iconSize: const WidgetStatePropertyAll(30),
+                    iconColor: WidgetStatePropertyAll(
+                      theme.colorScheme.inverseSurface,
+                    ),
+                  ),
+                  icon: const Icon(Icons.cameraswitch),
+                  onPressed: () async {
+                    await controller?.flipCamera();
+                    if (mounted) setState(() {});
+                  },
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.all(10),
+                child: IconButton(
+                  style: ButtonStyle(
+                    iconSize: const WidgetStatePropertyAll(30),
+                    iconColor: WidgetStatePropertyAll(
+                      theme.colorScheme.inverseSurface,
+                    ),
+                  ),
+                  icon: const Icon(Icons.flash_on),
+                  onPressed: () async {
+                    await controller?.toggleFlash();
+                    if (mounted) setState(() {});
+                  },
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.all(10),
+                child: IconButton(
+                  style: ButtonStyle(
+                    iconSize: const WidgetStatePropertyAll(30),
+                    iconColor: WidgetStatePropertyAll(
+                      theme.colorScheme.inverseSurface,
+                    ),
+                  ),
+                  icon: const Icon(Icons.photo),
+                  onPressed: _pickImage,
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.all(10),
+                child: IconButton(
+                  style: ButtonStyle(
+                    iconSize: const WidgetStatePropertyAll(30),
+                    iconColor: WidgetStatePropertyAll(
+                      theme.colorScheme.inverseSurface,
+                    ),
+                  ),
+                  icon: const Icon(Icons.arrow_back_ios_new),
+                  onPressed: () {
+                    controller?.pauseCamera();
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+            ],
           ),
         ],
-      )
-    ]));
+      ),
+    );
   }
 
   Widget _buildQrView(BuildContext context) {
@@ -194,31 +205,33 @@ class _QRBarReaderState extends State<QRBarReader> {
       });
     } else {
       VibrationProvider.vibrateError();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        content: const Row(
-          children: [
-            Icon(Icons.error, size: 15, color: Colors.white),
-            SizedBox(width: 10),
-            Text(
-              'Error!',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          content: const Row(
+            children: [
+              Icon(Icons.error, size: 15, color: Colors.white),
+              SizedBox(width: 10),
+              Text(
+                'Error!',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
+          duration: const Duration(milliseconds: 3000),
+          padding: const EdgeInsets.all(5.0),
+          margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+          behavior: SnackBarBehavior.floating,
+          dismissDirection: DismissDirection.vertical,
+          backgroundColor: const Color.fromARGB(255, 237, 67, 55),
         ),
-        duration: const Duration(milliseconds: 3000),
-        padding: const EdgeInsets.all(5.0),
-        margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-        behavior: SnackBarBehavior.floating,
-        dismissDirection: DismissDirection.vertical,
-        backgroundColor: const Color.fromARGB(255, 237, 67, 55),
-      ));
+      );
     }
   }
 
@@ -229,31 +242,33 @@ class _QRBarReaderState extends State<QRBarReader> {
         controller?.pauseCamera();
         Navigator.of(context).pop();
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            content: const Row(
-              children: [
-                Icon(Icons.error, size: 15, color: Colors.white),
-                SizedBox(width: 10),
-                Text(
-                  'No camera permission!',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              content: const Row(
+                children: [
+                  Icon(Icons.error, size: 15, color: Colors.white),
+                  SizedBox(width: 10),
+                  Text(
+                    'No camera permission!',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
+              duration: const Duration(milliseconds: 3000),
+              padding: const EdgeInsets.all(5.0),
+              margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+              behavior: SnackBarBehavior.floating,
+              dismissDirection: DismissDirection.vertical,
+              backgroundColor: const Color.fromARGB(255, 237, 67, 55),
             ),
-            duration: const Duration(milliseconds: 3000),
-            padding: const EdgeInsets.all(5.0),
-            margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-            behavior: SnackBarBehavior.floating,
-            dismissDirection: DismissDirection.vertical,
-            backgroundColor: const Color.fromARGB(255, 237, 67, 55),
-          ));
+          );
           setState(() {
             _permissionDeniedShown = true;
           });

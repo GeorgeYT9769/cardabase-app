@@ -131,9 +131,11 @@ class _InfoScreenState extends State<InfoScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('assets/icons/ic_launcher_foreground.png',
-                  height: MediaQuery.of(context).size.width / 2,
-                  width: MediaQuery.of(context).size.width / 2),
+              Image.asset(
+                'assets/icons/ic_launcher_foreground.png',
+                height: MediaQuery.of(context).size.width / 2,
+                width: MediaQuery.of(context).size.width / 2,
+              ),
               const SizedBox(height: 30),
               Text(
                 'Cardabase App',
@@ -158,9 +160,11 @@ class _InfoScreenState extends State<InfoScreen> {
               TextButton(
                 onPressed: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const NewsPage()));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const NewsPage(),
+                    ),
+                  );
                 },
                 child: Text(
                   'See Changelog',
@@ -188,9 +192,13 @@ class _InfoScreenState extends State<InfoScreen> {
                             label: const Text('Retry'),
                             style: OutlinedButton.styleFrom(
                               side: BorderSide(
-                                  color: theme.colorScheme.primary, width: 2),
+                                color: theme.colorScheme.primary,
+                                width: 2,
+                              ),
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 40, vertical: 15),
+                                horizontal: 40,
+                                vertical: 15,
+                              ),
                               backgroundColor: Colors.transparent,
                               elevation: 0.0,
                               shape: const RoundedRectangleBorder(
@@ -226,23 +234,28 @@ class _InfoScreenState extends State<InfoScreen> {
                                       _launchUrl(_githubReleasesUrl),
                                   style: OutlinedButton.styleFrom(
                                     side: BorderSide(
-                                        color: theme.colorScheme.primary,
-                                        width: 2),
+                                      color: theme.colorScheme.primary,
+                                      width: 2,
+                                    ),
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 40, vertical: 15),
+                                      horizontal: 40,
+                                      vertical: 15,
+                                    ),
                                     backgroundColor: Colors.transparent,
                                     elevation: 0.0,
                                     shape: const RoundedRectangleBorder(
                                       borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(15),
-                                          topRight: Radius.circular(15)),
+                                        topLeft: Radius.circular(15),
+                                        topRight: Radius.circular(15),
+                                      ),
                                     ),
                                   ),
                                   child: Text(
                                     'GitHub',
                                     style: theme.textTheme.bodyLarge?.copyWith(
-                                        fontSize: 18,
-                                        color: theme.colorScheme.primary),
+                                      fontSize: 18,
+                                      color: theme.colorScheme.primary,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -255,26 +268,32 @@ class _InfoScreenState extends State<InfoScreen> {
                                 height: MediaQuery.of(context).size.width / 5,
                                 child: OutlinedButton(
                                   onPressed: () => _launchUrl(
-                                      'https://f-droid.org/en/packages/com.georgeyt9769.cardabase/'),
+                                    'https://f-droid.org/en/packages/com.georgeyt9769.cardabase/',
+                                  ),
                                   style: OutlinedButton.styleFrom(
                                     side: BorderSide(
-                                        color: theme.colorScheme.primary,
-                                        width: 2),
+                                      color: theme.colorScheme.primary,
+                                      width: 2,
+                                    ),
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 40, vertical: 15),
+                                      horizontal: 40,
+                                      vertical: 15,
+                                    ),
                                     backgroundColor: Colors.transparent,
                                     elevation: 0.0,
                                     shape: const RoundedRectangleBorder(
                                       borderRadius: BorderRadius.only(
-                                          bottomLeft: Radius.circular(15),
-                                          bottomRight: Radius.circular(15)),
+                                        bottomLeft: Radius.circular(15),
+                                        bottomRight: Radius.circular(15),
+                                      ),
                                     ),
                                   ),
                                   child: Text(
                                     'F-Droid',
                                     style: theme.textTheme.bodyLarge?.copyWith(
-                                        fontSize: 18,
-                                        color: theme.colorScheme.primary),
+                                      fontSize: 18,
+                                      color: theme.colorScheme.primary,
+                                    ),
                                   ),
                                 ),
                               ),

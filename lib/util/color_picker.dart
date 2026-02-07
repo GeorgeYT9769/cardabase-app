@@ -60,10 +60,12 @@ class _ColorPickerSecondDialogState extends State<ColorPickerSecondDialog> {
               Navigator.pop(context, currentColor);
             },
             style: OutlinedButton.styleFrom(
-                elevation: 0.0,
-                side: BorderSide(color: theme.colorScheme.primary, width: 2.0),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(11))),
+              elevation: 0.0,
+              side: BorderSide(color: theme.colorScheme.primary, width: 2.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(11),
+              ),
+            ),
             child: Text(
               'Got it',
               style: theme.textTheme.bodyLarge?.copyWith(

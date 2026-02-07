@@ -113,17 +113,24 @@ class _SettingsState extends State<Settings> {
       builder: (context) => StatefulBuilder(
         builder: (context, setState2) {
           return AlertDialog(
-            title: Text('Auto Backups',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                    color: theme.colorScheme.inverseSurface, fontSize: 30)),
+            title: Text(
+              'Auto Backups',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.inverseSurface,
+                fontSize: 30,
+              ),
+            ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 SwitchListTile(
-                  title: Text('Enable Auto Backups',
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                          color: theme.colorScheme.inverseSurface,
-                          fontWeight: FontWeight.bold)),
+                  title: Text(
+                    'Enable Auto Backups',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.inverseSurface,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   value: _tempAutoUpdates,
                   onChanged: (value) {
                     setState2(() {
@@ -135,9 +142,7 @@ class _SettingsState extends State<Settings> {
                     });
                   },
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 10),
                 Slider(
                   year2023: false,
                   value: _tempAutoUpdateInterval.toDouble(),
@@ -164,22 +169,27 @@ class _SettingsState extends State<Settings> {
                     obscureText: true,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(width: 2.0)),
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(width: 2.0),
+                      ),
                       focusColor: theme.colorScheme.primary,
                       enabledBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: theme.colorScheme.primary),
-                          borderRadius: BorderRadius.circular(10)),
+                        borderSide:
+                            BorderSide(color: theme.colorScheme.primary),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       labelText: 'Password',
                       labelStyle: theme.textTheme.bodyLarge
                           ?.copyWith(color: theme.colorScheme.secondary),
-                      prefixIcon: Icon(Icons.password,
-                          color: theme.colorScheme.secondary),
+                      prefixIcon: Icon(
+                        Icons.password,
+                        color: theme.colorScheme.secondary,
+                      ),
                     ),
                     style: theme.textTheme.bodyLarge?.copyWith(
-                        color: theme.colorScheme.tertiary,
-                        fontWeight: FontWeight.bold),
+                      color: theme.colorScheme.tertiary,
+                      fontWeight: FontWeight.bold,
+                    ),
                     keyboardType: TextInputType.visiblePassword,
                     // onChanged: (value) removed this line
                   ),
@@ -190,7 +200,9 @@ class _SettingsState extends State<Settings> {
                       child: Text(
                         'Incorrect password!',
                         style: TextStyle(
-                            color: Colors.red, fontWeight: FontWeight.bold),
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                 ],
@@ -200,11 +212,15 @@ class _SettingsState extends State<Settings> {
               Center(
                 child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                      elevation: 0.0,
-                      side: BorderSide(
-                          color: theme.colorScheme.primary, width: 2.0),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(11))),
+                    elevation: 0.0,
+                    side: BorderSide(
+                      color: theme.colorScheme.primary,
+                      width: 2.0,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(11),
+                    ),
+                  ),
                   onPressed: () {
                     if (_tempAutoUpdates == true) {
                       // User wants to ENABLE auto-backups
@@ -261,32 +277,35 @@ class _SettingsState extends State<Settings> {
       cdb.updateDataBase();
       didReset = true;
     });
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      content: Row(
-        children: [
-          const Icon(
-            Icons.check,
-            size: 15,
-            color: Colors.white,
-          ),
-          const SizedBox(
-            width: 10,
-          ),
-          Text('Cardabase was reset!',
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        content: Row(
+          children: [
+            const Icon(
+              Icons.check,
+              size: 15,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 10),
+            Text(
+              'Cardabase was reset!',
               style: theme.textTheme.bodyLarge?.copyWith(
-                  fontSize: 18,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold)),
-        ],
+                fontSize: 18,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        duration: const Duration(milliseconds: 3000),
+        padding: const EdgeInsets.all(5.0),
+        margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+        behavior: SnackBarBehavior.floating,
+        dismissDirection: DismissDirection.vertical,
+        backgroundColor: const Color.fromARGB(255, 92, 184, 92),
       ),
-      duration: const Duration(milliseconds: 3000),
-      padding: const EdgeInsets.all(5.0),
-      margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
-      behavior: SnackBarBehavior.floating,
-      dismissDirection: DismissDirection.vertical,
-      backgroundColor: const Color.fromARGB(255, 92, 184, 92),
-    ));
+    );
     Navigator.of(context).pop(true);
   }
 
@@ -296,9 +315,13 @@ class _SettingsState extends State<Settings> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Enter Password',
-            style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.inverseSurface, fontSize: 30)),
+        title: Text(
+          'Enter Password',
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: theme.colorScheme.inverseSurface,
+            fontSize: 30,
+          ),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -350,8 +373,11 @@ class _SettingsState extends State<Settings> {
                         ),
                         content: Row(
                           children: [
-                            const Icon(Icons.error,
-                                size: 15, color: Colors.white),
+                            const Icon(
+                              Icons.error,
+                              size: 15,
+                              color: Colors.white,
+                            ),
                             const SizedBox(width: 10),
                             Text(
                               'Incorrect password!',
@@ -374,11 +400,15 @@ class _SettingsState extends State<Settings> {
                   }
                 },
                 style: OutlinedButton.styleFrom(
-                    elevation: 0.0,
-                    side: BorderSide(
-                        color: theme.colorScheme.primary, width: 2.0),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(11))),
+                  elevation: 0.0,
+                  side: BorderSide(
+                    color: theme.colorScheme.primary,
+                    width: 2.0,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(11),
+                  ),
+                ),
                 child: Text(
                   'EXPORT',
                   style: theme.textTheme.bodyLarge?.copyWith(
@@ -410,16 +440,22 @@ class _SettingsState extends State<Settings> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Are you sure?',
-            style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.inverseSurface, fontSize: 30)),
+        title: Text(
+          'Are you sure?',
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: theme.colorScheme.inverseSurface,
+            fontSize: 30,
+          ),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('This action cannot be undone!',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colorScheme.tertiary,
-                )),
+            Text(
+              'This action cannot be undone!',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.tertiary,
+              ),
+            ),
             if (passwordbox.isNotEmpty)
               TextFormField(
                 controller: controller,
@@ -470,8 +506,11 @@ class _SettingsState extends State<Settings> {
                           ),
                           content: Row(
                             children: [
-                              const Icon(Icons.error,
-                                  size: 15, color: Colors.white),
+                              const Icon(
+                                Icons.error,
+                                size: 15,
+                                color: Colors.white,
+                              ),
                               const SizedBox(width: 10),
                               Text(
                                 'Incorrect password!',
@@ -499,11 +538,15 @@ class _SettingsState extends State<Settings> {
                   }
                 },
                 style: OutlinedButton.styleFrom(
-                    elevation: 0.0,
-                    side: BorderSide(
-                        color: theme.colorScheme.primary, width: 2.0),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(11))),
+                  elevation: 0.0,
+                  side: BorderSide(
+                    color: theme.colorScheme.primary,
+                    width: 2.0,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(11),
+                  ),
+                ),
                 child: Text(
                   'DELETE',
                   style: theme.textTheme.bodyLarge?.copyWith(
@@ -533,7 +576,8 @@ class _SettingsState extends State<Settings> {
         backgroundColor: theme.colorScheme.surface,
         body: CustomScrollView(
           physics: const BouncingScrollPhysics(
-              decelerationRate: ScrollDecelerationRate.fast),
+            decelerationRate: ScrollDecelerationRate.fast,
+          ),
           slivers: [
             SliverAppBar(
               automaticallyImplyLeading: false,
@@ -548,10 +592,12 @@ class _SettingsState extends State<Settings> {
                   },
                 ),
               ],
-              title: Text('Settings',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    color: theme.colorScheme.tertiary,
-                  )),
+              title: Text(
+                'Settings',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: theme.colorScheme.tertiary,
+                ),
+              ),
               centerTitle: true,
               elevation: 0.0,
               backgroundColor: theme.colorScheme.surface,
@@ -570,9 +616,10 @@ class _SettingsState extends State<Settings> {
                         Text(
                           'App Settings',
                           style: theme.textTheme.bodyLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 23,
-                              color: theme.colorScheme.inverseSurface),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 23,
+                            color: theme.colorScheme.inverseSurface,
+                          ),
                         ),
                       ],
                     ),
@@ -651,9 +698,11 @@ class _SettingsState extends State<Settings> {
                     aboutSettingHeader: 'Protect your cards by using password',
                     settingAction: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const PasswordScreen()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PasswordScreen(),
+                        ),
+                      );
                     },
                     settingHeader: 'Password',
                     settingIcon: Icons.password,
@@ -664,9 +713,11 @@ class _SettingsState extends State<Settings> {
                     aboutSettingHeader: 'Categorize your cards by using tags',
                     settingAction: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const TagsPage()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const TagsPage(),
+                        ),
+                      );
                     },
                     settingHeader: 'Tags',
                     settingIcon: Icons.label,
@@ -725,9 +776,10 @@ class _SettingsState extends State<Settings> {
                         Text(
                           'Social Networks',
                           style: theme.textTheme.bodyLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 23,
-                              color: theme.colorScheme.inverseSurface),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 23,
+                            color: theme.colorScheme.inverseSurface,
+                          ),
                         ),
                       ],
                     ),
@@ -736,9 +788,11 @@ class _SettingsState extends State<Settings> {
                     aboutSettingHeader: 'About Cardabase',
                     settingAction: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const InfoScreen()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const InfoScreen(),
+                        ),
+                      );
                     },
                     settingHeader: 'App INFO',
                     settingIcon: Icons.info,
@@ -748,7 +802,8 @@ class _SettingsState extends State<Settings> {
                   MySetting(
                     aboutSettingHeader: 'Join Cardabase Discord community',
                     settingAction: () => _launchUrl(
-                        Uri.parse('https://discord.com/invite/fZNDfG2xv3')),
+                      Uri.parse('https://discord.com/invite/fZNDfG2xv3'),
+                    ),
                     settingHeader: 'Discord',
                     settingIcon: Icons.discord,
                     iconColor: theme.colorScheme.tertiary,
@@ -756,8 +811,11 @@ class _SettingsState extends State<Settings> {
                   ),
                   MySetting(
                     aboutSettingHeader: 'Visit source code of this project',
-                    settingAction: () => _launchUrl(Uri.parse(
-                        'https://github.com/GeorgeYT9769/cardabase-app')),
+                    settingAction: () => _launchUrl(
+                      Uri.parse(
+                        'https://github.com/GeorgeYT9769/cardabase-app',
+                      ),
+                    ),
                     settingHeader: 'GitHub',
                     settingIcon: Icons.code,
                     iconColor: theme.colorScheme.tertiary,
@@ -765,8 +823,11 @@ class _SettingsState extends State<Settings> {
                   ),
                   MySetting(
                     aboutSettingHeader: 'Visit F-Droid page of this project',
-                    settingAction: () => _launchUrl(Uri.parse(
-                        'https://f-droid.org/en/packages/com.georgeyt9769.cardabase/')),
+                    settingAction: () => _launchUrl(
+                      Uri.parse(
+                        'https://f-droid.org/en/packages/com.georgeyt9769.cardabase/',
+                      ),
+                    ),
                     settingHeader: 'F-Droid',
                     settingIcon: Icons.store,
                     iconColor: theme.colorScheme.tertiary,
@@ -776,7 +837,8 @@ class _SettingsState extends State<Settings> {
                     aboutSettingHeader:
                         'Check out the website for this project',
                     settingAction: () => _launchUrl(
-                        Uri.parse('https://georgeyt9769.github.io/cardabase/')),
+                      Uri.parse('https://georgeyt9769.github.io/cardabase/'),
+                    ),
                     settingHeader: 'Website',
                     settingIcon: Icons.web,
                     iconColor: theme.colorScheme.tertiary,

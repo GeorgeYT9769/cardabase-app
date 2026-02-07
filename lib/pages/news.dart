@@ -25,8 +25,11 @@ class _NewsPageState extends State<NewsPage>
 
   Future<void> fetchOnlineContent() async {
     try {
-      final response = await http.get(Uri.parse(
-          'https://raw.githubusercontent.com/GeorgeYT9769/cardabase-app/refs/heads/main/CHANGELOG.txt'));
+      final response = await http.get(
+        Uri.parse(
+          'https://raw.githubusercontent.com/GeorgeYT9769/cardabase-app/refs/heads/main/CHANGELOG.txt',
+        ),
+      );
       if (response.statusCode == 200) {
         setState(() {
           _onlineContent = response.body;
@@ -86,7 +89,8 @@ class _NewsPageState extends State<NewsPage>
         ],
         bottom: TabBar(
           physics: const BouncingScrollPhysics(
-              decelerationRate: ScrollDecelerationRate.fast),
+            decelerationRate: ScrollDecelerationRate.fast,
+          ),
           controller: _tabController,
           labelStyle: theme.textTheme.bodyLarge
               ?.copyWith(color: theme.colorScheme.inverseSurface, fontSize: 18),
@@ -102,7 +106,8 @@ class _NewsPageState extends State<NewsPage>
       ),
       body: TabBarView(
         physics: const BouncingScrollPhysics(
-            decelerationRate: ScrollDecelerationRate.fast),
+          decelerationRate: ScrollDecelerationRate.fast,
+        ),
         controller: _tabController,
         children: [
           RefreshIndicator(

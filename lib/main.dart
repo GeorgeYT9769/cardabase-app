@@ -46,8 +46,10 @@ void main() async {
             context: navigatorKey.currentContext!,
             builder: (dialogContext) {
               return AlertDialog(
-                title: const Text('Application Error',
-                    style: TextStyle(color: Colors.red)),
+                title: const Text(
+                  'Application Error',
+                  style: TextStyle(color: Colors.red),
+                ),
                 content: Text(
                   'Oops! Something critical went wrong:\n\n${details.exception}\n\n'
                   'Please send a screenshot of this error to the developer.\n',
@@ -55,8 +57,11 @@ void main() async {
                 ),
                 actions: [
                   TextButton(
-                    onPressed: () => _launchUrl(Uri.parse(
-                        'https://github.com/GeorgeYT9769/cardabase-app/issues')),
+                    onPressed: () => _launchUrl(
+                      Uri.parse(
+                        'https://github.com/GeorgeYT9769/cardabase-app/issues',
+                      ),
+                    ),
                     child: const Text('GitHub Issue'),
                   ),
                   TextButton(
@@ -156,7 +161,8 @@ class _MainState extends State<Main> {
           navigatorKey.currentContext != null) {
         if (shortcutType == 'add_card') {
           navigatorKey.currentState!.push(
-              MaterialPageRoute(builder: (context) => const CreateCard()));
+            MaterialPageRoute(builder: (context) => const CreateCard()),
+          );
         }
         if (shortcutType == 'info') {
           navigatorKey.currentState!
@@ -167,14 +173,16 @@ class _MainState extends State<Main> {
 
     quickActions.setShortcutItems(<ShortcutItem>[
       const ShortcutItem(
-          type: 'add_card',
-          localizedTitle: 'Add card',
-          icon: 'ic_add_card'), // Added icon
+        type: 'add_card',
+        localizedTitle: 'Add card',
+        icon: 'ic_add_card',
+      ), // Added icon
       const ShortcutItem(
-          type: 'info',
-          localizedTitle: 'Info',
-          localizedSubtitle: 'See info',
-          icon: 'ic_info') // Added icon
+        type: 'info',
+        localizedTitle: 'Info',
+        localizedSubtitle: 'See info',
+        icon: 'ic_info',
+      ), // Added icon
     ]);
   }
 
@@ -196,8 +204,10 @@ class _MainState extends State<Main> {
         final bool isDarkMode = box.get('isDarkMode', defaultValue: false);
         final bool useSystemFont =
             box.get('useSystemFont', defaultValue: false);
-        final bool useExtraDark = box.get('useExtraDark',
-            defaultValue: false); // Retrieve new setting
+        final bool useExtraDark = box.get(
+          'useExtraDark',
+          defaultValue: false,
+        ); // Retrieve new setting
 
         final ColorScheme extraDarkColorScheme = darkColorScheme.copyWith(
           surface: Colors.black,
@@ -213,10 +223,10 @@ class _MainState extends State<Main> {
             useMaterial3: true,
             colorScheme: lightColorScheme,
             pageTransitionsTheme: const PageTransitionsTheme(
-                builders: <TargetPlatform, PageTransitionsBuilder>{
-                  TargetPlatform.android:
-                      PredictiveBackPageTransitionsBuilder(),
-                }),
+              builders: <TargetPlatform, PageTransitionsBuilder>{
+                TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
+              },
+            ),
             fontFamily: textFont,
             textTheme: TextTheme(
               titleLarge: TextStyle(
@@ -227,17 +237,19 @@ class _MainState extends State<Main> {
                 color: const Color(0xFF0062A1), //tertiary
               ),
               bodyLarge: TextStyle(
-                  fontFamily: textFont, color: const Color(0xFF003062)),
+                fontFamily: textFont,
+                color: const Color(0xFF003062),
+              ),
             ),
           ),
           darkTheme: ThemeData(
             useMaterial3: true,
             colorScheme: useExtraDark ? extraDarkColorScheme : darkColorScheme,
             pageTransitionsTheme: const PageTransitionsTheme(
-                builders: <TargetPlatform, PageTransitionsBuilder>{
-                  TargetPlatform.android:
-                      PredictiveBackPageTransitionsBuilder(),
-                }),
+              builders: <TargetPlatform, PageTransitionsBuilder>{
+                TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
+              },
+            ),
             fontFamily: textFont,
             textTheme: TextTheme(
               titleLarge: TextStyle(
@@ -248,9 +260,9 @@ class _MainState extends State<Main> {
                 color: const Color(0xFF9CCAFF), //tertiary
               ),
               bodyLarge: TextStyle(
-                  fontFamily: textFont,
-                  color: const Color(0xFFD6E3FF) //inverseSurface
-                  ),
+                fontFamily: textFont,
+                color: const Color(0xFFD6E3FF), //inverseSurface
+              ),
             ),
           ),
           home: widget.initialScreen,

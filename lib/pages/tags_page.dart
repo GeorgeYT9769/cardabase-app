@@ -18,9 +18,13 @@ class _TagsPageState extends State<TagsPage> {
       builder: (context) {
         final theme = Theme.of(context);
         return AlertDialog(
-          title: Text('Add a tag',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colorScheme.inverseSurface, fontSize: 30)),
+          title: Text(
+            'Add a tag',
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: theme.colorScheme.inverseSurface,
+              fontSize: 30,
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -60,11 +64,15 @@ class _TagsPageState extends State<TagsPage> {
                     Navigator.of(context).pop();
                   },
                   style: OutlinedButton.styleFrom(
-                      elevation: 0.0,
-                      side: BorderSide(
-                          color: theme.colorScheme.primary, width: 2.0),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(11))),
+                    elevation: 0.0,
+                    side: BorderSide(
+                      color: theme.colorScheme.primary,
+                      width: 2.0,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(11),
+                    ),
+                  ),
                   child: Text(
                     'ADD',
                     style: theme.textTheme.bodyLarge?.copyWith(
@@ -90,32 +98,36 @@ class _TagsPageState extends State<TagsPage> {
       tags.add(tag);
       box.put('tags', tags);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        content: Row(
-          children: [
-            const Icon(
-              Icons.error,
-              size: 15,
-              color: Colors.white,
-            ),
-            const SizedBox(
-              width: 10,
-            ),
-            Text('Tag already exists!',
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          content: Row(
+            children: [
+              const Icon(
+                Icons.error,
+                size: 15,
+                color: Colors.white,
+              ),
+              const SizedBox(width: 10),
+              Text(
+                'Tag already exists!',
                 style: theme.textTheme.bodyLarge?.copyWith(
-                    fontSize: 18,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold)),
-          ],
+                  fontSize: 18,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          duration: const Duration(milliseconds: 3000),
+          padding: const EdgeInsets.all(5.0),
+          margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          behavior: SnackBarBehavior.floating,
+          dismissDirection: DismissDirection.vertical,
+          backgroundColor: const Color.fromARGB(255, 237, 67, 55),
         ),
-        duration: const Duration(milliseconds: 3000),
-        padding: const EdgeInsets.all(5.0),
-        margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-        behavior: SnackBarBehavior.floating,
-        dismissDirection: DismissDirection.vertical,
-        backgroundColor: const Color.fromARGB(255, 237, 67, 55),
-      ));
+      );
     }
   }
 
@@ -127,32 +139,36 @@ class _TagsPageState extends State<TagsPage> {
       tags.remove(tag);
       box.put('tags', tags);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        content: Row(
-          children: [
-            const Icon(
-              Icons.error,
-              size: 15,
-              color: Colors.white,
-            ),
-            const SizedBox(
-              width: 10,
-            ),
-            Text('Tag does not exist!',
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          content: Row(
+            children: [
+              const Icon(
+                Icons.error,
+                size: 15,
+                color: Colors.white,
+              ),
+              const SizedBox(width: 10),
+              Text(
+                'Tag does not exist!',
                 style: theme.textTheme.bodyLarge?.copyWith(
-                    fontSize: 18,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold)),
-          ],
+                  fontSize: 18,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          duration: const Duration(milliseconds: 3000),
+          padding: const EdgeInsets.all(5.0),
+          margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          behavior: SnackBarBehavior.floating,
+          dismissDirection: DismissDirection.vertical,
+          backgroundColor: const Color.fromARGB(255, 237, 67, 55),
         ),
-        duration: const Duration(milliseconds: 3000),
-        padding: const EdgeInsets.all(5.0),
-        margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-        behavior: SnackBarBehavior.floating,
-        dismissDirection: DismissDirection.vertical,
-        backgroundColor: const Color.fromARGB(255, 237, 67, 55),
-      ));
+      );
     }
   }
 
@@ -161,10 +177,12 @@ class _TagsPageState extends State<TagsPage> {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tags',
-            style: theme.textTheme.titleLarge?.copyWith(
-              color: theme.colorScheme.tertiary,
-            )),
+        title: Text(
+          'Tags',
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: theme.colorScheme.tertiary,
+          ),
+        ),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
@@ -200,7 +218,8 @@ class _TagsPageState extends State<TagsPage> {
 
           return ListView.builder(
             physics: const BouncingScrollPhysics(
-                decelerationRate: ScrollDecelerationRate.fast),
+              decelerationRate: ScrollDecelerationRate.fast,
+            ),
             itemCount: tags.length,
             itemBuilder: (context, index) {
               return ListTile(

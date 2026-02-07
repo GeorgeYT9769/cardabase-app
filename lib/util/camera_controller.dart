@@ -182,9 +182,11 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
               return Stack(
                 children: [
                   Positioned.fill(
-                      child: AspectRatio(
-                          aspectRatio: widget.cardAspectRatio,
-                          child: CameraPreview(_cameraController!))),
+                    child: AspectRatio(
+                      aspectRatio: widget.cardAspectRatio,
+                      child: CameraPreview(_cameraController!),
+                    ),
+                  ),
                   Positioned.fill(
                     child: CustomPaint(
                       painter: _CutoutPainter(
@@ -323,7 +325,8 @@ class _CutoutPainter extends CustomPainter {
           Path()..addRect(Rect.fromLTWH(0, 0, screenWidth, screenHeight)),
           Path()
             ..addRRect(
-                RRect.fromRectAndRadius(cutoutRect, const Radius.circular(15))),
+              RRect.fromRectAndRadius(cutoutRect, const Radius.circular(15)),
+            ),
         ),
         backgroundPaint,
       );
@@ -334,8 +337,9 @@ class _CutoutPainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2.0;
       canvas.drawRRect(
-          RRect.fromRectAndRadius(cutoutRect, const Radius.circular(15)),
-          borderPaint);
+        RRect.fromRectAndRadius(cutoutRect, const Radius.circular(15)),
+        borderPaint,
+      );
     }
   }
 

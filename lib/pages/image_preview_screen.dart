@@ -28,7 +28,7 @@ class ImagePreviewScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
             onPressed: () => Navigator.of(context).pop(),
-          )
+          ),
         ],
       ),
       body: Center(
@@ -45,8 +45,10 @@ class ImagePreviewScreen extends StatelessWidget {
             : barcodeData != null &&
                     barcodeData!.isNotEmpty &&
                     barcodeType != null
-                ? _buildBarcodeWidget(barcodeData!,
-                    barcodeType!) // Display barcode if data and type are provided
+                ? _buildBarcodeWidget(
+                    barcodeData!,
+                    barcodeType!,
+                  ) // Display barcode if data and type are provided
                 : const Text(
                     'No preview available',
                     style: TextStyle(color: Colors.black, fontSize: 20),
@@ -116,14 +118,16 @@ class ImagePreviewScreen extends StatelessWidget {
           data: data,
           backgroundColor: Colors.white, // Background color
           style: const TextStyle(
-              color: Colors.black,
-              fontSize: 16), // Style for human-readable text
+            color: Colors.black,
+            fontSize: 16,
+          ), // Style for human-readable text
           errorBuilder: (context, error) => Center(
-              child: Text(
-            'Error rendering barcode: $error\nData: $data',
-            style: const TextStyle(color: Colors.red, fontSize: 16),
-            textAlign: TextAlign.center,
-          )),
+            child: Text(
+              'Error rendering barcode: $error\nData: $data',
+              style: const TextStyle(color: Colors.red, fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+          ),
         ),
       ),
     );

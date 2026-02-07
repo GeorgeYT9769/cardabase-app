@@ -40,9 +40,13 @@ class _HomePageState extends State<Homepage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Enter Password',
-            style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.inverseSurface, fontSize: 30)),
+        title: Text(
+          'Enter Password',
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: theme.colorScheme.inverseSurface,
+            fontSize: 30,
+          ),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -95,8 +99,11 @@ class _HomePageState extends State<Homepage> {
                         ),
                         content: Row(
                           children: [
-                            const Icon(Icons.error,
-                                size: 15, color: Colors.white),
+                            const Icon(
+                              Icons.error,
+                              size: 15,
+                              color: Colors.white,
+                            ),
                             const SizedBox(width: 10),
                             Text(
                               'Incorrect password!',
@@ -119,11 +126,15 @@ class _HomePageState extends State<Homepage> {
                   }
                 },
                 style: OutlinedButton.styleFrom(
-                    elevation: 0.0,
-                    side: BorderSide(
-                        color: theme.colorScheme.primary, width: 2.0),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(11))),
+                  elevation: 0.0,
+                  side: BorderSide(
+                    color: theme.colorScheme.primary,
+                    width: 2.0,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(11),
+                  ),
+                ),
                 child: Text(
                   'DELETE',
                   style: theme.textTheme.bodyLarge?.copyWith(
@@ -145,9 +156,13 @@ class _HomePageState extends State<Homepage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Enter Password',
-            style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.inverseSurface, fontSize: 30)),
+        title: Text(
+          'Enter Password',
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: theme.colorScheme.inverseSurface,
+            fontSize: 30,
+          ),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -194,37 +209,39 @@ class _HomePageState extends State<Homepage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => EditCard(
-                              index: index,
-                              cardColorPreview: Color.fromARGB(
-                                  255,
-                                  cdb.myShops[index]['redValue'],
-                                  cdb.myShops[index]['greenValue'],
-                                  cdb.myShops[index]['blueValue']),
-                              redValue: cdb.myShops[index]['redValue'] ?? 158,
-                              greenValue:
-                                  cdb.myShops[index]['greenValue'] ?? 158,
-                              blueValue: cdb.myShops[index]['blueValue'] ?? 158,
-                              hasPassword:
-                                  cdb.myShops[index]['hasPassword'] ?? false,
-                              cardTextPreview:
-                                  (cdb.myShops[index]['cardName'] ?? '')
-                                      .toString(),
-                              cardName: cdb.myShops[index]['cardName'] ?? '',
-                              cardId: (cdb.myShops[index]['cardId'] ?? '')
-                                  .toString(),
-                              cardType: (cdb.myShops[index]['cardType'] ??
-                                      'CardType.ean13')
-                                  .toString(),
-                              tags: cdb.myShops[index]['tags'] ?? [],
-                              notes: cdb.myShops[index]['note'] ??
-                                  'Card notes are displayed here...',
-                              frontFacePath:
-                                  cdb.myShops[index]['imagePathFront'] ?? '',
-                              backFacePath:
-                                  cdb.myShops[index]['imagePathBack'] ?? '',
-                              useFrontFaceOverlay:
-                                  cdb.myShops[index]['useFrontFaceOverlay'] ?? false,
-                              hideTitle: cdb.myShops[index]['hideTitle'] ?? false),
+                            index: index,
+                            cardColorPreview: Color.fromARGB(
+                              255,
+                              cdb.myShops[index]['redValue'],
+                              cdb.myShops[index]['greenValue'],
+                              cdb.myShops[index]['blueValue'],
+                            ),
+                            redValue: cdb.myShops[index]['redValue'] ?? 158,
+                            greenValue: cdb.myShops[index]['greenValue'] ?? 158,
+                            blueValue: cdb.myShops[index]['blueValue'] ?? 158,
+                            hasPassword:
+                                cdb.myShops[index]['hasPassword'] ?? false,
+                            cardTextPreview:
+                                (cdb.myShops[index]['cardName'] ?? '')
+                                    .toString(),
+                            cardName: cdb.myShops[index]['cardName'] ?? '',
+                            cardId:
+                                (cdb.myShops[index]['cardId'] ?? '').toString(),
+                            cardType: (cdb.myShops[index]['cardType'] ??
+                                    'CardType.ean13')
+                                .toString(),
+                            tags: cdb.myShops[index]['tags'] ?? [],
+                            notes: cdb.myShops[index]['note'] ??
+                                'Card notes are displayed here...',
+                            frontFacePath:
+                                cdb.myShops[index]['imagePathFront'] ?? '',
+                            backFacePath:
+                                cdb.myShops[index]['imagePathBack'] ?? '',
+                            useFrontFaceOverlay: cdb.myShops[index]
+                                    ['useFrontFaceOverlay'] ??
+                                false,
+                            hideTitle: cdb.myShops[index]['hideTitle'] ?? false,
+                          ),
                         ),
                       ).then((value) {
                         setState(() {
@@ -241,8 +258,11 @@ class _HomePageState extends State<Homepage> {
                         ),
                         content: Row(
                           children: [
-                            const Icon(Icons.error,
-                                size: 15, color: Colors.white),
+                            const Icon(
+                              Icons.error,
+                              size: 15,
+                              color: Colors.white,
+                            ),
                             const SizedBox(width: 10),
                             Text(
                               'Incorrect password!',
@@ -265,11 +285,15 @@ class _HomePageState extends State<Homepage> {
                   }
                 },
                 style: OutlinedButton.styleFrom(
-                    elevation: 0.0,
-                    side: BorderSide(
-                        color: theme.colorScheme.primary, width: 2.0),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(11))),
+                  elevation: 0.0,
+                  side: BorderSide(
+                    color: theme.colorScheme.primary,
+                    width: 2.0,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(11),
+                  ),
+                ),
                 child: Text(
                   'EDIT',
                   style: theme.textTheme.bodyLarge?.copyWith(
@@ -326,39 +350,13 @@ class _HomePageState extends State<Homepage> {
           context,
           MaterialPageRoute(
             builder: (context) => EditCard(
-                index: index,
-                cardColorPreview: Color.fromARGB(255, card['redValue'],
-                    card['greenValue'], card['blueValue']),
-                redValue: card['redValue'],
-                greenValue: card['greenValue'],
-                blueValue: card['blueValue'],
-                hasPassword: card['hasPassword'] ?? false,
-                cardTextPreview: card['cardName'].toString(),
-                cardName: card['cardName'].toString(),
-                cardId: (card['cardId'] ?? '').toString(),
-                cardType: (card['cardType'] ?? 'CardType.ean13').toString(),
-                tags: card['tags'] ?? [],
-                notes: card['note'] ?? 'Card notes are displayed here...',
-                frontFacePath: cdb.myShops[index]['imagePathFront'] ?? '',
-                backFacePath: cdb.myShops[index]['imagePathBack'] ?? '',
-                useFrontFaceOverlay:
-                    cdb.myShops[index]['useFrontFaceOverlay'] ?? false,
-                hideTitle: cdb.myShops[index]['hideTitle'] ?? false),
-          ),
-        ).then((value) {
-          setState(() {
-            cdb.loadData();
-          });
-        });
-      }
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => EditCard(
               index: index,
               cardColorPreview: Color.fromARGB(
-                  255, card['redValue'], card['greenValue'], card['blueValue']),
+                255,
+                card['redValue'],
+                card['greenValue'],
+                card['blueValue'],
+              ),
               redValue: card['redValue'],
               greenValue: card['greenValue'],
               blueValue: card['blueValue'],
@@ -373,7 +371,43 @@ class _HomePageState extends State<Homepage> {
               backFacePath: cdb.myShops[index]['imagePathBack'] ?? '',
               useFrontFaceOverlay:
                   cdb.myShops[index]['useFrontFaceOverlay'] ?? false,
-              hideTitle: cdb.myShops[index]['hideTitle'] ?? false),
+              hideTitle: cdb.myShops[index]['hideTitle'] ?? false,
+            ),
+          ),
+        ).then((value) {
+          setState(() {
+            cdb.loadData();
+          });
+        });
+      }
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EditCard(
+            index: index,
+            cardColorPreview: Color.fromARGB(
+              255,
+              card['redValue'],
+              card['greenValue'],
+              card['blueValue'],
+            ),
+            redValue: card['redValue'],
+            greenValue: card['greenValue'],
+            blueValue: card['blueValue'],
+            hasPassword: card['hasPassword'] ?? false,
+            cardTextPreview: card['cardName'].toString(),
+            cardName: card['cardName'].toString(),
+            cardId: (card['cardId'] ?? '').toString(),
+            cardType: (card['cardType'] ?? 'CardType.ean13').toString(),
+            tags: card['tags'] ?? [],
+            notes: card['note'] ?? 'Card notes are displayed here...',
+            frontFacePath: cdb.myShops[index]['imagePathFront'] ?? '',
+            backFacePath: cdb.myShops[index]['imagePathBack'] ?? '',
+            useFrontFaceOverlay:
+                cdb.myShops[index]['useFrontFaceOverlay'] ?? false,
+            hideTitle: cdb.myShops[index]['hideTitle'] ?? false,
+          ),
         ),
       ).then((value) {
         setState(() {
@@ -409,32 +443,40 @@ class _HomePageState extends State<Homepage> {
         box.get('tags', defaultValue: <dynamic>[]) as List<dynamic>;
 
     await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return StatefulBuilder(builder: (context, setState2) {
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState2) {
             return AlertDialog(
-              title: Text('Sort',
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                      color: theme.colorScheme.inverseSurface, fontSize: 30)),
+              title: Text(
+                'Sort',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.inverseSurface,
+                  fontSize: 30,
+                ),
+              ),
               content: SizedBox(
                 height: 400,
                 width: double.maxFinite,
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(
-                      decelerationRate: ScrollDecelerationRate.fast),
+                    decelerationRate: ScrollDecelerationRate.fast,
+                  ),
                   child: Column(
                     children: <Widget>[
-                      Text('Tags:',
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                              fontSize: 17,
-                              color: theme.colorScheme.inverseSurface,
-                              fontWeight: FontWeight.w900)),
-                      const SizedBox(
-                        height: 10,
+                      Text(
+                        'Tags:',
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          fontSize: 17,
+                          color: theme.colorScheme.inverseSurface,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
+                      const SizedBox(height: 10),
                       SingleChildScrollView(
                         physics: const BouncingScrollPhysics(
-                            decelerationRate: ScrollDecelerationRate.fast),
+                          decelerationRate: ScrollDecelerationRate.fast,
+                        ),
                         scrollDirection: Axis.horizontal,
                         child: Row(
                           children: List.generate(
@@ -486,71 +528,78 @@ class _HomePageState extends State<Homepage> {
                                       selectedTag == allTags[chipIndex] ? 2 : 1,
                                 ),
                                 avatar: selectedTag == allTags[chipIndex]
-                                    ? Icon(Icons.check,
+                                    ? Icon(
+                                        Icons.check,
                                         size: 18,
-                                        color: theme.colorScheme.onPrimary)
+                                        color: theme.colorScheme.onPrimary,
+                                      )
                                     : null,
                               ),
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 5,
-                      ),
+                      const SizedBox(height: 5),
                       Divider(
                         color: theme.colorScheme.primary,
                         thickness: 1.0,
                       ),
-                      const SizedBox(
-                        height: 10,
+                      const SizedBox(height: 10),
+                      Text(
+                        'Sort by:',
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          fontSize: 17,
+                          color: theme.colorScheme.inverseSurface,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
-                      Text('Sort by:',
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                              fontSize: 17,
-                              color: theme.colorScheme.inverseSurface,
-                              fontWeight: FontWeight.w900)),
                       const SizedBox(
                         height: 10,
                       ),
                       DropdownMenu(
                         dropdownMenuEntries: [
                           DropdownMenuEntry<String>(
-                              value: 'nameaz',
-                              label: 'Name 0-Z',
-                              style: ButtonStyle(
-                                elevation: WidgetStateProperty.all(0.0),
-                              )),
+                            value: 'nameaz',
+                            label: 'Name 0-Z',
+                            style: ButtonStyle(
+                              elevation: WidgetStateProperty.all(0.0),
+                            ),
+                          ),
                           DropdownMenuEntry<String>(
-                              value: 'nameza',
-                              label: 'Name Z-0',
-                              style: ButtonStyle(
-                                elevation: WidgetStateProperty.all(0.0),
-                              )),
+                            value: 'nameza',
+                            label: 'Name Z-0',
+                            style: ButtonStyle(
+                              elevation: WidgetStateProperty.all(0.0),
+                            ),
+                          ),
                           DropdownMenuEntry<String>(
-                              value: 'latest',
-                              label: 'Latest',
-                              style: ButtonStyle(
-                                elevation: WidgetStateProperty.all(0.0),
-                              )),
+                            value: 'latest',
+                            label: 'Latest',
+                            style: ButtonStyle(
+                              elevation: WidgetStateProperty.all(0.0),
+                            ),
+                          ),
                           DropdownMenuEntry<String>(
-                              value: 'oldest',
-                              label: 'Oldest',
-                              style: ButtonStyle(
-                                elevation: WidgetStateProperty.all(0.0),
-                              )),
+                            value: 'oldest',
+                            label: 'Oldest',
+                            style: ButtonStyle(
+                              elevation: WidgetStateProperty.all(0.0),
+                            ),
+                          ),
                         ],
                         initialSelection: Hive.box('settingsBox')
                             .get('sort', defaultValue: 'oldest'),
                         inputDecorationTheme: InputDecorationTheme(
                           border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(width: 2.0)),
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(width: 2.0),
+                          ),
                           focusColor: theme.colorScheme.primary,
                           enabledBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: theme.colorScheme.primary),
-                              borderRadius: BorderRadius.circular(10)),
+                            borderSide:
+                                BorderSide(color: theme.colorScheme.primary),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                           labelStyle: theme.textTheme.bodyLarge
                               ?.copyWith(color: theme.colorScheme.secondary),
                           iconColor: theme.colorScheme.primary,
@@ -558,17 +607,25 @@ class _HomePageState extends State<Homepage> {
                         onSelected: (value) {
                           setState(() {
                             if (value == 'nameaz') {
-                              cdb.myShops.sort((a, b) =>
-                                  a['cardName'].compareTo(b['cardName']));
+                              cdb.myShops.sort(
+                                (a, b) =>
+                                    a['cardName'].compareTo(b['cardName']),
+                              );
                             } else if (value == 'nameza') {
-                              cdb.myShops.sort((a, b) =>
-                                  b['cardName'].compareTo(a['cardName']));
+                              cdb.myShops.sort(
+                                (a, b) =>
+                                    b['cardName'].compareTo(a['cardName']),
+                              );
                             } else if (value == 'latest') {
-                              cdb.myShops.sort((a, b) =>
-                                  b['uniqueId'].compareTo(a['uniqueId']));
+                              cdb.myShops.sort(
+                                (a, b) =>
+                                    b['uniqueId'].compareTo(a['uniqueId']),
+                              );
                             } else if (value == 'oldest') {
-                              cdb.myShops.sort((a, b) =>
-                                  a['uniqueId'].compareTo(b['uniqueId']));
+                              cdb.myShops.sort(
+                                (a, b) =>
+                                    a['uniqueId'].compareTo(b['uniqueId']),
+                              );
                             }
                             Hive.box('settingsBox').put('sort', value);
                             cdb.updateDataBase();
@@ -602,12 +659,14 @@ class _HomePageState extends State<Homepage> {
                       const SizedBox(
                         height: 10,
                       ),
-                      Text('Columns: $columnAmount',
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w900,
-                            color: theme.colorScheme.inverseSurface,
-                          )),
+                      Text(
+                        'Columns: $columnAmount',
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w900,
+                          color: theme.colorScheme.inverseSurface,
+                        ),
+                      ),
                       const SizedBox(
                         height: 10,
                       ),
@@ -637,11 +696,15 @@ class _HomePageState extends State<Homepage> {
                 Center(
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                        elevation: 0.0,
-                        side: BorderSide(
-                            color: theme.colorScheme.primary, width: 2.0),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(11))),
+                      elevation: 0.0,
+                      side: BorderSide(
+                        color: theme.colorScheme.primary,
+                        width: 2.0,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(11),
+                      ),
+                    ),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
@@ -657,8 +720,10 @@ class _HomePageState extends State<Homepage> {
                 ),
               ],
             );
-          });
-        });
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -694,12 +759,15 @@ class _HomePageState extends State<Homepage> {
                   tooltip: 'Add a card',
                   onPressed: () {
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (builder) => const CreateCard(),
-                        )).then((value) => setState(() {
-                          cdb.loadData();
-                        }));
+                      context,
+                      MaterialPageRoute(
+                        builder: (builder) => const CreateCard(),
+                      ),
+                    ).then(
+                      (value) => setState(() {
+                        cdb.loadData();
+                      }),
+                    );
                   },
                   child: const Icon(Icons.add_card),
                 ),
@@ -709,7 +777,8 @@ class _HomePageState extends State<Homepage> {
           floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
           body: CustomScrollView(
             physics: const BouncingScrollPhysics(
-                decelerationRate: ScrollDecelerationRate.fast),
+              decelerationRate: ScrollDecelerationRate.fast,
+            ),
             slivers: [
               SliverAppBar(
                 leading: IconButton(
@@ -733,12 +802,15 @@ class _HomePageState extends State<Homepage> {
                               ),
                               onPressed: () {
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (builder) => const WelcomeScreen(
-                                          currentAppVersion: "1.5.0"),
-                                    ));
-                              })
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (builder) => const WelcomeScreen(
+                                      currentAppVersion: "1.5.0",
+                                    ),
+                                  ),
+                                );
+                              },
+                            )
                           : const SizedBox.shrink();
                     },
                   ),
@@ -751,7 +823,8 @@ class _HomePageState extends State<Homepage> {
                       final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const Settings()),
+                          builder: (context) => const Settings(),
+                        ),
                       );
                       if (result == true && mounted) {
                         setState(() {
@@ -761,8 +834,10 @@ class _HomePageState extends State<Homepage> {
                     },
                   ),
                 ],
-                title: Text('Cardabase',
-                    style: theme.textTheme.titleLarge?.copyWith()),
+                title: Text(
+                  'Cardabase',
+                  style: theme.textTheme.titleLarge?.copyWith(),
+                ),
                 centerTitle: true,
                 elevation: 0.0,
                 backgroundColor: theme.colorScheme.surface,

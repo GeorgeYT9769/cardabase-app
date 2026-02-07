@@ -23,29 +23,37 @@ Future<bool> showImportDialog(BuildContext context) async {
           maxLines: 10,
           decoration: InputDecoration(
             hintStyle: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.inverseSurface, fontSize: 15),
+              color: theme.colorScheme.inverseSurface,
+              fontSize: 15,
+            ),
             hintText:
                 'This action will rewrite existing cards!\n \nPaste your Cardabase here:',
             border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(width: 2.0)),
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(width: 2.0),
+            ),
             focusColor: theme.colorScheme.primary,
             enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: theme.colorScheme.primary),
-                borderRadius: BorderRadius.circular(10)),
+              borderSide: BorderSide(color: theme.colorScheme.primary),
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
           style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.tertiary, fontWeight: FontWeight.bold),
+            color: theme.colorScheme.tertiary,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       actions: [
         OutlinedButton(
           onPressed: () => Navigator.of(context).pop(),
           style: OutlinedButton.styleFrom(
-              elevation: 0.0,
-              side: BorderSide(color: theme.colorScheme.primary, width: 2.0),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(11))),
+            elevation: 0.0,
+            side: BorderSide(color: theme.colorScheme.primary, width: 2.0),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(11),
+            ),
+          ),
           child: Text(
             'Cancel',
             style: theme.textTheme.bodyLarge?.copyWith(
@@ -60,33 +68,37 @@ Future<bool> showImportDialog(BuildContext context) async {
             final input = textController.text.trim();
             if (input.isEmpty) {
               VibrationProvider.vibrateSuccess();
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                content: Row(
-                  children: [
-                    const Icon(
-                      Icons.error,
-                      size: 15,
-                      color: Colors.white,
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Text('No data!',
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  content: Row(
+                    children: [
+                      const Icon(
+                        Icons.error,
+                        size: 15,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'No data!',
                         style: theme.textTheme.bodyLarge?.copyWith(
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold)),
-                  ],
+                          fontSize: 18,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  duration: const Duration(milliseconds: 3000),
+                  padding: const EdgeInsets.all(5.0),
+                  margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+                  behavior: SnackBarBehavior.floating,
+                  dismissDirection: DismissDirection.vertical,
+                  backgroundColor: const Color.fromARGB(255, 237, 67, 55),
                 ),
-                duration: const Duration(milliseconds: 3000),
-                padding: const EdgeInsets.all(5.0),
-                margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
-                behavior: SnackBarBehavior.floating,
-                dismissDirection: DismissDirection.vertical,
-                backgroundColor: const Color.fromARGB(255, 237, 67, 55),
-              ));
+              );
               return;
             }
 
@@ -171,39 +183,45 @@ Future<bool> showImportDialog(BuildContext context) async {
             textController.text = "";
 
             Navigator.of(context).pop(true);
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
-              content: Row(
-                children: [
-                  const Icon(
-                    Icons.check,
-                    size: 15,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Text('Imported $importedCount cards!',
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                content: Row(
+                  children: [
+                    const Icon(
+                      Icons.check,
+                      size: 15,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      'Imported $importedCount cards!',
                       style: theme.textTheme.bodyLarge?.copyWith(
-                          fontSize: 18,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold)),
-                ],
+                        fontSize: 18,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                duration: const Duration(milliseconds: 3000),
+                padding: const EdgeInsets.all(5.0),
+                margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+                behavior: SnackBarBehavior.floating,
+                dismissDirection: DismissDirection.vertical,
+                backgroundColor: const Color.fromARGB(255, 92, 184, 92),
               ),
-              duration: const Duration(milliseconds: 3000),
-              padding: const EdgeInsets.all(5.0),
-              margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
-              behavior: SnackBarBehavior.floating,
-              dismissDirection: DismissDirection.vertical,
-              backgroundColor: const Color.fromARGB(255, 92, 184, 92),
-            ));
+            );
           },
           style: OutlinedButton.styleFrom(
-              elevation: 0.0,
-              side: BorderSide(color: theme.colorScheme.primary, width: 2.0),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(11))),
+            elevation: 0.0,
+            side: BorderSide(color: theme.colorScheme.primary, width: 2.0),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(11),
+            ),
+          ),
           child: Text(
             'Import',
             style: theme.textTheme.bodyLarge?.copyWith(
