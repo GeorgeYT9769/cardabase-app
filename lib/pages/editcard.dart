@@ -812,7 +812,7 @@ class _EditCardState extends State<EditCard> {
                                   },
                                 ),
                               ),
-                              keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.text,
                               //maxLength: 13,
                               style: Theme.of(context)
                                   .textTheme

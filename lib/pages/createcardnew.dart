@@ -943,7 +943,7 @@ class _CreateCardState extends State<CreateCard>
                                   },
                                 ),
                               ),
-                              keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.text,
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyLarge
