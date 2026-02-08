@@ -272,17 +272,12 @@ class _QRBarReaderState extends State<QRBarReader> {
           setState(() {
             _permissionDeniedShown = true;
           });
-          if (mounted) {}
-        } else {}
-      } else {}
-    } else {
-      if (_permissionDeniedShown) {
-        if (mounted) {
-          setState(() {
-            _permissionDeniedShown = false;
-          });
-        } else {}
-      } else {}
+        }
+      }
+    } else if (_permissionDeniedShown && mounted) {
+      setState(() {
+        _permissionDeniedShown = false;
+      });
     }
   }
 
