@@ -15,14 +15,14 @@ import 'package:url_launcher/url_launcher.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
+Future<void> _launchUrl(Uri url) async {
+  if (!await launchUrl(url)) {
+    throw Exception('Could not launch $url');
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  Future<void> _launchUrl(url) async {
-    if (!await launchUrl(url)) {
-      throw Exception('Could not launch $url');
-    }
-  }
 
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.presentError(details);
@@ -99,13 +99,15 @@ void main() async {
 
   final PackageInfo packageInfo = await PackageInfo.fromPlatform();
   final String currentAppVersion = packageInfo.version;
-  final String? lastSeenAppVersion =
-      Hive.box('settingsBox').get('lastSeenAppVersion');
+  final lastSeenAppVersion =
+      Hive.box('settingsBox').get('lastSeenAppVersion') as String?;
   // Read auto-backup settings safely
-  final bool autoBackups = Hive.box('settingsBox').get('autoBackups') ?? false;
-  final String? lastAutoUpdate = Hive.box('settingsBox').get('lastAutoUpdate');
-  final int autoBackupInterval =
-      Hive.box('settingsBox').get('autoBackupInterval') ?? 7;
+  final autoBackups =
+      Hive.box('settingsBox').get('autoBackups') as bool? ?? false;
+  final lastAutoUpdate =
+      Hive.box('settingsBox').get('lastAutoUpdate') as String?;
+  final autoBackupInterval =
+      Hive.box('settingsBox').get('autoBackupInterval') as int? ?? 7;
 
   Widget initialScreen;
 
@@ -201,13 +203,11 @@ class _MainState extends State<Main> {
     return ValueListenableBuilder(
       valueListenable: Hive.box('settingsBox').listenable(),
       builder: (context, box, child) {
-        final bool isDarkMode = box.get('isDarkMode', defaultValue: false);
-        final bool useSystemFont =
-            box.get('useSystemFont', defaultValue: false);
-        final bool useExtraDark = box.get(
-          'useExtraDark',
-          defaultValue: false,
-        ); // Retrieve new setting
+        final isDarkMode = box.get('isDarkMode', defaultValue: false) as bool;
+        final useSystemFont =
+            box.get('useSystemFont', defaultValue: false) as bool;
+        final useExtraDark = box.get('useExtraDark', defaultValue: false)
+            as bool; // Retrieve new setting
 
         final ColorScheme extraDarkColorScheme = darkColorScheme.copyWith(
           surface: Colors.black,

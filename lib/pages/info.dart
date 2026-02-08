@@ -46,8 +46,8 @@ class _InfoScreenState extends State<InfoScreen> {
       final response = await http.get(Uri.parse(_githubApiUrl));
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        final String githubTag = data['tag_name'] ?? '';
+        final data = json.decode(response.body) as Map<String, dynamic>? ?? {};
+        final String githubTag = data['tag_name'] as String? ?? '';
 
         _latestGitHubVersion =
             githubTag.startsWith('v') ? githubTag.substring(1) : githubTag;

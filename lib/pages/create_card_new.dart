@@ -131,7 +131,7 @@ class _CreateCardState extends State<CreateCard>
         );
       },
     ).then((value) {
-      if (value != null) {
+      if (value is Color) {
         setState(() {
           cardColorPreview = value;
           redValue = (cardColorPreview.r * 255.0).round();
@@ -601,7 +601,7 @@ class _CreateCardState extends State<CreateCard>
             );
             setState(() {
               if (result is Map<String, dynamic>) {
-                final String code = result['code'];
+                final code = result['code'] as String;
 
                 if (code != '-1') {
                   final List<String> rawList =
@@ -636,8 +636,10 @@ class _CreateCardState extends State<CreateCard>
           ValueListenableBuilder(
             valueListenable: Hive.box('settingsBox').listenable(),
             builder: (context, settingsBox, child) {
-              final bool showLegacyCardButton =
-                  settingsBox.get('developerOptions', defaultValue: false);
+              final showLegacyCardButton = settingsBox.get(
+                'developerOptions',
+                defaultValue: false,
+              ) as bool;
               return showLegacyCardButton
                   ? IconButton(
                       icon: Icon(
@@ -826,7 +828,7 @@ class _CreateCardState extends State<CreateCard>
                                     );
                                     setState(() {
                                       if (result is Map<String, dynamic>) {
-                                        final String code = result['code'];
+                                        final code = result['code'] as String;
                                         final format =
                                             result['format'].toString();
                                         if (code != '-1') {
@@ -1041,7 +1043,8 @@ class _CreateCardState extends State<CreateCard>
                                         scrollDirection: Axis.horizontal,
                                         itemCount: allTags.length,
                                         itemBuilder: (context, chipIndex) {
-                                          final tag = allTags[chipIndex];
+                                          final tag =
+                                              allTags[chipIndex] as String;
                                           final isSelected =
                                               selectedTags.contains(tag);
                                           return Padding(

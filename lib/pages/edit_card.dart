@@ -151,7 +151,7 @@ class _EditCardState extends State<EditCard> {
         );
       },
     ).then((value) {
-      if (value != null) {
+      if (value is Color) {
         setState(() {
           cardColorPreview = value;
           redValue = (cardColorPreview.r * 255.0).round();
@@ -943,7 +943,7 @@ class _EditCardState extends State<EditCard> {
                                   scrollDirection: Axis.horizontal,
                                   itemCount: allTags.length,
                                   itemBuilder: (context, chipIndex) {
-                                    final tag = allTags[chipIndex];
+                                    final tag = allTags[chipIndex] as String;
                                     final isSelected =
                                         selectedTags.contains(tag);
                                     return Padding(

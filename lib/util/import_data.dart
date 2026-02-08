@@ -130,14 +130,21 @@ Future<bool> showImportDialog(BuildContext context) async {
                     final newMap = {
                       'cardName': cardMap['cardName'] ?? '',
                       'cardId': cardMap['cardId'] ?? '',
-                      'redValue': int.tryParse(cardMap['redValue'] ?? '0') ?? 0,
-                      'greenValue':
-                          int.tryParse(cardMap['greenValue'] ?? '0') ?? 0,
-                      'blueValue':
-                          int.tryParse(cardMap['blueValue'] ?? '0') ?? 0,
+                      'redValue':
+                          int.tryParse(cardMap['redValue'] as String? ?? '0') ??
+                              0,
+                      'greenValue': int.tryParse(
+                            cardMap['greenValue'] as String? ?? '0',
+                          ) ??
+                          0,
+                      'blueValue': int.tryParse(
+                            cardMap['blueValue'] as String? ?? '0',
+                          ) ??
+                          0,
                       'cardType': cardMap['cardType'] ?? '',
                       'hasPassword':
-                          (cardMap['hasPassword']?.toLowerCase() == 'true'),
+                          ((cardMap['hasPassword'] as String?)?.toLowerCase() ==
+                              'true'),
                       'uniqueId': uniqueId + importedCount.toString(),
                       'note': cardMap['note'] ?? '',
                     };

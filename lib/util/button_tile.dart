@@ -3,7 +3,7 @@ import 'package:flutter_bounceable/flutter_bounceable.dart';
 
 class ButtonTile extends StatelessWidget {
   final String buttonText;
-  final buttonAction;
+  final void Function() buttonAction;
 
   const ButtonTile({
     super.key,
