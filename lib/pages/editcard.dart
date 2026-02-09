@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cardabase/util/ean.dart';
 import 'package:cardabase/util/read_barcode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -163,7 +164,7 @@ class _EditCardState extends State<EditCard> {
 
   void saveNewCard() {
     if (controller.text.isNotEmpty &&
-        verifyEan(controllercardid.text) == true &&
+        _verifyEan(controllercardid.text) == true &&
         cardTypeText != 'Card Type') {
       final now = DateTime.now();
       final uniqueId =
@@ -254,7 +255,7 @@ class _EditCardState extends State<EditCard> {
         dismissDirection: DismissDirection.vertical,
         backgroundColor: const Color.fromARGB(255, 237, 67, 55),
       ));
-    } else if (verifyEan(controllercardid.text) == false) {
+    } else if (_verifyEan(controllercardid.text) == false) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           shape:
@@ -383,44 +384,30 @@ class _EditCardState extends State<EditCard> {
 
   //CHECKING IF THE CARD CAN BE DISPLAYED
   //P.S. WRITTEN BY CHAT-GPT CUZ GOT NO IDEA HOW TO CHECK THEM MYSELF :)
-  bool verifyEan(String eanCode) {
-    if (cardTypeText == 'CardType.ean13') {
-      if (eanCode == '9769') {
-        controllercardid.text = '978020137962';
-        return true;
-      } else if (eanCode.length != 13 || int.tryParse(eanCode) == null) {
+  bool _verifyEan(String eanCode) {
+    if (cardTypeText == 'CardType.ean13' && eanCode == '9769') {
+      // TODO: why?
+      controllercardid.text = '978020137962';
+      return true;
+    }
+    if (cardTypeText == 'CardType.ean8') {
+      final expectedLength = switch (cardTypeText) {
+        'CardType.ean13' => 13,
+        'CardType.ean8' => 8,
+        'CardType.itf14' => 14,
+        'CardType.itf16' => 16,
+        'CardType.upca' => 12,
+        'CardType.upce' => 8,
+        _ => throw Exception('unexpected card type'),
+      };
+      if (eanCode.length != expectedLength) {
         return false;
       }
-      int oddSum = 0;
-      int evenSum = 0;
-      for (int i = 0; i < 12; i++) {
-        int digit = int.parse(eanCode[i]);
-        if (i % 2 == 0) {
-          oddSum += digit;
-        } else {
-          evenSum += digit;
-        }
-      }
-      int totalSum = oddSum + evenSum * 3;
-      int checkDigit = (10 - totalSum % 10) % 10;
-      return checkDigit == int.parse(eanCode[12]);
-    } else if (cardTypeText == 'CardType.ean8') {
-      if (eanCode.length != 8 || int.tryParse(eanCode) == null) {
+      final code = int.tryParse(eanCode);
+      if (code == null) {
         return false;
       }
-      int oddSum = 0;
-      int evenSum = 0;
-      for (int i = 0; i < 7; i++) {
-        int digit = int.parse(eanCode[i]);
-        if (i % 2 == 0) {
-          evenSum += digit;
-        } else {
-          oddSum += digit;
-        }
-      }
-      int totalSum = oddSum + evenSum * 3;
-      int checkDigit = (10 - totalSum % 10) % 10;
-      return checkDigit == int.parse(eanCode[7]);
+      return verifyEan(code, expectedLength) == null;
     } else if (cardTypeText == 'CardType.ean5') {
       if (eanCode.length != 5) {
         return false;
@@ -435,74 +422,6 @@ class _EditCardState extends State<EditCard> {
       }
     } else if (cardTypeText == 'CardType.itf') {
       return int.tryParse(eanCode) != null;
-    } else if (cardTypeText == 'CardType.itf14') {
-      if (eanCode.length != 14 || int.tryParse(eanCode) == null) {
-        return false;
-      }
-
-      int sum = 0;
-      for (int i = 0; i < 13; i++) {
-        int digit = int.parse(eanCode[i]);
-        if (i % 2 == 0) {
-          sum += digit * 3;
-        } else {
-          sum += digit;
-        }
-      }
-
-      int checkDigit = (10 - (sum % 10)) % 10;
-      return checkDigit == int.parse(eanCode[13]);
-    } else if (cardTypeText == 'CardType.itf16') {
-      if (eanCode.length != 16 || int.tryParse(eanCode) == null) {
-        return false;
-      }
-
-      int sum = 0;
-      for (int i = 0; i < 15; i++) {
-        int digit = int.parse(eanCode[i]);
-        if (i % 2 == 0) {
-          sum += digit * 3;
-        } else {
-          sum += digit;
-        }
-      }
-
-      int checkDigit = (10 - (sum % 10)) % 10;
-      return checkDigit == int.parse(eanCode[15]);
-    } else if (cardTypeText == 'CardType.upca') {
-      if (eanCode.length != 12 || int.tryParse(eanCode) == null) {
-        return false;
-      }
-      int oddSum = 0;
-      int evenSum = 0;
-      for (int i = 0; i < 11; i++) {
-        int digit = int.parse(eanCode[i]);
-        if (i % 2 == 0) {
-          evenSum += digit;
-        } else {
-          oddSum += digit;
-        }
-      }
-      int totalSum = oddSum + evenSum * 3;
-      int checkDigit = (10 - totalSum % 10) % 10;
-      return checkDigit == int.parse(eanCode[11]);
-    } else if (cardTypeText == 'CardType.upce') {
-      if (eanCode.length != 8 || int.tryParse(eanCode) == null) {
-        return false;
-      }
-      int oddSum = 0;
-      int evenSum = 0;
-      for (int i = 0; i < 7; i++) {
-        int digit = int.parse(eanCode[i]);
-        if (i % 2 == 0) {
-          evenSum += digit;
-        } else {
-          oddSum += digit;
-        }
-      }
-      int totalSum = oddSum + evenSum * 3;
-      int checkDigit = (10 - totalSum % 10) % 10;
-      return checkDigit == int.parse(eanCode[7]);
     } else {
       return true;
     }
