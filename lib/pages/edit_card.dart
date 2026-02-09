@@ -819,7 +819,7 @@ class _EditCardState extends State<EditCard> {
                                   },
                                 ),
                               ),
-                              keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.text,
                               //maxLength: 13,
                               style: theme.textTheme.bodyLarge?.copyWith(
                                 color: theme.colorScheme.tertiary,

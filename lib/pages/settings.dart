@@ -749,7 +749,8 @@ class _SettingsState extends State<Settings> {
                     borderColor: theme.colorScheme.primary,
                   ),
                   MySetting(
-                    aboutSettingHeader: 'Backup your cards into self-hosted cloud storage',
+                    aboutSettingHeader:
+                        'Backup your cards into self-hosted cloud storage',
                     settingAction: () {},
                     settingHeader: 'Cloud Backups',
                     iconColor: Theme.of(context).colorScheme.tertiary,
