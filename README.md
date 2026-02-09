@@ -66,7 +66,6 @@ By downloading the app you agree:
 - add biometric identification for the password
 - add a counter to every card, so when card is clicked, it would add a point, then this could be used to sort by the most used cards
 - custom color theme, custom theme builder
-- images for the cards
 - anonymous bug reporting (to Discord issue tracker)
 - idk, let me know via issues ;)
 
@@ -118,9 +117,22 @@ This is how the structure of the data in the QR Code looks like:
 - `<Card Type>` - Type of the card, they can be [THESE](https://github.com/GeorgeYT9769/cardabase-app/blob/2e86905c4fb4f861cd3008506a681aab96ea9b38/lib/pages/createcardnew.dart#L9-L27) or [THESE](https://github.com/GeorgeYT9769/cardabase-app/blob/2e86905c4fb4f861cd3008506a681aab96ea9b38/lib/pages/createcardnew.dart#L58-L89), (same types) (String)
 - `<Password>` - If the card has a password or not (bool)
 
+## 📌 Permissions
+Currently, the app uses these permissions (+why are they needed) :
+- android.permission.WRITE_EXTERNAL_STORAGE - used by the storage system to save the app's data, mandatory
+- android.permission.READ_EXTERNAL_STORAGE - used by the storage system to save the app's data, mandatory
+- android.permission.MANAGE_EXTERNAL_STORAGE - used by the import and export system, optional
+- android.permission.WRITE_SETTINGS - used by the brightness controller, optional
+- android.permission.VIBRATE - used to vibrate the device on actions, optional
+- android.permission.INTERNET - used to check the latest version of the app and fetch the online changelog, optional
+- android.permission.CAMERA - used to read barcodes and take pictures of the cards, optional
+- android.permission.READ_MEDIA_IMAGES - used to select images for cards, optional
+- android.permission.READ_MEDIA_VISUAL_USER_SELECTED - used to select images for cards, optional
+
 ## 🤝 Thanks to
 
 - [Edin Divović](https://www.youtube.com/@NotEdin_)
+- [Wim Van Laer](https://github.com/wim07101993)
 - All the bug reporters that make the app even better.
 
 ## 🙌 Support

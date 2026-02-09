@@ -910,7 +910,7 @@ class _CreateCardState extends State<CreateCard>
                                   },
                                 ),
                               ),
-                              keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.text,
                               style: theme.textTheme.bodyLarge?.copyWith(
                                 color: theme.colorScheme.tertiary,
                                 fontWeight: FontWeight.bold,
