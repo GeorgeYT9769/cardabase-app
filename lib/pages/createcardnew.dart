@@ -397,7 +397,12 @@ class _CreateCardState extends State<CreateCard>
       controllercardid.text = '9780201379624';
       return true;
     }
-    if (cardTypeText == 'CardType.ean8') {
+    if (cardTypeText == 'CardType.ean13' ||
+        cardTypeText == 'CardType.ean8' ||
+        cardTypeText == 'CardType.itf14' ||
+        cardTypeText == 'CardType.itf16' ||
+        cardTypeText == 'CardType.upca' ||
+        cardTypeText == 'CardType.upce') {
       final expectedLength = switch (cardTypeText) {
         'CardType.ean13' => 13,
         'CardType.ean8' => 8,
