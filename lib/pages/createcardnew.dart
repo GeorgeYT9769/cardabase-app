@@ -394,7 +394,7 @@ class _CreateCardState extends State<CreateCard>
   bool _verifyEan(String eanCode) {
     if (cardTypeText == 'CardType.ean13' && eanCode == '9769') {
       // TODO: why?
-      controllercardid.text = '978020137962';
+      controllercardid.text = '9780201379624';
       return true;
     }
     if (cardTypeText == 'CardType.ean8') {
