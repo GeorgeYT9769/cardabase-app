@@ -1,10 +1,10 @@
 import 'package:cardabase/util/ean.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-main() {
+void main() {
   group('verifyEan', () {
     const validCodes = [
-      _ValidEanCodeTestCase(code: 2292302559524, length: 13),
+      _ValidEanCodeTestCase(code: '2292302559524', length: 13),
     ];
 
     for (final testCase in validCodes) {
@@ -16,14 +16,19 @@ main() {
 
     const invalidCodes = [
       _InvalidEanCodeTestCase(
-        code: 2292302559523,
+        code: '2292302559523',
         length: 13,
         exception: EanCheckSumIncorrectException(),
       ),
       _InvalidEanCodeTestCase(
-        code: 1234567891011121314,
+        code: '123467891011',
         length: 13,
-        exception: EanTooLongException(),
+        exception: EanCodeInvalidLengthException(),
+      ),
+      _InvalidEanCodeTestCase(
+        code: '12345678910111',
+        length: 13,
+        exception: EanCodeInvalidLengthException(),
       ),
     ];
 
@@ -41,7 +46,7 @@ class _ValidEanCodeTestCase {
     required this.code,
     required this.length,
   });
-  final int code;
+  final String code;
   final int length;
 }
 
@@ -51,7 +56,7 @@ class _InvalidEanCodeTestCase {
     required this.length,
     required this.exception,
   });
-  final int code;
+  final String code;
   final int length;
   final Exception exception;
 }

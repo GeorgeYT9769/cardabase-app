@@ -31,6 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   barcode_widget: ^2.0.4
+  equatable: ">=2.0.8 <3.0.0"
   flutter_colorpicker: ^1.0.3
   hive_ce: ">=2.19.3 <3.0.0"
   hive_ce_flutter: ">=2.3.4 <3.0.0"

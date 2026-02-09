@@ -405,14 +405,10 @@ class _EditCardState extends State<EditCard> {
         'CardType.upce' => 8,
         _ => throw Exception('unexpected card type'),
       };
-      if (eanCode.length != expectedLength) {
+      if (eanCode.length != expectedLength || int.tryParse(eanCode) == null) {
         return false;
       }
-      final code = int.tryParse(eanCode);
-      if (code == null) {
-        return false;
-      }
-      return verifyEan(code, expectedLength) == null;
+      return verifyEan(eanCode, expectedLength) == null;
     } else if (cardTypeText == 'CardType.ean5') {
       if (eanCode.length != 5) {
         return false;
