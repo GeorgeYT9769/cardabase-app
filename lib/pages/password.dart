@@ -1,9 +1,8 @@
+import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:password_strength_checker/password_strength_checker.dart';
-
-import '../util/vibration_provider.dart';
 
 class PasswordScreen extends StatefulWidget {
   const PasswordScreen({super.key});
@@ -22,7 +21,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
   TextEditingController confirmPassword = TextEditingController();
   TextEditingController resetPassword = TextEditingController();
 
-  void setPasswordFunc() {
+  void setPasswordFunc(ThemeData theme) {
     if (password.text.isNotEmpty && confirmPassword.text.isNotEmpty) {
       if (password.text == confirmPassword.text) {
         passwordbox.put('PW', password.text);
@@ -33,53 +32,91 @@ class _PasswordScreenState extends State<PasswordScreen> {
           hideConfirmPassword = true;
         });
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          content: Row(
-            children: [
-              Icon(
-                Icons.check,
-                size: 15,
-                color: Colors.white,
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Text('Success!',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontSize: 18,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold)),
-            ],
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            content: Row(
+              children: [
+                const Icon(
+                  Icons.check,
+                  size: 15,
+                  color: Colors.white,
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  'Success!',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontSize: 18,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            duration: const Duration(milliseconds: 3000),
+            padding: const EdgeInsets.all(5.0),
+            margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+            behavior: SnackBarBehavior.floating,
+            dismissDirection: DismissDirection.vertical,
+            backgroundColor: const Color.fromARGB(255, 92, 184, 92),
           ),
-          duration: const Duration(milliseconds: 3000),
-          padding: const EdgeInsets.all(5.0),
-          margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
-          behavior: SnackBarBehavior.floating,
-          dismissDirection: DismissDirection.vertical,
-          backgroundColor: const Color.fromARGB(255, 92, 184, 92),
-        ));
+        );
       } else {
         VibrationProvider.vibrateSuccess();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            content: Row(
+              children: [
+                const Icon(
+                  Icons.error,
+                  size: 15,
+                  color: Colors.white,
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  'Passwords does not match!',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontSize: 18,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            duration: const Duration(milliseconds: 3000),
+            padding: const EdgeInsets.all(5.0),
+            margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+            behavior: SnackBarBehavior.floating,
+            dismissDirection: DismissDirection.vertical,
+            backgroundColor: const Color.fromARGB(255, 237, 67, 55),
+          ),
+        );
+      }
+    } else {
+      VibrationProvider.vibrateSuccess();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           content: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.error,
                 size: 15,
                 color: Colors.white,
               ),
-              SizedBox(
-                width: 10,
+              const SizedBox(width: 10),
+              Text(
+                'Password cannot be empty!',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontSize: 18,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              Text('Passwords does not match!',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontSize: 18,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold)),
             ],
           ),
           duration: const Duration(milliseconds: 3000),
@@ -88,40 +125,12 @@ class _PasswordScreenState extends State<PasswordScreen> {
           behavior: SnackBarBehavior.floating,
           dismissDirection: DismissDirection.vertical,
           backgroundColor: const Color.fromARGB(255, 237, 67, 55),
-        ));
-      }
-    } else {
-      VibrationProvider.vibrateSuccess();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        content: Row(
-          children: [
-            Icon(
-              Icons.error,
-              size: 15,
-              color: Colors.white,
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Text('Password cannot be empty!',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontSize: 18,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold)),
-          ],
         ),
-        duration: const Duration(milliseconds: 3000),
-        padding: const EdgeInsets.all(5.0),
-        margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
-        behavior: SnackBarBehavior.floating,
-        dismissDirection: DismissDirection.vertical,
-        backgroundColor: const Color.fromARGB(255, 237, 67, 55),
-      ));
+      );
     }
   }
 
-  void resetPasswordFunc() {
+  void resetPasswordFunc(ThemeData theme) {
     if (resetPassword.text == passwordbox.get('PW')) {
       setState(() {
         passwordbox.clear();
@@ -130,60 +139,68 @@ class _PasswordScreenState extends State<PasswordScreen> {
         resetPassword.text = '';
       });
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        content: Row(
-          children: [
-            Icon(
-              Icons.check,
-              size: 15,
-              color: Colors.white,
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Text('Success!',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontSize: 18,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold)),
-          ],
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          content: Row(
+            children: [
+              const Icon(
+                Icons.check,
+                size: 15,
+                color: Colors.white,
+              ),
+              const SizedBox(width: 10),
+              Text(
+                'Success!',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontSize: 18,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          duration: const Duration(milliseconds: 3000),
+          padding: const EdgeInsets.all(5.0),
+          margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+          behavior: SnackBarBehavior.floating,
+          dismissDirection: DismissDirection.vertical,
+          backgroundColor: const Color.fromARGB(255, 92, 184, 92),
         ),
-        duration: const Duration(milliseconds: 3000),
-        padding: const EdgeInsets.all(5.0),
-        margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
-        behavior: SnackBarBehavior.floating,
-        dismissDirection: DismissDirection.vertical,
-        backgroundColor: const Color.fromARGB(255, 92, 184, 92),
-      ));
+      );
     } else {
       VibrationProvider.vibrateSuccess();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        content: Row(
-          children: [
-            Icon(
-              Icons.error,
-              size: 15,
-              color: Colors.white,
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Text('Incorrect password!',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontSize: 18,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold)),
-          ],
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          content: Row(
+            children: [
+              const Icon(
+                Icons.error,
+                size: 15,
+                color: Colors.white,
+              ),
+              const SizedBox(width: 10),
+              Text(
+                'Incorrect password!',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontSize: 18,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          duration: const Duration(milliseconds: 3000),
+          padding: const EdgeInsets.all(5.0),
+          margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+          behavior: SnackBarBehavior.floating,
+          dismissDirection: DismissDirection.vertical,
+          backgroundColor: const Color.fromARGB(255, 237, 67, 55),
         ),
-        duration: const Duration(milliseconds: 3000),
-        padding: const EdgeInsets.all(5.0),
-        margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
-        behavior: SnackBarBehavior.floating,
-        dismissDirection: DismissDirection.vertical,
-        backgroundColor: const Color.fromARGB(255, 237, 67, 55),
-      ));
+      );
     }
   }
 
@@ -213,294 +230,282 @@ class _PasswordScreenState extends State<PasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final passNotifier = ValueNotifier<PasswordStrength?>(null);
 
     return Scaffold(
-        backgroundColor: Theme.of(context)
-            .colorScheme
-            .surface, // - BACKGROUND COLOR (DEFAULT)
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          actions: [
-            IconButton(
-              icon: Icon(
-                Icons.arrow_back_ios_new,
-                color: Theme.of(context).colorScheme.secondary,
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-              },
+      backgroundColor:
+          theme.colorScheme.surface, // - BACKGROUND COLOR (DEFAULT)
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios_new,
+              color: theme.colorScheme.secondary,
             ),
-          ],
-          title: Text('Password',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w900,
-                    fontFamily: 'xirod',
-                    letterSpacing: 5,
-                    color: Theme.of(context).colorScheme.tertiary,
-                  )),
-          centerTitle: true,
-          elevation: 0.0,
-          backgroundColor: Theme.of(context).colorScheme.surface,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
+        title: Text(
+          'Password',
+          style: theme.textTheme.bodyLarge?.copyWith(
+            fontSize: 17,
+            fontWeight: FontWeight.w900,
+            fontFamily: 'xirod',
+            letterSpacing: 5,
+            color: theme.colorScheme.tertiary,
+          ),
         ),
-        body: passwordbox.isEmpty == true
-            // NO PWD
-            ? Container(
-                padding: const EdgeInsets.all(20),
-                child: ListView(
-                  children: [
-                    Text(
-                      'CREATE A PASSWORD',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                            color: Theme.of(context).colorScheme.inverseSurface,
-                          ),
-                      textAlign: TextAlign.center,
+        centerTitle: true,
+        elevation: 0.0,
+        backgroundColor: theme.colorScheme.surface,
+      ),
+      body: passwordbox.isEmpty == true
+          // NO PWD
+          ? Container(
+              padding: const EdgeInsets.all(20),
+              child: ListView(
+                children: [
+                  Text(
+                    'CREATE A PASSWORD',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: theme.colorScheme.inverseSurface,
                     ),
-                    const SizedBox(
-                      height: 10,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Give your cards a password. Once you have set it up, you may use that password to safeguard your cards.',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      //cardTypeText
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: theme.colorScheme.inverseSurface,
                     ),
-                    Text(
-                      'Give your cards a password. Once you have set it up, you may use that password to safeguard your cards.',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            //cardTypeText
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                            color: Theme.of(context).colorScheme.inverseSurface,
-                          ),
-                      textAlign: TextAlign.justify,
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    TextFormField(
-                      controller: password,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(width: 2.0)),
-                        focusColor: Theme.of(context).colorScheme.primary,
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.primary,
-                                width: 1.0),
-                            borderRadius: BorderRadius.circular(10)),
-                        labelText: 'Password',
-                        labelStyle: Theme.of(context)
-                            .textTheme
-                            .bodyLarge
-                            ?.copyWith(
-                                color: Theme.of(context).colorScheme.secondary),
-                        prefixIcon: Icon(Icons.password,
-                            color: Theme.of(context).colorScheme.secondary),
-                        suffixIcon: IconButton(
-                            icon: Icon(
-                                hidePassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                color: Theme.of(context).colorScheme.secondary),
-                            onPressed: showPasswordFunc),
+                    textAlign: TextAlign.justify,
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: password,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(width: 2.0),
                       ),
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.tertiary,
-                          fontWeight: FontWeight.bold),
-                      keyboardType: TextInputType.visiblePassword,
-                      obscureText: hidePassword,
-                      onChanged: (value) {
-                        passNotifier.value =
-                            PasswordStrength.calculate(text: value);
-                      },
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    TextFormField(
-                      controller: confirmPassword,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(width: 2.0)),
-                        focusColor: Theme.of(context).colorScheme.primary,
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.primary,
-                                width: 1.0),
-                            borderRadius: BorderRadius.circular(10)),
-                        labelText: 'Password again',
-                        labelStyle: Theme.of(context)
-                            .textTheme
-                            .bodyLarge
-                            ?.copyWith(
-                              color: Theme.of(context).colorScheme.secondary,
-                            ),
-                        prefixIcon: Icon(Icons.password,
-                            color: Theme.of(context).colorScheme.secondary),
-                        suffixIcon: IconButton(
-                            icon: Icon(
-                                hideConfirmPassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                color: Theme.of(context).colorScheme.secondary),
-                            onPressed: showConfirmPasswordFunc),
+                      focusColor: theme.colorScheme.primary,
+                      enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: theme.colorScheme.primary),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.inverseSurface,
-                          fontWeight: FontWeight.bold),
-                      keyboardType: TextInputType.visiblePassword,
-                      obscureText: hideConfirmPassword,
+                      labelText: 'Password',
+                      labelStyle: theme.textTheme.bodyLarge
+                          ?.copyWith(color: theme.colorScheme.secondary),
+                      prefixIcon: Icon(
+                        Icons.password,
+                        color: theme.colorScheme.secondary,
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          hidePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: theme.colorScheme.secondary,
+                        ),
+                        onPressed: showPasswordFunc,
+                      ),
                     ),
-                    const SizedBox(
-                      height: 20,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.tertiary,
+                      fontWeight: FontWeight.bold,
                     ),
-                    PasswordStrengthChecker(
-                      strength: passNotifier,
-                      configuration: PasswordStrengthCheckerConfiguration(
-                          borderColor: Theme.of(context).colorScheme.tertiary,
-                          inactiveBorderColor:
-                              Theme.of(context).colorScheme.tertiary,
-                          borderWidth: 1,
-                          statusWidgetAlignment: MainAxisAlignment.center),
+                    keyboardType: TextInputType.visiblePassword,
+                    obscureText: hidePassword,
+                    onChanged: (value) {
+                      passNotifier.value =
+                          PasswordStrength.calculate(text: value);
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: confirmPassword,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(width: 2.0),
+                      ),
+                      focusColor: theme.colorScheme.primary,
+                      enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: theme.colorScheme.primary),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      labelText: 'Password again',
+                      labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                        color: theme.colorScheme.secondary,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.password,
+                        color: theme.colorScheme.secondary,
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          hideConfirmPassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: theme.colorScheme.secondary,
+                        ),
+                        onPressed: showConfirmPasswordFunc,
+                      ),
                     ),
-                    const SizedBox(
-                      height: 20,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.inverseSurface,
+                      fontWeight: FontWeight.bold,
                     ),
-                    Bounceable(
-                      onTap: () {},
-                      child: SizedBox(
-                        height: 70,
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.all(15),
-                            side: BorderSide(
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            backgroundColor: Colors.transparent,
-                            elevation: 0.0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            minimumSize: const Size.fromHeight(100),
+                    keyboardType: TextInputType.visiblePassword,
+                    obscureText: hideConfirmPassword,
+                  ),
+                  const SizedBox(height: 20),
+                  PasswordStrengthChecker(
+                    strength: passNotifier,
+                    configuration: PasswordStrengthCheckerConfiguration(
+                      borderColor: theme.colorScheme.tertiary,
+                      inactiveBorderColor: theme.colorScheme.tertiary,
+                      borderWidth: 1,
+                      statusWidgetAlignment: MainAxisAlignment.center,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Bounceable(
+                    onTap: () {},
+                    child: SizedBox(
+                      height: 70,
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.all(15),
+                          side: BorderSide(
+                            color: theme.colorScheme.primary,
                           ),
-                          onPressed: setPasswordFunc,
-                          child: Text(
-                            'SET',
-                            style:
-                                Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .inverseSurface,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                          backgroundColor: Colors.transparent,
+                          elevation: 0.0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          minimumSize: const Size.fromHeight(100),
+                        ),
+                        onPressed: () => setPasswordFunc(theme),
+                        child: Text(
+                          'SET',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.inverseSurface,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ),
-                  ],
-                ),
-              )
-            //PWD
-            : Container(
-                padding: const EdgeInsets.all(20),
-                child: ListView(
-                  children: [
-                    Text(
-                      'RESET PASSWORD',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                            color: Theme.of(context).colorScheme.inverseSurface,
-                          ),
-                      textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            )
+          //PWD
+          : Container(
+              padding: const EdgeInsets.all(20),
+              child: ListView(
+                children: [
+                  Text(
+                    'RESET PASSWORD',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: theme.colorScheme.inverseSurface,
                     ),
-                    const SizedBox(
-                      height: 10,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'If you wish to change your password or stop using it, you may do so here.',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: theme.colorScheme.inverseSurface,
                     ),
-                    Text(
-                      'If you wish to change your password or stop using it, you may do so here.',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                            color: Theme.of(context).colorScheme.inverseSurface,
-                          ),
-                      textAlign: TextAlign.justify,
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    TextFormField(
-                      controller: resetPassword,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(width: 2.0)),
-                        focusColor: Theme.of(context).colorScheme.primary,
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.primary,
-                                width: 1.0),
-                            borderRadius: BorderRadius.circular(10)),
-                        labelText: 'Password',
-                        labelStyle: Theme.of(context)
-                            .textTheme
-                            .bodyLarge
-                            ?.copyWith(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .inverseSurface),
-                        prefixIcon: Icon(Icons.password,
-                            color: Theme.of(context).colorScheme.secondary),
-                        suffixIcon: IconButton(
-                            icon: Icon(
-                                hidePassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                color: Theme.of(context).colorScheme.secondary),
-                            onPressed: showPasswordFunc),
+                    textAlign: TextAlign.justify,
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: resetPassword,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(width: 2.0),
                       ),
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.inverseSurface,
-                          fontWeight: FontWeight.bold),
-                      keyboardType: TextInputType.visiblePassword,
-                      obscureText: hidePassword,
+                      focusColor: theme.colorScheme.primary,
+                      enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: theme.colorScheme.primary),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      labelText: 'Password',
+                      labelStyle: theme.textTheme.bodyLarge
+                          ?.copyWith(color: theme.colorScheme.inverseSurface),
+                      prefixIcon: Icon(
+                        Icons.password,
+                        color: theme.colorScheme.secondary,
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          hidePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: theme.colorScheme.secondary,
+                        ),
+                        onPressed: showPasswordFunc,
+                      ),
                     ),
-                    const SizedBox(
-                      height: 20,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.inverseSurface,
+                      fontWeight: FontWeight.bold,
                     ),
-                    Bounceable(
-                      onTap: () {},
-                      child: SizedBox(
-                        height: 70,
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.all(15),
-                            side: BorderSide(
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            backgroundColor: Colors.transparent,
-                            elevation: 0.0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            minimumSize: const Size.fromHeight(100),
+                    keyboardType: TextInputType.visiblePassword,
+                    obscureText: hidePassword,
+                  ),
+                  const SizedBox(height: 20),
+                  Bounceable(
+                    onTap: () {},
+                    child: SizedBox(
+                      height: 70,
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.all(15),
+                          side: BorderSide(
+                            color: theme.colorScheme.primary,
                           ),
-                          onPressed: resetPasswordFunc,
-                          child: Text(
-                            'RESET',
-                            style:
-                                Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .inverseSurface,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                          backgroundColor: Colors.transparent,
+                          elevation: 0.0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          minimumSize: const Size.fromHeight(100),
+                        ),
+                        onPressed: () => resetPasswordFunc(theme),
+                        child: Text(
+                          'RESET',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.inverseSurface,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ));
+                  ),
+                ],
+              ),
+            ),
+    );
   }
 }

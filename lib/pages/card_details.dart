@@ -1,13 +1,12 @@
 import 'dart:io';
 
 import 'package:barcode_widget/barcode_widget.dart';
+import 'package:cardabase/pages/image_preview_screen.dart';
 import 'package:cardabase/pages/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:screen_brightness/screen_brightness.dart';
-
-import 'image_preview_screen.dart';
 
 class CardDetails extends StatefulWidget {
   final settingsbox = Hive.box('settingsBox');
@@ -25,20 +24,21 @@ class CardDetails extends StatefulWidget {
   final String imagePathFront;
   final String imagePathBack;
 
-  CardDetails(
-      {super.key,
-      required this.cardid,
-      required this.cardtext,
-      required this.cardTileColor,
-      required this.cardType,
-      required this.hasPassword,
-      required this.red,
-      required this.green,
-      required this.blue,
-      required this.tags,
-      required this.note,
-      required this.imagePathFront,
-      required this.imagePathBack});
+  CardDetails({
+    super.key,
+    required this.cardid,
+    required this.cardtext,
+    required this.cardTileColor,
+    required this.cardType,
+    required this.hasPassword,
+    required this.red,
+    required this.green,
+    required this.blue,
+    required this.tags,
+    required this.note,
+    required this.imagePathFront,
+    required this.imagePathBack,
+  });
 
   @override
   State<CardDetails> createState() => _CardDetailsState();
@@ -115,295 +115,304 @@ class _CardDetailsState extends State<CardDetails> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(
-            icon: Icon(
-              Icons.qr_code_2,
-              color: Theme.of(context).colorScheme.secondary,
-            ),
-            onPressed: () {
-              showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text(
-                        'Share',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: Theme.of(context).colorScheme.inverseSurface,
-                            fontSize: 30),
-                      ),
-                      content: Container(
-                        height: 200,
-                        padding: const EdgeInsets.all(15),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10.0),
-                            color: Colors.white),
-                        child: BarcodeWidget(
-                          padding: const EdgeInsets.all(10),
-                          data:
-                              '[${widget.cardtext}, ${widget.cardid}, ${widget.red}, ${widget.green}, ${widget.blue}, ${widget.cardType}, ${widget.hasPassword},${widget.tags}]',
-                          barcode: Barcode.qrCode(),
-                          drawText: true,
-                          style: const TextStyle(color: Colors.black),
-                        ),
-                      ),
-                      actions: [
-                        Center(
-                          child: OutlinedButton(
-                            style: OutlinedButton.styleFrom(
-                                elevation: 0.0,
-                                side: BorderSide(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                    width: 2.0),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(11))),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text(
-                              'DONE',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color:
-                                        Theme.of(context).colorScheme.tertiary,
-                                  ),
-                            ),
+          icon: Icon(
+            Icons.qr_code_2,
+            color: theme.colorScheme.secondary,
+          ),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text(
+                    'Share',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.inverseSurface,
+                      fontSize: 30,
+                    ),
+                  ),
+                  content: Container(
+                    height: 200,
+                    padding: const EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: Colors.white,
+                    ),
+                    child: BarcodeWidget(
+                      padding: const EdgeInsets.all(10),
+                      data:
+                          '[${widget.cardtext}, ${widget.cardid}, ${widget.red}, ${widget.green}, ${widget.blue}, ${widget.cardType}, ${widget.hasPassword},${widget.tags}]',
+                      barcode: Barcode.qrCode(),
+                      style: const TextStyle(color: Colors.black),
+                    ),
+                  ),
+                  actions: [
+                    Center(
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          elevation: 0.0,
+                          side: BorderSide(
+                            color: theme.colorScheme.primary,
+                            width: 2.0,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(11),
                           ),
                         ),
-                      ],
-                    );
-                  });
-            }),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          'DONE',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: theme.colorScheme.tertiary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        ),
         actions: [
           IconButton(
             icon: Icon(
               Icons.arrow_back_ios_new,
-              color: Theme.of(context).colorScheme.secondary,
+              color: theme.colorScheme.secondary,
             ),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],
-        title: Text('Details',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith()),
+        title: Text('Details', style: theme.textTheme.titleLarge?.copyWith()),
         centerTitle: true,
         elevation: 0.0,
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: theme.colorScheme.surface,
       ),
       body: ListView(
-          physics: const BouncingScrollPhysics(
-              decelerationRate: ScrollDecelerationRate.fast),
-          children: [
-            Container(
-                padding: EdgeInsetsGeometry.fromLTRB(20, 0, 20, 0),
-                child: Text(widget.cardtext,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.inverseSurface,
-                        fontSize: 50))),
-            SizedBox(
-              height: MediaQuery.of(context).size.width / 1.586,
-              width: MediaQuery.of(context).size.width,
-              child: Builder(
-                builder: (context) {
-                  final hasFront = widget.imagePathFront != '';
-                  final hasBack = widget.imagePathBack != '';
-                  final pages = <Widget>[];
-                  if (hasFront) {
-                    pages.add(
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ImagePreviewScreen(
-                                        imagePath: widget.imagePathFront,
-                                      )));
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          margin: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-                          decoration: BoxDecoration(
-                            color: widget.cardTileColor,
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.file(
-                              File(widget.imagePathFront),
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: double.infinity,
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }
+        physics: const BouncingScrollPhysics(
+          decelerationRate: ScrollDecelerationRate.fast,
+        ),
+        children: [
+          Container(
+            padding: const EdgeInsetsGeometry.fromLTRB(20, 0, 20, 0),
+            child: Text(
+              widget.cardtext,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.inverseSurface,
+                fontSize: 50,
+              ),
+            ),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.width / 1.586,
+            width: MediaQuery.of(context).size.width,
+            child: Builder(
+              builder: (context) {
+                final hasFront = widget.imagePathFront != '';
+                final hasBack = widget.imagePathBack != '';
+                final pages = <Widget>[];
+                if (hasFront) {
                   pages.add(
                     GestureDetector(
                       onTap: () {
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ImagePreviewScreen(
-                                      barcodeData: widget.cardid,
-                                      barcodeType: widget.cardType,
-                                    )));
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ImagePreviewScreen(
+                              imagePath: widget.imagePathFront,
+                            ),
+                          ),
+                        );
                       },
                       child: Container(
                         padding: const EdgeInsets.all(10),
                         margin: const EdgeInsets.fromLTRB(20, 12, 20, 12),
                         decoration: BoxDecoration(
-                            color: widget.cardTileColor,
-                            borderRadius: BorderRadius.circular(15)),
-                        child: Container(
-                          height: 120,
-                          padding: const EdgeInsets.all(15),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10.0),
-                            color: Colors.white,
-                          ),
-                          child: BarcodeWidget(
-                            padding: const EdgeInsets.all(10),
-                            data: widget.cardid,
-                            barcode: getBarcodeType(widget.cardType),
-                            drawText: true,
-                            style: const TextStyle(color: Colors.black),
-                            errorBuilder: (context, error) => Center(
-                              child: Text(
-                                'Invalid barcode data',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.red),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
+                          color: widget.cardTileColor,
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.file(
+                            File(widget.imagePathFront),
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
                           ),
                         ),
                       ),
                     ),
                   );
-                  if (hasBack) {
-                    pages.add(
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ImagePreviewScreen(
-                                        imagePath: widget.imagePathBack,
-                                      )));
-                        },
-                        child: Container(
+                }
+                pages.add(
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ImagePreviewScreen(
+                            barcodeData: widget.cardid,
+                            barcodeType: widget.cardType,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      margin: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+                      decoration: BoxDecoration(
+                        color: widget.cardTileColor,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Container(
+                        height: 120,
+                        padding: const EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10.0),
+                          color: Colors.white,
+                        ),
+                        child: BarcodeWidget(
                           padding: const EdgeInsets.all(10),
-                          margin: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-                          decoration: BoxDecoration(
-                            color: widget.cardTileColor,
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.file(
-                              File(widget.imagePathBack),
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: double.infinity,
+                          data: widget.cardid,
+                          barcode: getBarcodeType(widget.cardType),
+                          style: const TextStyle(color: Colors.black),
+                          errorBuilder: (context, error) => Center(
+                            child: Text(
+                              'Invalid barcode data',
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
                           ),
                         ),
                       ),
-                    );
-                  }
-                  final initialPage = hasFront ? 1 : 0;
-                  return PageView(
-                    controller: PageController(initialPage: initialPage),
-                    children: pages,
-                  );
-                },
-              ),
-            ),
-            widget.note.isEmpty
-                ? Container()
-                : Container(
-                    padding: const EdgeInsets.all(20),
-                    child: TextField(
-                      enabled: false,
-                      maxLines: 10,
-                      decoration: InputDecoration(
-                        hintStyle: Theme.of(context)
-                            .textTheme
-                            .bodyLarge
-                            ?.copyWith(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .inverseSurface,
-                                fontSize: 15),
-                        hintText: widget.note,
-                        disabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.primary,
-                                width: 1.0),
-                            borderRadius: BorderRadius.circular(10)),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(width: 2.0)),
-                        focusColor: Theme.of(context).colorScheme.primary,
-                        enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.primary,
-                                width: 1.0),
-                            borderRadius: BorderRadius.circular(10)),
-                      ),
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.tertiary,
-                          fontWeight: FontWeight.bold),
                     ),
                   ),
-            SizedBox(
-              height: 100,
-            )
-          ]),
-      floatingActionButton: Bounceable(
-          onTap: () {},
-          child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-              child: SizedBox(
-                height: 60,
-                width: double.infinity,
-                child: FloatingActionButton.extended(
-                  elevation: 0.0,
-                  heroTag: 'saveFAB',
-                  onPressed: () => Navigator.pop(context),
-                  tooltip: 'SAVE',
-                  backgroundColor: Colors.green.shade700,
-                  icon: Icon(
-                    Icons.check,
-                    color: Colors.white,
+                );
+                if (hasBack) {
+                  pages.add(
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ImagePreviewScreen(
+                              imagePath: widget.imagePathBack,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        margin: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+                        decoration: BoxDecoration(
+                          color: widget.cardTileColor,
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.file(
+                            File(widget.imagePathBack),
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                final initialPage = hasFront ? 1 : 0;
+                return PageView(
+                  controller: PageController(initialPage: initialPage),
+                  children: pages,
+                );
+              },
+            ),
+          ),
+          if (widget.note.isEmpty)
+            Container()
+          else
+            Container(
+              padding: const EdgeInsets.all(20),
+              child: TextField(
+                enabled: false,
+                maxLines: 10,
+                decoration: InputDecoration(
+                  hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                    color: theme.colorScheme.inverseSurface,
+                    fontSize: 15,
                   ),
-                  shape: RoundedRectangleBorder(
+                  hintText: widget.note,
+                  disabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: theme.colorScheme.primary),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  label: Text(
-                    'SAVE',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        //cardTypeText
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                        color: Colors.white),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(width: 2.0),
+                  ),
+                  focusColor: theme.colorScheme.primary,
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: theme.colorScheme.primary),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-              ))),
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.tertiary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          const SizedBox(height: 100),
+        ],
+      ),
+      floatingActionButton: Bounceable(
+        onTap: () {},
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+          child: SizedBox(
+            height: 60,
+            width: double.infinity,
+            child: FloatingActionButton.extended(
+              elevation: 0.0,
+              heroTag: 'saveFAB',
+              onPressed: () => Navigator.pop(context),
+              tooltip: 'SAVE',
+              backgroundColor: Colors.green.shade700,
+              icon: const Icon(
+                Icons.check,
+                color: Colors.white,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              label: Text(
+                'SAVE',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  //cardTypeText
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }

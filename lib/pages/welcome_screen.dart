@@ -1,4 +1,4 @@
-import 'package:cardabase/pages/homepage.dart';
+import 'package:cardabase/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_bounceable/flutter_bounceable.dart';
@@ -7,8 +7,7 @@ import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 class WelcomeScreen extends StatefulWidget {
   final String currentAppVersion;
 
-  const WelcomeScreen({Key? key, required this.currentAppVersion})
-      : super(key: key);
+  const WelcomeScreen({super.key, required this.currentAppVersion});
 
   @override
   State<WelcomeScreen> createState() => _WelcomeScreenState();
@@ -43,7 +42,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     final lines = changelogText.split('\n');
     int start = -1;
     for (int i = 0; i < lines.length; i++) {
-      if (lines[i].contains(version + ':')) {
+      if (lines[i].contains('$version:')) {
         start = i;
         break;
       }
@@ -52,8 +51,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
     final buffer = StringBuffer();
     for (int i = start; i < lines.length; i++) {
-      if (i != start && RegExp(r'^\d{1,2}\.\d{1,2}\.\d{4}').hasMatch(lines[i]))
+      if (i != start &&
+          RegExp(r'^\d{1,2}\.\d{1,2}\.\d{4}').hasMatch(lines[i])) {
         break;
+      }
       buffer.writeln(lines[i]);
     }
     return buffer.toString().trim();
@@ -61,17 +62,18 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final changelogWidget = changelog == null
         ? const CircularProgressIndicator()
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'What\'s new in version ${widget.currentAppVersion}:',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
+                "What's new in version ${widget.currentAppVersion}:",
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
               ),
               const SizedBox(height: 10),
               AnimatedCrossFade(
@@ -84,10 +86,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   children: [
                     Text(
                       _getFirstLines(changelog!, 3),
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge
-                          ?.copyWith(fontSize: 16),
+                      style: theme.textTheme.bodyLarge?.copyWith(fontSize: 16),
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -107,9 +106,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         child: SingleChildScrollView(
                           child: Text(
                             changelog!,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyLarge
+                            style: theme.textTheme.bodyLarge
                                 ?.copyWith(fontSize: 16),
                           ),
                         ),
@@ -131,9 +128,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       appBar: AppBar(
         title: Text(
           'Welcome to Cardabase!',
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontSize: 25,
-              ),
+          style: theme.textTheme.bodyLarge?.copyWith(
+            fontSize: 25,
+          ),
         ),
         automaticallyImplyLeading: false,
       ),
@@ -143,16 +140,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.auto_awesome,
-                  size: 80, color: Theme.of(context).colorScheme.primary),
+              Icon(
+                Icons.auto_awesome,
+                size: 80,
+                color: theme.colorScheme.primary,
+              ),
               const SizedBox(height: 30),
               changelogWidget,
               Text(
                 'Important: New storage system -> ERRORS. To fix this, export and import all your cards to convert them.',
                 textAlign: TextAlign.center,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyLarge
+                style: theme.textTheme.bodyLarge
                     ?.copyWith(fontSize: 16, color: Colors.red),
               ),
               const SizedBox(height: 40),
@@ -166,28 +164,35 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       await Hive.box('settingsBox')
                           .put('lastSeenAppVersion', widget.currentAppVersion);
                       Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => Homepage()),
+                        MaterialPageRoute(
+                          builder: (context) => const Homepage(),
+                        ),
                       );
                     },
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(
-                          color: Theme.of(context).colorScheme.primary,
-                          width: 2),
+                        color: theme.colorScheme.primary,
+                        width: 2,
+                      ),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 40, vertical: 15),
+                        horizontal: 40,
+                        vertical: 15,
+                      ),
                       backgroundColor: Colors.transparent,
                       elevation: 0.0,
-                      shape: RoundedRectangleBorder(
+                      shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(15),
-                            topRight: Radius.circular(15)),
+                          topLeft: Radius.circular(15),
+                          topRight: Radius.circular(15),
+                        ),
                       ),
                     ),
                     child: Text(
                       'Continue',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontSize: 22,
-                          color: Theme.of(context).colorScheme.primary),
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontSize: 22,
+                        color: theme.colorScheme.primary,
+                      ),
                     ),
                   ),
                 ),
@@ -203,27 +208,34 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       await Hive.box('settingsBox')
                           .put('lastSeenAppVersion', widget.currentAppVersion);
                       Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => Homepage()),
+                        MaterialPageRoute(
+                          builder: (context) => const Homepage(),
+                        ),
                       );
                     },
                     style: OutlinedButton.styleFrom(
-                        side: BorderSide(
-                            color: Theme.of(context).colorScheme.inverseSurface,
-                            width: 2),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 40, vertical: 15),
-                        backgroundColor: Colors.transparent,
-                        elevation: 0.0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(15),
-                              bottomRight: Radius.circular(15)),
+                      side: BorderSide(
+                        color: theme.colorScheme.inverseSurface,
+                        width: 2,
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 40,
+                        vertical: 15,
+                      ),
+                      backgroundColor: Colors.transparent,
+                      elevation: 0.0,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(15),
+                          bottomRight: Radius.circular(15),
                         ),
-                        minimumSize: const Size.square(40)),
+                      ),
+                      minimumSize: const Size.square(40),
+                    ),
                     child: Text(
                       'Skip for now',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.inverseSurface),
+                      style: theme.textTheme.bodyLarge
+                          ?.copyWith(color: theme.colorScheme.inverseSurface),
                     ),
                   ),
                 ),

@@ -1,16 +1,15 @@
 import 'package:cardabase/data/cardabase_db.dart';
+import 'package:cardabase/pages/create_card_new.dart';
+import 'package:cardabase/pages/edit_card.dart';
 import 'package:cardabase/pages/settings.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
 import 'package:cardabase/util/card_tile.dart';
 import 'package:cardabase/util/setting_tile.dart';
+import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
-
-import '../util/vibration_provider.dart';
-import 'createcardnew.dart';
-import 'editcard.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -20,7 +19,7 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomePageState extends State<Homepage> {
-  cardabase_db cdb = cardabase_db();
+  CardabaseDb cdb = CardabaseDb();
   final passwordbox = Hive.box('password');
   int columnAmount = 1;
   double columnAmountDouble = 1.0;
@@ -35,16 +34,19 @@ class _HomePageState extends State<Homepage> {
     columnAmountDouble = columnAmount.toDouble();
   }
 
-  showUnlockDialogDelete(BuildContext context, int index) {
+  showUnlockDialogDelete(BuildContext context, ThemeData theme, int index) {
     final TextEditingController controller = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Enter Password',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.inverseSurface,
-                fontSize: 30)),
+        title: Text(
+          'Enter Password',
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: theme.colorScheme.inverseSurface,
+            fontSize: 30,
+          ),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -56,27 +58,26 @@ class _HomePageState extends State<Homepage> {
                   borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(width: 2.0),
                 ),
-                focusColor: Theme.of(context).colorScheme.primary,
+                focusColor: theme.colorScheme.primary,
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.primary,
-                    width: 1.0,
+                    color: theme.colorScheme.primary,
                   ),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
+                labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.secondary,
+                ),
                 prefixIcon: Icon(
                   Icons.password,
-                  color: Theme.of(context).colorScheme.secondary,
+                  color: theme.colorScheme.secondary,
                 ),
                 labelText: 'Password',
               ),
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.tertiary,
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.tertiary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 20),
             Center(
@@ -98,18 +99,19 @@ class _HomePageState extends State<Homepage> {
                         ),
                         content: Row(
                           children: [
-                            Icon(Icons.error, size: 15, color: Colors.white),
-                            SizedBox(width: 10),
+                            const Icon(
+                              Icons.error,
+                              size: 15,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 10),
                             Text(
                               'Incorrect password!',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(
-                                    fontSize: 18,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                fontSize: 18,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
@@ -124,18 +126,21 @@ class _HomePageState extends State<Homepage> {
                   }
                 },
                 style: OutlinedButton.styleFrom(
-                    elevation: 0.0,
-                    side: BorderSide(
-                        color: Theme.of(context).colorScheme.primary,
-                        width: 2.0),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(11))),
+                  elevation: 0.0,
+                  side: BorderSide(
+                    color: theme.colorScheme.primary,
+                    width: 2.0,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(11),
+                  ),
+                ),
                 child: Text(
                   'DELETE',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      ),
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
                 ),
               ),
             ),
@@ -145,16 +150,19 @@ class _HomePageState extends State<Homepage> {
     );
   }
 
-  showUnlockDialogEdit(BuildContext context, int index) {
+  showUnlockDialogEdit(BuildContext context, ThemeData theme, int index) {
     final TextEditingController controller = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Enter Password',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.inverseSurface,
-                fontSize: 30)),
+        title: Text(
+          'Enter Password',
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: theme.colorScheme.inverseSurface,
+            fontSize: 30,
+          ),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -166,27 +174,26 @@ class _HomePageState extends State<Homepage> {
                   borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(width: 2.0),
                 ),
-                focusColor: Theme.of(context).colorScheme.primary,
+                focusColor: theme.colorScheme.primary,
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.primary,
-                    width: 1.0,
+                    color: theme.colorScheme.primary,
                   ),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
+                labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.secondary,
+                ),
                 prefixIcon: Icon(
                   Icons.password,
-                  color: Theme.of(context).colorScheme.secondary,
+                  color: theme.colorScheme.secondary,
                 ),
                 labelText: 'Password',
               ),
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.tertiary,
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.tertiary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 20),
             Center(
@@ -202,37 +209,39 @@ class _HomePageState extends State<Homepage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => EditCard(
-                              index: index,
-                              cardColorPreview: Color.fromARGB(
-                                  255,
-                                  cdb.myShops[index]['redValue'],
-                                  cdb.myShops[index]['greenValue'],
-                                  cdb.myShops[index]['blueValue']),
-                              redValue: cdb.myShops[index]['redValue'] ?? 158,
-                              greenValue:
-                                  cdb.myShops[index]['greenValue'] ?? 158,
-                              blueValue: cdb.myShops[index]['blueValue'] ?? 158,
-                              hasPassword:
-                                  cdb.myShops[index]['hasPassword'] ?? false,
-                              cardTextPreview:
-                                  (cdb.myShops[index]['cardName'] ?? '')
-                                      .toString(),
-                              cardName: cdb.myShops[index]['cardName'] ?? '',
-                              cardId: (cdb.myShops[index]['cardId'] ?? '')
-                                  .toString(),
-                              cardType: (cdb.myShops[index]['cardType'] ??
-                                      'CardType.ean13')
-                                  .toString(),
-                              tags: cdb.myShops[index]['tags'] ?? [],
-                              notes: (cdb.myShops[index]['note'] ??
-                                  'Card notes are displayed here...'),
-                              frontFacePath:
-                                  cdb.myShops[index]['imagePathFront'] ?? '',
-                              backFacePath:
-                                  cdb.myShops[index]['imagePathBack'] ?? '',
-                              useFrontFaceOverlay:
-                                  cdb.myShops[index]['useFrontFaceOverlay'] ?? false,
-                              hideTitle: cdb.myShops[index]['hideTitle'] ?? false),
+                            index: index,
+                            cardColorPreview: Color.fromARGB(
+                              255,
+                              cdb.myShops[index]['redValue'],
+                              cdb.myShops[index]['greenValue'],
+                              cdb.myShops[index]['blueValue'],
+                            ),
+                            redValue: cdb.myShops[index]['redValue'] ?? 158,
+                            greenValue: cdb.myShops[index]['greenValue'] ?? 158,
+                            blueValue: cdb.myShops[index]['blueValue'] ?? 158,
+                            hasPassword:
+                                cdb.myShops[index]['hasPassword'] ?? false,
+                            cardTextPreview:
+                                (cdb.myShops[index]['cardName'] ?? '')
+                                    .toString(),
+                            cardName: cdb.myShops[index]['cardName'] ?? '',
+                            cardId:
+                                (cdb.myShops[index]['cardId'] ?? '').toString(),
+                            cardType: (cdb.myShops[index]['cardType'] ??
+                                    'CardType.ean13')
+                                .toString(),
+                            tags: cdb.myShops[index]['tags'] ?? [],
+                            notes: cdb.myShops[index]['note'] ??
+                                'Card notes are displayed here...',
+                            frontFacePath:
+                                cdb.myShops[index]['imagePathFront'] ?? '',
+                            backFacePath:
+                                cdb.myShops[index]['imagePathBack'] ?? '',
+                            useFrontFaceOverlay: cdb.myShops[index]
+                                    ['useFrontFaceOverlay'] ??
+                                false,
+                            hideTitle: cdb.myShops[index]['hideTitle'] ?? false,
+                          ),
                         ),
                       ).then((value) {
                         setState(() {
@@ -249,18 +258,19 @@ class _HomePageState extends State<Homepage> {
                         ),
                         content: Row(
                           children: [
-                            Icon(Icons.error, size: 15, color: Colors.white),
-                            SizedBox(width: 10),
+                            const Icon(
+                              Icons.error,
+                              size: 15,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 10),
                             Text(
                               'Incorrect password!',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(
-                                    fontSize: 18,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                fontSize: 18,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
@@ -275,18 +285,21 @@ class _HomePageState extends State<Homepage> {
                   }
                 },
                 style: OutlinedButton.styleFrom(
-                    elevation: 0.0,
-                    side: BorderSide(
-                        color: Theme.of(context).colorScheme.primary,
-                        width: 2.0),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(11))),
+                  elevation: 0.0,
+                  side: BorderSide(
+                    color: theme.colorScheme.primary,
+                    width: 2.0,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(11),
+                  ),
+                ),
                 child: Text(
                   'EDIT',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      ),
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
                 ),
               ),
             ),
@@ -296,10 +309,10 @@ class _HomePageState extends State<Homepage> {
     );
   }
 
-  askForPasswordDelete(int index) {
+  askForPasswordDelete(ThemeData theme, int index) {
     if (cdb.myShops[index]['hasPassword'] == true) {
       if (passwordbox.isNotEmpty) {
-        showUnlockDialogDelete(context, index);
+        showUnlockDialogDelete(context, theme, index);
       } else {
         deleteCard(index);
       }
@@ -327,34 +340,39 @@ class _HomePageState extends State<Homepage> {
     });
   }
 
-  void editCard(context, int index) {
+  void editCard(context, ThemeData theme, int index) {
     final card = cdb.myShops[index];
     if (cdb.myShops[index]['hasPassword'] == true) {
       if (passwordbox.isNotEmpty) {
-        showUnlockDialogEdit(context, index);
+        showUnlockDialogEdit(context, theme, index);
       } else {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => EditCard(
-                index: index,
-                cardColorPreview: Color.fromARGB(255, card['redValue'],
-                    card['greenValue'], card['blueValue']),
-                redValue: card['redValue'],
-                greenValue: card['greenValue'],
-                blueValue: card['blueValue'],
-                hasPassword: card['hasPassword'] ?? false,
-                cardTextPreview: card['cardName'].toString(),
-                cardName: card['cardName'].toString(),
-                cardId: (card['cardId'] ?? '').toString(),
-                cardType: (card['cardType'] ?? 'CardType.ean13').toString(),
-                tags: card['tags'] ?? [],
-                notes: (card['note'] ?? 'Card notes are displayed here...'),
-                frontFacePath: cdb.myShops[index]['imagePathFront'] ?? '',
-                backFacePath: cdb.myShops[index]['imagePathBack'] ?? '',
-                useFrontFaceOverlay:
-                    cdb.myShops[index]['useFrontFaceOverlay'] ?? false,
-                hideTitle: cdb.myShops[index]['hideTitle'] ?? false),
+              index: index,
+              cardColorPreview: Color.fromARGB(
+                255,
+                card['redValue'],
+                card['greenValue'],
+                card['blueValue'],
+              ),
+              redValue: card['redValue'],
+              greenValue: card['greenValue'],
+              blueValue: card['blueValue'],
+              hasPassword: card['hasPassword'] ?? false,
+              cardTextPreview: card['cardName'].toString(),
+              cardName: card['cardName'].toString(),
+              cardId: (card['cardId'] ?? '').toString(),
+              cardType: (card['cardType'] ?? 'CardType.ean13').toString(),
+              tags: card['tags'] ?? [],
+              notes: card['note'] ?? 'Card notes are displayed here...',
+              frontFacePath: cdb.myShops[index]['imagePathFront'] ?? '',
+              backFacePath: cdb.myShops[index]['imagePathBack'] ?? '',
+              useFrontFaceOverlay:
+                  cdb.myShops[index]['useFrontFaceOverlay'] ?? false,
+              hideTitle: cdb.myShops[index]['hideTitle'] ?? false,
+            ),
           ),
         ).then((value) {
           setState(() {
@@ -367,24 +385,29 @@ class _HomePageState extends State<Homepage> {
         context,
         MaterialPageRoute(
           builder: (context) => EditCard(
-              index: index,
-              cardColorPreview: Color.fromARGB(
-                  255, card['redValue'], card['greenValue'], card['blueValue']),
-              redValue: card['redValue'],
-              greenValue: card['greenValue'],
-              blueValue: card['blueValue'],
-              hasPassword: card['hasPassword'] ?? false,
-              cardTextPreview: card['cardName'].toString(),
-              cardName: card['cardName'].toString(),
-              cardId: (card['cardId'] ?? '').toString(),
-              cardType: (card['cardType'] ?? 'CardType.ean13').toString(),
-              tags: card['tags'] ?? [],
-              notes: (card['note'] ?? 'Card notes are displayed here...'),
-              frontFacePath: cdb.myShops[index]['imagePathFront'] ?? '',
-              backFacePath: cdb.myShops[index]['imagePathBack'] ?? '',
-              useFrontFaceOverlay:
-                  cdb.myShops[index]['useFrontFaceOverlay'] ?? false,
-              hideTitle: cdb.myShops[index]['hideTitle'] ?? false),
+            index: index,
+            cardColorPreview: Color.fromARGB(
+              255,
+              card['redValue'],
+              card['greenValue'],
+              card['blueValue'],
+            ),
+            redValue: card['redValue'],
+            greenValue: card['greenValue'],
+            blueValue: card['blueValue'],
+            hasPassword: card['hasPassword'] ?? false,
+            cardTextPreview: card['cardName'].toString(),
+            cardName: card['cardName'].toString(),
+            cardId: (card['cardId'] ?? '').toString(),
+            cardType: (card['cardType'] ?? 'CardType.ean13').toString(),
+            tags: card['tags'] ?? [],
+            notes: card['note'] ?? 'Card notes are displayed here...',
+            frontFacePath: cdb.myShops[index]['imagePathFront'] ?? '',
+            backFacePath: cdb.myShops[index]['imagePathBack'] ?? '',
+            useFrontFaceOverlay:
+                cdb.myShops[index]['useFrontFaceOverlay'] ?? false,
+            hideTitle: cdb.myShops[index]['hideTitle'] ?? false,
+          ),
         ),
       ).then((value) {
         setState(() {
@@ -414,44 +437,46 @@ class _HomePageState extends State<Homepage> {
     }
   }
 
-  void columnAmountDialog() async {
+  Future<void> columnAmountDialog(ThemeData theme) async {
     final box = Hive.box('settingsBox');
     final List<dynamic> allTags =
         box.get('tags', defaultValue: <dynamic>[]) as List<dynamic>;
 
     await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return StatefulBuilder(builder: (context, setState2) {
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState2) {
             return AlertDialog(
-              title: Text('Sort',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.inverseSurface,
-                      fontSize: 30)),
+              title: Text(
+                'Sort',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.inverseSurface,
+                  fontSize: 30,
+                ),
+              ),
               content: SizedBox(
                 height: 400,
                 width: double.maxFinite,
                 child: SingleChildScrollView(
-                  physics: BouncingScrollPhysics(
-                      decelerationRate: ScrollDecelerationRate.fast),
+                  physics: const BouncingScrollPhysics(
+                    decelerationRate: ScrollDecelerationRate.fast,
+                  ),
                   child: Column(
                     children: <Widget>[
-                      Text('Tags:',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyLarge
-                              ?.copyWith(
-                                  fontSize: 17,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .inverseSurface,
-                                  fontWeight: FontWeight.w900)),
-                      SizedBox(
-                        height: 10,
+                      Text(
+                        'Tags:',
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          fontSize: 17,
+                          color: theme.colorScheme.inverseSurface,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
+                      const SizedBox(height: 10),
                       SingleChildScrollView(
-                        physics: BouncingScrollPhysics(
-                            decelerationRate: ScrollDecelerationRate.fast),
+                        physics: const BouncingScrollPhysics(
+                          decelerationRate: ScrollDecelerationRate.fast,
+                        ),
                         scrollDirection: Axis.horizontal,
                         child: Row(
                           children: List.generate(
@@ -461,7 +486,7 @@ class _HomePageState extends State<Homepage> {
                                   const EdgeInsets.symmetric(horizontal: 4.0),
                               child: ActionChip(
                                 label: Text(allTags[chipIndex]),
-                                onPressed: () async {
+                                onPressed: () {
                                   setState2(() {
                                     setState(() {
                                       final tag = allTags[chipIndex];
@@ -482,144 +507,136 @@ class _HomePageState extends State<Homepage> {
                                     });
                                   });
                                 },
-                                labelStyle: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith(
-                                      color: selectedTag == allTags[chipIndex]
-                                          ? Theme.of(context)
-                                              .colorScheme
-                                              .onPrimary
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .inverseSurface,
-                                    ),
+                                labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                                  color: selectedTag == allTags[chipIndex]
+                                      ? theme.colorScheme.onPrimary
+                                      : theme.colorScheme.inverseSurface,
+                                ),
                                 backgroundColor:
                                     selectedTag == allTags[chipIndex]
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Theme.of(context)
-                                            .colorScheme
-                                            .onInverseSurface,
+                                        ? theme.colorScheme.primary
+                                        : theme.colorScheme.onInverseSurface,
                                 elevation: selectedTag == allTags[chipIndex]
                                     ? null
                                     : 0.0,
                                 side: BorderSide(
                                   color: selectedTag == allTags[chipIndex]
-                                      ? Theme.of(context).colorScheme.primary
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .primary
+                                      ? theme.colorScheme.primary
+                                      : theme.colorScheme.primary
                                           .withValues(alpha: 0.3),
                                   width:
                                       selectedTag == allTags[chipIndex] ? 2 : 1,
                                 ),
                                 avatar: selectedTag == allTags[chipIndex]
-                                    ? Icon(Icons.check,
+                                    ? Icon(
+                                        Icons.check,
                                         size: 18,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary)
+                                        color: theme.colorScheme.onPrimary,
+                                      )
                                     : null,
                               ),
                             ),
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 5,
-                      ),
+                      const SizedBox(height: 5),
                       Divider(
-                        color: Theme.of(context).colorScheme.primary,
+                        color: theme.colorScheme.primary,
                         thickness: 1.0,
                       ),
-                      SizedBox(
-                        height: 10,
+                      const SizedBox(height: 10),
+                      Text(
+                        'Sort by:',
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          fontSize: 17,
+                          color: theme.colorScheme.inverseSurface,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
-                      Text('Sort by:',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyLarge
-                              ?.copyWith(
-                                  fontSize: 17,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .inverseSurface,
-                                  fontWeight: FontWeight.w900)),
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
                       DropdownMenu(
                         dropdownMenuEntries: [
                           DropdownMenuEntry<String>(
-                              value: 'nameaz',
-                              label: 'Name 0-Z',
-                              style: ButtonStyle(
-                                elevation: WidgetStateProperty.all(0.0),
-                              )),
+                            value: 'nameaz',
+                            label: 'Name 0-Z',
+                            style: ButtonStyle(
+                              elevation: WidgetStateProperty.all(0.0),
+                            ),
+                          ),
                           DropdownMenuEntry<String>(
-                              value: 'nameza',
-                              label: 'Name Z-0',
-                              style: ButtonStyle(
-                                elevation: WidgetStateProperty.all(0.0),
-                              )),
+                            value: 'nameza',
+                            label: 'Name Z-0',
+                            style: ButtonStyle(
+                              elevation: WidgetStateProperty.all(0.0),
+                            ),
+                          ),
                           DropdownMenuEntry<String>(
-                              value: 'latest',
-                              label: 'Latest',
-                              style: ButtonStyle(
-                                elevation: WidgetStateProperty.all(0.0),
-                              )),
+                            value: 'latest',
+                            label: 'Latest',
+                            style: ButtonStyle(
+                              elevation: WidgetStateProperty.all(0.0),
+                            ),
+                          ),
                           DropdownMenuEntry<String>(
-                              value: 'oldest',
-                              label: 'Oldest',
-                              style: ButtonStyle(
-                                elevation: WidgetStateProperty.all(0.0),
-                              )),
+                            value: 'oldest',
+                            label: 'Oldest',
+                            style: ButtonStyle(
+                              elevation: WidgetStateProperty.all(0.0),
+                            ),
+                          ),
                         ],
                         initialSelection: Hive.box('settingsBox')
                             .get('sort', defaultValue: 'oldest'),
                         inputDecorationTheme: InputDecorationTheme(
                           border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(width: 2.0)),
-                          focusColor: Theme.of(context).colorScheme.primary,
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(width: 2.0),
+                          ),
+                          focusColor: theme.colorScheme.primary,
                           enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: 1.0),
-                              borderRadius: BorderRadius.circular(10)),
-                          labelStyle: Theme.of(context)
-                              .textTheme
-                              .bodyLarge
-                              ?.copyWith(
-                                  color:
-                                      Theme.of(context).colorScheme.secondary),
-                          iconColor: Theme.of(context).colorScheme.primary,
+                            borderSide:
+                                BorderSide(color: theme.colorScheme.primary),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          labelStyle: theme.textTheme.bodyLarge
+                              ?.copyWith(color: theme.colorScheme.secondary),
+                          iconColor: theme.colorScheme.primary,
                         ),
                         onSelected: (value) {
                           setState(() {
                             if (value == 'nameaz') {
-                              cdb.myShops.sort((a, b) =>
-                                  a['cardName'].compareTo(b['cardName']));
+                              cdb.myShops.sort(
+                                (a, b) =>
+                                    a['cardName'].compareTo(b['cardName']),
+                              );
                             } else if (value == 'nameza') {
-                              cdb.myShops.sort((a, b) =>
-                                  b['cardName'].compareTo(a['cardName']));
+                              cdb.myShops.sort(
+                                (a, b) =>
+                                    b['cardName'].compareTo(a['cardName']),
+                              );
                             } else if (value == 'latest') {
-                              cdb.myShops.sort((a, b) =>
-                                  b['uniqueId'].compareTo(a['uniqueId']));
+                              cdb.myShops.sort(
+                                (a, b) =>
+                                    b['uniqueId'].compareTo(a['uniqueId']),
+                              );
                             } else if (value == 'oldest') {
-                              cdb.myShops.sort((a, b) =>
-                                  a['uniqueId'].compareTo(b['uniqueId']));
+                              cdb.myShops.sort(
+                                (a, b) =>
+                                    a['uniqueId'].compareTo(b['uniqueId']),
+                              );
                             }
                             Hive.box('settingsBox').put('sort', value);
                             cdb.updateDataBase();
                           });
                         },
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
                       Divider(
-                        color: Theme.of(context).colorScheme.primary,
+                        color: theme.colorScheme.primary,
                         thickness: 1.0,
                       ),
                       MySetting(
@@ -633,25 +650,24 @@ class _HomePageState extends State<Homepage> {
                         settingHeader: 'Reorder',
                         settingIcon: Icons.reorder,
                         iconColor: reorderMode ? Colors.green : Colors.red,
-                        borderColor: Theme.of(context).colorScheme.primary,
+                        borderColor: theme.colorScheme.primary,
                       ),
                       Divider(
-                        color: Theme.of(context).colorScheme.primary,
+                        color: theme.colorScheme.primary,
                         thickness: 1.0,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
-                      Text('Columns: $columnAmount',
-                          style:
-                              Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w900,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .inverseSurface,
-                                  )),
-                      SizedBox(
+                      Text(
+                        'Columns: $columnAmount',
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w900,
+                          color: theme.colorScheme.inverseSurface,
+                        ),
+                      ),
+                      const SizedBox(
                         height: 10,
                       ),
                       Slider(
@@ -665,7 +681,7 @@ class _HomePageState extends State<Homepage> {
                             setState(() {
                               VibrationProvider.vibrateSuccess();
                               columnAmountDouble = newValue;
-                              columnAmount = columnAmountDouble.round().toInt();
+                              columnAmount = columnAmountDouble.round();
                               Hive.box('settingsBox')
                                   .put('columnAmount', columnAmount);
                             });
@@ -680,33 +696,39 @@ class _HomePageState extends State<Homepage> {
                 Center(
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                        elevation: 0.0,
-                        side: BorderSide(
-                            color: Theme.of(context).colorScheme.primary,
-                            width: 2.0),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(11))),
+                      elevation: 0.0,
+                      side: BorderSide(
+                        color: theme.colorScheme.primary,
+                        width: 2.0,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(11),
+                      ),
+                    ),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
                     child: Text(
                       'SELECT',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                            color: Theme.of(context).colorScheme.inverseSurface,
-                          ),
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: theme.colorScheme.inverseSurface,
+                      ),
                     ),
                   ),
                 ),
               ],
             );
-          });
-        });
+          },
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return FutureBuilder(
       future: Hive.isBoxOpen('mybox') ? Future.value() : Hive.openBox('mybox'),
       builder: (context, snapshot) {
@@ -714,9 +736,7 @@ class _HomePageState extends State<Homepage> {
           return Center(
             child: Text(
               'Storage error: ${snapshot.error}',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
+              style: theme.textTheme.bodyLarge
                   ?.copyWith(color: Colors.red, fontSize: 18),
               textAlign: TextAlign.center,
             ),
@@ -726,7 +746,7 @@ class _HomePageState extends State<Homepage> {
           return const Center(child: CircularProgressIndicator());
         }
         return Scaffold(
-          backgroundColor: Theme.of(context).colorScheme.surface,
+          backgroundColor: theme.colorScheme.surface,
           floatingActionButton: Bounceable(
             onTap: () {},
             child: SizedBox(
@@ -739,12 +759,15 @@ class _HomePageState extends State<Homepage> {
                   tooltip: 'Add a card',
                   onPressed: () {
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (builder) => const CreateCard(),
-                        )).then((value) => setState(() {
-                          cdb.loadData();
-                        }));
+                      context,
+                      MaterialPageRoute(
+                        builder: (builder) => const CreateCard(),
+                      ),
+                    ).then(
+                      (value) => setState(() {
+                        cdb.loadData();
+                      }),
+                    );
                   },
                   child: const Icon(Icons.add_card),
                 ),
@@ -754,15 +777,17 @@ class _HomePageState extends State<Homepage> {
           floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
           body: CustomScrollView(
             physics: const BouncingScrollPhysics(
-                decelerationRate: ScrollDecelerationRate.fast),
+              decelerationRate: ScrollDecelerationRate.fast,
+            ),
             slivers: [
               SliverAppBar(
                 leading: IconButton(
-                    icon: Icon(
-                      Icons.sort,
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
-                    onPressed: columnAmountDialog),
+                  icon: Icon(
+                    Icons.sort,
+                    color: theme.colorScheme.secondary,
+                  ),
+                  onPressed: () => columnAmountDialog(theme),
+                ),
                 actions: [
                   ValueListenableBuilder(
                     valueListenable: Hive.box('settingsBox').listenable(),
@@ -773,29 +798,33 @@ class _HomePageState extends State<Homepage> {
                           ? IconButton(
                               icon: Icon(
                                 Icons.web_stories,
-                                color: Theme.of(context).colorScheme.secondary,
+                                color: theme.colorScheme.secondary,
                               ),
                               onPressed: () {
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (builder) => const WelcomeScreen(
-                                          currentAppVersion: "1.5.0"),
-                                    ));
-                              })
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (builder) => const WelcomeScreen(
+                                      currentAppVersion: '1.5.0',
+                                    ),
+                                  ),
+                                );
+                              },
+                            )
                           : const SizedBox.shrink();
                     },
                   ),
                   IconButton(
                     icon: Icon(
                       Icons.settings,
-                      color: Theme.of(context).colorScheme.secondary,
+                      color: theme.colorScheme.secondary,
                     ),
                     onPressed: () async {
                       final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const Settings()),
+                          builder: (context) => const Settings(),
+                        ),
                       );
                       if (result == true && mounted) {
                         setState(() {
@@ -805,16 +834,17 @@ class _HomePageState extends State<Homepage> {
                     },
                   ),
                 ],
-                title: Text('Cardabase',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith()),
+                title: Text(
+                  'Cardabase',
+                  style: theme.textTheme.titleLarge?.copyWith(),
+                ),
                 centerTitle: true,
                 elevation: 0.0,
-                backgroundColor: Theme.of(context).colorScheme.surface,
+                backgroundColor: theme.colorScheme.surface,
                 floating: true,
                 snap: true,
-                toolbarHeight: kToolbarHeight,
               ),
-              _buildContentSliver(context),
+              _buildContentSliver(context, theme),
             ],
           ),
         );
@@ -822,7 +852,7 @@ class _HomePageState extends State<Homepage> {
     );
   }
 
-  Widget _buildContentSliver(BuildContext context) {
+  Widget _buildContentSliver(BuildContext context, ThemeData theme) {
     try {
       if (cdb.myShops.isEmpty) {
         return SliverFillRemaining(
@@ -830,9 +860,7 @@ class _HomePageState extends State<Homepage> {
           child: Center(
             child: Text(
               'Your Cardabase is empty',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
+              style: theme.textTheme.bodyLarge
                   ?.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
@@ -840,8 +868,8 @@ class _HomePageState extends State<Homepage> {
       }
       final int itemCount = cdb.myShops.length;
       final int crossAxisCount = columnAmount;
-      final double childAspectRatio = 1.4;
-      final double gridPadding = 8.0;
+      const double childAspectRatio = 1.4;
+      const double gridPadding = 8.0;
       if (reorderMode) {
         final List<Widget> children = List.generate(itemCount, (index) {
           if (index >= cdb.myShops.length) return const SizedBox.shrink();
@@ -849,7 +877,7 @@ class _HomePageState extends State<Homepage> {
           return CardTile(
             key: ValueKey(card['uniqueId'] ?? index),
             shopName: (card['cardName'] ?? 'No Name').toString(),
-            deleteFunction: (context) => askForPasswordDelete(index),
+            deleteFunction: (context) => askForPasswordDelete(theme, index),
             cardnumber: card['cardId']?.toString() ?? '',
             cardTileColor: Color.fromARGB(
               255,
@@ -862,7 +890,7 @@ class _HomePageState extends State<Homepage> {
             red: card['redValue'] ?? 158,
             green: card['greenValue'] ?? 158,
             blue: card['blueValue'] ?? 158,
-            editFunction: (context) => editCard(context, index),
+            editFunction: (context) => editCard(context, theme, index),
             moveUpFunction: (context) => moveUp(index),
             moveDownFunction: (context) => moveDown(index),
             duplicateFunction: (context) => duplicateCard(index),
@@ -877,15 +905,12 @@ class _HomePageState extends State<Homepage> {
             imagePathBack: card['imagePathBack'] ?? '',
             useFrontFaceOverlay: card['useFrontFaceOverlay'] ?? false,
             hideTitle: card['hideTitle'] ?? false,
-            dragHandle: null,
           );
         });
         return SliverPadding(
-          padding: EdgeInsets.all(gridPadding),
+          padding: const EdgeInsets.all(gridPadding),
           sliver: ReorderableSliverGridView.count(
             crossAxisCount: crossAxisCount,
-            mainAxisSpacing: 0,
-            crossAxisSpacing: 0,
             childAspectRatio: childAspectRatio,
             children: children,
             onReorder: (oldIndex, newIndex) {
@@ -899,7 +924,7 @@ class _HomePageState extends State<Homepage> {
         );
       } else {
         return SliverPadding(
-          padding: EdgeInsets.all(gridPadding),
+          padding: const EdgeInsets.all(gridPadding),
           sliver: SliverGrid(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
@@ -908,7 +933,12 @@ class _HomePageState extends State<Homepage> {
                 return CardTile(
                   key: ValueKey(card['uniqueId'] ?? index),
                   shopName: (card['cardName'] ?? 'No Name').toString(),
-                  deleteFunction: (context) => askForPasswordDelete(index),
+                  deleteFunction: (context) {
+                    return askForPasswordDelete(
+                      theme,
+                      index,
+                    );
+                  },
                   cardnumber: card['cardId']?.toString() ?? '',
                   cardTileColor: Color.fromARGB(
                     255,
@@ -921,7 +951,7 @@ class _HomePageState extends State<Homepage> {
                   red: card['redValue'] ?? 158,
                   green: card['greenValue'] ?? 158,
                   blue: card['blueValue'] ?? 158,
-                  editFunction: (context) => editCard(context, index),
+                  editFunction: (context) => editCard(context, theme, index),
                   moveUpFunction: (context) => moveUp(index),
                   moveDownFunction: (context) => moveDown(index),
                   duplicateFunction: (context) => duplicateCard(index),
@@ -936,15 +966,12 @@ class _HomePageState extends State<Homepage> {
                   imagePathBack: card['imagePathBack'] ?? '',
                   useFrontFaceOverlay: card['useFrontFaceOverlay'] ?? false,
                   hideTitle: card['hideTitle'] ?? false,
-                  dragHandle: null,
                 );
               },
               childCount: itemCount,
             ),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: crossAxisCount,
-              crossAxisSpacing: 0,
-              mainAxisSpacing: 0,
               childAspectRatio: childAspectRatio,
             ),
           ),
@@ -956,9 +983,7 @@ class _HomePageState extends State<Homepage> {
         child: Center(
           child: Text(
             'Error: $e',
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge
+            style: theme.textTheme.bodyLarge
                 ?.copyWith(color: Colors.red, fontSize: 18),
             textAlign: TextAlign.center,
           ),

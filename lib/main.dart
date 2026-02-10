@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:cardabase/pages/createcardnew.dart';
-import 'package:cardabase/pages/homepage.dart';
+import 'package:cardabase/pages/create_card_new.dart';
+import 'package:cardabase/pages/home_page.dart';
 import 'package:cardabase/pages/settings.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
 import 'package:cardabase/theme/color_schemes.g.dart';
@@ -46,8 +46,10 @@ void main() async {
             context: navigatorKey.currentContext!,
             builder: (dialogContext) {
               return AlertDialog(
-                title: const Text('Application Error',
-                    style: TextStyle(color: Colors.red)),
+                title: const Text(
+                  'Application Error',
+                  style: TextStyle(color: Colors.red),
+                ),
                 content: Text(
                   'Oops! Something critical went wrong:\n\n${details.exception}\n\n'
                   'Please send a screenshot of this error to the developer.\n',
@@ -55,8 +57,11 @@ void main() async {
                 ),
                 actions: [
                   TextButton(
-                    onPressed: () => _launchUrl(Uri.parse(
-                        'https://github.com/GeorgeYT9769/cardabase-app/issues')),
+                    onPressed: () => _launchUrl(
+                      Uri.parse(
+                        'https://github.com/GeorgeYT9769/cardabase-app/issues',
+                      ),
+                    ),
                     child: const Text('GitHub Issue'),
                   ),
                   TextButton(
@@ -93,13 +98,13 @@ void main() async {
   await Hive.openBox('password'); // storage for password
 
   final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-  String currentAppVersion = packageInfo.version;
-  String? lastSeenAppVersion =
+  final String currentAppVersion = packageInfo.version;
+  final String? lastSeenAppVersion =
       Hive.box('settingsBox').get('lastSeenAppVersion');
   // Read auto-backup settings safely
-  bool autoBackups = Hive.box('settingsBox').get('autoBackups') ?? false;
-  String? lastAutoUpdate = Hive.box('settingsBox').get('lastAutoUpdate');
-  int autoBackupInterval =
+  final bool autoBackups = Hive.box('settingsBox').get('autoBackups') ?? false;
+  final String? lastAutoUpdate = Hive.box('settingsBox').get('lastAutoUpdate');
+  final int autoBackupInterval =
       Hive.box('settingsBox').get('autoBackupInterval') ?? 7;
 
   Widget initialScreen;
@@ -107,7 +112,7 @@ void main() async {
   if (lastSeenAppVersion == null || lastSeenAppVersion != currentAppVersion) {
     initialScreen = WelcomeScreen(currentAppVersion: currentAppVersion);
   } else {
-    initialScreen = Homepage();
+    initialScreen = const Homepage();
   }
 
   runApp(
@@ -144,7 +149,7 @@ class Main extends StatefulWidget {
 }
 
 class _MainState extends State<Main> {
-  final QuickActions quickActions = QuickActions();
+  static const QuickActions quickActions = QuickActions();
   String shortcut = 'nothing set';
 
   @override
@@ -156,7 +161,8 @@ class _MainState extends State<Main> {
           navigatorKey.currentContext != null) {
         if (shortcutType == 'add_card') {
           navigatorKey.currentState!.push(
-              MaterialPageRoute(builder: (context) => const CreateCard()));
+            MaterialPageRoute(builder: (context) => const CreateCard()),
+          );
         }
         if (shortcutType == 'info') {
           navigatorKey.currentState!
@@ -167,14 +173,16 @@ class _MainState extends State<Main> {
 
     quickActions.setShortcutItems(<ShortcutItem>[
       const ShortcutItem(
-          type: 'add_card',
-          localizedTitle: 'Add card',
-          icon: 'ic_add_card'), // Added icon
+        type: 'add_card',
+        localizedTitle: 'Add card',
+        icon: 'ic_add_card',
+      ), // Added icon
       const ShortcutItem(
-          type: 'info',
-          localizedTitle: 'Info',
-          localizedSubtitle: 'See info',
-          icon: 'ic_info') // Added icon
+        type: 'info',
+        localizedTitle: 'Info',
+        localizedSubtitle: 'See info',
+        icon: 'ic_info',
+      ), // Added icon
     ]);
   }
 
@@ -193,12 +201,15 @@ class _MainState extends State<Main> {
     return ValueListenableBuilder(
       valueListenable: Hive.box('settingsBox').listenable(),
       builder: (context, box, child) {
-        bool isDarkMode = box.get('isDarkMode', defaultValue: false);
-        bool useSystemFont = box.get('useSystemFont', defaultValue: false);
-        bool useExtraDark = box.get('useExtraDark',
-            defaultValue: false); // Retrieve new setting
+        final bool isDarkMode = box.get('isDarkMode', defaultValue: false);
+        final bool useSystemFont =
+            box.get('useSystemFont', defaultValue: false);
+        final bool useExtraDark = box.get(
+          'useExtraDark',
+          defaultValue: false,
+        ); // Retrieve new setting
 
-        ColorScheme extraDarkColorScheme = darkColorScheme.copyWith(
+        final ColorScheme extraDarkColorScheme = darkColorScheme.copyWith(
           surface: Colors.black,
         );
 
@@ -212,10 +223,10 @@ class _MainState extends State<Main> {
             useMaterial3: true,
             colorScheme: lightColorScheme,
             pageTransitionsTheme: const PageTransitionsTheme(
-                builders: <TargetPlatform, PageTransitionsBuilder>{
-                  TargetPlatform.android:
-                      PredictiveBackPageTransitionsBuilder(),
-                }),
+              builders: <TargetPlatform, PageTransitionsBuilder>{
+                TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
+              },
+            ),
             fontFamily: textFont,
             textTheme: TextTheme(
               titleLarge: TextStyle(
@@ -223,20 +234,22 @@ class _MainState extends State<Main> {
                 letterSpacing: useSystemFont ? 3 : 5,
                 fontSize: useSystemFont ? 25 : 17,
                 fontWeight: FontWeight.w900,
-                color: Color(0xFF0062A1), //tertiary
+                color: const Color(0xFF0062A1), //tertiary
               ),
-              bodyLarge:
-                  TextStyle(fontFamily: textFont, color: Color(0xFF003062)),
+              bodyLarge: TextStyle(
+                fontFamily: textFont,
+                color: const Color(0xFF003062),
+              ),
             ),
           ),
           darkTheme: ThemeData(
             useMaterial3: true,
             colorScheme: useExtraDark ? extraDarkColorScheme : darkColorScheme,
             pageTransitionsTheme: const PageTransitionsTheme(
-                builders: <TargetPlatform, PageTransitionsBuilder>{
-                  TargetPlatform.android:
-                      PredictiveBackPageTransitionsBuilder(),
-                }),
+              builders: <TargetPlatform, PageTransitionsBuilder>{
+                TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
+              },
+            ),
             fontFamily: textFont,
             textTheme: TextTheme(
               titleLarge: TextStyle(
@@ -244,12 +257,12 @@ class _MainState extends State<Main> {
                 letterSpacing: useSystemFont ? 3 : 5,
                 fontSize: useSystemFont ? 25 : 17,
                 fontWeight: FontWeight.w900,
-                color: Color(0xFF9CCAFF), //tertiary
+                color: const Color(0xFF9CCAFF), //tertiary
               ),
               bodyLarge: TextStyle(
-                  fontFamily: textFont,
-                  color: Color(0xFFD6E3FF) //inverseSurface
-                  ),
+                fontFamily: textFont,
+                color: const Color(0xFFD6E3FF), //inverseSurface
+              ),
             ),
           ),
           home: widget.initialScreen,
