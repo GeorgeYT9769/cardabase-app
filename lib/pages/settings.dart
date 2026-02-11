@@ -158,7 +158,7 @@ class _SettingsState extends State<Settings> {
                         }
                       : null,
                 ),
-                // Password verification field (only if password exists and _tempAutoUpdates is true)
+                // Password verification field (only if password exists and tempAutoUpdates is true)
                 if (tempAutoUpdates &&
                     passwordbox.isNotEmpty &&
                     (passwordbox.get('PW') != null &&
