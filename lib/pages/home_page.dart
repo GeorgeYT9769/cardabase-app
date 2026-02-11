@@ -631,25 +631,21 @@ class _HomePageState extends State<Homepage> {
                         onSelected: (value) {
                           setState(() {
                             if (value == 'nameaz') {
-                              cdb.myShops.sort(
-                                (a, b) => (a['cardName'] as int)
-                                    .compareTo(b['cardName'] as int),
-                              );
+                              cdb.myShops.sort((a, b) {
+                                return a['cardName'].compareTo(b['cardName']);
+                              });
                             } else if (value == 'nameza') {
-                              cdb.myShops.sort(
-                                (a, b) => (b['cardName'] as int)
-                                    .compareTo(a['cardName'] as int),
-                              );
+                              cdb.myShops.sort((a, b) {
+                                return b['cardName'].compareTo(a['cardName']);
+                              });
                             } else if (value == 'latest') {
-                              cdb.myShops.sort(
-                                (a, b) => (b['uniqueId'] as int)
-                                    .compareTo(a['uniqueId'] as int),
-                              );
+                              cdb.myShops.sort((a, b) {
+                                return b['uniqueId'].compareTo(a['uniqueId']);
+                              });
                             } else if (value == 'oldest') {
-                              cdb.myShops.sort(
-                                (a, b) => (a['uniqueId'] as int)
-                                    .compareTo(b['uniqueId'] as int),
-                              );
+                              cdb.myShops.sort((a, b) {
+                                return a['uniqueId'].compareTo(b['uniqueId']);
+                              });
                             }
                             Hive.box('settingsBox').put('sort', value);
                             cdb.updateDataBase();
