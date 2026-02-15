@@ -949,7 +949,7 @@ class _HomePageState extends State<Homepage> {
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 if (index >= cdb.myShops.length) return null;
-                final card = cdb.myShops[index] as Map<String, dynamic>;
+                final card = cdb.myShops[index] as Map<dynamic, dynamic>;
                 return CardTile(
                   key: ValueKey(card['uniqueId'] ?? index),
                   shopName: (card['cardName'] ?? 'No Name').toString(),
