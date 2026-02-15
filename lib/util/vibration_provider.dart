@@ -4,7 +4,8 @@ import 'package:hive_ce/hive.dart';
 class VibrationProvider {
   static final _bbox = Hive.box('settingsBox');
 
-  static bool get vibrate => _bbox.get('setVibration', defaultValue: true);
+  static bool get vibrate =>
+      _bbox.get('setVibration', defaultValue: true) as bool;
 
   static Future<void> toggleVibration() {
     return _bbox.put('setVibration', !vibrate);

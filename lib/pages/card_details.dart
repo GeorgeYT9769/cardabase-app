@@ -46,7 +46,8 @@ class CardDetails extends StatefulWidget {
 
 class _CardDetailsState extends State<CardDetails> {
   double? _previousBrightness;
-  bool setBrightness = settingsbox.get('setBrightness', defaultValue: true);
+  final setBrightness =
+      settingsbox.get('setBrightness', defaultValue: true) as bool;
 
   @override
   void initState() {

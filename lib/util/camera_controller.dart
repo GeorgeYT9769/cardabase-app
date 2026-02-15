@@ -110,7 +110,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
       hideCutoutBorder = true;
     });
     await Future.delayed(const Duration(milliseconds: 50));
-    final RenderBox box = context.findRenderObject() as RenderBox;
+    final RenderBox box = context.findRenderObject()! as RenderBox;
     final Size screenSize = box.size;
     final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
     final double cutoutWidth = screenSize.width * widget.cutoutWidthPercentage;

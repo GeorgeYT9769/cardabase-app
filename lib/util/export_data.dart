@@ -32,7 +32,7 @@ Future<void> exportCardList(
   if (await requestStoragePermission() || !toFile) {
     try {
       final directory = Directory('/storage/emulated/0/Download');
-      final List<dynamic>? cardList = cardBox.get('CARDLIST');
+      final cardList = cardBox.get('CARDLIST') as List?;
       if (cardList == null || cardList.isEmpty) {
         VibrationProvider.vibrateSuccess();
         ScaffoldMessenger.of(context).showSnackBar(

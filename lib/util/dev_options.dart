@@ -4,9 +4,9 @@ class DeveloperOptionsProvider {
   static final _bbox = Hive.box('settingsBox');
 
   static bool get developerOptions =>
-      _bbox.get('developerOptions', defaultValue: false);
+      _bbox.get('developerOptions', defaultValue: false) as bool;
 
-  static void toggleDeveloperOptions() {
-    _bbox.put('developerOptions', !developerOptions);
+  static Future<void> toggleDeveloperOptions() {
+    return _bbox.put('developerOptions', !developerOptions);
   }
 }

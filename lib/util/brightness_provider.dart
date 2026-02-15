@@ -3,9 +3,10 @@ import 'package:hive_ce/hive.dart';
 class BrightnessProvider {
   static final _bbox = Hive.box('settingsBox');
 
-  static bool get brightness => _bbox.get('setBrightness', defaultValue: true);
+  static bool get brightness =>
+      _bbox.get('setBrightness', defaultValue: true) as bool;
 
-  static void toggleBrightness() {
-    _bbox.put('setBrightness', !brightness);
+  static Future<void> toggleBrightness() {
+    return _bbox.put('setBrightness', !brightness);
   }
 }

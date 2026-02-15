@@ -202,7 +202,7 @@ class _TagsPageState extends State<TagsPage> {
       body: ValueListenableBuilder(
         valueListenable: Hive.box('settingsBox').listenable(),
         builder: (context, box, widget) {
-          final tags = box.get('tags', defaultValue: <dynamic>[]);
+          final tags = box.get('tags', defaultValue: <dynamic>[]) as List?;
 
           if (tags == null || tags.isEmpty) {
             return Center(
@@ -224,7 +224,7 @@ class _TagsPageState extends State<TagsPage> {
             itemBuilder: (context, index) {
               return ListTile(
                 title: Text(
-                  tags[index],
+                  tags[index] as String,
                   style: theme.textTheme.bodyLarge?.copyWith(
                     color: theme.colorScheme.inverseSurface,
                     fontSize: 20,
@@ -235,7 +235,7 @@ class _TagsPageState extends State<TagsPage> {
                 trailing: IconButton(
                   icon: Icon(Icons.delete, color: theme.colorScheme.secondary),
                   onPressed: () {
-                    removeTag(tags[index], theme);
+                    removeTag(tags[index] as String, theme);
                   },
                 ),
               );

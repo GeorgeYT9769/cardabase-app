@@ -3,9 +3,10 @@ import 'package:hive_ce/hive.dart';
 class ThemeProvider {
   static final _box = Hive.box('settingsBox');
 
-  static bool get isDarkMode => _box.get('isDarkMode', defaultValue: false);
+  static bool get isDarkMode =>
+      _box.get('isDarkMode', defaultValue: false) as bool;
 
-  static void toggleTheme() {
-    _box.put('isDarkMode', !isDarkMode);
+  static Future<void> toggleTheme() {
+    return _box.put('isDarkMode', !isDarkMode);
   }
 }

@@ -30,14 +30,19 @@ class _HomePageState extends State<Homepage> {
   void initState() {
     super.initState();
     cdb.loadData();
-    columnAmount = Hive.box('settingsBox').get('columnAmount', defaultValue: 1);
+    columnAmount =
+        Hive.box('settingsBox').get('columnAmount', defaultValue: 1) as int;
     columnAmountDouble = columnAmount.toDouble();
   }
 
-  showUnlockDialogDelete(BuildContext context, ThemeData theme, int index) {
+  Future<void> showUnlockDialogDelete(
+    BuildContext context,
+    ThemeData theme,
+    int index,
+  ) {
     final TextEditingController controller = TextEditingController();
 
-    showDialog(
+    return showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
@@ -150,10 +155,14 @@ class _HomePageState extends State<Homepage> {
     );
   }
 
-  showUnlockDialogEdit(BuildContext context, ThemeData theme, int index) {
+  Future<void> showUnlockDialogEdit(
+    BuildContext context,
+    ThemeData theme,
+    int index,
+  ) {
     final TextEditingController controller = TextEditingController();
 
-    showDialog(
+    return showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
@@ -212,35 +221,44 @@ class _HomePageState extends State<Homepage> {
                             index: index,
                             cardColorPreview: Color.fromARGB(
                               255,
-                              cdb.myShops[index]['redValue'],
-                              cdb.myShops[index]['greenValue'],
-                              cdb.myShops[index]['blueValue'],
+                              cdb.myShops[index]['redValue'] as int,
+                              cdb.myShops[index]['greenValue'] as int,
+                              cdb.myShops[index]['blueValue'] as int,
                             ),
-                            redValue: cdb.myShops[index]['redValue'] ?? 158,
-                            greenValue: cdb.myShops[index]['greenValue'] ?? 158,
-                            blueValue: cdb.myShops[index]['blueValue'] ?? 158,
+                            redValue:
+                                cdb.myShops[index]['redValue'] as int? ?? 158,
+                            greenValue:
+                                cdb.myShops[index]['greenValue'] as int? ?? 158,
+                            blueValue:
+                                cdb.myShops[index]['blueValue'] as int? ?? 158,
                             hasPassword:
-                                cdb.myShops[index]['hasPassword'] ?? false,
+                                cdb.myShops[index]['hasPassword'] as bool? ??
+                                    false,
                             cardTextPreview:
                                 (cdb.myShops[index]['cardName'] ?? '')
                                     .toString(),
-                            cardName: cdb.myShops[index]['cardName'] ?? '',
+                            cardName:
+                                cdb.myShops[index]['cardName'] as String? ?? '',
                             cardId:
                                 (cdb.myShops[index]['cardId'] ?? '').toString(),
                             cardType: (cdb.myShops[index]['cardType'] ??
                                     'CardType.ean13')
                                 .toString(),
-                            tags: cdb.myShops[index]['tags'] ?? [],
-                            notes: cdb.myShops[index]['note'] ??
+                            tags: cdb.myShops[index]['tags'] as List? ?? [],
+                            notes: cdb.myShops[index]['note'] as String? ??
                                 'Card notes are displayed here...',
-                            frontFacePath:
-                                cdb.myShops[index]['imagePathFront'] ?? '',
-                            backFacePath:
-                                cdb.myShops[index]['imagePathBack'] ?? '',
+                            frontFacePath: cdb.myShops[index]['imagePathFront']
+                                    as String? ??
+                                '',
+                            backFacePath: cdb.myShops[index]['imagePathBack']
+                                    as String? ??
+                                '',
                             useFrontFaceOverlay: cdb.myShops[index]
-                                    ['useFrontFaceOverlay'] ??
+                                    ['useFrontFaceOverlay'] as bool? ??
                                 false,
-                            hideTitle: cdb.myShops[index]['hideTitle'] ?? false,
+                            hideTitle:
+                                cdb.myShops[index]['hideTitle'] as bool? ??
+                                    false,
                           ),
                         ),
                       ).then((value) {
@@ -309,16 +327,17 @@ class _HomePageState extends State<Homepage> {
     );
   }
 
-  askForPasswordDelete(ThemeData theme, int index) {
+  Future<void> askForPasswordDelete(ThemeData theme, int index) {
     if (cdb.myShops[index]['hasPassword'] == true) {
       if (passwordbox.isNotEmpty) {
-        showUnlockDialogDelete(context, theme, index);
+        return showUnlockDialogDelete(context, theme, index);
       } else {
         deleteCard(index);
       }
     } else {
       deleteCard(index);
     }
+    return Future.value();
   }
 
   void toggleReorderMode() {
@@ -340,7 +359,7 @@ class _HomePageState extends State<Homepage> {
     });
   }
 
-  void editCard(context, ThemeData theme, int index) {
+  void editCard(BuildContext context, ThemeData theme, int index) {
     final card = cdb.myShops[index];
     if (cdb.myShops[index]['hasPassword'] == true) {
       if (passwordbox.isNotEmpty) {
@@ -353,25 +372,28 @@ class _HomePageState extends State<Homepage> {
               index: index,
               cardColorPreview: Color.fromARGB(
                 255,
-                card['redValue'],
-                card['greenValue'],
-                card['blueValue'],
+                card['redValue'] as int,
+                card['greenValue'] as int,
+                card['blueValue'] as int,
               ),
-              redValue: card['redValue'],
-              greenValue: card['greenValue'],
-              blueValue: card['blueValue'],
-              hasPassword: card['hasPassword'] ?? false,
+              redValue: card['redValue'] as int,
+              greenValue: card['greenValue'] as int,
+              blueValue: card['blueValue'] as int,
+              hasPassword: card['hasPassword'] as bool? ?? false,
               cardTextPreview: card['cardName'].toString(),
               cardName: card['cardName'].toString(),
               cardId: (card['cardId'] ?? '').toString(),
               cardType: (card['cardType'] ?? 'CardType.ean13').toString(),
-              tags: card['tags'] ?? [],
-              notes: card['note'] ?? 'Card notes are displayed here...',
-              frontFacePath: cdb.myShops[index]['imagePathFront'] ?? '',
-              backFacePath: cdb.myShops[index]['imagePathBack'] ?? '',
+              tags: card['tags'] as List? ?? [],
+              notes:
+                  card['note'] as String? ?? 'Card notes are displayed here...',
+              frontFacePath:
+                  cdb.myShops[index]['imagePathFront'] as String? ?? '',
+              backFacePath:
+                  cdb.myShops[index]['imagePathBack'] as String? ?? '',
               useFrontFaceOverlay:
-                  cdb.myShops[index]['useFrontFaceOverlay'] ?? false,
-              hideTitle: cdb.myShops[index]['hideTitle'] ?? false,
+                  cdb.myShops[index]['useFrontFaceOverlay'] as bool? ?? false,
+              hideTitle: cdb.myShops[index]['hideTitle'] as bool? ?? false,
             ),
           ),
         ).then((value) {
@@ -388,25 +410,27 @@ class _HomePageState extends State<Homepage> {
             index: index,
             cardColorPreview: Color.fromARGB(
               255,
-              card['redValue'],
-              card['greenValue'],
-              card['blueValue'],
+              card['redValue'] as int,
+              card['greenValue'] as int,
+              card['blueValue'] as int,
             ),
-            redValue: card['redValue'],
-            greenValue: card['greenValue'],
-            blueValue: card['blueValue'],
-            hasPassword: card['hasPassword'] ?? false,
+            redValue: card['redValue'] as int,
+            greenValue: card['greenValue'] as int,
+            blueValue: card['blueValue'] as int,
+            hasPassword: card['hasPassword'] as bool? ?? false,
             cardTextPreview: card['cardName'].toString(),
             cardName: card['cardName'].toString(),
             cardId: (card['cardId'] ?? '').toString(),
             cardType: (card['cardType'] ?? 'CardType.ean13').toString(),
-            tags: card['tags'] ?? [],
-            notes: card['note'] ?? 'Card notes are displayed here...',
-            frontFacePath: cdb.myShops[index]['imagePathFront'] ?? '',
-            backFacePath: cdb.myShops[index]['imagePathBack'] ?? '',
+            tags: card['tags'] as List? ?? [],
+            notes:
+                card['note'] as String? ?? 'Card notes are displayed here...',
+            frontFacePath:
+                cdb.myShops[index]['imagePathFront'] as String? ?? '',
+            backFacePath: cdb.myShops[index]['imagePathBack'] as String? ?? '',
             useFrontFaceOverlay:
-                cdb.myShops[index]['useFrontFaceOverlay'] ?? false,
-            hideTitle: cdb.myShops[index]['hideTitle'] ?? false,
+                cdb.myShops[index]['useFrontFaceOverlay'] as bool? ?? false,
+            hideTitle: cdb.myShops[index]['hideTitle'] as bool? ?? false,
           ),
         ),
       ).then((value) {
@@ -485,11 +509,11 @@ class _HomePageState extends State<Homepage> {
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 4.0),
                               child: ActionChip(
-                                label: Text(allTags[chipIndex]),
+                                label: Text(allTags[chipIndex] as String),
                                 onPressed: () {
                                   setState2(() {
                                     setState(() {
-                                      final tag = allTags[chipIndex];
+                                      final tag = allTags[chipIndex] as String?;
                                       if (selectedTag == tag) {
                                         selectedTag = null;
                                         cdb.loadData();
@@ -607,25 +631,21 @@ class _HomePageState extends State<Homepage> {
                         onSelected: (value) {
                           setState(() {
                             if (value == 'nameaz') {
-                              cdb.myShops.sort(
-                                (a, b) =>
-                                    a['cardName'].compareTo(b['cardName']),
-                              );
+                              cdb.myShops.sort((a, b) {
+                                return a['cardName'].compareTo(b['cardName']);
+                              });
                             } else if (value == 'nameza') {
-                              cdb.myShops.sort(
-                                (a, b) =>
-                                    b['cardName'].compareTo(a['cardName']),
-                              );
+                              cdb.myShops.sort((a, b) {
+                                return b['cardName'].compareTo(a['cardName']);
+                              });
                             } else if (value == 'latest') {
-                              cdb.myShops.sort(
-                                (a, b) =>
-                                    b['uniqueId'].compareTo(a['uniqueId']),
-                              );
+                              cdb.myShops.sort((a, b) {
+                                return b['uniqueId'].compareTo(a['uniqueId']);
+                              });
                             } else if (value == 'oldest') {
-                              cdb.myShops.sort(
-                                (a, b) =>
-                                    a['uniqueId'].compareTo(b['uniqueId']),
-                              );
+                              cdb.myShops.sort((a, b) {
+                                return a['uniqueId'].compareTo(b['uniqueId']);
+                              });
                             }
                             Hive.box('settingsBox').put('sort', value);
                             cdb.updateDataBase();
@@ -792,8 +812,8 @@ class _HomePageState extends State<Homepage> {
                   ValueListenableBuilder(
                     valueListenable: Hive.box('settingsBox').listenable(),
                     builder: (context, settingsBox, child) {
-                      final bool showLegacyCardButton = settingsBox
-                          .get('developerOptions', defaultValue: false);
+                      final showLegacyCardButton = settingsBox
+                          .get('developerOptions', defaultValue: false) as bool;
                       return showLegacyCardButton
                           ? IconButton(
                               icon: Icon(
@@ -881,15 +901,15 @@ class _HomePageState extends State<Homepage> {
             cardnumber: card['cardId']?.toString() ?? '',
             cardTileColor: Color.fromARGB(
               255,
-              card['redValue'] ?? 158,
-              card['greenValue'] ?? 158,
-              card['blueValue'] ?? 158,
+              card['redValue'] as int? ?? 158,
+              card['greenValue'] as int? ?? 158,
+              card['blueValue'] as int? ?? 158,
             ),
-            cardType: card['cardType'] ?? 'CardType.ean13',
-            hasPassword: card['hasPassword'] ?? false,
-            red: card['redValue'] ?? 158,
-            green: card['greenValue'] ?? 158,
-            blue: card['blueValue'] ?? 158,
+            cardType: card['cardType'] as String? ?? 'CardType.ean13',
+            hasPassword: card['hasPassword'] as bool? ?? false,
+            red: card['redValue'] as int? ?? 158,
+            green: card['greenValue'] as int? ?? 158,
+            blue: card['blueValue'] as int? ?? 158,
             editFunction: (context) => editCard(context, theme, index),
             moveUpFunction: (context) => moveUp(index),
             moveDownFunction: (context) => moveDown(index),
@@ -897,14 +917,14 @@ class _HomePageState extends State<Homepage> {
             labelSize: columnAmount == 1 ? 50 : 50 / columnAmount,
             borderSize: columnAmount == 1 ? 15 : 20 / columnAmount,
             marginSize: columnAmount == 1 ? 10 : 20 / columnAmount,
-            tags: card['tags'] ?? [],
+            tags: card['tags'] as List? ?? [],
             reorderMode: reorderMode,
-            note: card['note'] ?? 'Card notes are displayed here...',
-            uniqueId: card['uniqueId'] ?? 'Error',
-            imagePathFront: card['imagePathFront'] ?? '',
-            imagePathBack: card['imagePathBack'] ?? '',
-            useFrontFaceOverlay: card['useFrontFaceOverlay'] ?? false,
-            hideTitle: card['hideTitle'] ?? false,
+            note: card['note'] as String? ?? 'Card notes are displayed here...',
+            uniqueId: card['uniqueId'] as String? ?? 'Error',
+            imagePathFront: card['imagePathFront'] as String? ?? '',
+            imagePathBack: card['imagePathBack'] as String? ?? '',
+            useFrontFaceOverlay: card['useFrontFaceOverlay'] as bool? ?? false,
+            hideTitle: card['hideTitle'] as bool? ?? false,
           );
         });
         return SliverPadding(
@@ -929,7 +949,7 @@ class _HomePageState extends State<Homepage> {
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 if (index >= cdb.myShops.length) return null;
-                final card = cdb.myShops[index];
+                final card = cdb.myShops[index] as Map<dynamic, dynamic>;
                 return CardTile(
                   key: ValueKey(card['uniqueId'] ?? index),
                   shopName: (card['cardName'] ?? 'No Name').toString(),
@@ -942,15 +962,15 @@ class _HomePageState extends State<Homepage> {
                   cardnumber: card['cardId']?.toString() ?? '',
                   cardTileColor: Color.fromARGB(
                     255,
-                    card['redValue'] ?? 158,
-                    card['greenValue'] ?? 158,
-                    card['blueValue'] ?? 158,
+                    card['redValue'] as int? ?? 158,
+                    card['greenValue'] as int? ?? 158,
+                    card['blueValue'] as int? ?? 158,
                   ),
-                  cardType: card['cardType'] ?? 'CardType.ean13',
-                  hasPassword: card['hasPassword'] ?? false,
-                  red: card['redValue'] ?? 158,
-                  green: card['greenValue'] ?? 158,
-                  blue: card['blueValue'] ?? 158,
+                  cardType: card['cardType'] as String? ?? 'CardType.ean13',
+                  hasPassword: card['hasPassword'] as bool? ?? false,
+                  red: card['redValue'] as int? ?? 158,
+                  green: card['greenValue'] as int? ?? 158,
+                  blue: card['blueValue'] as int? ?? 158,
                   editFunction: (context) => editCard(context, theme, index),
                   moveUpFunction: (context) => moveUp(index),
                   moveDownFunction: (context) => moveDown(index),
@@ -958,14 +978,16 @@ class _HomePageState extends State<Homepage> {
                   labelSize: columnAmount == 1 ? 50 : 50 / columnAmount,
                   borderSize: columnAmount == 1 ? 15 : 20 / columnAmount,
                   marginSize: columnAmount == 1 ? 10 : 20 / columnAmount,
-                  tags: card['tags'] ?? [],
+                  tags: card['tags'] as List? ?? [],
                   reorderMode: reorderMode,
-                  note: card['note'] ?? 'Card notes are displayed here...',
-                  uniqueId: card['uniqueId'] ?? 'Error',
-                  imagePathFront: card['imagePathFront'] ?? '',
-                  imagePathBack: card['imagePathBack'] ?? '',
-                  useFrontFaceOverlay: card['useFrontFaceOverlay'] ?? false,
-                  hideTitle: card['hideTitle'] ?? false,
+                  note: card['note'] as String? ??
+                      'Card notes are displayed here...',
+                  uniqueId: card['uniqueId'] as String? ?? 'Error',
+                  imagePathFront: card['imagePathFront'] as String? ?? '',
+                  imagePathBack: card['imagePathBack'] as String? ?? '',
+                  useFrontFaceOverlay:
+                      card['useFrontFaceOverlay'] as bool? ?? false,
+                  hideTitle: card['hideTitle'] as bool? ?? false,
                 );
               },
               childCount: itemCount,

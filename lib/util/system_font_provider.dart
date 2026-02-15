@@ -5,12 +5,12 @@ class SystemFontProvider {
 
   static bool get useSystemFont {
     final box = Hive.box('settingsBox');
-    return box.get(systemFontKey, defaultValue: false);
+    return box.get(systemFontKey, defaultValue: false) as bool;
   }
 
-  static void toggleSystemFont() {
+  static Future<void> toggleSystemFont() {
     final box = Hive.box('settingsBox');
-    final bool current = box.get(systemFontKey, defaultValue: false);
-    box.put(systemFontKey, !current);
+    final bool current = box.get(systemFontKey, defaultValue: false) as bool;
+    return box.put(systemFontKey, !current);
   }
 }

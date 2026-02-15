@@ -24,9 +24,9 @@ bool vibrate = VibrationProvider.vibrate;
 CardabaseDb cdb = CardabaseDb();
 bool devOptions = DeveloperOptionsProvider.developerOptions;
 bool useSystemFontEverywhere = SystemFontProvider.useSystemFont;
-bool autoUpdates = settingsbox.get('autoBackups') ?? false;
-int autoUpdateInterval = settingsbox.get('autoBackupInterval') ?? 7;
-bool useExtraDark = settingsbox.get('useExtraDark') ?? false;
+bool autoUpdates = settingsbox.get('autoBackups') as bool? ?? false;
+int autoUpdateInterval = settingsbox.get('autoBackupInterval') as int? ?? 7;
+bool useExtraDark = settingsbox.get('useExtraDark') as bool? ?? false;
 
 class Settings extends StatefulWidget {
   const Settings({
@@ -48,7 +48,7 @@ class _SettingsState extends State<Settings> {
     super.initState();
   }
 
-  Future<void> _launchUrl(url) async {
+  Future<void> _launchUrl(Uri url) async {
     if (!await launchUrl(url)) {
       throw Exception('Could not launch $url');
     }
@@ -101,14 +101,14 @@ class _SettingsState extends State<Settings> {
     });
   }
 
-  void showAutoUpdateDialog(ThemeData theme) {
-    bool _tempAutoUpdates = autoUpdates;
-    int _tempAutoUpdateInterval = autoUpdateInterval;
-    final TextEditingController _passwordVerifyControllerDialog =
+  Future<void> showAutoUpdateDialog(ThemeData theme) {
+    bool tempAutoUpdates = autoUpdates;
+    int tempAutoUpdateInterval = autoUpdateInterval;
+    final TextEditingController passwordVerifyControllerDialog =
         TextEditingController();
-    bool _isPasswordCorrectDialog = true;
+    bool isPasswordCorrectDialog = true;
 
-    showDialog(
+    return showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState2) {
@@ -131,13 +131,13 @@ class _SettingsState extends State<Settings> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  value: _tempAutoUpdates,
+                  value: tempAutoUpdates,
                   onChanged: (value) {
                     setState2(() {
-                      _tempAutoUpdates = value;
+                      tempAutoUpdates = value;
                       if (!value) {
-                        _isPasswordCorrectDialog = true;
-                        _passwordVerifyControllerDialog.clear();
+                        isPasswordCorrectDialog = true;
+                        passwordVerifyControllerDialog.clear();
                       }
                     });
                   },
@@ -145,27 +145,27 @@ class _SettingsState extends State<Settings> {
                 const SizedBox(height: 10),
                 Slider(
                   year2023: false,
-                  value: _tempAutoUpdateInterval.toDouble(),
+                  value: tempAutoUpdateInterval.toDouble(),
                   min: 1,
                   max: 365,
                   divisions: 364,
-                  label: '$_tempAutoUpdateInterval days',
-                  onChanged: _tempAutoUpdateInterval.toDouble() > 0
+                  label: '$tempAutoUpdateInterval days',
+                  onChanged: tempAutoUpdateInterval.toDouble() > 0
                       ? (double value) {
                           setState2(() {
-                            _tempAutoUpdateInterval = value.toInt();
+                            tempAutoUpdateInterval = value.toInt();
                           });
                         }
                       : null,
                 ),
-                // Password verification field (only if password exists and _tempAutoUpdates is true)
-                if (_tempAutoUpdates &&
+                // Password verification field (only if password exists and tempAutoUpdates is true)
+                if (tempAutoUpdates &&
                     passwordbox.isNotEmpty &&
                     (passwordbox.get('PW') != null &&
                         passwordbox.get('PW').toString().isNotEmpty)) ...[
                   const SizedBox(height: 16),
                   TextFormField(
-                    controller: _passwordVerifyControllerDialog,
+                    controller: passwordVerifyControllerDialog,
                     obscureText: true,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
@@ -193,8 +193,8 @@ class _SettingsState extends State<Settings> {
                     keyboardType: TextInputType.visiblePassword,
                     // onChanged: (value) removed this line
                   ),
-                  if (!_isPasswordCorrectDialog &&
-                      _passwordVerifyControllerDialog.text.isNotEmpty)
+                  if (!isPasswordCorrectDialog &&
+                      passwordVerifyControllerDialog.text.isNotEmpty)
                     const Padding(
                       padding: EdgeInsets.only(top: 8.0),
                       child: Text(
@@ -222,33 +222,33 @@ class _SettingsState extends State<Settings> {
                     ),
                   ),
                   onPressed: () {
-                    if (_tempAutoUpdates == true) {
+                    if (tempAutoUpdates == true) {
                       // User wants to ENABLE auto-backups
                       if (passwordbox.isNotEmpty &&
                           (passwordbox.get('PW') != null &&
                               passwordbox.get('PW').toString().isNotEmpty)) {
                         // Password is set, check if entered password is correct
-                        if (_passwordVerifyControllerDialog.text ==
+                        if (passwordVerifyControllerDialog.text ==
                             passwordbox.get('PW')) {
                           // Password correct, commit changes to actual state
-                          setAutoBackupsState(true, _tempAutoUpdateInterval);
+                          setAutoBackupsState(true, tempAutoUpdateInterval);
                           Navigator.of(context).pop();
                         } else {
                           // Password incorrect, update dialog state to show error
                           setState2(() {
-                            _isPasswordCorrectDialog = false;
+                            isPasswordCorrectDialog = false;
                           });
                           VibrationProvider
                               .vibrateSuccess(); // Provide feedback for incorrect password
                         }
                       } else {
                         // No password set, enable directly
-                        setAutoBackupsState(true, _tempAutoUpdateInterval);
+                        setAutoBackupsState(true, tempAutoUpdateInterval);
                         Navigator.of(context).pop();
                       }
                     } else {
                       // User wants to DISABLE auto-backups (no password needed)
-                      setAutoBackupsState(false, _tempAutoUpdateInterval);
+                      setAutoBackupsState(false, tempAutoUpdateInterval);
                       Navigator.of(context).pop();
                     }
                   },
@@ -309,10 +309,10 @@ class _SettingsState extends State<Settings> {
     Navigator.of(context).pop(true);
   }
 
-  void showUnlockDialogExport(BuildContext context, ThemeData theme) {
+  Future<void> showUnlockDialogExport(BuildContext context, ThemeData theme) {
     final TextEditingController controller = TextEditingController();
 
-    showDialog(
+    return showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
@@ -425,7 +425,7 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  askForPasswordExport(ThemeData theme) {
+  void askForPasswordExport(ThemeData theme) {
     if (passwordbox.isNotEmpty) {
       showUnlockDialogExport(context, theme);
     } else {
