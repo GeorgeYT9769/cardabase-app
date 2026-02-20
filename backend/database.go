@@ -76,7 +76,7 @@ func (db *Database) UpsertCard(ctx context.Context, cardId string, data map[stri
 func (db *Database) RemoveCard(ctx context.Context, cardId string) error {
 	db.logger.Info("removing card", slog.String("cardId", cardId))
 
-	// define the quer which will remove the card from the database
+	// define the query which will remove the card from the database
 	const query = `
 		DELETE FROM cards AS card
 		WHERE card.id = @id

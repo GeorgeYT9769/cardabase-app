@@ -10,10 +10,13 @@ import 'package:cardabase/util/import_data.dart';
 import 'package:cardabase/util/setting_tile.dart';
 import 'package:cardabase/util/system_font_provider.dart';
 import 'package:cardabase/util/vibration_provider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'cloud_backup.dart';
 
 final settingsbox = Hive.box('settingsBox');
 final passwordbox = Hive.box('password');
@@ -693,6 +696,14 @@ class _SettingsState extends State<Settings> {
                         ? Icons.font_download
                         : Icons.font_download_outlined,
                     borderColor: theme.colorScheme.primary,
+                  ), MySetting(
+                    aboutSettingHeader: 'Add special effects to Card Tile',
+                    settingAction: () {},
+                    settingHeader: 'Card Tile effects',
+                    iconColor:
+                        theme.colorScheme.tertiary,
+                    settingIcon: CupertinoIcons.sparkles,
+                    borderColor: theme.colorScheme.primary,
                   ),
                   MySetting(
                     aboutSettingHeader: 'Protect your cards by using password',
@@ -751,8 +762,15 @@ class _SettingsState extends State<Settings> {
                   MySetting(
                     aboutSettingHeader:
                         'Backup your cards into self-hosted cloud storage',
-                    settingAction: () {},
-                    settingHeader: 'Cloud Backups',
+                    settingAction: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CloudBackup(),
+                        ),
+                      );
+                    },
+                    settingHeader: 'Cloud Backup',
                     iconColor: Theme.of(context).colorScheme.tertiary,
                     settingIcon: Icons.cloud,
                     borderColor: Theme.of(context).colorScheme.primary,

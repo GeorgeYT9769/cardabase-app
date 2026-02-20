@@ -117,7 +117,7 @@ class _QRBarReaderState extends State<QRBarReader> {
 
   Widget _buildQrView(BuildContext context) {
     final scanArea = (MediaQuery.of(context).size.width < 400 ||
-            MediaQuery.of(context).size.height < 400)
+        MediaQuery.of(context).size.height < 400)
         ? 200.0
         : 400.0;
     return QRView(
@@ -188,7 +188,7 @@ class _QRBarReaderState extends State<QRBarReader> {
 
   Future<void> _pickImage() async {
     final imageFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    await ImagePicker().pickImage(source: ImageSource.gallery);
     if (imageFile == null) return;
 
     final bytes = await imageFile.readAsBytes();

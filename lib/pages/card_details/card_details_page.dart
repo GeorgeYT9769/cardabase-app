@@ -65,6 +65,10 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
     }
   }
 
+  Color getContrastingTextColor(Color bg) {
+    return bg.computeLuminance() > 0.7 ? Colors.black : Colors.white;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -76,13 +80,18 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
           decelerationRate: ScrollDecelerationRate.fast,
         ),
         children: [
-          Padding(
+          Container(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+            margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: widget.borderColor,
+            ),
             child: Text(
               widget.title,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.inverseSurface,
+                color: getContrastingTextColor(widget.borderColor),
                 fontSize: 50,
               ),
             ),
@@ -124,8 +133,9 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
           context: context,
           builder: (context) => ShareCardDialog(
             // TODO(wim): extract this logic somewhere central
+            // note from George: no need to share tags, the other user might not have the same tags making it useless data sitting there
             data:
-                '[${widget.title}, ${widget.cardData}, ${widget.borderColor.r.toInt()}, ${widget.borderColor.g.toInt()}, ${widget.borderColor.b.toInt()}, ${widget.barcodeType}, ${widget.hasPassword}, ${widget.tags}]',
+                '[${widget.title}, ${widget.cardData}, ${(widget.borderColor.r * 255).toInt()}, ${(widget.borderColor.g * 255).toInt()}, ${(widget.borderColor.b * 255).toInt()}, ${widget.barcodeType}, ${widget.hasPassword}]',
           ),
         ),
       ),
@@ -157,16 +167,19 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
           CardFace.image(
             cardTileColor: widget.borderColor,
             image: frontImage,
+            showWhiteOutline: false,
           ),
         CardFace.barcode(
           cardTileColor: widget.borderColor,
           cardData: widget.cardData,
           barcodeType: widget.barcodeType,
+          showWhiteOutline: true,
         ),
         if (backImage != null)
           CardFace.image(
             cardTileColor: widget.borderColor,
             image: backImage,
+            showWhiteOutline: false,
           ),
       ],
     );

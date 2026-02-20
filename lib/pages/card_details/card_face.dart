@@ -8,15 +8,18 @@ class CardFace extends StatelessWidget {
     required this.cardTileColor,
     required this.fullScreenBuilder,
     required this.child,
+    required this.showWhiteOutline,
   });
 
   factory CardFace.barcode({
     required Color cardTileColor,
     required String cardData,
     required BarcodeType barcodeType,
+    required bool showWhiteOutline,
   }) {
     return CardFace(
       cardTileColor: cardTileColor,
+      showWhiteOutline: showWhiteOutline,
       fullScreenBuilder: (context) => FullScreenCardFacePage.barcode(
         cardData: cardData,
         barcodeType: barcodeType,
@@ -44,9 +47,11 @@ class CardFace extends StatelessWidget {
   factory CardFace.image({
     required Color cardTileColor,
     required ImageProvider image,
+    required bool showWhiteOutline,
   }) {
     return CardFace(
       cardTileColor: cardTileColor,
+      showWhiteOutline: showWhiteOutline,
       fullScreenBuilder: (context) => FullScreenCardFacePage.image(
         image: image,
       ),
@@ -65,6 +70,7 @@ class CardFace extends StatelessWidget {
   final Color cardTileColor;
   final WidgetBuilder fullScreenBuilder;
   final Widget child;
+  final bool showWhiteOutline;
 
   @override
   Widget build(BuildContext context) {
@@ -80,15 +86,17 @@ class CardFace extends StatelessWidget {
           color: cardTileColor,
           borderRadius: BorderRadius.circular(15),
         ),
-        child: Container(
-          height: 120,
-          padding: const EdgeInsets.all(15),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10.0),
-            color: Colors.white,
-          ),
-          child: child,
-        ),
+        child: showWhiteOutline
+          ? Container(
+            height: 120,
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10.0),
+              color: Colors.white,
+            ),
+            child: child,
+          )
+          : child,
       ),
     );
   }
