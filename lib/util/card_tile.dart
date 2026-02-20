@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:barcode_widget/barcode_widget.dart';
-import 'package:cardabase/pages/card_details.dart';
+import 'package:cardabase/pages/card_details/card_details_page.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
@@ -10,9 +10,9 @@ import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 class CardTile extends StatefulWidget {
   final String shopName;
   final Function(BuildContext) deleteFunction;
-  final String cardnumber;
+  final String cardData;
   final Color cardTileColor;
-  final String cardType;
+  final BarcodeType barcodeType;
   final bool hasPassword;
   final Function(BuildContext) editFunction;
   final Function(BuildContext) moveUpFunction;
@@ -26,26 +26,19 @@ class CardTile extends StatefulWidget {
   final bool reorderMode;
   final String note;
   final String uniqueId;
-  final String imagePathFront;
-  final String imagePathBack;
+  final String frontImagePath;
+  final String backImagePath;
   final bool useFrontFaceOverlay;
   final bool hideTitle;
-
-  final int red;
-  final int green;
-  final int blue;
 
   const CardTile({
     super.key,
     required this.shopName,
     required this.deleteFunction,
-    required this.cardnumber,
+    required this.cardData,
     required this.cardTileColor,
-    required this.cardType,
+    required this.barcodeType,
     required this.hasPassword,
-    required this.red,
-    required this.green,
-    required this.blue,
     required this.editFunction,
     required this.moveUpFunction,
     required this.moveDownFunction,
@@ -58,8 +51,8 @@ class CardTile extends StatefulWidget {
     required this.note,
     required this.uniqueId,
     required this.duplicateFunction,
-    required this.imagePathFront,
-    required this.imagePathBack,
+    required this.frontImagePath,
+    required this.backImagePath,
     required this.useFrontFaceOverlay,
     required this.hideTitle,
   });
@@ -71,6 +64,35 @@ class CardTile extends StatefulWidget {
 class _CardTileState extends State<CardTile> {
   final passwordbox = Hive.box('password');
   final settingsbox = Hive.box('settingsBox');
+
+  ImageProvider? frontImage;
+  ImageProvider? backImage;
+
+  @override
+  void initState() {
+    super.initState();
+    frontImage = widget.frontImagePath.isNotEmpty
+        ? FileImage(File(widget.frontImagePath))
+        : null;
+    backImage = widget.backImagePath.isNotEmpty
+        ? FileImage(File(widget.backImagePath))
+        : null;
+  }
+
+  @override
+  void didUpdateWidget(covariant CardTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.frontImagePath != widget.frontImagePath) {
+      frontImage = widget.frontImagePath.isNotEmpty
+          ? FileImage(File(widget.frontImagePath))
+          : null;
+    }
+    if (oldWidget.backImagePath != widget.backImagePath) {
+      backImage = widget.backImagePath.isNotEmpty
+          ? FileImage(File(widget.backImagePath))
+          : null;
+    }
+  }
 
   Color getContrastingTextColor(Color bg) {
     return bg.computeLuminance() > 0.7 ? Colors.black : Colors.white;
@@ -177,19 +199,16 @@ class _CardTileState extends State<CardTile> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => CardDetails(
-                              cardid: widget.cardnumber,
-                              cardtext: widget.shopName,
-                              cardTileColor: widget.cardTileColor,
-                              cardType: widget.cardType,
+                            builder: (context) => CardDetailsPage(
+                              cardData: widget.cardData,
+                              title: widget.shopName,
+                              borderColor: widget.cardTileColor,
+                              barcodeType: widget.barcodeType,
                               hasPassword: widget.hasPassword,
-                              red: widget.red,
-                              green: widget.green,
-                              blue: widget.blue,
                               tags: const [],
                               note: widget.note,
-                              imagePathFront: widget.imagePathFront,
-                              imagePathBack: widget.imagePathBack,
+                              frontImage: frontImage,
+                              backImage: backImage,
                             ),
                           ),
                         );
@@ -264,19 +283,16 @@ class _CardTileState extends State<CardTile> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => CardDetails(
-              cardid: widget.cardnumber,
-              cardtext: widget.shopName,
-              cardTileColor: widget.cardTileColor,
-              cardType: widget.cardType,
+            builder: (context) => CardDetailsPage(
+              cardData: widget.cardData,
+              title: widget.shopName,
+              borderColor: widget.cardTileColor,
+              barcodeType: widget.barcodeType,
               hasPassword: widget.hasPassword,
-              red: widget.red,
-              green: widget.green,
-              blue: widget.blue,
               tags: const [],
               note: widget.note,
-              imagePathFront: widget.imagePathFront,
-              imagePathBack: widget.imagePathBack,
+              frontImage: frontImage,
+              backImage: backImage,
             ),
           ),
         );
@@ -313,9 +329,9 @@ class _CardTileState extends State<CardTile> {
                       fit: StackFit.expand,
                       children: [
                         if (widget.useFrontFaceOverlay &&
-                            widget.imagePathFront.isNotEmpty)
+                            widget.frontImagePath.isNotEmpty)
                           FutureBuilder<bool>(
-                            future: File(widget.imagePathFront).exists(),
+                            future: File(widget.frontImagePath).exists(),
                             builder: (
                               BuildContext context,
                               AsyncSnapshot<bool> snapshot,
@@ -327,7 +343,7 @@ class _CardTileState extends State<CardTile> {
                                   borderRadius:
                                       BorderRadius.circular(widget.borderSize),
                                   child: Image.file(
-                                    File(widget.imagePathFront),
+                                    File(widget.frontImagePath),
                                     fit: BoxFit.cover,
                                     width: double.infinity,
                                     height: double.infinity,
