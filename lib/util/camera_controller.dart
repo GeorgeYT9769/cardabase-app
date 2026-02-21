@@ -32,6 +32,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
   List<CameraDescription>? _cameras;
   Future<void>? _initializeControllerFuture;
   XFile? _capturedImageFile;
+  double _brightness = 0.0;
 
   final TransformationController _transformationController =
       TransformationController();
@@ -88,6 +89,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
       final XFile file = await _cameraController!.takePicture();
       setState(() {
         _capturedImageFile = file;
+        _transformationController.value = Matrix4.diagonal3Values(1.0, .93, 1.0); // Start zoomed in, allow zooming out
       });
     } catch (e) {
       // Handle error
@@ -100,6 +102,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     if (image != null) {
       setState(() {
         _capturedImageFile = image;
+        _transformationController.value = Matrix4.diagonal3Values(1, .93, 1); // Start zoomed in, allow zooming out
       });
     }
   }
@@ -167,6 +170,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
   void _retakePicture() {
     setState(() {
       _capturedImageFile = null;
+      _brightness = 0.0;
     });
   }
 
@@ -206,11 +210,20 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                     Positioned.fill(
                       child: InteractiveViewer(
                         transformationController: _transformationController,
-                        minScale: 1.0,
-                        maxScale: 4.0,
-                        child: Image.file(
-                          File(_capturedImageFile!.path),
-                          fit: BoxFit.contain,
+                        minScale: 0.1,
+                        maxScale: 5.0,
+                        boundaryMargin: const EdgeInsets.all(double.infinity),
+                        child: ColorFiltered(
+                          colorFilter: ColorFilter.matrix([
+                            1, 0, 0, 0, _brightness * 255,
+                            0, 1, 0, 0, _brightness * 255,
+                            0, 0, 1, 0, _brightness * 255,
+                            0, 0, 0, 1, 0,
+                          ]),
+                          child: Image.file(
+                            File(_capturedImageFile!.path),
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
                     ),
@@ -262,20 +275,55 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                 ),
               ],
             )
-          : Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          : Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                FloatingActionButton.extended(
-                  heroTag: 'retakePhoto',
-                  onPressed: _retakePicture,
-                  label: const Text('Retake'),
-                  icon: const Icon(Icons.refresh),
+                Text(
+                  'Brightness: ${_brightness.toStringAsFixed(1)}',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w900,
+                    color: Theme.of(context).colorScheme.inverseSurface,
+                  ),
                 ),
-                FloatingActionButton.extended(
-                  heroTag: 'usePhoto',
-                  onPressed: _confirmAndSavePicture,
-                  label: const Text('Use Photo'),
-                  icon: const Icon(Icons.check),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.brightness_6_rounded),
+                      Expanded(
+                        child: Slider(
+                          value: _brightness,
+                          year2023: false,
+                          min: -1.0,
+                          max: 1.0,
+                          //activeColor: widget.cutoutColor,
+                          onChanged: (value) {
+                            setState(() {
+                              _brightness = value;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    FloatingActionButton.extended(
+                      heroTag: 'retakePhoto',
+                      onPressed: _retakePicture,
+                      label: const Text('Retake'),
+                      icon: const Icon(Icons.refresh),
+                    ),
+                    FloatingActionButton.extended(
+                      heroTag: 'usePhoto',
+                      onPressed: _confirmAndSavePicture,
+                      label: const Text('Use Photo'),
+                      icon: const Icon(Icons.check),
+                    ),
+                  ],
                 ),
               ],
             ),

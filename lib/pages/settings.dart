@@ -30,6 +30,9 @@ bool useSystemFontEverywhere = SystemFontProvider.useSystemFont;
 bool autoUpdates = settingsbox.get('autoBackups') as bool? ?? false;
 int autoUpdateInterval = settingsbox.get('autoBackupInterval') as int? ?? 7;
 bool useExtraDark = settingsbox.get('useExtraDark') as bool? ?? false;
+bool useEffects = settingsbox.get('effect') as bool? ?? false;
+String effectChosen = settingsbox.get('effectChosen') as String? ?? 'none';
+
 
 class Settings extends StatefulWidget {
   const Settings({
@@ -102,6 +105,106 @@ class _SettingsState extends State<Settings> {
         settingsbox.put('lastAutoUpdate', DateTime.now().toString());
       }
     });
+  }
+
+  void setEffectsState(bool newValue, String effect) {
+    setState(() {
+      useEffects = newValue;
+      settingsbox.put('effect', autoUpdates);
+      settingsbox.put('effectChosen', autoUpdateInterval);
+    });
+  }
+  Future<void> cardEffectsDialog(ThemeData theme) {
+    bool tempUseEffects = useEffects;
+
+    return showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState2) {
+          return AlertDialog(
+            title: Text(
+              'Card effects',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.inverseSurface,
+                fontSize: 30,
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SwitchListTile(
+                  title: Text(
+                    'Effects',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.inverseSurface,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  value: tempUseEffects,
+                  onChanged: (value) {
+                    setState2(() {
+                      tempUseEffects = value;
+                    });
+                  },
+                ),
+                if (tempUseEffects)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12.0),
+                    child: DropdownButton<String>(
+                      value: effectChosen,
+                      elevation: 0,
+                      dropdownColor: theme.colorScheme.surface,
+                      borderRadius: BorderRadius.circular(10),
+                      items: [
+                        DropdownMenuItem(value: 'none', child: Text('None')),
+                        DropdownMenuItem(value: 'shimmer', child: Text('Shimmer')),
+                        DropdownMenuItem(value: 'glitter', child: Text('Glitter')),
+                        DropdownMenuItem(value: 'grain', child: Text('Grain')),
+                      ],
+                      onChanged: (value) {
+                        setState2(() {
+                          effectChosen = value ?? 'none';
+                        });
+                      },
+                    ),
+                  ),
+              ],
+            ),
+            actions: [
+              Center(
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    elevation: 0.0,
+                    side: BorderSide(
+                      color: theme.colorScheme.primary,
+                      width: 2.0,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(11),
+                    ),
+                  ),
+                  onPressed: () {
+                    useEffects = tempUseEffects;
+                    settingsbox.put('effect', useEffects);
+                    settingsbox.put('effectChosen', effectChosen);
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    'DONE',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: theme.colorScheme.tertiary,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
   }
 
   Future<void> showAutoUpdateDialog(ThemeData theme) {
@@ -230,27 +333,22 @@ class _SettingsState extends State<Settings> {
                       if (passwordbox.isNotEmpty &&
                           (passwordbox.get('PW') != null &&
                               passwordbox.get('PW').toString().isNotEmpty)) {
-                        // Password is set, check if entered password is correct
                         if (passwordVerifyControllerDialog.text ==
                             passwordbox.get('PW')) {
-                          // Password correct, commit changes to actual state
                           setAutoBackupsState(true, tempAutoUpdateInterval);
                           Navigator.of(context).pop();
                         } else {
-                          // Password incorrect, update dialog state to show error
                           setState2(() {
                             isPasswordCorrectDialog = false;
                           });
                           VibrationProvider
-                              .vibrateSuccess(); // Provide feedback for incorrect password
+                              .vibrateSuccess();
                         }
                       } else {
-                        // No password set, enable directly
                         setAutoBackupsState(true, tempAutoUpdateInterval);
                         Navigator.of(context).pop();
                       }
                     } else {
-                      // User wants to DISABLE auto-backups (no password needed)
                       setAutoBackupsState(false, tempAutoUpdateInterval);
                       Navigator.of(context).pop();
                     }
@@ -436,6 +534,8 @@ class _SettingsState extends State<Settings> {
       showExportTypeDialog(context);
     }
   }
+  //TODO: unite all the passwords dialogs and toasts dialog
+  //TODO: add fingerprint verification
 
   void showDialogDelete(BuildContext context, ThemeData theme) {
     final TextEditingController controller = TextEditingController();
@@ -698,10 +798,12 @@ class _SettingsState extends State<Settings> {
                     borderColor: theme.colorScheme.primary,
                   ), MySetting(
                     aboutSettingHeader: 'Add special effects to Card Tile',
-                    settingAction: () {},
+                    settingAction: () async {
+                      await cardEffectsDialog(theme);
+                      setState(() {});
+                    },
                     settingHeader: 'Card Tile effects',
-                    iconColor:
-                        theme.colorScheme.tertiary,
+                    iconColor: useEffects ? Colors.green : Colors.red,
                     settingIcon: CupertinoIcons.sparkles,
                     borderColor: theme.colorScheme.primary,
                   ),
@@ -861,8 +963,7 @@ class _SettingsState extends State<Settings> {
                     borderColor: theme.colorScheme.primary,
                   ),
                   MySetting(
-                    aboutSettingHeader:
-                        'Check out the website for this project',
+                    aboutSettingHeader: 'Check out the website for this project',
                     settingAction: () => _launchUrl(
                       Uri.parse('https://georgeyt9769.github.io/cardabase/'),
                     ),
