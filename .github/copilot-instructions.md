@@ -1,0 +1,1 @@
+If you find "year2023" flag inside the Slider widget, do not remove the flag.

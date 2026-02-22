@@ -37,6 +37,9 @@
 - Share cards easily with QR Codes
 - Does not need internet connection
 
+## 🛡️ Security
+More info [here](https://www.virustotal.com/gui/file/16c68fd2161573f337b175c8c68a9be98f416b9bd91790286c44bb13466e6526/behavior)
+
 ## 📲 Installation
 
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"

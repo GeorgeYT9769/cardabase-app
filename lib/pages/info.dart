@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:cardabase/pages/news.dart';
+import 'package:cardabase/util/expressive_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:http/http.dart' as http;
+import 'package:material_new_shapes/material_new_shapes.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -174,7 +176,22 @@ class _InfoScreenState extends State<InfoScreen> {
               ),
               const SizedBox(height: 30),
               if (_isLoading)
-                const CircularProgressIndicator()
+                ExpressiveLoadingIndicator(
+                  color: Theme.of(context).colorScheme.tertiary,
+                  constraints: const BoxConstraints(
+                    minWidth: 64.0,
+                    minHeight: 64.0,
+                    maxWidth: 64.0,
+                    maxHeight: 64.0,
+                  ),
+                  polygons: [
+                    MaterialShapes.softBurst,
+                    MaterialShapes.pentagon,
+                    MaterialShapes.pill,
+                  ],
+                  semanticsLabel: 'Loading',
+                  semanticsValue: 'In progress',
+                )
               else
                 _hasError
                     ? Column(

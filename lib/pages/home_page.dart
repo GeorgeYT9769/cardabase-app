@@ -489,86 +489,85 @@ class _HomePageState extends State<Homepage> {
                   ),
                   child: Column(
                     children: <Widget>[
-                      Text(
-                        'Tags:',
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          fontSize: 17,
-                          color: theme.colorScheme.inverseSurface,
-                          fontWeight: FontWeight.w900,
+                      if (allTags.isNotEmpty) ...[
+                        Text(
+                          'Tags:',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontSize: 17,
+                            color: theme.colorScheme.inverseSurface,
+                            fontWeight: FontWeight.w900,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(
-                          decelerationRate: ScrollDecelerationRate.fast,
-                        ),
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: List.generate(
-                            allTags.length,
-                            (chipIndex) => Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 4.0),
-                              child: ActionChip(
-                                label: Text(allTags[chipIndex] as String),
-                                onPressed: () {
-                                  setState2(() {
-                                    setState(() {
-                                      final tag = allTags[chipIndex] as String?;
-                                      if (selectedTag == tag) {
-                                        selectedTag = null;
-                                        cdb.loadData();
-                                      } else {
-                                        selectedTag = tag;
-                                        cdb.loadData();
-                                        cdb.myShops = cdb.myShops.where((shop) {
-                                          final tags = shop['tags'];
-                                          if (tags is List) {
-                                            return tags.contains(tag);
-                                          }
-                                          return false;
-                                        }).toList();
-                                      }
+                        const SizedBox(height: 10),
+                        SingleChildScrollView(
+                          physics: const BouncingScrollPhysics(
+                            decelerationRate: ScrollDecelerationRate.fast,
+                          ),
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: List.generate(
+                              allTags.length,
+                              (chipIndex) => Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                child: ActionChip(
+                                  label: Text(allTags[chipIndex] as String),
+                                  onPressed: () {
+                                    setState2(() {
+                                      setState(() {
+                                        final tag = allTags[chipIndex] as String?;
+                                        if (selectedTag == tag) {
+                                          selectedTag = null;
+                                          cdb.loadData();
+                                        } else {
+                                          selectedTag = tag;
+                                          cdb.loadData();
+                                          cdb.myShops = cdb.myShops.where((shop) {
+                                            final tags = shop['tags'];
+                                            if (tags is List) {
+                                              return tags.contains(tag);
+                                            }
+                                            return false;
+                                          }).toList();
+                                        }
+                                      });
                                     });
-                                  });
-                                },
-                                labelStyle: theme.textTheme.bodyLarge?.copyWith(
-                                  color: selectedTag == allTags[chipIndex]
-                                      ? theme.colorScheme.onPrimary
-                                      : theme.colorScheme.inverseSurface,
-                                ),
-                                backgroundColor:
-                                    selectedTag == allTags[chipIndex]
+                                  },
+                                  labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                                    color: selectedTag == allTags[chipIndex]
+                                        ? theme.colorScheme.onPrimary
+                                        : theme.colorScheme.inverseSurface,
+                                  ),
+                                  backgroundColor:
+                                      selectedTag == allTags[chipIndex]
+                                          ? theme.colorScheme.primary
+                                          : theme.colorScheme.onInverseSurface,
+                                  elevation: selectedTag == allTags[chipIndex]
+                                      ? null
+                                      : 0.0,
+                                  side: BorderSide(
+                                    color: selectedTag == allTags[chipIndex]
                                         ? theme.colorScheme.primary
-                                        : theme.colorScheme.onInverseSurface,
-                                elevation: selectedTag == allTags[chipIndex]
-                                    ? null
-                                    : 0.0,
-                                side: BorderSide(
-                                  color: selectedTag == allTags[chipIndex]
-                                      ? theme.colorScheme.primary
-                                      : theme.colorScheme.primary
-                                          .withValues(alpha: 0.3),
-                                  width:
-                                      selectedTag == allTags[chipIndex] ? 2 : 1,
+                                        : theme.colorScheme.primary.withValues(alpha: 0.3),
+                                    width: selectedTag == allTags[chipIndex] ? 2 : 1,
+                                  ),
+                                  avatar: selectedTag == allTags[chipIndex]
+                                      ? Icon(
+                                          Icons.check,
+                                          size: 18,
+                                          color: theme.colorScheme.onPrimary,
+                                        )
+                                      : null,
                                 ),
-                                avatar: selectedTag == allTags[chipIndex]
-                                    ? Icon(
-                                        Icons.check,
-                                        size: 18,
-                                        color: theme.colorScheme.onPrimary,
-                                      )
-                                    : null,
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 5),
-                      Divider(
-                        color: theme.colorScheme.primary,
-                        thickness: 1.0,
-                      ),
+                        const SizedBox(height: 5),
+                        Divider(
+                          color: theme.colorScheme.primary,
+                          thickness: 1.0,
+                        ),
+                      ],
                       const SizedBox(height: 10),
                       Text(
                         'Sort by:',
@@ -796,77 +795,82 @@ class _HomePageState extends State<Homepage> {
             ),
           ),
           floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-          body: CustomScrollView(
-            physics: const BouncingScrollPhysics(
-              decelerationRate: ScrollDecelerationRate.fast,
-            ),
-            slivers: [
-              SliverAppBar(
-                leading: IconButton(
-                  icon: Icon(
-                    Icons.sort,
-                    color: theme.colorScheme.secondary,
-                  ),
-                  onPressed: () => columnAmountDialog(theme),
+          body: ValueListenableBuilder(
+            valueListenable: Hive.box('settingsBox').listenable(),
+            builder: (context, box, child) {
+              return CustomScrollView(
+                physics: const BouncingScrollPhysics(
+                  decelerationRate: ScrollDecelerationRate.fast,
                 ),
-                actions: [
-                  ValueListenableBuilder(
-                    valueListenable: Hive.box('settingsBox').listenable(),
-                    builder: (context, settingsBox, child) {
-                      final showLegacyCardButton = settingsBox
-                          .get('developerOptions', defaultValue: false) as bool;
-                      return showLegacyCardButton
-                          ? IconButton(
-                              icon: Icon(
-                                Icons.web_stories,
-                                color: theme.colorScheme.secondary,
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (builder) => const WelcomeScreen(
-                                      currentAppVersion: '1.5.0',
-                                    ),
-                                  ),
-                                );
-                              },
-                            )
-                          : const SizedBox.shrink();
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.settings,
-                      color: theme.colorScheme.secondary,
+                slivers: [
+                  SliverAppBar(
+                    leading: IconButton(
+                      icon: Icon(
+                        Icons.sort,
+                        color: theme.colorScheme.secondary,
+                      ),
+                      onPressed: () => columnAmountDialog(theme),
                     ),
-                    onPressed: () async {
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const Settings(),
+                    actions: [
+                      ValueListenableBuilder(
+                        valueListenable: Hive.box('settingsBox').listenable(),
+                        builder: (context, settingsBox, child) {
+                          final showLegacyCardButton = settingsBox
+                              .get('developerOptions', defaultValue: false) as bool;
+                          return showLegacyCardButton
+                              ? IconButton(
+                                  icon: Icon(
+                                    Icons.web_stories,
+                                    color: theme.colorScheme.secondary,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (builder) => const WelcomeScreen(
+                                          currentAppVersion: '1.5.0',
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                )
+                              : const SizedBox.shrink();
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.settings,
+                          color: theme.colorScheme.secondary,
                         ),
-                      );
-                      if (result == true && mounted) {
-                        setState(() {
-                          cdb.loadData();
-                        });
-                      }
-                    },
+                        onPressed: () async {
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const Settings(),
+                            ),
+                          );
+                          if (result == true && mounted) {
+                            setState(() {
+                              cdb.loadData();
+                            });
+                          }
+                        },
+                      ),
+                    ],
+                    title: Text(
+                      'Cardabase',
+                      style: theme.textTheme.titleLarge?.copyWith(),
+                    ),
+                    centerTitle: true,
+                    elevation: 0.0,
+                    backgroundColor: theme.colorScheme.surface,
+                    floating: true,
+                    snap: true,
                   ),
+                  _buildContentSliver(context, theme),
                 ],
-                title: Text(
-                  'Cardabase',
-                  style: theme.textTheme.titleLarge?.copyWith(),
-                ),
-                centerTitle: true,
-                elevation: 0.0,
-                backgroundColor: theme.colorScheme.surface,
-                floating: true,
-                snap: true,
-              ),
-              _buildContentSliver(context, theme),
-            ],
+              );
+            },
           ),
         );
       },

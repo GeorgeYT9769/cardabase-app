@@ -148,25 +148,24 @@ class _SettingsState extends State<Settings> {
                   },
                 ),
                 if (tempUseEffects)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12.0),
-                    child: DropdownButton<String>(
-                      value: effectChosen,
-                      elevation: 0,
-                      dropdownColor: theme.colorScheme.surface,
-                      borderRadius: BorderRadius.circular(10),
-                      items: [
-                        DropdownMenuItem(value: 'none', child: Text('None')),
-                        DropdownMenuItem(value: 'shimmer', child: Text('Shimmer')),
-                        DropdownMenuItem(value: 'glitter', child: Text('Glitter')),
-                        DropdownMenuItem(value: 'grain', child: Text('Grain')),
-                      ],
-                      onChanged: (value) {
-                        setState2(() {
-                          effectChosen = value ?? 'none';
-                        });
-                      },
-                    ),
+                  DropdownButton<String>(
+                    value: effectChosen,
+                    elevation: 0,
+                    dropdownColor: theme.colorScheme.surface,
+                    style: theme.textTheme.bodyLarge?.copyWith(),
+                    borderRadius: BorderRadius.circular(10),
+                    underline: SizedBox.shrink(),
+                    items: [
+                      DropdownMenuItem(value: 'none', child: Text('None')),
+                      DropdownMenuItem(value: 'shimmer', child: Text('Shimmer')),
+                      DropdownMenuItem(value: 'snowy', child: Text('Snowy')),
+                      DropdownMenuItem(value: 'grain', child: Text('Grain')),
+                    ],
+                    onChanged: (value) {
+                      setState2(() {
+                        effectChosen = value ?? 'none';
+                      });
+                    },
                   ),
               ],
             ),

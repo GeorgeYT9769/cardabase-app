@@ -354,6 +354,14 @@ class _CardTileState extends State<CardTile> {
                               }
                             },
                           ),
+                        Builder(
+                          builder: (context) {
+                            final effect = settingsbox.get('effectChosen', defaultValue: 'none') as String;
+                            final useEffects = settingsbox.get('effect', defaultValue: false) as bool;
+                            if (!useEffects || effect == 'none') return const SizedBox.shrink();
+                            return _buildEffectOverlay(effect, widget.borderSize);
+                          },
+                        ),
                         Padding(
                           padding: const EdgeInsets.all(5.0),
                           child: Center(
@@ -459,4 +467,87 @@ class _CardTileState extends State<CardTile> {
       },
     );
   }
+
+  Widget _buildEffectOverlay(String effect, double borderRadius) {
+    switch (effect) {
+      case 'grain':
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(borderRadius),
+          child: Image.asset(
+            'assets/noise.png', // Place a seamless noise image in your assets
+            fit: BoxFit.cover,
+            color: Colors.white.withValues(alpha: 0.08),
+            colorBlendMode: BlendMode.srcOver,
+          ),
+        );
+      case 'snowy':
+        return _GlitterOverlay(borderRadius: borderRadius);
+      default:
+        return const SizedBox.shrink();
+    }
+  }
+}
+
+class _GlitterOverlay extends StatefulWidget {
+  final double borderRadius;
+  const _GlitterOverlay({Key? key, required this.borderRadius}) : super(key: key);
+
+  @override
+  State<_GlitterOverlay> createState() => _GlitterOverlayState();
+}
+
+class _GlitterOverlayState extends State<_GlitterOverlay> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 2))
+      ..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(widget.borderRadius),
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return CustomPaint(
+            painter: _GlitterPainter(_controller.value),
+            size: Size.infinite,
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _GlitterPainter extends CustomPainter {
+  final double progress;
+  _GlitterPainter(this.progress);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withValues(alpha: .18)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
+    final sparkleCount = 18;
+    for (int i = 0; i < sparkleCount; i++) {
+      final t = (progress + i / sparkleCount) % 1.0;
+      final x = size.width * (0.1 + 0.8 * (i % 3) / 2 + 0.2 * t);
+      final y = size.height * ((i / sparkleCount + t) % 1.0);
+      final radius = 1.5 + 2.5 * (1 - (t - 0.5).abs() * 2);
+      canvas.drawCircle(Offset(x, y), radius, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_GlitterPainter oldDelegate) => oldDelegate.progress != progress;
 }
