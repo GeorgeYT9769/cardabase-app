@@ -55,6 +55,7 @@ class _CreateCardState extends State<CreateCard>
   int redValue = 158;
   int blueValue = 158;
   int greenValue = 158;
+  int pointsAmount = 0;
 
   Color cardColorPreview = Colors.grey;
 
@@ -66,6 +67,8 @@ class _CreateCardState extends State<CreateCard>
   TextEditingController controller = TextEditingController();
   TextEditingController controllercardid = TextEditingController();
   TextEditingController noteController = TextEditingController();
+  TextEditingController pointsController = TextEditingController();
+
 
   bool hasPassword = false;
   bool useFrontFaceOverlay = false;
@@ -577,6 +580,7 @@ class _CreateCardState extends State<CreateCard>
   void initState() {
     cdb.loadData();
     super.initState();
+    pointsController.text = pointsAmount.toString();
   }
 
 //structure of the page
@@ -980,6 +984,69 @@ class _CreateCardState extends State<CreateCard>
                                     ),
                                   ),
                                 ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            TextFormField(
+                              controller: pointsController,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.deny(
+                                  RegExp(r'[ ,\-]'),
+                                ),
+                              ],
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: const BorderSide(width: 2.0),
+                                ),
+                                focusColor: theme.colorScheme.primary,
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                labelText: 'Points',
+                                labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                                  color: theme.colorScheme.inverseSurface,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 17,
+                                ),
+                                prefixIcon: IconButton(
+                                  icon: Icon(
+                                    Icons.remove,
+                                    color: theme.colorScheme.secondary,
+                                  ),
+                                  onPressed: () {
+                                    if (pointsAmount > 0) {
+                                      setState(() {
+                                        pointsAmount--;
+                                        pointsController.text =
+                                            pointsAmount.toString();
+                                      });
+                                    }
+                                  },
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    Icons.add,
+                                    color: theme.colorScheme.secondary,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      pointsAmount++;
+                                      pointsController.text =
+                                          pointsAmount.toString();
+                                    });
+                                  },
+                                ),
+                              ),
+                              keyboardType: TextInputType.number,
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: theme.colorScheme.tertiary,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                             const SizedBox(
