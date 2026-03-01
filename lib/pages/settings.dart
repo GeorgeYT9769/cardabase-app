@@ -132,6 +132,14 @@ class _SettingsState extends State<Settings> {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                Text(
+                    'Warning: may cause lags on some phones. Enable on your own risk.',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: Colors.red,
+                      fontSize: 15,
+                    ),
+                ),
                 SwitchListTile(
                   title: Text(
                     'Effects',
@@ -157,9 +165,9 @@ class _SettingsState extends State<Settings> {
                     underline: SizedBox.shrink(),
                     items: [
                       DropdownMenuItem(value: 'none', child: Text('None')),
-                      DropdownMenuItem(value: 'shimmer', child: Text('Shimmer')),
                       DropdownMenuItem(value: 'snowy', child: Text('Snowy')),
                       DropdownMenuItem(value: 'grain', child: Text('Grain')),
+                      DropdownMenuItem(value: 'glitter', child: Text('Glitter')),
                     ],
                     onChanged: (value) {
                       setState2(() {

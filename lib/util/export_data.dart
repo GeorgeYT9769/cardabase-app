@@ -99,12 +99,13 @@ Future<void> exportCardList(
               'hasPassword: ${card['hasPassword'] ?? ''}, '
               'uniqueId: ${card['uniqueId'] ?? ''}, '
               'note: ${card['note'] ?? ''}, '
+              'pointsAmount: ${card['pointsAmount'] ?? ''}'
               '}');
         }
       }
 
       if (toFile) {
-        final filePath = '${directory.path}/Cardabase_backup_$timestamp.txt';
+        final filePath = '${directory.path}/Cardabase/Cardabase_backup_$timestamp.txt';
         final file = File(filePath);
         await file.writeAsString(txtBuffer.toString());
         ScaffoldMessenger.of(context).showSnackBar(

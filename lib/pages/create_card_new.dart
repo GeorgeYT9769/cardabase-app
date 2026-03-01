@@ -2,13 +2,17 @@ import 'dart:io';
 
 import 'package:cardabase/data/cardabase_db.dart';
 import 'package:cardabase/util/camera_controller.dart';
-import 'package:cardabase/util/widgets/color_picker_dialog.dart';
+import 'package:cardabase/util/color_picker.dart';
 import 'package:cardabase/util/dashed_rect.dart';
+import 'package:cardabase/util/dev_options.dart';
 import 'package:cardabase/util/read_barcode.dart';
+import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
+
+bool devOptions = DeveloperOptionsProvider.developerOptions;
 
 enum CardType {
   code39('Code 39', 'code39'),
@@ -34,74 +38,49 @@ enum CardType {
   final String type;
 }
 
-class EditCard extends StatefulWidget {
-  final Color cardColorPreview;
-  final int redValue;
-  final int greenValue;
-  final int blueValue;
-  final bool hasPassword;
-  final int index;
-  final String cardTextPreview;
-  final String cardName;
-  final String cardId;
-  final String cardType;
-  final List<dynamic> tags;
-  final String notes;
-  final String frontFacePath;
-  final String backFacePath;
-  final bool useFrontFaceOverlay;
-  final bool hideTitle;
-  final int pointsAmount;
-
-  const EditCard({
-    super.key,
-    required this.cardColorPreview,
-    required this.redValue,
-    required this.greenValue,
-    required this.blueValue,
-    required this.hasPassword,
-    required this.index,
-    required this.cardTextPreview,
-    required this.cardName,
-    required this.cardId,
-    required this.cardType,
-    required this.tags,
-    required this.notes,
-    required this.frontFacePath,
-    required this.backFacePath,
-    required this.useFrontFaceOverlay,
-    required this.hideTitle,
-    required this.pointsAmount,
-  });
+class CreateCard extends StatefulWidget {
+  const CreateCard({super.key});
 
   @override
-  State<EditCard> createState() => _EditCardState();
+  State<CreateCard> createState() => _CreateCardState();
 }
 
-class _EditCardState extends State<EditCard> {
+class _CreateCardState extends State<CreateCard>
+    with SingleTickerProviderStateMixin {
   final passwordbox = Hive.box('password');
 
   CardabaseDb cdb = CardabaseDb();
+  String cardType = 'ean-13';
 
-  late Color cardColorPreview;
-  late int redValue;
-  late int greenValue;
-  late int blueValue;
-  late bool hasPassword;
-  late String cardTextPreview;
+  int redValue = 158;
+  int blueValue = 158;
+  int greenValue = 158;
+  int pointsAmount = 0;
 
+  Color cardColorPreview = Colors.grey;
+
+  Color getContrastingTextColor(Color bg) {
+    return bg.computeLuminance() > 0.7 ? Colors.black : Colors.white;
+  }
+
+  String cardTextPreview = 'Card';
   TextEditingController controller = TextEditingController();
   TextEditingController controllercardid = TextEditingController();
   TextEditingController noteController = TextEditingController();
   TextEditingController pointsController = TextEditingController();
 
-  late Set<String> selectedTags;
 
-  late String imagePathFront;
-  late String imagePathBack;
-  late bool useFrontFaceOverlay;
-  late bool hideTitle;
-  late int pointsAmount;
+  bool hasPassword = false;
+  bool useFrontFaceOverlay = false;
+  bool hideTitle = false;
+
+  Set<String> selectedTags = {};
+
+  late final FocusNode cardNameFocusNode;
+  late final FocusNode cardIdFocusNode;
+
+  String? _imagePathFront;
+  String? _imagePathBack;
 
   String getBarcodeTypeText(String cardTypeText) {
     switch (cardTypeText) {
@@ -138,7 +117,7 @@ class _EditCardState extends State<EditCard> {
       case 'CardType.aztec':
         return 'Type: AZTEC';
       default:
-        return 'Card Type';
+        return 'Barcode Type';
     }
   }
 
@@ -150,7 +129,7 @@ class _EditCardState extends State<EditCard> {
     await showDialog(
       context: context,
       builder: (context) {
-        return ColorPickerDialog(
+        return ColorPickerSecondDialog(
           cardColor: cardColorPreview,
         );
       },
@@ -167,14 +146,15 @@ class _EditCardState extends State<EditCard> {
   }
 
   void saveNewCard(ThemeData theme) {
+    //x;
     if (controller.text.isNotEmpty &&
         verifyEan(controllercardid.text) == true &&
-        cardTypeText != 'Card Type') {
+        cardTypeText != 'Barcode Type') {
       final now = DateTime.now();
       final uniqueId =
           '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
       setState(() {
-        cdb.myShops.insert(widget.index + 1, {
+        cdb.myShops.add({
           'cardName': controller.text,
           'cardId': controllercardid.text,
           'redValue': redValue,
@@ -185,13 +165,12 @@ class _EditCardState extends State<EditCard> {
           'uniqueId': uniqueId,
           'tags': selectedTags.toList(),
           'note': noteController.text,
-          'imagePathFront': imagePathFront,
-          'imagePathBack': imagePathBack,
+          'imagePathFront': _imagePathFront,
+          'imagePathBack': _imagePathBack,
           'useFrontFaceOverlay': useFrontFaceOverlay,
           'hideTitle': hideTitle,
           'pointsAmount': pointsAmount,
         });
-        cdb.myShops.removeAt(widget.index);
       });
       cdb.updateDataBase();
       Navigator.pop(context);
@@ -201,11 +180,16 @@ class _EditCardState extends State<EditCard> {
       redValue = 158;
       blueValue = 158;
       greenValue = 158;
-      cardTypeText = 'Card Type';
+      cardTypeText = 'Barcode Type';
       hasPassword = false;
+      _imagePathFront = null;
+      _imagePathBack = null;
+      useFrontFaceOverlay = false;
+      selectedTags.clear();
       hideTitle = false;
       pointsAmount = 0;
     } else if (controller.text.isEmpty == true) {
+      VibrationProvider.vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           shape:
@@ -237,6 +221,7 @@ class _EditCardState extends State<EditCard> {
         ),
       );
     } else if (controllercardid.text.isEmpty == true) {
+      VibrationProvider.vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           shape: RoundedRectangleBorder(
@@ -269,6 +254,7 @@ class _EditCardState extends State<EditCard> {
         ),
       );
     } else if (verifyEan(controllercardid.text) == false) {
+      VibrationProvider.vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           shape:
@@ -299,7 +285,8 @@ class _EditCardState extends State<EditCard> {
           backgroundColor: const Color.fromARGB(255, 237, 67, 55),
         ),
       );
-    } else if (cardTypeText == 'Card Type') {
+    } else if (cardTypeText == 'Barcode Type') {
+      VibrationProvider.vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           shape:
@@ -313,7 +300,7 @@ class _EditCardState extends State<EditCard> {
               ),
               const SizedBox(width: 10),
               Text(
-                'Card Type was not selected!',
+                'Barcode Type missing!',
                 style: theme.textTheme.bodyLarge?.copyWith(
                   fontSize: 18,
                   color: Colors.white,
@@ -331,6 +318,7 @@ class _EditCardState extends State<EditCard> {
         ),
       );
     } else {
+      VibrationProvider.vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           shape:
@@ -372,38 +360,57 @@ class _EditCardState extends State<EditCard> {
     redValue = 158;
     blueValue = 158;
     greenValue = 158;
+    _imagePathFront = null; // Clear image path on cancel
+    _imagePathBack = null; // Clear image path on cancel
+    pointsAmount = 0;
+  }
+
+  void addLegacyCard() {
+    setState(() {
+      cdb.myShops.add([
+        'Legacy Card',
+        '9780201379624',
+        158,
+        158,
+        158,
+        'CardType.ean13',
+        false,
+      ]);
+    });
+    cdb.updateDataBase();
+    Navigator.pop(context);
   }
 
   Future<void> takeFrontPicture() async {
-    final String? resultPath = await Navigator.push(
+    final String? imagePathFront = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const CameraControllerScreen()),
     );
-    if (resultPath != null) {
+    if (imagePathFront != null) {
       setState(() {
-        imagePathFront = resultPath;
+        _imagePathFront = imagePathFront;
       });
     }
   }
 
   Future<void> takeBackPicture() async {
-    final String? resultPath = await Navigator.push(
+    final String? imagePathBack = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const CameraControllerScreen()),
     );
-    if (resultPath != null) {
+    if (imagePathBack != null) {
       setState(() {
-        imagePathBack = resultPath;
+        _imagePathBack = imagePathBack;
       });
     }
   }
 
-  //CHECKING IF THE CARD CAN BE DISPLAYED
+  //CHECKING IF THE CARD CAN BE SAVED (AND ALSO DISPLAYED)
   //P.S. WRITTEN BY CHAT-GPT CUZ GOT NO IDEA HOW TO CHECK THEM MYSELF :)
   bool verifyEan(String eanCode) {
     if (cardTypeText == 'CardType.ean13') {
       if (eanCode == '9769') {
-        controllercardid.text = '978020137962';
+        controllercardid.text = '9780201379624';
         return true;
       } else if (eanCode.length != 13 || int.tryParse(eanCode) == null) {
         return false;
@@ -461,7 +468,7 @@ class _EditCardState extends State<EditCard> {
       for (int i = 0; i < 13; i++) {
         final int digit = int.parse(eanCode[i]);
         if (i.isEven) {
-          sum += digit * 3;
+          sum += digit * 3; // Even position from left = odd from right
         } else {
           sum += digit;
         }
@@ -526,7 +533,7 @@ class _EditCardState extends State<EditCard> {
   }
 
   CardType? selectedCardType;
-  String cardTypeText = 'Card Type';
+  String cardTypeText = 'Barcode Type';
 
   Future<void> _showBarcodeSelectorDialog(ThemeData theme) async {
     final CardType? result = await showDialog<CardType>(
@@ -534,14 +541,14 @@ class _EditCardState extends State<EditCard> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(
-            'Select Barcode Type',
+            'Barcode Type',
             style: theme.textTheme.bodyLarge?.copyWith(
               color: theme.colorScheme.inverseSurface,
               fontSize: 30,
             ),
           ),
           content: SizedBox(
-            height: 300,
+            height: 300, // Custom height for the dialog
             width: double.maxFinite,
             child: Scrollbar(
               child: ListView.builder(
@@ -574,35 +581,17 @@ class _EditCardState extends State<EditCard> {
 //init state
   @override
   void initState() {
-    super.initState();
     cdb.loadData();
-    cardColorPreview = widget.cardColorPreview;
-    redValue = widget.redValue;
-    greenValue = widget.greenValue;
-    blueValue = widget.blueValue;
-    cardTypeText = widget.cardType;
-    hasPassword = widget.hasPassword;
-    cardTextPreview = widget.cardTextPreview;
-    controller.text = widget.cardName;
-    controllercardid.text = widget.cardId;
-    noteController.text = widget.notes;
-    selectedTags = Set<String>.from(widget.tags.map((e) => e.toString()));
-    imagePathFront = widget.frontFacePath;
-    imagePathBack = widget.backFacePath;
-    useFrontFaceOverlay = widget.useFrontFaceOverlay;
-    hideTitle = widget.hideTitle;
-    pointsAmount = widget.pointsAmount;
+    super.initState();
     pointsController.text = pointsAmount.toString();
   }
 
-  Color getContrastingTextColor(Color bg) {
-    return bg.computeLuminance() > 0.7 ? Colors.black : Colors.white;
-  }
-
+//structure of the page
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
+      //resizeToAvoidBottomInset: false,
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(
@@ -618,13 +607,14 @@ class _EditCardState extends State<EditCard> {
               ),
             );
             setState(() {
-              if (result is String) {
-                if (result != '-1') {
-                  final List<String> rawList = result
-                      .replaceAll('[', '')
-                      .replaceAll(']', '')
-                      .split(', ');
+              if (result is Map<String, dynamic>) {
+                final code = result['code'] as String;
 
+                if (code != '-1') {
+                  final List<String> rawList =
+                      code.replaceAll('[', '').replaceAll(']', '').split(', ');
+
+                  // Convert values into correct types
                   final String name = rawList[0];
                   final String number = rawList[1];
                   final int red = int.parse(rawList[2]);
@@ -632,7 +622,6 @@ class _EditCardState extends State<EditCard> {
                   final int blue = int.parse(rawList[4]);
                   final String cardType = rawList[5];
                   final bool hasPwd = rawList[6] == 'true';
-                  final List<String> tags = rawList.sublist(7);
 
                   setState(() {
                     controller.text = name;
@@ -644,7 +633,6 @@ class _EditCardState extends State<EditCard> {
                     blueValue = blue;
                     cardTypeText = cardType;
                     hasPassword = hasPwd;
-                    selectedTags = Set<String>.from(tags.map((e) => e));
                   });
                 }
               }
@@ -652,6 +640,24 @@ class _EditCardState extends State<EditCard> {
           },
         ),
         actions: [
+          ValueListenableBuilder(
+            valueListenable: Hive.box('settingsBox').listenable(),
+            builder: (context, settingsBox, child) {
+              final showLegacyCardButton = settingsBox.get(
+                'developerOptions',
+                defaultValue: false,
+              ) as bool;
+              return showLegacyCardButton
+                  ? IconButton(
+                      icon: Icon(
+                        Icons.credit_card_off,
+                        color: theme.colorScheme.secondary,
+                      ),
+                      onPressed: addLegacyCard,
+                    )
+                  : const SizedBox.shrink();
+            },
+          ),
           IconButton(
             icon: Icon(
               Icons.arrow_back_ios_new,
@@ -660,7 +666,7 @@ class _EditCardState extends State<EditCard> {
             onPressed: cancelCard,
           ),
         ],
-        title: Text('Edit card', style: theme.textTheme.titleLarge?.copyWith()),
+        title: Text('New card', style: theme.textTheme.titleLarge?.copyWith()),
         centerTitle: true,
         elevation: 0.0,
         backgroundColor: theme.colorScheme.surface,
@@ -673,7 +679,8 @@ class _EditCardState extends State<EditCard> {
         ),
         children: [
           SizedBox(
-            height: MediaQuery.of(context).size.width / 1.50,
+            height:
+                MediaQuery.of(context).size.width / 1.586, //height of button
             width: MediaQuery.of(context).size.width,
             child: Container(
               margin: const EdgeInsets.all(20),
@@ -683,26 +690,33 @@ class _EditCardState extends State<EditCard> {
               ),
               child: Stack(
                 children: [
-                  if (useFrontFaceOverlay && imagePathFront != '')
+                  if (useFrontFaceOverlay && _imagePathFront != null)
                     ClipRRect(
                       borderRadius: BorderRadius.circular(15),
                       child: Image.file(
-                        File(imagePathFront),
+                        File(_imagePathFront!),
                         fit: BoxFit.cover,
                         width: double.infinity,
                         height: double.infinity,
                       ),
                     ),
                   Center(
-                    child: Text(
-                      hideTitle ? '' : cardTextPreview,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        fontSize: 50,
-                        fontWeight: FontWeight.bold,
-                        color: getContrastingTextColor(cardColorPreview),
-                      ),
-                      maxLines: 2,
-                      textAlign: TextAlign.center,
+                    child: Wrap(
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                          child: Text(
+                            hideTitle ? '' : cardTextPreview,
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              fontSize: 50,
+                              fontWeight: FontWeight.bold,
+                              color: getContrastingTextColor(cardColorPreview),
+                            ),
+                            maxLines: 2,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -758,7 +772,9 @@ class _EditCardState extends State<EditCard> {
                                 ),
                                 labelText: 'Card Name',
                                 labelStyle: theme.textTheme.bodyLarge?.copyWith(
-                                  color: theme.colorScheme.secondary,
+                                  color: theme.colorScheme.inverseSurface,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 17,
                                 ),
                                 prefixIcon: Icon(
                                   Icons.abc,
@@ -770,7 +786,7 @@ class _EditCardState extends State<EditCard> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 15),
                             //text field card id
                             TextFormField(
                               controller: controllercardid,
@@ -779,7 +795,7 @@ class _EditCardState extends State<EditCard> {
                                       ? null
                                       : [
                                           FilteringTextInputFormatter.deny(
-                                            RegExp(r'[ .,-]'),
+                                            RegExp(r'[ \.,\-]'),
                                           ),
                                         ],
                               decoration: InputDecoration(
@@ -796,7 +812,9 @@ class _EditCardState extends State<EditCard> {
                                 ),
                                 labelText: 'Card ID',
                                 labelStyle: theme.textTheme.bodyLarge?.copyWith(
-                                  color: theme.colorScheme.secondary,
+                                  color: theme.colorScheme.inverseSurface,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 17,
                                 ),
                                 prefixIcon: Icon(
                                   Icons.numbers,
@@ -816,9 +834,83 @@ class _EditCardState extends State<EditCard> {
                                       ),
                                     );
                                     setState(() {
-                                      if (result is String) {
-                                        if (result != '-1') {
-                                          controllercardid.text = result;
+                                      if (result is Map<String, dynamic>) {
+                                        final code = result['code'] as String;
+                                        final format =
+                                            result['format'].toString();
+                                        if (code != '-1') {
+                                          controllercardid.text = code;
+
+                                          selectedCardType = switch (format) {
+                                            'BarcodeFormat.code39' =>
+                                              selectedCardType =
+                                                  CardType.code39,
+                                            'BarcodeFormat.code93' =>
+                                              selectedCardType =
+                                                  CardType.code93,
+                                            'BarcodeFormat.code128' =>
+                                              selectedCardType =
+                                                  CardType.code128,
+                                            'BarcodeFormat.ean13' =>
+                                              selectedCardType = CardType.ean13,
+                                            'BarcodeFormat.ean8' =>
+                                              selectedCardType = CardType.ean8,
+                                            'BarcodeFormat.upcA' =>
+                                              selectedCardType = CardType.upca,
+                                            'BarcodeFormat.upcE' =>
+                                              selectedCardType = CardType.upce,
+                                            'BarcodeFormat.codabar' =>
+                                              selectedCardType =
+                                                  CardType.codabar,
+                                            'BarcodeFormat.qrcode' =>
+                                              selectedCardType =
+                                                  CardType.qrcode,
+                                            'BarcodeFormat.dataMatrix' =>
+                                              selectedCardType =
+                                                  CardType.datamatrix,
+                                            'BarcodeFormat.aztec' =>
+                                              selectedCardType = CardType.aztec,
+                                            _ => selectedCardType = null,
+                                          };
+                                          cardTypeText = selectedCardType
+                                                  ?.toString() ??
+                                              'Barcode Type'; //controllercardid.text = "";
+                                          if (code.startsWith('[') &&
+                                              code.endsWith(']')) {
+                                            final List<String> rawList = code
+                                                .replaceAll('[', '')
+                                                .replaceAll(']', '')
+                                                .split(', ');
+
+                                            final String name = rawList[0];
+                                            final String number = rawList[1];
+                                            final int red =
+                                                int.parse(rawList[2]);
+                                            final int green =
+                                                int.parse(rawList[3]);
+                                            final int blue =
+                                                int.parse(rawList[4]);
+                                            final String cardType = rawList[5];
+                                            final bool hasPwd =
+                                                rawList[6] == 'true';
+
+                                            setState(() {
+                                              controller.text = name;
+                                              cardTextPreview = name;
+                                              cardColorPreview = Color.fromARGB(
+                                                255,
+                                                red,
+                                                green,
+                                                blue,
+                                              );
+                                              controllercardid.text = number;
+                                              redValue = red;
+                                              greenValue = green;
+                                              blueValue = blue;
+                                              cardTypeText = cardType;
+                                              hasPassword = hasPwd;
+                                            });
+                                          }
                                         } else {
                                           controllercardid.text = '';
                                         }
@@ -828,15 +920,12 @@ class _EditCardState extends State<EditCard> {
                                 ),
                               ),
                               keyboardType: TextInputType.text,
-                              //maxLength: 13,
                               style: theme.textTheme.bodyLarge?.copyWith(
                                 color: theme.colorScheme.tertiary,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(
-                              height: 20,
-                            ),
+                            const SizedBox(height: 15),
                             Bounceable(
                               onTap: () {},
                               child: SizedBox(
@@ -860,18 +949,17 @@ class _EditCardState extends State<EditCard> {
                                   child: Text(
                                     getBarcodeTypeText(cardTypeText),
                                     style: theme.textTheme.bodyLarge?.copyWith(
-                                      //cardTypeText
-                                      color: theme.colorScheme.tertiary,
+                                      color: theme.colorScheme.inverseSurface,
                                       fontWeight: FontWeight.bold,
+                                      fontSize: 17,
                                     ),
                                   ),
                                 ),
                               ),
                             ),
                             const SizedBox(
-                              height: 20,
+                              height: 15,
                             ),
-                            //color picker button
                             Bounceable(
                               onTap: () {},
                               child: SizedBox(
@@ -893,8 +981,9 @@ class _EditCardState extends State<EditCard> {
                                   child: Text(
                                     'Card Color',
                                     style: theme.textTheme.bodyLarge?.copyWith(
-                                      color: theme.colorScheme.tertiary,
+                                      color: theme.colorScheme.inverseSurface,
                                       fontWeight: FontWeight.bold,
+                                      fontSize: 17,
                                     ),
                                   ),
                                 ),
@@ -937,8 +1026,7 @@ class _EditCardState extends State<EditCard> {
                                     if (pointsAmount > 0) {
                                       setState(() {
                                         pointsAmount--;
-                                        pointsController.text =
-                                            pointsAmount.toString();
+                                        pointsController.text = pointsAmount.toString();
                                       });
                                     }
                                   },
@@ -951,8 +1039,7 @@ class _EditCardState extends State<EditCard> {
                                   onPressed: () {
                                     setState(() {
                                       pointsAmount++;
-                                      pointsController.text =
-                                          pointsAmount.toString();
+                                      pointsController.text = pointsAmount.toString();
                                     });
                                   },
                                 ),
@@ -974,9 +1061,7 @@ class _EditCardState extends State<EditCard> {
                                   color: theme.colorScheme.inverseSurface,
                                   fontSize: 15,
                                 ),
-                                hintText: widget.notes.isEmpty
-                                    ? 'Some notes...'
-                                    : widget.notes,
+                                hintText: 'Some notes...',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: const BorderSide(width: 2.0),
@@ -1004,135 +1089,91 @@ class _EditCardState extends State<EditCard> {
                             if (allTags.isEmpty)
                               const SizedBox.shrink()
                             else
-                              SizedBox(
-                                height: 40,
-                                child: ListView.builder(
-                                  physics: const BouncingScrollPhysics(
-                                    decelerationRate:
-                                        ScrollDecelerationRate.fast,
+                              Row(
+                                children: [
+                                  Text(
+                                    'Tags:',
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                      color: theme.colorScheme.inverseSurface,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
                                   ),
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: allTags.length,
-                                  itemBuilder: (context, chipIndex) {
-                                    final tag = allTags[chipIndex] as String;
-                                    final isSelected =
-                                        selectedTags.contains(tag);
-                                    return Padding(
-                                      padding: const EdgeInsets.only(top: 10),
-                                      child: ActionChip(
-                                        label: Text(tag),
-                                        onPressed: () {
-                                          setState(() {
-                                            if (isSelected) {
-                                              selectedTags.remove(tag);
-                                            } else {
-                                              selectedTags.add(tag);
-                                            }
-                                          });
-                                        },
-                                        labelStyle:
-                                            theme.textTheme.bodyLarge?.copyWith(
-                                          color: isSelected
-                                              ? theme.colorScheme.onPrimary
-                                              : theme
-                                                  .colorScheme.inverseSurface,
-                                          fontWeight: FontWeight.bold,
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: SizedBox(
+                                      height: 40,
+                                      child: ListView.builder(
+                                        physics: const BouncingScrollPhysics(
+                                          decelerationRate:
+                                              ScrollDecelerationRate.fast,
                                         ),
-                                        backgroundColor: isSelected
-                                            ? theme.colorScheme.primary
-                                            : theme.colorScheme.surface,
-                                        side: BorderSide(
-                                          color: isSelected
-                                              ? theme.colorScheme.primary
-                                              : theme.colorScheme.primary
-                                                  .withValues(alpha: 0.3),
-                                          width: isSelected ? 2 : 1,
-                                        ),
-                                        avatar: isSelected
-                                            ? Icon(
-                                                Icons.check,
-                                                size: 18,
-                                                color:
-                                                    theme.colorScheme.onPrimary,
-                                              )
-                                            : null,
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            Bounceable(
-                              onTap: takeFrontPicture,
-                              child: Container(
-                                alignment: Alignment.center,
-                                child: SizedBox(
-                                  height:
-                                      (MediaQuery.of(context).size.width - 40) /
-                                          1.586,
-                                  width: double.infinity,
-                                  child: Stack(
-                                    fit: StackFit.expand,
-                                    children: [
-                                      CustomPaint(
-                                        painter: DashedRect(
-                                          color: theme.colorScheme.primary,
-                                        ),
-                                      ),
-                                      // Icons and text behind the photo
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.camera_alt,
-                                            color: theme.colorScheme.secondary,
-                                          ),
-                                          Text(
-                                            'Front face picture',
-                                            style: theme.textTheme.bodyLarge
-                                                ?.copyWith(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 15,
-                                              color: theme
-                                                  .colorScheme.inverseSurface,
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: allTags.length,
+                                        itemBuilder: (context, chipIndex) {
+                                          final tag =
+                                              allTags[chipIndex] as String;
+                                          final isSelected =
+                                              selectedTags.contains(tag);
+                                          return Padding(
+                                            padding: const EdgeInsets.fromLTRB(
+                                              0,
+                                              0,
+                                              10,
+                                              0,
                                             ),
-                                          ),
-                                        ],
+                                            child: ActionChip(
+                                              label: Text(tag),
+                                              onPressed: () {
+                                                setState(() {
+                                                  if (isSelected) {
+                                                    selectedTags.remove(tag);
+                                                  } else {
+                                                    selectedTags.add(tag);
+                                                  }
+                                                });
+                                              },
+                                              labelStyle: theme
+                                                  .textTheme.bodyLarge
+                                                  ?.copyWith(
+                                                color: isSelected
+                                                    ? theme
+                                                        .colorScheme.onPrimary
+                                                    : theme.colorScheme
+                                                        .inverseSurface,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              backgroundColor: isSelected
+                                                  ? theme.colorScheme.primary
+                                                  : theme.colorScheme.surface,
+                                              side: BorderSide(
+                                                color: isSelected
+                                                    ? theme.colorScheme.primary
+                                                    : theme.colorScheme.primary
+                                                        .withValues(alpha: 0.3),
+                                                width: isSelected ? 2 : 1,
+                                              ),
+                                              avatar: isSelected
+                                                  ? Icon(
+                                                      Icons.check,
+                                                      size: 18,
+                                                      color: theme.colorScheme
+                                                          .onPrimary,
+                                                    )
+                                                  : null,
+                                            ),
+                                          );
+                                        },
                                       ),
-                                      Center(
-                                        child: GestureDetector(
-                                          onLongPress: () {
-                                            setState(() {
-                                              imagePathFront = '';
-                                            });
-                                          },
-                                          child: imagePathFront != ''
-                                              ? ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(15),
-                                                  child: Image.file(
-                                                    File(imagePathFront),
-                                                    fit: BoxFit.cover,
-                                                    width: double.infinity,
-                                                    height: double.infinity,
-                                                  ),
-                                                )
-                                              : const SizedBox.shrink(),
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ),
                             const SizedBox(
                               height: 15,
                             ),
                             Bounceable(
-                              onTap: takeBackPicture,
+                              onTap: () {},
                               child: Container(
                                 alignment: Alignment.center,
                                 child: SizedBox(
@@ -1147,7 +1188,88 @@ class _EditCardState extends State<EditCard> {
                                     child: GestureDetector(
                                       onLongPress: () {
                                         setState(() {
-                                          imagePathBack = '';
+                                          _imagePathFront = null;
+                                        });
+                                      },
+                                      child: OutlinedButton(
+                                        onPressed: takeFrontPicture,
+                                        style: OutlinedButton.styleFrom(
+                                          side: BorderSide(
+                                            color: theme.colorScheme.primary,
+                                            width: 2,
+                                            style: BorderStyle.none,
+                                          ),
+                                          backgroundColor: Colors.transparent,
+                                          elevation: 0.0,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                          ),
+                                          minimumSize:
+                                              const Size.fromHeight(100),
+                                          padding: EdgeInsets
+                                              .zero, // Remove internal padding
+                                        ),
+                                        child: _imagePathFront != null
+                                            ? ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                                child: Image.file(
+                                                  File(_imagePathFront!),
+                                                  fit: BoxFit.cover,
+                                                  width: double.infinity,
+                                                  height: double.infinity,
+                                                ),
+                                              )
+                                            : Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(
+                                                    Icons.camera_alt,
+                                                    color: theme
+                                                        .colorScheme.secondary,
+                                                  ),
+                                                  Text(
+                                                    'Front face picture',
+                                                    style: theme
+                                                        .textTheme.bodyLarge
+                                                        ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 15,
+                                                      color: theme.colorScheme
+                                                          .inverseSurface,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            Bounceable(
+                              onTap: () {},
+                              child: Container(
+                                alignment: Alignment.center,
+                                child: SizedBox(
+                                  height:
+                                      (MediaQuery.of(context).size.width - 40) /
+                                          1.586,
+                                  width: double.infinity,
+                                  child: CustomPaint(
+                                    painter: DashedRect(
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                    child: GestureDetector(
+                                      onLongPress: () {
+                                        setState(() {
+                                          _imagePathBack = null;
                                         });
                                       },
                                       child: OutlinedButton(
@@ -1160,22 +1282,20 @@ class _EditCardState extends State<EditCard> {
                                           ),
                                           backgroundColor: Colors.transparent,
                                           elevation: 0.0,
-                                          padding: EdgeInsets.zero,
-                                          // Add this to remove default padding
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(15),
                                           ),
                                           minimumSize:
                                               const Size.fromHeight(100),
-                                          //padding: EdgeInsets.zero, // Remove internal padding
+                                          padding: EdgeInsets.zero,
                                         ),
-                                        child: imagePathBack != ''
+                                        child: _imagePathBack != null
                                             ? ClipRRect(
                                                 borderRadius:
                                                     BorderRadius.circular(15),
                                                 child: Image.file(
-                                                  File(imagePathBack),
+                                                  File(_imagePathBack!),
                                                   fit: BoxFit.contain,
                                                   width: double.infinity,
                                                   height: double.infinity,
@@ -1225,14 +1345,15 @@ class _EditCardState extends State<EditCard> {
                                 ),
                               ),
                               controlAffinity: ListTileControlAffinity.leading,
-                              side:
-                                  BorderSide(color: theme.colorScheme.primary),
+                              side: BorderSide(
+                                color: theme.colorScheme.primary,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5),
                               ),
                               onChanged: (bool? checked) {
                                 setState(() {
-                                  useFrontFaceOverlay = checked ?? false;
+                                  useFrontFaceOverlay = checked!;
                                 });
                               },
                             ),
@@ -1248,8 +1369,9 @@ class _EditCardState extends State<EditCard> {
                                 ),
                               ),
                               controlAffinity: ListTileControlAffinity.leading,
-                              side:
-                                  BorderSide(color: theme.colorScheme.primary),
+                              side: BorderSide(
+                                color: theme.colorScheme.primary,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5),
                               ),
@@ -1306,7 +1428,7 @@ class _EditCardState extends State<EditCard> {
       floatingActionButton: Bounceable(
         onTap: () {},
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
           child: SizedBox(
             height: 60,
             width: double.infinity,
