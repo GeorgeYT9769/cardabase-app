@@ -32,11 +32,11 @@ class _PointsFormFieldState extends State<PointsFormField> {
   }
 
   void onWidgetControllerValueChanged() {
-    final strValue = widget.controller.value?.toString();
+    final strValue = widget.controller.value.toString();
     if (strValue == _textController.text) {
       return;
     }
-    _textController.text = strValue ?? '0';
+    _textController.text = strValue;
   }
 
   @override
