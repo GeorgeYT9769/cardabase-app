@@ -51,6 +51,7 @@ class EditCard extends StatefulWidget {
   final String backFacePath;
   final bool useFrontFaceOverlay;
   final bool hideTitle;
+  final int pointsAmount;
 
   const EditCard({
     super.key,
@@ -70,6 +71,7 @@ class EditCard extends StatefulWidget {
     required this.backFacePath,
     required this.useFrontFaceOverlay,
     required this.hideTitle,
+    required this.pointsAmount,
   });
 
   @override
@@ -91,6 +93,7 @@ class _EditCardState extends State<EditCard> {
   TextEditingController controller = TextEditingController();
   TextEditingController controllercardid = TextEditingController();
   TextEditingController noteController = TextEditingController();
+  TextEditingController pointsController = TextEditingController();
 
   late Set<String> selectedTags;
 
@@ -98,6 +101,7 @@ class _EditCardState extends State<EditCard> {
   late String imagePathBack;
   late bool useFrontFaceOverlay;
   late bool hideTitle;
+  late int pointsAmount;
 
   String getBarcodeTypeText(String cardTypeText) {
     switch (cardTypeText) {
@@ -185,6 +189,7 @@ class _EditCardState extends State<EditCard> {
           'imagePathBack': imagePathBack,
           'useFrontFaceOverlay': useFrontFaceOverlay,
           'hideTitle': hideTitle,
+          'pointsAmount': pointsAmount,
         });
         cdb.myShops.removeAt(widget.index);
       });
@@ -199,6 +204,7 @@ class _EditCardState extends State<EditCard> {
       cardTypeText = 'Card Type';
       hasPassword = false;
       hideTitle = false;
+      pointsAmount = 0;
     } else if (controller.text.isEmpty == true) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -585,6 +591,8 @@ class _EditCardState extends State<EditCard> {
     imagePathBack = widget.backFacePath;
     useFrontFaceOverlay = widget.useFrontFaceOverlay;
     hideTitle = widget.hideTitle;
+    pointsAmount = widget.pointsAmount;
+    pointsController.text = pointsAmount.toString();
   }
 
   Color getContrastingTextColor(Color bg) {
@@ -890,6 +898,69 @@ class _EditCardState extends State<EditCard> {
                                     ),
                                   ),
                                 ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            TextFormField(
+                              controller: pointsController,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.deny(
+                                  RegExp(r'[ ,\-\.]'),
+                                ),
+                              ],
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: const BorderSide(width: 2.0),
+                                ),
+                                focusColor: theme.colorScheme.primary,
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                labelText: 'Points',
+                                labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                                  color: theme.colorScheme.inverseSurface,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 17,
+                                ),
+                                prefixIcon: IconButton(
+                                  icon: Icon(
+                                    Icons.remove,
+                                    color: theme.colorScheme.secondary,
+                                  ),
+                                  onPressed: () {
+                                    if (pointsAmount > 0) {
+                                      setState(() {
+                                        pointsAmount--;
+                                        pointsController.text =
+                                            pointsAmount.toString();
+                                      });
+                                    }
+                                  },
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    Icons.add,
+                                    color: theme.colorScheme.secondary,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      pointsAmount++;
+                                      pointsController.text =
+                                          pointsAmount.toString();
+                                    });
+                                  },
+                                ),
+                              ),
+                              keyboardType: TextInputType.number,
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: theme.colorScheme.tertiary,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                             const SizedBox(

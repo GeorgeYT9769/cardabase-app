@@ -18,6 +18,7 @@ class CardDetailsPage extends StatefulWidget {
     required this.note,
     required this.frontImage,
     required this.backImage,
+    required this.pointsAmount,
   });
 
   final String cardData;
@@ -29,6 +30,7 @@ class CardDetailsPage extends StatefulWidget {
   final String note;
   final ImageProvider? frontImage;
   final ImageProvider? backImage;
+  final int pointsAmount;
 
   @override
   State<CardDetailsPage> createState() => _CardDetailsPageState();
@@ -87,13 +89,25 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
               borderRadius: BorderRadius.circular(15),
               color: widget.borderColor,
             ),
-            child: Text(
-              widget.title,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: getContrastingTextColor(widget.borderColor),
-                fontSize: 50,
-              ),
+            child: Column(
+              children: [
+                Text(
+                  widget.title,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: getContrastingTextColor(widget.borderColor),
+                    fontSize: 50,
+                  ),
+                ),
+                Text(
+                  '${widget.pointsAmount} points',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: getContrastingTextColor(widget.borderColor),
+                    fontSize: 20,
+                  ),
+                ),
+              ],
             ),
           ),
           SizedBox(

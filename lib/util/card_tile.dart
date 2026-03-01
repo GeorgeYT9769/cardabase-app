@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:cardabase/pages/card_details/card_details_page.dart';
@@ -30,6 +31,7 @@ class CardTile extends StatefulWidget {
   final String backImagePath;
   final bool useFrontFaceOverlay;
   final bool hideTitle;
+  final int pointsAmount;
 
   const CardTile({
     super.key,
@@ -55,6 +57,7 @@ class CardTile extends StatefulWidget {
     required this.backImagePath,
     required this.useFrontFaceOverlay,
     required this.hideTitle,
+    required this.pointsAmount,
   });
 
   @override
@@ -209,6 +212,7 @@ class _CardTileState extends State<CardTile> {
                               note: widget.note,
                               frontImage: frontImage,
                               backImage: backImage,
+                              pointsAmount: widget.pointsAmount,
                             ),
                           ),
                         );
@@ -293,6 +297,7 @@ class _CardTileState extends State<CardTile> {
               note: widget.note,
               frontImage: frontImage,
               backImage: backImage,
+              pointsAmount: widget.pointsAmount,
             ),
           ),
         );
@@ -476,11 +481,13 @@ class _CardTileState extends State<CardTile> {
           child: Image.asset(
             'assets/noise.png', // Place a seamless noise image in your assets
             fit: BoxFit.cover,
-            color: Colors.white.withValues(alpha: 0.08),
+            color: Colors.white.withAlpha(20),
             colorBlendMode: BlendMode.srcOver,
           ),
         );
       case 'snowy':
+        return _SnowyOverlay(borderRadius: borderRadius);
+      case 'glitter':
         return _GlitterOverlay(borderRadius: borderRadius);
       default:
         return const SizedBox.shrink();
@@ -488,15 +495,15 @@ class _CardTileState extends State<CardTile> {
   }
 }
 
-class _GlitterOverlay extends StatefulWidget {
+class _SnowyOverlay extends StatefulWidget {
   final double borderRadius;
-  const _GlitterOverlay({Key? key, required this.borderRadius}) : super(key: key);
+  const _SnowyOverlay({Key? key, required this.borderRadius}) : super(key: key);
 
   @override
-  State<_GlitterOverlay> createState() => _GlitterOverlayState();
+  State<_SnowyOverlay> createState() => _SnowyOverlayState();
 }
 
-class _GlitterOverlayState extends State<_GlitterOverlay> with SingleTickerProviderStateMixin {
+class _SnowyOverlayState extends State<_SnowyOverlay> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -520,7 +527,7 @@ class _GlitterOverlayState extends State<_GlitterOverlay> with SingleTickerProvi
         animation: _controller,
         builder: (context, child) {
           return CustomPaint(
-            painter: _GlitterPainter(_controller.value),
+            painter: _SnowyPainter(_controller.value),
             size: Size.infinite,
           );
         },
@@ -529,9 +536,9 @@ class _GlitterOverlayState extends State<_GlitterOverlay> with SingleTickerProvi
   }
 }
 
-class _GlitterPainter extends CustomPainter {
+class _SnowyPainter extends CustomPainter {
   final double progress;
-  _GlitterPainter(this.progress);
+  _SnowyPainter(this.progress);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -549,5 +556,87 @@ class _GlitterPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_GlitterPainter oldDelegate) => oldDelegate.progress != progress;
+  bool shouldRepaint(_SnowyPainter oldDelegate) => oldDelegate.progress != progress;
 }
+
+class _GlitterOverlay extends StatefulWidget {
+  final double borderRadius;
+  const _GlitterOverlay({Key? key, required this.borderRadius}) : super(key: key);
+
+  @override
+  State<_GlitterOverlay> createState() => _GlitterOverlayState();
+}
+
+class _GlitterOverlayState extends State<_GlitterOverlay> {
+  late List<_GlitterStar> _stars;
+  final int _starCount = 5; // Fewer stars for performance
+
+  @override
+  void initState() {
+    super.initState();
+    _stars = List.generate(_starCount, (i) => _GlitterStar.random());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(widget.borderRadius),
+      child: CustomPaint(
+        painter: _GlitterPainter(_stars),
+        size: Size.infinite,
+      ),
+    );
+  }
+}
+
+class _GlitterStar {
+  final double x;
+  final double y;
+  final double size;
+  final Color color;
+  final String symbol;
+
+  _GlitterStar(this.x, this.y, this.size, this.color, this.symbol);
+
+  static final List<String> symbols = ['*', '✦', '✬', '✯', '˚', '｡', '❀', '+', '-', '/', '♪', '♫',];
+
+  static _GlitterStar random() {
+    final rnd = UniqueKey().hashCode;
+    final x = (rnd % 1000) / 1000.0;
+    final y = ((rnd ~/ 1000) % 1000) / 1000.0;
+    final size = 18.0 + (rnd % 8); // Large for visibility
+    final color = Colors.white.withValues(alpha: 0.5); // More transparent
+    final symbol = symbols[rnd % symbols.length];
+    return _GlitterStar(x, y, size, color, symbol);
+  }
+}
+
+class _GlitterPainter extends CustomPainter {
+  final List<_GlitterStar> stars;
+  _GlitterPainter(this.stars);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    for (final star in stars) {
+      final px = star.x * size.width;
+      final py = star.y * size.height;
+      final textPainter = TextPainter(
+        text: TextSpan(
+          text: star.symbol,
+          style: TextStyle(
+            fontSize: star.size,
+            color: star.color,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout();
+      textPainter.paint(canvas, Offset(px - textPainter.width / 2, py - textPainter.height / 2));
+    }
+  }
+
+  @override
+  bool shouldRepaint(_GlitterPainter oldDelegate) => false;
+}
+

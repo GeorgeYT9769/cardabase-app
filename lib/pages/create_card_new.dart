@@ -169,6 +169,7 @@ class _CreateCardState extends State<CreateCard>
           'imagePathBack': _imagePathBack,
           'useFrontFaceOverlay': useFrontFaceOverlay,
           'hideTitle': hideTitle,
+          'pointsAmount': pointsAmount,
         });
       });
       cdb.updateDataBase();
@@ -186,6 +187,7 @@ class _CreateCardState extends State<CreateCard>
       useFrontFaceOverlay = false;
       selectedTags.clear();
       hideTitle = false;
+      pointsAmount = 0;
     } else if (controller.text.isEmpty == true) {
       VibrationProvider.vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -360,6 +362,7 @@ class _CreateCardState extends State<CreateCard>
     greenValue = 158;
     _imagePathFront = null; // Clear image path on cancel
     _imagePathBack = null; // Clear image path on cancel
+    pointsAmount = 0;
   }
 
   void addLegacyCard() {
@@ -993,7 +996,7 @@ class _CreateCardState extends State<CreateCard>
                               controller: pointsController,
                               inputFormatters: [
                                 FilteringTextInputFormatter.deny(
-                                  RegExp(r'[ ,\-]'),
+                                  RegExp(r'[ ,\-\.]'),
                                 ),
                               ],
                               decoration: InputDecoration(
@@ -1023,8 +1026,7 @@ class _CreateCardState extends State<CreateCard>
                                     if (pointsAmount > 0) {
                                       setState(() {
                                         pointsAmount--;
-                                        pointsController.text =
-                                            pointsAmount.toString();
+                                        pointsController.text = pointsAmount.toString();
                                       });
                                     }
                                   },
@@ -1037,8 +1039,7 @@ class _CreateCardState extends State<CreateCard>
                                   onPressed: () {
                                     setState(() {
                                       pointsAmount++;
-                                      pointsController.text =
-                                          pointsAmount.toString();
+                                      pointsController.text = pointsAmount.toString();
                                     });
                                   },
                                 ),

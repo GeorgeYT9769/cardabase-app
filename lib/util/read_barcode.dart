@@ -48,7 +48,7 @@ class _QRBarReaderState extends State<QRBarReader> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Container(
-                margin: const EdgeInsets.all(10),
+                margin: const EdgeInsets.fromLTRB(10,10,10,40),
                 child: IconButton(
                   style: ButtonStyle(
                     iconSize: const WidgetStatePropertyAll(30),
@@ -64,7 +64,7 @@ class _QRBarReaderState extends State<QRBarReader> {
                 ),
               ),
               Container(
-                margin: const EdgeInsets.all(10),
+                margin: const EdgeInsets.fromLTRB(10,10,10,40),
                 child: IconButton(
                   style: ButtonStyle(
                     iconSize: const WidgetStatePropertyAll(30),
@@ -80,7 +80,7 @@ class _QRBarReaderState extends State<QRBarReader> {
                 ),
               ),
               Container(
-                margin: const EdgeInsets.all(10),
+                margin: const EdgeInsets.fromLTRB(10,10,10,40),
                 child: IconButton(
                   style: ButtonStyle(
                     iconSize: const WidgetStatePropertyAll(30),
@@ -93,7 +93,7 @@ class _QRBarReaderState extends State<QRBarReader> {
                 ),
               ),
               Container(
-                margin: const EdgeInsets.all(10),
+                margin: const EdgeInsets.fromLTRB(10,10,10,40),
                 child: IconButton(
                   style: ButtonStyle(
                     iconSize: const WidgetStatePropertyAll(30),

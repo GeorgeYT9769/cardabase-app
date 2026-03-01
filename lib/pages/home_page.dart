@@ -211,10 +211,8 @@ class _HomePageState extends State<Homepage> {
                 onPressed: () {
                   if (controller.text == passwordbox.get('PW')) {
                     FocusScope.of(context).unfocus();
-
                     Future.delayed(const Duration(milliseconds: 100), () {
                       Navigator.pop(context);
-
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -233,33 +231,28 @@ class _HomePageState extends State<Homepage> {
                             blueValue:
                                 cdb.myShops[index]['blueValue'] as int? ?? 158,
                             hasPassword:
-                                cdb.myShops[index]['hasPassword'] as bool? ??
-                                    false,
+                                cdb.myShops[index]['hasPassword'] as bool? ?? false,
                             cardTextPreview:
-                                (cdb.myShops[index]['cardName'] ?? '')
-                                    .toString(),
+                                (cdb.myShops[index]['cardName'] ?? '').toString(),
                             cardName:
                                 cdb.myShops[index]['cardName'] as String? ?? '',
                             cardId:
                                 (cdb.myShops[index]['cardId'] ?? '').toString(),
-                            cardType: (cdb.myShops[index]['cardType'] ??
-                                    'CardType.ean13')
-                                .toString(),
-                            tags: cdb.myShops[index]['tags'] as List? ?? [],
-                            notes: cdb.myShops[index]['note'] as String? ??
-                                'Card notes are displayed here...',
-                            frontFacePath: cdb.myShops[index]['imagePathFront']
-                                    as String? ??
-                                '',
-                            backFacePath: cdb.myShops[index]['imagePathBack']
-                                    as String? ??
-                                '',
-                            useFrontFaceOverlay: cdb.myShops[index]
-                                    ['useFrontFaceOverlay'] as bool? ??
-                                false,
+                            cardType:
+                                (cdb.myShops[index]['cardType'] ?? 'CardType.ean13').toString(),
+                            tags:
+                                cdb.myShops[index]['tags'] as List? ?? [],
+                            notes:
+                                cdb.myShops[index]['note'] as String? ?? 'Card notes are displayed here...',
+                            frontFacePath:
+                                cdb.myShops[index]['imagePathFront'] as String? ?? '',
+                            backFacePath:
+                                cdb.myShops[index]['imagePathBack'] as String? ?? '',
+                            useFrontFaceOverlay:
+                                cdb.myShops[index]['useFrontFaceOverlay'] as bool? ?? false,
                             hideTitle:
-                                cdb.myShops[index]['hideTitle'] as bool? ??
-                                    false,
+                                cdb.myShops[index]['hideTitle'] as bool? ?? false,
+                            pointsAmount: cdb.myShops[index]['pointsAmount'] as int? ?? 0,
                           ),
                         ),
                       ).then((value) {
@@ -389,12 +382,13 @@ class _HomePageState extends State<Homepage> {
               notes:
                   card['note'] as String? ?? 'Card notes are displayed here...',
               frontFacePath:
-                  cdb.myShops[index]['imagePathFront'] as String? ?? '',
+                  card['imagePathFront'] as String? ?? '',
               backFacePath:
-                  cdb.myShops[index]['imagePathBack'] as String? ?? '',
+                  card['imagePathBack'] as String? ?? '',
               useFrontFaceOverlay:
-                  cdb.myShops[index]['useFrontFaceOverlay'] as bool? ?? false,
-              hideTitle: cdb.myShops[index]['hideTitle'] as bool? ?? false,
+                  card['useFrontFaceOverlay'] as bool? ?? false,
+              hideTitle: card['hideTitle'] as bool? ?? false,
+              pointsAmount: card['pointsAmount'] as int? ?? 0,
             ),
           ),
         ).then((value) {
@@ -427,11 +421,12 @@ class _HomePageState extends State<Homepage> {
             notes:
                 card['note'] as String? ?? 'Card notes are displayed here...',
             frontFacePath:
-                cdb.myShops[index]['imagePathFront'] as String? ?? '',
-            backFacePath: cdb.myShops[index]['imagePathBack'] as String? ?? '',
+                card['imagePathFront'] as String? ?? '',
+            backFacePath: card['imagePathBack'] as String? ?? '',
             useFrontFaceOverlay:
-                cdb.myShops[index]['useFrontFaceOverlay'] as bool? ?? false,
-            hideTitle: cdb.myShops[index]['hideTitle'] as bool? ?? false,
+                card['useFrontFaceOverlay'] as bool? ?? false,
+            hideTitle: card['hideTitle'] as bool? ?? false,
+            pointsAmount: card['pointsAmount'] as int? ?? 0,
           ),
         ),
       ).then((value) {
@@ -929,6 +924,7 @@ class _HomePageState extends State<Homepage> {
             backImagePath: card['imagePathBack'] as String? ?? '',
             useFrontFaceOverlay: card['useFrontFaceOverlay'] as bool? ?? false,
             hideTitle: card['hideTitle'] as bool? ?? false,
+            pointsAmount: card['pointsAmount'] as int? ?? 0,
           );
         });
         return SliverPadding(
@@ -990,6 +986,7 @@ class _HomePageState extends State<Homepage> {
                   backImagePath: card['imagePathBack'] as String? ?? '',
                   useFrontFaceOverlay: card['useFrontFaceOverlay'] as bool? ?? false,
                   hideTitle: card['hideTitle'] as bool? ?? false,
+                  pointsAmount: card['pointsAmount'] as int? ?? 0,
                 );
               },
               childCount: itemCount,
