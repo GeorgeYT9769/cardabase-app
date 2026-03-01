@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:cardabase/data/cardabase_db.dart';
 import 'package:cardabase/util/camera_controller.dart';
-import 'package:cardabase/util/widgets/color_picker_dialog.dart';
 import 'package:cardabase/util/dashed_rect.dart';
 import 'package:cardabase/util/read_barcode.dart';
+import 'package:cardabase/util/widgets/color_picker_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
