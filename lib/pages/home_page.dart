@@ -1,6 +1,6 @@
 import 'package:cardabase/data/cardabase_db.dart';
 import 'package:cardabase/pages/card_details/card_face.dart';
-import 'package:cardabase/pages/create_card/create_card_new.dart';
+import 'package:cardabase/pages/create_card/create_card.dart';
 import 'package:cardabase/pages/edit_card.dart';
 import 'package:cardabase/pages/settings.dart';
 import 'package:cardabase/pages/welcome_screen.dart';

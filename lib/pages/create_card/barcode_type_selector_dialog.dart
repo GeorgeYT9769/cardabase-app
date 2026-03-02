@@ -1,4 +1,5 @@
 import 'package:barcode_widget/barcode_widget.dart';
+import 'package:cardabase/util/barcode_type_extensions.dart';
 import 'package:flutter/material.dart';
 
 class BarcodeTypeSelectorDialog extends StatelessWidget {
@@ -30,7 +31,7 @@ class BarcodeTypeSelectorDialog extends StatelessWidget {
           itemBuilder: (context, index) {
             final type = allowedTypes[index];
             return ListTile(
-              title: Text(type.name),
+              title: Text(type.getLabel()),
               onTap: () => Navigator.of(context).pop(type),
             );
           },

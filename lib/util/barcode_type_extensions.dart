@@ -18,7 +18,10 @@ BarcodeType parseBarcodeTypeStringFromDb(String value) {
     'CardType.qrcode' => BarcodeType.QrCode,
     'CardType.codabar' => BarcodeType.Codabar,
     'CardType.datamatrix' => BarcodeType.DataMatrix,
-    _ => BarcodeType.values.firstWhere((type) => type.toString() == value),
+    _ => BarcodeType.values.firstWhere(
+        (type) => type.toString() == value,
+        orElse: () => throw Exception('unknown barcode type: $value'),
+      ),
   };
 }
 
@@ -46,7 +49,7 @@ extension BarcodeTypeExtensions on BarcodeType {
       BarcodeType.DataMatrix => 'Data Matrix',
       BarcodeType.Aztec => 'Aztec',
       BarcodeType.Rm4scc => 'RM4SCC',
-      BarcodeType.Postnet => ' Postnet',
+      BarcodeType.Postnet => 'Postnet',
     };
   }
 

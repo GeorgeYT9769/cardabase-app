@@ -157,6 +157,7 @@ class _CreateCardState extends State<CreateCard>
       'imagePathBack': backImagePath.value,
       'useFrontFaceOverlay': useFrontFaceOverlay.value,
       'hideTitle': hideTitle.value,
+      'pointsAmount': points.value,
     });
     cdb.updateDataBase();
     Navigator.pop(context);
@@ -217,9 +218,11 @@ class _CreateCardState extends State<CreateCard>
       ),
     );
 
-    if (result != null) {
-      barcodeType.value = result;
+    if (result == null || !mounted) {
+      return;
     }
+
+    barcodeType.value = result;
   }
 
   Future<void> _scanSharedCode() async {
@@ -228,7 +231,7 @@ class _CreateCardState extends State<CreateCard>
       MaterialPageRoute(builder: (context) => const QRBarReader()),
     );
 
-    if (result == null) {
+    if (result == null || !mounted) {
       return;
     }
 
@@ -364,6 +367,7 @@ class _CreateCardState extends State<CreateCard>
   Widget _card(ThemeData theme) {
     return MultiListenableBuilder(
       listenables: [
+        useFrontFaceOverlay,
         frontImagePath,
         cardName,
         cardColor,

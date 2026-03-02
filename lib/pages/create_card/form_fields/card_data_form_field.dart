@@ -1,5 +1,6 @@
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:cardabase/pages/create_card/verify_code.dart';
+import 'package:cardabase/util/form_validation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -20,7 +21,7 @@ class CardDataFormField extends StatelessWidget {
     final theme = Theme.of(context);
     return TextFormField(
       controller: controller,
-      validator: validBarcode(barcodeType),
+      validator: isNotEmpty<String>().and(validBarcode(barcodeType)),
       inputFormatters: barcodeType == BarcodeType.QrCode
           ? null
           : [

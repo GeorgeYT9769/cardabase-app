@@ -4,8 +4,7 @@ import 'package:flutter/widgets.dart';
 
 FormFieldValidator<String> validBarcode(BarcodeType type) {
   return switch (type) {
-    BarcodeType.Itf =>
-      hasLength<String>(14).and(isDigits()).and(hasValidGs1Checksum()),
+    BarcodeType.Itf => hasLength<String>(14).and(isDigits()),
     BarcodeType.CodeITF16 =>
       hasLength<String>(16).and(isDigits()).and(hasValidGs1Checksum()),
     BarcodeType.CodeITF14 =>

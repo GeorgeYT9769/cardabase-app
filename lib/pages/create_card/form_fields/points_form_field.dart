@@ -20,6 +20,7 @@ class _PointsFormFieldState extends State<PointsFormField> {
   void initState() {
     super.initState();
     widget.controller.addListener(onWidgetControllerValueChanged);
+    _textController.text = widget.controller.value.toString();
   }
 
   @override
@@ -28,7 +29,14 @@ class _PointsFormFieldState extends State<PointsFormField> {
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.removeListener(onWidgetControllerValueChanged);
       widget.controller.addListener(onWidgetControllerValueChanged);
+      _textController.text = widget.controller.value.toString();
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    widget.controller.removeListener(onWidgetControllerValueChanged);
   }
 
   void onWidgetControllerValueChanged() {
