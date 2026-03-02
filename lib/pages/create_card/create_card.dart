@@ -53,9 +53,6 @@ class _CreateCardState extends State<CreateCard>
   late final allTags =
       settingsBox.get('tags', defaultValue: []) as List<dynamic>;
 
-  late final FocusNode cardNameFocusNode;
-  late final FocusNode cardIdFocusNode;
-
   Color getContrastingTextColor(Color bg) {
     return bg.computeLuminance() > 0.7 ? Colors.black : Colors.white;
   }
