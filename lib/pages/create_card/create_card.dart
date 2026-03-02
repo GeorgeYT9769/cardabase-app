@@ -14,15 +14,12 @@ import 'package:cardabase/pages/create_card/form_fields/save_button.dart';
 import 'package:cardabase/pages/create_card/form_fields/take_picture_button.dart';
 import 'package:cardabase/pages/create_card/verify_code.dart';
 import 'package:cardabase/util/barcode_type_extensions.dart';
-import 'package:cardabase/util/dev_options.dart';
 import 'package:cardabase/util/read_barcode.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:cardabase/util/widgets/color_picker_dialog.dart';
 import 'package:cardabase/util/widgets/multi_listenable_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
-
-bool devOptions = DeveloperOptionsProvider.developerOptions;
 
 class CreateCard extends StatefulWidget {
   const CreateCard({super.key});
@@ -263,6 +260,22 @@ class _CreateCardState extends State<CreateCard>
   void initState() {
     cdb.loadData();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    cardName.dispose();
+    cardData.dispose();
+    notes.dispose();
+    points.dispose();
+    frontImagePath.dispose();
+    backImagePath.dispose();
+    cardColor.dispose();
+    barcodeType.dispose();
+    hasPassword.dispose();
+    useFrontFaceOverlay.dispose();
+    hideTitle.dispose();
+    super.dispose();
   }
 
   @override
