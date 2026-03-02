@@ -16,6 +16,9 @@
       <img alt="GitHub forks" src="https://img.shields.io/github/forks/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Forks">
       <img alt="GitHub license" src="https://img.shields.io/github/license/GeorgeYT9769/cardabase-app?style=for-the-badge&label=License">
       <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/GeorgeYT9769/cardabase-app/total?style=for-the-badge&label=Downloads">
+      <img alt="Downloads@latest" src="https://img.shields.io/github/downloads/GeorgeYT9769/cardabase-app/latest/total?style=for-the-badge">
+      <img alt="Commit Activity" src="https://img.shields.io/github/commit-activity/w/GeorgeYT9769/cardabase-app?style=for-the-badge">
+      <img alt="F-Droid" src="https://img.shields.io/f-droid/v/com.georgeyt9769.cardabase?style=for-the-badge&label=F-Droid">
       <br />
       <a href="https://discord.com/invite/fZNDfG2xv3">
         <img alt="Discord" src="https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white">
