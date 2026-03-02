@@ -35,8 +35,9 @@ class _PointsFormFieldState extends State<PointsFormField> {
 
   @override
   void dispose() {
-    super.dispose();
     widget.controller.removeListener(onWidgetControllerValueChanged);
+    _textController.dispose();
+    super.dispose();
   }
 
   void onWidgetControllerValueChanged() {
