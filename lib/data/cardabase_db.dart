@@ -24,6 +24,8 @@ class CardabaseDb {
 
   //update the data
   void updateDataBase() {
+    // TODO(wim): make this method redundant by using streams to auto update
+    // the in memory db
     _myBox.put('CARDLIST', myShops);
   }
 

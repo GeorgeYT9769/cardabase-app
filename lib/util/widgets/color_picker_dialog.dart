@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
-class ColorPickerSecondDialog extends StatefulWidget {
-  const ColorPickerSecondDialog({super.key, required this.cardColor});
+class ColorPickerDialog extends StatefulWidget {
+  const ColorPickerDialog({super.key, required this.cardColor});
 
   final Color cardColor;
 
   @override
-  State<ColorPickerSecondDialog> createState() =>
-      _ColorPickerSecondDialogState();
+  State<ColorPickerDialog> createState() => _ColorPickerDialogState();
 }
 
-class _ColorPickerSecondDialogState extends State<ColorPickerSecondDialog> {
+class _ColorPickerDialogState extends State<ColorPickerDialog> {
   Color? currentColor;
 
   @override
