@@ -5,6 +5,7 @@ import 'package:barcode_widget/barcode_widget.dart';
 import 'package:cardabase/pages/card_details/card_details_page.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
@@ -408,6 +409,42 @@ class _CardTileState extends State<CardTile> {
           padding: const EdgeInsets.all(16),
           child: Wrap(
             children: [
+              //TODO: switch colors, use right format, show numbers under barcode
+              ListTile(
+                leading: Icon(Icons.widgets, color: theme.colorScheme.tertiary),
+                title: Text(
+                  'Set as Widget',
+                  style: theme.textTheme.bodyLarge?.copyWith(),
+                ),
+                onTap: () async {
+                  Navigator.pop(context);
+                  const channel = MethodChannel('cardabase_widget');
+                  final success = await channel.invokeMethod<bool>('setWidgetCard', {
+                    'data': widget.cardData,
+                    'type': widget.barcodeType.toString(),
+                    'r': (widget.cardTileColor.r * 255).toInt(),
+                    'g': (widget.cardTileColor.g * 255).toInt(),
+                    'b': (widget.cardTileColor.b * 255).toInt(),
+                  });
+                  if (success == true) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Widget updated!',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: Colors.white,
+                          ),
+                        ),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        backgroundColor: Colors.green.shade700,
+                      ),
+                    );
+                  }
+                },
+              ),
               ListTile(
                 leading: Icon(Icons.edit, color: theme.colorScheme.tertiary),
                 title:

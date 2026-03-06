@@ -283,82 +283,104 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
             },
           ),
           floatingActionButton: _capturedImageFile == null
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    FloatingActionButton(
-                      heroTag: 'selectFromGallery',
-                      onPressed: () async {
-                        await _pickImageFromGallery();
-                      },
-                      child: const Icon(Icons.photo_library),
-                    ),
-                    FloatingActionButton(
-                      heroTag: 'takePhoto',
-                      onPressed: () async {
-                        try {
-                          await _initializeControllerFuture;
-                          await _takePicture();
-                        } catch (e) {
-                          Navigator.pop(context);
-                        }
-                      },
-                      child: const Icon(Icons.camera_alt),
-                    ),
-                  ],
-                )
-              : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Brightness: ${_brightness.toStringAsFixed(1)}',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w900,
-                        color: Theme.of(context).colorScheme.inverseSurface,
+              ? Container(
+                margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Theme.of(context).colorScheme.surface.withValues(alpha: .4),
+                ),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      FloatingActionButton(
+                        heroTag: 'selectFromGallery',
+                        onPressed: () async {
+                          await _pickImageFromGallery();
+                        },
+                        backgroundColor: Colors.transparent,
+                        elevation: 0,
+                        child: const Icon(Icons.photo_library),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.brightness_6_rounded),
-                          Expanded(
-                            child: Slider(
-                              value: _brightness,
-                              year2023: false,
-                              min: -1.0,
-                              max: 1.0,
-                              //activeColor: widget.cutoutColor,
-                              onChanged: (value) {
-                                setState(() {
-                                  _brightness = value;
-                                });
-                              },
+                      FloatingActionButton(
+                        heroTag: 'takePhoto',
+                        onPressed: () async {
+                          try {
+                            await _initializeControllerFuture;
+                            await _takePicture();
+                          } catch (e) {
+                            Navigator.pop(context);
+                          }
+                        },
+                        backgroundColor: Colors.transparent,
+                        elevation: 0,
+                        child: const Icon(Icons.camera_alt),
+                      ),
+                    ],
+                  ),
+              )
+              : Container(
+                margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Theme.of(context).colorScheme.surface.withValues(alpha: .4),
+                ),
+                child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Brightness: ${_brightness.toStringAsFixed(1)}',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w900,
+                          color: Theme.of(context).colorScheme.inverseSurface,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.brightness_6_rounded),
+                            Expanded(
+                              child: Slider(
+                                value: _brightness,
+                                year2023: false,
+                                min: -1.0,
+                                max: 1.0,
+                                //activeColor: widget.cutoutColor,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _brightness = value;
+                                  });
+                                },
+                              ),
                             ),
+                          ],
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          FloatingActionButton.extended(
+                            heroTag: 'retakePhoto',
+                            onPressed: _retakePicture,
+                            label: const Text('Retake'),
+                            icon: const Icon(Icons.refresh),
+                            backgroundColor: Colors.transparent,
+                            elevation: 0,
+                          ),
+                          FloatingActionButton.extended(
+                            heroTag: 'usePhoto',
+                            onPressed: _confirmAndSavePicture,
+                            label: const Text('Use Photo'),
+                            icon: const Icon(Icons.check),
+                            backgroundColor: Colors.transparent,
+                            elevation: 0,
                           ),
                         ],
                       ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        FloatingActionButton.extended(
-                          heroTag: 'retakePhoto',
-                          onPressed: _retakePicture,
-                          label: const Text('Retake'),
-                          icon: const Icon(Icons.refresh),
-                        ),
-                        FloatingActionButton.extended(
-                          heroTag: 'usePhoto',
-                          onPressed: _confirmAndSavePicture,
-                          label: const Text('Use Photo'),
-                          icon: const Icon(Icons.check),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+              ),
           floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         ),
         if (_isSaving)

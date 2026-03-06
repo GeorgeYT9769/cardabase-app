@@ -50,7 +50,7 @@ class _QRBarReaderState extends State<QRBarReader> {
       floatingActionButton: Container(
         margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(20),
           color: theme.colorScheme.surface.withValues(alpha: .4),
         ),
         child: Row(
