@@ -44,73 +44,81 @@ class _QRBarReaderState extends State<QRBarReader> {
       body: Column(
         children: <Widget>[
           Expanded(flex: 4, child: _buildQrView(context)),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Container(
-                margin: const EdgeInsets.fromLTRB(10,10,10,40),
-                child: IconButton(
-                  style: ButtonStyle(
-                    iconSize: const WidgetStatePropertyAll(30),
-                    iconColor: WidgetStatePropertyAll(
-                      theme.colorScheme.inverseSurface,
-                    ),
-                  ),
-                  icon: const Icon(Icons.cameraswitch),
-                  onPressed: () async {
-                    await controller?.flipCamera();
-                    if (mounted) setState(() {});
-                  },
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.fromLTRB(10,10,10,40),
-                child: IconButton(
-                  style: ButtonStyle(
-                    iconSize: const WidgetStatePropertyAll(30),
-                    iconColor: WidgetStatePropertyAll(
-                      theme.colorScheme.inverseSurface,
-                    ),
-                  ),
-                  icon: const Icon(Icons.flash_on),
-                  onPressed: () async {
-                    await controller?.toggleFlash();
-                    if (mounted) setState(() {});
-                  },
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.fromLTRB(10,10,10,40),
-                child: IconButton(
-                  style: ButtonStyle(
-                    iconSize: const WidgetStatePropertyAll(30),
-                    iconColor: WidgetStatePropertyAll(
-                      theme.colorScheme.inverseSurface,
-                    ),
-                  ),
-                  icon: const Icon(Icons.photo),
-                  onPressed: _pickImage,
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.fromLTRB(10,10,10,40),
-                child: IconButton(
-                  style: ButtonStyle(
-                    iconSize: const WidgetStatePropertyAll(30),
-                    iconColor: WidgetStatePropertyAll(
-                      theme.colorScheme.inverseSurface,
-                    ),
-                  ),
-                  icon: const Icon(Icons.arrow_back_ios_new),
-                  onPressed: () {
-                    controller?.pauseCamera();
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ),
-            ],
-          ),
         ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Container(
+        margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: theme.colorScheme.surface.withValues(alpha: .4),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Container(
+              margin: const EdgeInsets.all(10),
+              child: IconButton(
+                style: ButtonStyle(
+                  iconSize: const WidgetStatePropertyAll(30),
+                  iconColor: WidgetStatePropertyAll(
+                    theme.colorScheme.inverseSurface,
+                  ),
+                ),
+                icon: const Icon(Icons.cameraswitch),
+                onPressed: () async {
+                  await controller?.flipCamera();
+                  if (mounted) setState(() {});
+                },
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(10),
+              child: IconButton(
+                style: ButtonStyle(
+                  iconSize: const WidgetStatePropertyAll(30),
+                  iconColor: WidgetStatePropertyAll(
+                    theme.colorScheme.inverseSurface,
+                  ),
+                ),
+                icon: const Icon(Icons.flash_on),
+                onPressed: () async {
+                  await controller?.toggleFlash();
+                  if (mounted) setState(() {});
+                },
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(10),
+              child: IconButton(
+                style: ButtonStyle(
+                  iconSize: const WidgetStatePropertyAll(30),
+                  iconColor: WidgetStatePropertyAll(
+                    theme.colorScheme.inverseSurface,
+                  ),
+                ),
+                icon: const Icon(Icons.photo),
+                onPressed: _pickImage,
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.all(10),
+              child: IconButton(
+                style: ButtonStyle(
+                  iconSize: const WidgetStatePropertyAll(30),
+                  iconColor: WidgetStatePropertyAll(
+                    theme.colorScheme.inverseSurface,
+                  ),
+                ),
+                icon: const Icon(Icons.arrow_back_ios_new),
+                onPressed: () {
+                  controller?.pauseCamera();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
