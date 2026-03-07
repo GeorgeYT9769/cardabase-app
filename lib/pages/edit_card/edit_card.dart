@@ -170,7 +170,7 @@ class _EditCardState extends State<EditCard> {
         ),
       ],
       title: Text(
-        'New card',
+        widget.cardIndexInDb == null ? 'New card' : 'Edit card',
         style: theme.textTheme.titleLarge?.copyWith(),
       ),
       centerTitle: true,
