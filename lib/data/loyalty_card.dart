@@ -73,7 +73,7 @@ class LoyaltyCard {
           ? BarcodeType.CodeEAN13
           : parseBarcodeTypeStringFromDb(strBarcodeType),
       requiresAuth: model.getBool('hasPassword') ?? false,
-      uniqueId: model.getString('uniqueId') ?? '',
+      uniqueId: model.getString('uniqueId') ?? generateUniqueId(),
       tags: model.getList('tags')?.whereType<String>().toSet() ?? {},
       notes: model.getString('note'),
       frontImagePath: model.getString('imagePathFront'),
