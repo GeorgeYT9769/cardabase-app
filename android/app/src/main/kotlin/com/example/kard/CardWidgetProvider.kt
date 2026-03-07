@@ -32,9 +32,10 @@ class CardWidgetProvider : AppWidgetProvider() {
                 // Empty state - no card selected yet
                 views.setViewVisibility(R.id.widget_text, android.view.View.VISIBLE)
                 views.setViewVisibility(R.id.widget_barcode, android.view.View.GONE)
+                views.setViewVisibility(R.id.widget_data_text, android.view.View.GONE)
                 views.setInt(R.id.widget_bg_border, "setBackgroundColor", Color.DKGRAY)
             } else {
-                val cardType = prefs.getString("card_type", "CardType.ean13")
+                val cardType = prefs.getString("card_type", "CardType.ean13") ?: "CardType.ean13"
                 val red = prefs.getInt("card_r", 255)
                 val green = prefs.getInt("card_g", 255)
                 val blue = prefs.getInt("card_b", 255)
@@ -42,10 +43,14 @@ class CardWidgetProvider : AppWidgetProvider() {
 
                 views.setViewVisibility(R.id.widget_text, android.view.View.GONE)
                 views.setViewVisibility(R.id.widget_barcode, android.view.View.VISIBLE)
+                views.setViewVisibility(R.id.widget_data_text, android.view.View.VISIBLE)
                 views.setInt(R.id.widget_bg_border, "setBackgroundColor", color)
 
+                // Show barcode data text
+                views.setTextViewText(R.id.widget_data_text, cardData)
+
                 // Generate barcode
-                val format = getBarcodeFormat(cardType ?: "")
+                val format = getBarcodeFormat(cardType)
                 val bitmap = generateBarcodeBitmap(cardData, format)
 
                 if (bitmap != null) {
@@ -70,6 +75,7 @@ class CardWidgetProvider : AppWidgetProvider() {
 
         private fun getBarcodeFormat(type: String): BarcodeFormat {
             return when (type) {
+                // CardType.xxx format (stored in DB)
                 "CardType.code39" -> BarcodeFormat.CODE_39
                 "CardType.code93" -> BarcodeFormat.CODE_93
                 "CardType.code128" -> BarcodeFormat.CODE_128
@@ -82,6 +88,23 @@ class CardWidgetProvider : AppWidgetProvider() {
                 "CardType.datamatrix" -> BarcodeFormat.DATA_MATRIX
                 "CardType.aztec" -> BarcodeFormat.AZTEC
                 "CardType.itf" -> BarcodeFormat.ITF
+                // BarcodeType.xxx format (from Dart enum toString())
+                "BarcodeType.Code39" -> BarcodeFormat.CODE_39
+                "BarcodeType.Code93" -> BarcodeFormat.CODE_93
+                "BarcodeType.Code128" -> BarcodeFormat.CODE_128
+                "BarcodeType.CodeEAN13" -> BarcodeFormat.EAN_13
+                "BarcodeType.CodeEAN8" -> BarcodeFormat.EAN_8
+                "BarcodeType.CodeEAN5" -> BarcodeFormat.EAN_8
+                "BarcodeType.CodeEAN2" -> BarcodeFormat.EAN_8
+                "BarcodeType.CodeUPCA" -> BarcodeFormat.UPC_A
+                "BarcodeType.CodeUPCE" -> BarcodeFormat.UPC_E
+                "BarcodeType.Codabar" -> BarcodeFormat.CODABAR
+                "BarcodeType.QrCode" -> BarcodeFormat.QR_CODE
+                "BarcodeType.DataMatrix" -> BarcodeFormat.DATA_MATRIX
+                "BarcodeType.Aztec" -> BarcodeFormat.AZTEC
+                "BarcodeType.Itf" -> BarcodeFormat.ITF
+                "BarcodeType.CodeITF14" -> BarcodeFormat.ITF
+                "BarcodeType.CodeITF16" -> BarcodeFormat.ITF
                 else -> BarcodeFormat.CODE_128
             }
         }

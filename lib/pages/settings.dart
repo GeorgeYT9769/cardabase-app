@@ -1005,6 +1005,7 @@ class _SettingsState extends State<Settings> {
                   //  iconColor: devOptions ? Colors.green : Colors.red,
                   //  borderColor: theme.colorScheme.primary,
                   //),
+                  SizedBox(height: 100,),
                 ],
               ),
             ),

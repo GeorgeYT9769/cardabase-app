@@ -11,16 +11,17 @@
         android:id="@+id/widget_bg_inner"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#000000"
-        android:padding="16dp"
-        android:gravity="center">
+        android:background="#FFFFFF"
+        android:padding="12dp"
+        android:gravity="center"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/widget_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Pin a card from the Cardabase app"
-            android:textColor="#FFFFFF"
+            android:text="Set a card from the Cardabase app"
+            android:textColor="#000000"
             android:textSize="14sp"
             android:gravity="center"
             android:visibility="visible" />
@@ -28,9 +29,20 @@
         <ImageView
             android:id="@+id/widget_barcode"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:layout_gravity="center"
             android:scaleType="fitCenter"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/widget_data_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:layout_marginTop="4dp"
             android:visibility="gone" />
 
     </LinearLayout>
