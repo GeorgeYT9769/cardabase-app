@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:cardabase/data/loyalty_card.dart';
 import 'package:cardabase/pages/edit_card/barcode_type_selector_dialog.dart';
+import 'package:cardabase/pages/edit_card/error_snack_bar.dart';
 import 'package:cardabase/pages/edit_card/form_fields/barcode_type_selector_button.dart';
 import 'package:cardabase/pages/edit_card/form_fields/card_data_form_field.dart';
 import 'package:cardabase/pages/edit_card/form_fields/card_name_form_field.dart';
@@ -82,13 +83,19 @@ class _EditCardFormState extends State<EditCardForm> {
     };
 
     if (code.startsWith('[') && code.endsWith(']')) {
-      final card = LoyaltyCard.fromShare(code);
-
-      widget.card.name.text = card.name;
-      widget.card.color.value = card.color;
-      widget.card.data.text = card.data;
-      widget.card.barcodeType.value = card.barcodeType;
-      widget.card.requiresAuth.value = card.requiresAuth;
+      try {
+        final card = LoyaltyCard.fromShare(code);
+        widget.card.name.text = card.name;
+        widget.card.color.value = card.color;
+        widget.card.data.text = card.data;
+        widget.card.barcodeType.value = card.barcodeType;
+        widget.card.requiresAuth.value = card.requiresAuth;
+      } on FormatException {
+        showErrorSnackBar(
+          context,
+          'Scanned code is not a valid Cardabase share code.',
+        );
+      }
     }
   }
 
