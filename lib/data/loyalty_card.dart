@@ -146,12 +146,13 @@ class LoyaltyCard {
   }
 
   String toShareData() {
+    final color = this.color ?? Colors.grey;
     final props = [
       name,
       data,
-      ((color?.r ?? 34) * 255).toInt().toString(),
-      ((color?.g ?? 34) * 255).toInt().toString(),
-      ((color?.b ?? 34) * 255).toInt().toString(),
+      (color.r * 255).toInt().toString(),
+      (color.g * 255).toInt().toString(),
+      (color.b * 255).toInt().toString(),
       barcodeType.getDbStringValue(),
       requiresAuth ? 'true' : 'false',
     ].join(', ');
