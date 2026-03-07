@@ -1,9 +1,16 @@
+import 'package:cardabase/data/loyalty_card.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
 class CardabaseDb {
   List myShops = [];
 
   final _myBox = Hive.box('mybox');
+
+  LoyaltyCard getAt(int index) {
+    final dbMap = (myShops[index] as Map)
+        .map((key, value) => MapEntry(key as String, value));
+    return LoyaltyCard.fromDbModel(dbMap);
+  }
 
   //load the data
   void loadData() {

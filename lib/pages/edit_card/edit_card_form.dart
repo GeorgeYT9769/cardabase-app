@@ -1,72 +1,47 @@
 import 'dart:io';
 
 import 'package:barcode_widget/barcode_widget.dart';
-import 'package:cardabase/data/cardabase_db.dart';
-import 'package:cardabase/pages/create_card/barcode_type_selector_dialog.dart';
-import 'package:cardabase/pages/create_card/error_snack_bar.dart';
-import 'package:cardabase/pages/create_card/form_fields/barcode_type_selector_button.dart';
-import 'package:cardabase/pages/create_card/form_fields/card_data_form_field.dart';
-import 'package:cardabase/pages/create_card/form_fields/card_name_form_field.dart';
-import 'package:cardabase/pages/create_card/form_fields/color_picker_button.dart';
-import 'package:cardabase/pages/create_card/form_fields/notes_form_field.dart';
-import 'package:cardabase/pages/create_card/form_fields/points_form_field.dart';
-import 'package:cardabase/pages/create_card/form_fields/save_button.dart';
-import 'package:cardabase/pages/create_card/form_fields/take_picture_button.dart';
-import 'package:cardabase/pages/create_card/verify_code.dart';
-import 'package:cardabase/util/barcode_type_extensions.dart';
+import 'package:cardabase/data/loyalty_card.dart';
+import 'package:cardabase/pages/edit_card/barcode_type_selector_dialog.dart';
+import 'package:cardabase/pages/edit_card/form_fields/barcode_type_selector_button.dart';
+import 'package:cardabase/pages/edit_card/form_fields/card_data_form_field.dart';
+import 'package:cardabase/pages/edit_card/form_fields/card_name_form_field.dart';
+import 'package:cardabase/pages/edit_card/form_fields/color_picker_button.dart';
+import 'package:cardabase/pages/edit_card/form_fields/notes_form_field.dart';
+import 'package:cardabase/pages/edit_card/form_fields/points_form_field.dart';
+import 'package:cardabase/pages/edit_card/form_fields/take_picture_button.dart';
 import 'package:cardabase/util/read_barcode.dart';
-import 'package:cardabase/util/vibration_provider.dart';
 import 'package:cardabase/util/widgets/color_picker_dialog.dart';
 import 'package:cardabase/util/widgets/multi_listenable_builder.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_ce_flutter/hive_ce_flutter.dart';
+import 'package:hive_ce/hive.dart';
 
-class CreateCard extends StatefulWidget {
-  const CreateCard({super.key});
+class EditCardForm extends StatefulWidget {
+  const EditCardForm({
+    super.key,
+    required this.formKey,
+    required this.card,
+  });
+
+  final Key formKey;
+  final EditableLoyaltyCard card;
 
   @override
-  State<CreateCard> createState() => _CreateCardState();
+  State<EditCardForm> createState() => _EditCardFormState();
 }
 
-class _CreateCardState extends State<CreateCard>
-    with SingleTickerProviderStateMixin {
-  final _formKey = GlobalKey<FormState>();
-
-  final settingsBox = Hive.box('settingsBox');
+class _EditCardFormState extends State<EditCardForm> {
   final passwordBox = Hive.box('password');
-  final CardabaseDb cdb = CardabaseDb();
-
-  final cardName = TextEditingController(text: 'Card');
-  final cardData = TextEditingController();
-  final notes = TextEditingController();
-  final points = ValueNotifier<int>(0);
-  final frontImagePath = ValueNotifier<String?>(null);
-  final backImagePath = ValueNotifier<String?>(null);
-  final cardColor = ValueNotifier<Color>(Colors.grey);
-  final barcodeType = ValueNotifier<BarcodeType>(BarcodeType.CodeEAN13);
-  final hasPassword = ValueNotifier<bool>(false);
-  final useFrontFaceOverlay = ValueNotifier<bool>(false);
-  final hideTitle = ValueNotifier<bool>(false);
-
-  final Set<String> selectedTags = {};
 
   late final allTags =
-      settingsBox.get('tags', defaultValue: []) as List<dynamic>;
+      Hive.box('settingsBox').get('tags', defaultValue: []) as List<dynamic>;
 
-  Color getContrastingTextColor(Color bg) {
-    return bg.computeLuminance() > 0.7 ? Colors.black : Colors.white;
-  }
-
-  Future<void> _showColorPickerDialog() async {
-    final selectedColor = await showDialog<Color>(
-      context: context,
-      builder: (context) => ColorPickerDialog(
-        cardColor: cardColor.value,
-      ),
-    );
-    if (selectedColor is Color) {
-      cardColor.value = selectedColor;
+  Color get textColor {
+    final bg = widget.card.color.value;
+    if (bg == null) {
+      return Colors.white;
     }
+    return bg.computeLuminance() > 0.7 ? Colors.black : Colors.white;
   }
 
   Future<void> _scanCard() async {
@@ -84,13 +59,13 @@ class _CreateCardState extends State<CreateCard>
     final code = result['code'] as String;
     final format = result['format'].toString();
     if (code == '-1') {
-      setState(() => cardData.text = '');
+      widget.card.data.text = '';
       return;
     }
 
-    cardData.text = code;
+    widget.card.data.text = code;
 
-    barcodeType.value = switch (format) {
+    widget.card.barcodeType.value = switch (format) {
       'BarcodeFormat.code39' => BarcodeType.Code39,
       'BarcodeFormat.code93' => BarcodeType.Code93,
       'BarcodeFormat.code128' => BarcodeType.Code128,
@@ -107,84 +82,14 @@ class _CreateCardState extends State<CreateCard>
     };
 
     if (code.startsWith('[') && code.endsWith(']')) {
-      final List<String> rawList =
-          code.replaceAll('[', '').replaceAll(']', '').split(', ');
+      final card = LoyaltyCard.fromShare(code);
 
-      final String name = rawList[0];
-      final String number = rawList[1];
-      final int red = int.parse(rawList[2]);
-      final int green = int.parse(rawList[3]);
-      final int blue = int.parse(rawList[4]);
-      final String cardType = rawList[5];
-      final bool hasPwd = rawList[6] == 'true';
-
-      cardName.text = name;
-      cardColor.value = Color.fromARGB(255, red, green, blue);
-      cardData.text = number;
-      barcodeType.value = parseBarcodeTypeStringFromDb(cardType);
-      hasPassword.value = hasPwd;
+      widget.card.name.text = card.name;
+      widget.card.color.value = card.color;
+      widget.card.data.text = card.data;
+      widget.card.barcodeType.value = card.barcodeType;
+      widget.card.requiresAuth.value = card.requiresAuth;
     }
-  }
-
-  void _save() {
-    if (_formKey.currentState?.validate() != true) {
-      showValidationError();
-      return;
-    }
-    final now = DateTime.now();
-    final uniqueId =
-        '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
-
-    final cardColor = this.cardColor.value;
-    cdb.myShops.add({
-      'cardName': cardName.text,
-      'cardId': cardData.text,
-      'redValue': (cardColor.r * 255).round(),
-      'greenValue': (cardColor.g * 255).round(),
-      'blueValue': (cardColor.b * 255).round(),
-      'cardType': barcodeType.value.getDbStringValue(),
-      'hasPassword': hasPassword.value,
-      'uniqueId': uniqueId,
-      'tags': selectedTags.toList(),
-      'note': notes.text,
-      'imagePathFront': frontImagePath.value,
-      'imagePathBack': backImagePath.value,
-      'useFrontFaceOverlay': useFrontFaceOverlay.value,
-      'hideTitle': hideTitle.value,
-      'pointsAmount': points.value,
-    });
-    cdb.updateDataBase();
-    Navigator.pop(context);
-  }
-
-  void showValidationError() {
-    // TODO(wim): why do we vibrate success while there is an error?
-    VibrationProvider.vibrateSuccess();
-
-    if (cardName.text.isEmpty == true) {
-      showErrorSnackBar(context, 'Card Name cannot be empty!');
-    } else if (cardData.text.isEmpty == true) {
-      showErrorSnackBar(context, 'Card ID cannot be empty!');
-    } else if (validBarcode(barcodeType.value)(cardData.text) != null) {
-      showErrorSnackBar(context, 'Card ID contains a mistake!');
-    } else {
-      showErrorSnackBar(context, 'Unknown error');
-    }
-  }
-
-  void _addLegacyCard() {
-    cdb.myShops.add([
-      'Legacy Card',
-      '9780201379624',
-      158,
-      158,
-      158,
-      'CardType.ean13',
-      false,
-    ]);
-    setState(() {});
-    cdb.updateDataBase();
-    Navigator.pop(context);
   }
 
   Future<void> _showBarcodeSelectorDialog() async {
@@ -216,184 +121,87 @@ class _CreateCardState extends State<CreateCard>
       return;
     }
 
-    barcodeType.value = result;
+    widget.card.barcodeType.value = result;
   }
 
-  Future<void> _scanSharedCode() async {
-    final result = await Navigator.push<Map<String, dynamic>>(
-      context,
-      MaterialPageRoute(builder: (context) => const QRBarReader()),
+  Future<void> _showColorPickerDialog() async {
+    final selectedColor = await showDialog<Color>(
+      context: context,
+      builder: (context) => ColorPickerDialog(
+        cardColor: widget.card.color.value ?? Colors.grey,
+      ),
     );
-
-    if (result == null || !mounted) {
-      return;
+    if (selectedColor is Color) {
+      widget.card.color.value = selectedColor;
     }
-
-    final code = result['code'] as String;
-    if (code == '-1') {
-      return;
-    }
-
-    // TODO(wim): why use custom sharing protocol? Use json instead.
-    final List<String> rawList =
-        code.replaceAll('[', '').replaceAll(']', '').split(', ');
-    // Convert values into correct types
-    final String name = rawList[0];
-    final String number = rawList[1];
-    final int red = int.parse(rawList[2]);
-    final int green = int.parse(rawList[3]);
-    final int blue = int.parse(rawList[4]);
-    final String cardType = rawList[5];
-    final bool hasPwd = rawList[6] == 'true';
-
-    cardName.text = name;
-    cardColor.value = Color.fromARGB(255, red, green, blue);
-    cardData.text = number;
-    barcodeType.value = parseBarcodeTypeStringFromDb(cardType);
-    hasPassword.value = hasPwd;
-  }
-
-  @override
-  void initState() {
-    cdb.loadData();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    cardName.dispose();
-    cardData.dispose();
-    notes.dispose();
-    points.dispose();
-    frontImagePath.dispose();
-    backImagePath.dispose();
-    cardColor.dispose();
-    barcodeType.dispose();
-    hasPassword.dispose();
-    useFrontFaceOverlay.dispose();
-    hideTitle.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
-      appBar: _appBar(theme),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          physics: const BouncingScrollPhysics(
-            decelerationRate: ScrollDecelerationRate.fast,
+    return Form(
+      key: widget.formKey,
+      child: ListView(
+        physics: const BouncingScrollPhysics(
+          decelerationRate: ScrollDecelerationRate.fast,
+        ),
+        children: [
+          SizedBox(
+            // TODO(wim): migrate this to LayoutBuilder
+            height: MediaQuery.of(context).size.width / 1.586,
+            width: MediaQuery.of(context).size.width,
+            child: _card(theme),
           ),
-          children: [
-            SizedBox(
-              // TODO(wim): migrate this to LayoutBuilder
-              height: MediaQuery.of(context).size.width / 1.586,
-              width: MediaQuery.of(context).size.width,
-              child: _card(theme),
-            ),
-            DefaultTabController(
-              length: 2,
-              child: Column(
-                children: [
-                  TabBar(
-                    tabs: const [
-                      Tab(text: 'Card Details'),
-                      Tab(text: 'Others'),
+          DefaultTabController(
+            length: 2,
+            child: Column(
+              children: [
+                TabBar(
+                  tabs: const [
+                    Tab(text: 'Card Details'),
+                    Tab(text: 'Others'),
+                  ],
+                  labelColor: theme.colorScheme.primary,
+                  unselectedLabelColor: theme.colorScheme.onSurface,
+                  splashFactory: NoSplash.splashFactory,
+                ),
+                SizedBox(
+                  height: 1000,
+                  child: TabBarView(
+                    children: [
+                      _cardDetails(theme),
+                      _other(theme),
                     ],
-                    labelColor: theme.colorScheme.primary,
-                    unselectedLabelColor: theme.colorScheme.onSurface,
-                    splashFactory: NoSplash.splashFactory,
                   ),
-                  SizedBox(
-                    height: 1000,
-                    child: TabBarView(
-                      children: [
-                        _cardDetails(theme),
-                        _other(theme),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-      floatingActionButton: SaveButton(onPressed: _save),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-    );
-  }
-
-  AppBar _appBar(ThemeData theme) {
-    return AppBar(
-      leading: IconButton(
-        icon: Icon(
-          Icons.qr_code_2,
-          color: theme.colorScheme.secondary,
-        ),
-        onPressed: _scanSharedCode,
-      ),
-      actions: [
-        ValueListenableBuilder(
-          valueListenable: settingsBox.listenable(),
-          builder: (context, settingsBox, _) {
-            // TODO(wim): wrap this to make it type-safe
-            final showLegacyCardButton = settingsBox.get(
-              'developerOptions',
-              defaultValue: false,
-            ) as bool;
-            return showLegacyCardButton
-                ? IconButton(
-                    icon: Icon(
-                      Icons.credit_card_off,
-                      color: theme.colorScheme.secondary,
-                    ),
-                    onPressed: _addLegacyCard,
-                  )
-                : const SizedBox.shrink();
-          },
-        ),
-        IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: theme.colorScheme.secondary,
           ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ],
-      title: Text(
-        'New card',
-        style: theme.textTheme.titleLarge?.copyWith(),
+        ],
       ),
-      centerTitle: true,
-      elevation: 0.0,
-      backgroundColor: theme.colorScheme.surface,
     );
   }
 
   Widget _card(ThemeData theme) {
     return MultiListenableBuilder(
       listenables: [
-        useFrontFaceOverlay,
-        frontImagePath,
-        cardName,
-        cardColor,
-        hideTitle,
+        widget.card.useFrontFaceOverlay,
+        widget.card.frontImagePath,
+        widget.card.name,
+        widget.card.color,
+        widget.card.hideTitle,
       ],
       builder: (context) {
-        final path = frontImagePath.value;
+        final path = widget.card.frontImagePath.value;
         return Container(
           margin: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: cardColor.value,
+            color: widget.card.color.value ?? Colors.grey,
             borderRadius: BorderRadius.circular(15),
           ),
           child: Stack(
             children: [
-              if (useFrontFaceOverlay.value && path != null)
+              if (widget.card.useFrontFaceOverlay.value && path != null)
                 ClipRRect(
                   borderRadius: BorderRadius.circular(15),
                   child: Image.file(
@@ -403,18 +211,18 @@ class _CreateCardState extends State<CreateCard>
                     height: double.infinity,
                   ),
                 ),
-              if (!hideTitle.value)
+              if (!widget.card.hideTitle.value)
                 Center(
                   child: Wrap(
                     children: [
                       Container(
                         margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                         child: Text(
-                          cardName.text,
+                          widget.card.name.text,
                           style: theme.textTheme.bodyLarge?.copyWith(
                             fontSize: 50,
                             fontWeight: FontWeight.bold,
-                            color: getContrastingTextColor(cardColor.value),
+                            color: textColor,
                           ),
                           maxLines: 2,
                           textAlign: TextAlign.center,
@@ -435,19 +243,19 @@ class _CreateCardState extends State<CreateCard>
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          CardNameFormField(controller: cardName),
+          CardNameFormField(controller: widget.card.name),
           const SizedBox(height: 15),
           ValueListenableBuilder(
-            valueListenable: barcodeType,
+            valueListenable: widget.card.barcodeType,
             builder: (context, barcodeType, _) => CardDataFormField(
-              controller: cardData,
+              controller: widget.card.data,
               barcodeType: barcodeType,
               onScanButtonPressed: _scanCard,
             ),
           ),
           const SizedBox(height: 15),
           ValueListenableBuilder(
-            valueListenable: barcodeType,
+            valueListenable: widget.card.barcodeType,
             builder: (context, barcodeType, _) => BarcodeTypeSelectorButton(
               barcodeType: barcodeType,
               onPressed: _showBarcodeSelectorDialog,
@@ -456,9 +264,9 @@ class _CreateCardState extends State<CreateCard>
           const SizedBox(height: 15),
           ColorPickerButton(onPressed: _showColorPickerDialog),
           const SizedBox(height: 15),
-          PointsFormField(controller: points),
+          PointsFormField(controller: widget.card.points),
           const SizedBox(height: 15),
-          NotesFormField(controller: notes),
+          NotesFormField(controller: widget.card.notes),
         ],
       ),
     );
@@ -494,7 +302,7 @@ class _CreateCardState extends State<CreateCard>
                       itemCount: allTags.length,
                       itemBuilder: (context, chipIndex) {
                         final tag = allTags[chipIndex] as String;
-                        final isSelected = selectedTags.contains(tag);
+                        final isSelected = widget.card.tags.value.contains(tag);
                         return Padding(
                           padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
                           child: ActionChip(
@@ -502,9 +310,15 @@ class _CreateCardState extends State<CreateCard>
                             onPressed: () {
                               setState(() {
                                 if (isSelected) {
-                                  selectedTags.remove(tag);
+                                  widget.card.tags.value = {
+                                    ...widget.card.tags.value
+                                        .where((t) => t == tag),
+                                  };
                                 } else {
-                                  selectedTags.add(tag);
+                                  widget.card.tags.value = {
+                                    ...widget.card.tags.value,
+                                    tag,
+                                  };
                                 }
                               });
                             },
@@ -541,7 +355,7 @@ class _CreateCardState extends State<CreateCard>
             ),
           const SizedBox(height: 15),
           TakePictureButton(
-            picturePath: frontImagePath,
+            picturePath: widget.card.frontImagePath,
             label: Text(
               'Front face picture',
               style: theme.textTheme.bodyLarge?.copyWith(
@@ -553,7 +367,7 @@ class _CreateCardState extends State<CreateCard>
           ),
           const SizedBox(height: 15),
           TakePictureButton(
-            picturePath: backImagePath,
+            picturePath: widget.card.backImagePath,
             label: Text(
               'Back face picture',
               style: theme.textTheme.bodyLarge?.copyWith(
@@ -565,13 +379,12 @@ class _CreateCardState extends State<CreateCard>
           ),
           const SizedBox(height: 15),
           ValueListenableBuilder(
-            valueListenable: useFrontFaceOverlay,
+            valueListenable: widget.card.useFrontFaceOverlay,
             builder: (context, value, _) => CheckboxListTile(
               value: value,
               title: Text(
                 'Use front face picture as a card thumbnail',
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  //cardTypeText
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
                   color: theme.colorScheme.inverseSurface,
@@ -584,12 +397,13 @@ class _CreateCardState extends State<CreateCard>
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(5),
               ),
-              onChanged: (checked) =>
-                  useFrontFaceOverlay.value = checked ?? false,
+              onChanged: (checked) {
+                widget.card.useFrontFaceOverlay.value = checked ?? false;
+              },
             ),
           ),
           ValueListenableBuilder(
-            valueListenable: hideTitle,
+            valueListenable: widget.card.hideTitle,
             builder: (context, value, _) => CheckboxListTile(
               value: value,
               title: Text(
@@ -608,18 +422,19 @@ class _CreateCardState extends State<CreateCard>
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(5),
               ),
-              onChanged: (checked) => hideTitle.value = checked ?? false,
+              onChanged: (checked) {
+                widget.card.hideTitle.value = checked ?? false;
+              },
             ),
           ),
           if (passwordBox.isNotEmpty)
             ValueListenableBuilder(
-              valueListenable: hasPassword,
+              valueListenable: widget.card.requiresAuth,
               builder: (context, value, _) => CheckboxListTile(
                 value: value,
                 title: Text(
                   'Use the password for this card',
                   style: theme.textTheme.bodyLarge?.copyWith(
-                    //cardTypeText
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
                     color: theme.colorScheme.inverseSurface,
@@ -632,7 +447,9 @@ class _CreateCardState extends State<CreateCard>
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5),
                 ),
-                onChanged: (checked) => hasPassword.value = checked ?? false,
+                onChanged: (checked) {
+                  widget.card.requiresAuth.value = checked ?? false;
+                },
               ),
             )
           else

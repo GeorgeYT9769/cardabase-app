@@ -1,7 +1,7 @@
 import 'package:cardabase/data/cardabase_db.dart';
+import 'package:cardabase/data/loyalty_card.dart';
 import 'package:cardabase/pages/card_details/card_face.dart';
-import 'package:cardabase/pages/create_card/create_card.dart';
-import 'package:cardabase/pages/edit_card.dart';
+import 'package:cardabase/pages/edit_card/edit_card.dart';
 import 'package:cardabase/pages/settings.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
 import 'package:cardabase/util/card_tile.dart';
@@ -217,42 +217,8 @@ class _HomePageState extends State<Homepage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => EditCard(
-                            index: index,
-                            cardColorPreview: Color.fromARGB(
-                              255,
-                              cdb.myShops[index]['redValue'] as int,
-                              cdb.myShops[index]['greenValue'] as int,
-                              cdb.myShops[index]['blueValue'] as int,
-                            ),
-                            redValue:
-                                cdb.myShops[index]['redValue'] as int? ?? 158,
-                            greenValue:
-                                cdb.myShops[index]['greenValue'] as int? ?? 158,
-                            blueValue:
-                                cdb.myShops[index]['blueValue'] as int? ?? 158,
-                            hasPassword:
-                                cdb.myShops[index]['hasPassword'] as bool? ?? false,
-                            cardTextPreview:
-                                (cdb.myShops[index]['cardName'] ?? '').toString(),
-                            cardName:
-                                cdb.myShops[index]['cardName'] as String? ?? '',
-                            cardId:
-                                (cdb.myShops[index]['cardId'] ?? '').toString(),
-                            cardType:
-                                (cdb.myShops[index]['cardType'] ?? 'CardType.ean13').toString(),
-                            tags:
-                                cdb.myShops[index]['tags'] as List? ?? [],
-                            notes:
-                                cdb.myShops[index]['note'] as String? ?? 'Card notes are displayed here...',
-                            frontFacePath:
-                                cdb.myShops[index]['imagePathFront'] as String? ?? '',
-                            backFacePath:
-                                cdb.myShops[index]['imagePathBack'] as String? ?? '',
-                            useFrontFaceOverlay:
-                                cdb.myShops[index]['useFrontFaceOverlay'] as bool? ?? false,
-                            hideTitle:
-                                cdb.myShops[index]['hideTitle'] as bool? ?? false,
-                            pointsAmount: cdb.myShops[index]['pointsAmount'] as int? ?? 0,
+                            cardIndexInDb: index,
+                            card: cdb.getAt(index),
                           ),
                         ),
                       ).then((value) {
@@ -354,8 +320,8 @@ class _HomePageState extends State<Homepage> {
   }
 
   void editCard(BuildContext context, ThemeData theme, int index) {
-    final card = cdb.myShops[index];
-    if (cdb.myShops[index]['hasPassword'] == true) {
+    final card = cdb.getAt(index);
+    if (card.requiresAuth) {
       if (passwordbox.isNotEmpty) {
         showUnlockDialogEdit(context, theme, index);
       } else {
@@ -363,32 +329,8 @@ class _HomePageState extends State<Homepage> {
           context,
           MaterialPageRoute(
             builder: (context) => EditCard(
-              index: index,
-              cardColorPreview: Color.fromARGB(
-                255,
-                card['redValue'] as int,
-                card['greenValue'] as int,
-                card['blueValue'] as int,
-              ),
-              redValue: card['redValue'] as int,
-              greenValue: card['greenValue'] as int,
-              blueValue: card['blueValue'] as int,
-              hasPassword: card['hasPassword'] as bool? ?? false,
-              cardTextPreview: card['cardName'].toString(),
-              cardName: card['cardName'].toString(),
-              cardId: (card['cardId'] ?? '').toString(),
-              cardType: (card['cardType'] ?? 'CardType.ean13').toString(),
-              tags: card['tags'] as List? ?? [],
-              notes:
-                  card['note'] as String? ?? 'Card notes are displayed here...',
-              frontFacePath:
-                  card['imagePathFront'] as String? ?? '',
-              backFacePath:
-                  card['imagePathBack'] as String? ?? '',
-              useFrontFaceOverlay:
-                  card['useFrontFaceOverlay'] as bool? ?? false,
-              hideTitle: card['hideTitle'] as bool? ?? false,
-              pointsAmount: card['pointsAmount'] as int? ?? 0,
+              cardIndexInDb: index,
+              card: card,
             ),
           ),
         ).then((value) {
@@ -402,31 +344,8 @@ class _HomePageState extends State<Homepage> {
         context,
         MaterialPageRoute(
           builder: (context) => EditCard(
-            index: index,
-            cardColorPreview: Color.fromARGB(
-              255,
-              card['redValue'] as int,
-              card['greenValue'] as int,
-              card['blueValue'] as int,
-            ),
-            redValue: card['redValue'] as int,
-            greenValue: card['greenValue'] as int,
-            blueValue: card['blueValue'] as int,
-            hasPassword: card['hasPassword'] as bool? ?? false,
-            cardTextPreview: card['cardName'].toString(),
-            cardName: card['cardName'].toString(),
-            cardId: (card['cardId'] ?? '').toString(),
-            cardType: (card['cardType'] ?? 'CardType.ean13').toString(),
-            tags: card['tags'] as List? ?? [],
-            notes:
-                card['note'] as String? ?? 'Card notes are displayed here...',
-            frontFacePath:
-                card['imagePathFront'] as String? ?? '',
-            backFacePath: card['imagePathBack'] as String? ?? '',
-            useFrontFaceOverlay:
-                card['useFrontFaceOverlay'] as bool? ?? false,
-            hideTitle: card['hideTitle'] as bool? ?? false,
-            pointsAmount: card['pointsAmount'] as int? ?? 0,
+            cardIndexInDb: index,
+            card: card,
           ),
         ),
       ).then((value) {
@@ -776,7 +695,9 @@ class _HomePageState extends State<Homepage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (builder) => const CreateCard(),
+                        builder: (builder) => EditCard(
+                          card: LoyaltyCard.empty(),
+                        ),
                       ),
                     ).then(
                       (value) => setState(() {
@@ -949,27 +870,20 @@ class _HomePageState extends State<Homepage> {
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 if (index >= cdb.myShops.length) return null;
-                final card = cdb.myShops[index] as Map<dynamic, dynamic>;
+                final card = cdb.getAt(index);
                 return CardTile(
-                  key: ValueKey(card['uniqueId'] ?? index),
-                  shopName: (card['cardName'] ?? 'No Name').toString(),
+                  key: ValueKey(card.uniqueId),
+                  shopName: (card.name).toString(),
                   deleteFunction: (context) {
                     return askForPasswordDelete(
                       theme,
                       index,
                     );
                   },
-                  cardData: card['cardId']?.toString() ?? '',
-                  cardTileColor: Color.fromARGB(
-                    255,
-                    card['redValue'] as int? ?? 158,
-                    card['greenValue'] as int? ?? 158,
-                    card['blueValue'] as int? ?? 158,
-                  ),
-                  barcodeType: parseBarcodeType(
-                    card['cardType'] as String? ?? 'CardType.ean13',
-                  ),
-                  hasPassword: card['hasPassword'] ?? false,
+                  cardData: card.data,
+                  cardTileColor: card.color ?? Colors.grey,
+                  barcodeType: card.barcodeType,
+                  hasPassword: card.requiresAuth,
                   editFunction: (context) => editCard(context, theme, index),
                   moveUpFunction: (context) => moveUp(index),
                   moveDownFunction: (context) => moveDown(index),
@@ -977,16 +891,15 @@ class _HomePageState extends State<Homepage> {
                   labelSize: columnAmount == 1 ? 50 : 50 / columnAmount,
                   borderSize: columnAmount == 1 ? 15 : 20 / columnAmount,
                   marginSize: columnAmount == 1 ? 10 : 20 / columnAmount,
-                  tags: card['tags'] as List? ?? [],
+                  tags: card.tags.toList(growable: false),
                   reorderMode: reorderMode,
-                  note: card['note'] as String? ??
-                      'Card notes are displayed here...',
-                  uniqueId: card['uniqueId'] as String? ?? 'Error',
-                  frontImagePath: card['imagePathFront'] as String? ?? '',
-                  backImagePath: card['imagePathBack'] as String? ?? '',
-                  useFrontFaceOverlay: card['useFrontFaceOverlay'] as bool? ?? false,
-                  hideTitle: card['hideTitle'] as bool? ?? false,
-                  pointsAmount: card['pointsAmount'] as int? ?? 0,
+                  note: card.notes ?? 'Card notes are displayed here...',
+                  uniqueId: card.uniqueId,
+                  frontImagePath: card.frontImagePath ?? '',
+                  backImagePath: card.backImagePath ?? '',
+                  useFrontFaceOverlay: card.useFrontFaceOverlay,
+                  hideTitle: card.hideTitle,
+                  pointsAmount: card.points,
                 );
               },
               childCount: itemCount,
