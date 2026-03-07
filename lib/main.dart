@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:cardabase/pages/create_card/create_card.dart';
+import 'package:cardabase/data/loyalty_card.dart';
+import 'package:cardabase/pages/edit_card/edit_card.dart';
 import 'package:cardabase/pages/home_page.dart';
 import 'package:cardabase/pages/settings.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
@@ -163,7 +164,9 @@ class _MainState extends State<Main> {
           navigatorKey.currentContext != null) {
         if (shortcutType == 'add_card') {
           navigatorKey.currentState!.push(
-            MaterialPageRoute(builder: (context) => const CreateCard()),
+            MaterialPageRoute(
+              builder: (context) => EditCard(card: LoyaltyCard.empty()),
+            ),
           );
         }
         if (shortcutType == 'info') {
