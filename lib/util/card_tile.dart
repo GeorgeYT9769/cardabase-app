@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'dart:math';
-
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:cardabase/pages/card_details/card_details_page.dart';
 import 'package:cardabase/util/vibration_provider.dart';
@@ -395,6 +393,163 @@ class _CardTileState extends State<CardTile> {
     );
   }
 
+  Future<void> _setWidgetCard(BuildContext context, ThemeData theme) async {
+    const channel = MethodChannel('cardabase_widget');
+    final success = await channel.invokeMethod<bool>('setWidgetCard', {
+      'data': widget.cardData,
+      'type': widget.barcodeType.toString(),
+      'r': (widget.cardTileColor.r * 255).toInt(),
+      'g': (widget.cardTileColor.g * 255).toInt(),
+      'b': (widget.cardTileColor.b * 255).toInt(),
+    });
+    if (success == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          content: Row(
+            children: [
+              const Icon(Icons.check, size: 15, color: Colors.white),
+              const SizedBox(width: 10),
+              Text(
+                'Widget updated!',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontSize: 18,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          duration: const Duration(milliseconds: 3000),
+          padding: const EdgeInsets.all(5.0),
+          margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+          behavior: SnackBarBehavior.floating,
+          dismissDirection: DismissDirection.vertical,
+          backgroundColor: const Color.fromARGB(255, 92, 184, 92),
+        ),
+      );
+    }
+  }
+
+  void _showUnlockDialogForWidget(BuildContext context, ThemeData theme) {
+    final TextEditingController controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Enter Password',
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: theme.colorScheme.inverseSurface,
+            fontSize: 30,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: controller,
+              obscureText: true,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(width: 2.0),
+                ),
+                focusColor: theme.colorScheme.primary,
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: theme.colorScheme.primary,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.secondary,
+                ),
+                prefixIcon: Icon(
+                  Icons.password,
+                  color: theme.colorScheme.secondary,
+                ),
+                labelText: 'Password',
+              ),
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.tertiary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Center(
+              child: OutlinedButton(
+                onPressed: () {
+                  if (controller.text == passwordbox.get('PW')) {
+                    FocusScope.of(context).unfocus();
+                    Future.delayed(const Duration(milliseconds: 100), () {
+                      Navigator.pop(context);
+                      _setWidgetCard(context, theme);
+                    });
+                  } else {
+                    VibrationProvider.vibrateSuccess();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        content: Row(
+                          children: [
+                            const Icon(
+                              Icons.error,
+                              size: 15,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              'Incorrect password!',
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                fontSize: 18,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        duration: const Duration(milliseconds: 3000),
+                        padding: const EdgeInsets.all(5.0),
+                        margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+                        behavior: SnackBarBehavior.floating,
+                        dismissDirection: DismissDirection.vertical,
+                        backgroundColor:
+                            const Color.fromARGB(255, 237, 67, 55),
+                        elevation: 0.0,
+                      ),
+                    );
+                  }
+                },
+                style: OutlinedButton.styleFrom(
+                  elevation: 0.0,
+                  side: BorderSide(
+                    color: theme.colorScheme.primary,
+                    width: 2.0,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(11),
+                  ),
+                ),
+                child: Text(
+                  'Unlock',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: theme.colorScheme.tertiary,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showBottomSheet(BuildContext context, ThemeData theme) {
     VibrationProvider.vibrateSuccess();
     showModalBottomSheet(
@@ -414,167 +569,12 @@ class _CardTileState extends State<CardTile> {
                   'Set as Widget',
                   style: theme.textTheme.bodyLarge?.copyWith(),
                 ),
-                onTap: () async {
+                onTap: () {
                   Navigator.pop(context);
-                  Future<void> setWidget() async {
-                    const channel = MethodChannel('cardabase_widget');
-                    final success = await channel.invokeMethod<bool>('setWidgetCard', {
-                      'data': widget.cardData,
-                      'type': widget.barcodeType.toString(),
-                      'r': (widget.cardTileColor.r * 255).toInt(),
-                      'g': (widget.cardTileColor.g * 255).toInt(),
-                      'b': (widget.cardTileColor.b * 255).toInt(),
-                    });
-                    if (success == true) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          shape:
-                          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          content: Row(
-                            children: [
-                              const Icon(
-                                Icons.check,
-                                size: 15,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                'Widget updated!',
-                                style: theme.textTheme.bodyLarge?.copyWith(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          duration: const Duration(milliseconds: 3000),
-                          padding: const EdgeInsets.all(5.0),
-                          margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
-                          behavior: SnackBarBehavior.floating,
-                          dismissDirection: DismissDirection.vertical,
-                          backgroundColor: const Color.fromARGB(255, 92, 184, 92),
-                        ),
-                      );
-                    }
-                  }
                   if (passwordbox.isNotEmpty && widget.hasPassword) {
-                    final TextEditingController controller = TextEditingController();
-                    final bool? unlocked = await showDialog<bool>(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (context) => AlertDialog(
-                        title: Text(
-                          'Enter Password',
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            color: theme.colorScheme.inverseSurface,
-                            fontSize: 30,
-                          ),
-                        ),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            TextFormField(
-                              controller: controller,
-                              obscureText: true,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: const BorderSide(width: 2.0),
-                                ),
-                                focusColor: theme.colorScheme.primary,
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: theme.colorScheme.primary,
-                                  ),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                labelStyle: theme.textTheme.bodyLarge?.copyWith(
-                                  color: theme.colorScheme.secondary,
-                                ),
-                                prefixIcon: Icon(
-                                  Icons.password,
-                                  color: theme.colorScheme.secondary,
-                                ),
-                                labelText: 'Password',
-                              ),
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                color: theme.colorScheme.tertiary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            Center(
-                              child: OutlinedButton(
-                                onPressed: () {
-                                  if (controller.text == passwordbox.get('PW')) {
-                                    FocusScope.of(context).unfocus();
-                                    Navigator.pop(context, true);
-                                  } else {
-                                    VibrationProvider.vibrateSuccess();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        content: Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.error,
-                                              size: 15,
-                                              color: Colors.white,
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Text(
-                                              'Incorrect password!',
-                                              style: theme.textTheme.bodyLarge?.copyWith(
-                                                fontSize: 18,
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        duration: const Duration(milliseconds: 3000),
-                                        padding: const EdgeInsets.all(5.0),
-                                        margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-                                        behavior: SnackBarBehavior.floating,
-                                        dismissDirection: DismissDirection.vertical,
-                                        backgroundColor: const Color.fromARGB(255, 237, 67, 55),
-                                        elevation: 0.0,
-                                      ),
-                                    );
-                                  }
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  elevation: 0.0,
-                                  side: BorderSide(
-                                    color: theme.colorScheme.primary,
-                                    width: 2.0,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(11),
-                                  ),
-                                ),
-                                child: Text(
-                                  'Unlock',
-                                  style: theme.textTheme.bodyLarge?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color: theme.colorScheme.tertiary,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                    if (unlocked == true) {
-                      await setWidget();
-                    }
+                    _showUnlockDialogForWidget(context, theme);
                   } else {
-                    await setWidget();
+                    _setWidgetCard(context, theme);
                   }
                 },
               ),

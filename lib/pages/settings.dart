@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:math';
+import 'package:cardabase/config/secrets.dart';
 import 'package:cardabase/data/cardabase_db.dart';
 import 'package:cardabase/pages/info.dart';
 import 'package:cardabase/pages/password.dart';
@@ -375,6 +378,183 @@ class _SettingsState extends State<Settings> {
         },
       ),
     );
+  }
+
+  void reportBug(ThemeData theme) {
+    final TextEditingController bugController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState2) {
+          bool isSending = false;
+
+          return AlertDialog(
+            title: Text(
+              'Report a Bug',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.inverseSurface,
+                fontSize: 30,
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Describe the issue you encountered:',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: theme.colorScheme.tertiary,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: bugController,
+                  maxLines: 5,
+                  minLines: 3,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(width: 2.0),
+                    ),
+                    focusColor: theme.colorScheme.primary,
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: theme.colorScheme.primary,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.secondary,
+                    ),
+                    prefixIcon: Icon(
+                      Icons.bug_report,
+                      color: theme.colorScheme.secondary,
+                    ),
+                    labelText: 'Bug description',
+                    alignLabelWithHint: true,
+                  ),
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: theme.colorScheme.tertiary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              Center(
+                child: OutlinedButton(
+                  onPressed: isSending
+                      ? null
+                      : () async {
+                          final text = bugController.text.trim();
+                          if (text.isEmpty) return;
+
+                          setState2(() {
+                            isSending = true;
+                          });
+
+                          final sent = await _sendToDiscordWebhook(text);
+
+                          if (!context.mounted) return;
+
+                          Navigator.pop(context);
+
+                          ScaffoldMessenger.of(this.context).showSnackBar(
+                            SnackBar(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              content: Row(
+                                children: [
+                                  Icon(
+                                    sent ? Icons.check : Icons.error,
+                                    size: 15,
+                                    color: Colors.white,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    sent
+                                        ? 'Bug report sent!'
+                                        : 'Failed to send report',
+                                    style:
+                                        theme.textTheme.bodyLarge?.copyWith(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              duration:
+                                  const Duration(milliseconds: 3000),
+                              padding: const EdgeInsets.all(5.0),
+                              margin: const EdgeInsets.fromLTRB(
+                                  20, 0, 20, 30),
+                              behavior: SnackBarBehavior.floating,
+                              dismissDirection:
+                                  DismissDirection.vertical,
+                              backgroundColor: sent
+                                  ? const Color.fromARGB(
+                                      255, 92, 184, 92)
+                                  : const Color.fromARGB(
+                                      255, 237, 67, 55),
+                            ),
+                          );
+                        },
+                  style: OutlinedButton.styleFrom(
+                    elevation: 0.0,
+                    side: BorderSide(
+                      color: theme.colorScheme.primary,
+                      width: 2.0,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(11),
+                    ),
+                  ),
+                  child: isSending
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: theme.colorScheme.tertiary,
+                          ),
+                        )
+                      : Text(
+                          'SEND',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: theme.colorScheme.inverseSurface,
+                          ),
+                        ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Future<bool> _sendToDiscordWebhook(String message) async {
+    // Stored in lib/config/secrets.dart (gitignored)
+    final webhookUrl = discordWebhookUrl;
+
+    try {
+      final uri = Uri.parse(webhookUrl);
+      final httpClient = HttpClient();
+      final request = await httpClient.postUrl(uri);
+      request.headers.set('Content-Type', 'application/json');
+      final body = '{"content": "**Bug Report:**\\n$message"}';
+      request.write(body);
+      final response = await request.close();
+      httpClient.close();
+      return response.statusCode == 200 || response.statusCode == 204;
+    } catch (e) {
+      debugPrint('Error sending bug report: $e');
+      return false;
+    }
   }
 
   void resetCardabase(ThemeData theme) {
@@ -942,6 +1122,14 @@ class _SettingsState extends State<Settings> {
                     ),
                     settingHeader: 'Discord',
                     settingIcon: Icons.discord,
+                    iconColor: theme.colorScheme.tertiary,
+                    borderColor: theme.colorScheme.primary,
+                  ),
+                  MySetting(
+                    aboutSettingHeader: 'Report a bug anonymously',
+                    settingAction: () => reportBug(theme),
+                    settingHeader: 'Bug report',
+                    settingIcon: Icons.bug_report,
                     iconColor: theme.colorScheme.tertiary,
                     borderColor: theme.colorScheme.primary,
                   ),
