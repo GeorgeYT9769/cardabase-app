@@ -2,7 +2,7 @@ name: Android Release
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master" ] #This should be "main" but I dont want it to run all the time when making commits and eventually failing...
   pull_request:
     branches: [ "master" ]
 
@@ -47,6 +47,10 @@ jobs:
       - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses || true
 
+      - name: Create secrets file
+        run: |
+          mkdir -p lib/config
+          echo "const String discordWebhookUrl = '${{ secrets.DISCORD_WEBHOOK_URL }}';" > lib/config/secrets.dart
 
       - name: Get dependencies
         run: flutter pub get
