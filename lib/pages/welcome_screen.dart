@@ -1,4 +1,4 @@
-import 'package:cardabase/pages/home_page.dart';
+import 'package:cardabase/pages/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_bounceable/flutter_bounceable.dart';

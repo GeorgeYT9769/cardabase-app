@@ -6,9 +6,15 @@ class CardabaseDb {
 
   final _myBox = Hive.box('mybox');
 
-  LoyaltyCard getAt(int index) {
-    final dbMap = (myShops[index] as Map)
-        .map((key, value) => MapEntry(key as String, value));
+  LoyaltyCard getAt(int index) => _mapEntryToModel(myShops[index]);
+
+  Iterable<LoyaltyCard> getAll() {
+    return myShops.map(_mapEntryToModel);
+  }
+
+  LoyaltyCard _mapEntryToModel(dynamic entry) {
+    final dbMap =
+        (entry as Map).map((key, value) => MapEntry(key as String, value));
     return LoyaltyCard.fromDbModel(dbMap);
   }
 
