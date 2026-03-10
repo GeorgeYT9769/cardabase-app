@@ -55,17 +55,6 @@ class _HomePageState extends State<Homepage> {
     super.dispose();
   }
 
-  // void applyTagFilter() {
-  //   cdb.myShops = cdb.myShops.where((shop) {
-  //     final tags = shop['tags'];
-  //     if (tags is List) {
-  //       return tags.contains(tagFilter.value);
-  //     }
-  //     return false;
-  //   }).toList();
-  //   setState(() {});
-  // }
-
   void saveAndApplyNumberOfColumns() {
     settingsBox.put('columnAmount', numberOfColumns.value);
     setState(() {});
