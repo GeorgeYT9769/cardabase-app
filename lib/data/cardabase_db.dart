@@ -8,8 +8,60 @@ class CardabaseDb {
 
   LoyaltyCard getAt(int index) => _mapEntryToModel(myShops[index]);
 
+  void upsert(LoyaltyCard card) {
+    final index = _indexOf(card.uniqueId);
+    if (index < 0) {
+      myShops.add(card.toDbModel());
+    } else {
+      myShops[index] = card.toDbModel();
+    }
+    updateDataBase();
+  }
+
   Iterable<LoyaltyCard> getAll() {
     return myShops.map(_mapEntryToModel);
+  }
+
+  LoyaltyCard? remove(String id) {
+    final index = _indexOf(id);
+    final removed = myShops.removeAt(index);
+    if (removed == null) {
+      return null;
+    }
+    updateDataBase();
+    return _mapEntryToModel(removed);
+  }
+
+  void move(String id, int Function(int oldIndex) indexManipulator) {
+    final index = _indexOf(id);
+    moveByIndex(index, indexManipulator(index));
+  }
+
+  void moveByIndex(int oldIndex, int newIndex) {
+    final card = myShops.removeAt(oldIndex);
+    myShops.insert(newIndex, card);
+    updateDataBase();
+  }
+
+  void duplicate(String id) {
+    final index = _indexOf(id);
+    myShops.insert(index + 1, myShops[index]);
+    updateDataBase();
+  }
+
+  bool exists(String id) {
+    return _indexOf(id) >= 0;
+  }
+
+  int _indexOf(String id) {
+    var i = 0;
+    for (final card in getAll()) {
+      if (card.uniqueId == id) {
+        return i;
+      }
+      i++;
+    }
+    return -1;
   }
 
   LoyaltyCard _mapEntryToModel(dynamic entry) {

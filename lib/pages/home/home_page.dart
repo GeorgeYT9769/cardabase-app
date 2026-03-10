@@ -85,8 +85,8 @@ class _HomePageState extends State<Homepage> {
     setState(() {});
   }
 
-  Future<void> deleteCard(ThemeData theme, int index) async {
-    if (passwordBox.isNotEmpty && cdb.getAt(index).requiresAuth) {
+  Future<void> deleteCard(ThemeData theme, LoyaltyCard card) async {
+    if (passwordBox.isNotEmpty && card.requiresAuth) {
       final success = await showDialog<bool>(
         context: context,
         builder: (context) => PasswordChallengeDialog(
@@ -105,13 +105,8 @@ class _HomePageState extends State<Homepage> {
       }
     }
 
-    setState(() => cdb.myShops.removeAt(index));
-    cdb.updateDataBase();
-  }
-
-  void duplicateCard(int index) {
-    setState(() => cdb.myShops.insert(index + 1, cdb.myShops[index]));
-    cdb.updateDataBase();
+    cdb.remove(card.uniqueId);
+    setState(() {});
   }
 
   Future<void> addCard() async {
@@ -127,8 +122,7 @@ class _HomePageState extends State<Homepage> {
     setState(() {});
   }
 
-  Future<void> editCard(ThemeData theme, int index) async {
-    final card = cdb.getAt(index);
+  Future<void> editCard(ThemeData theme, LoyaltyCard card) async {
     if (passwordBox.isNotEmpty && card.requiresAuth) {
       final success = await showDialog(
         context: context,
@@ -149,35 +143,10 @@ class _HomePageState extends State<Homepage> {
     }
     await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => EditCard(
-          cardIndexInDb: index,
-          card: cdb.getAt(index),
-        ),
-      ),
+      MaterialPageRoute(builder: (context) => EditCard(card: card)),
     );
 
     setState(() => cdb.loadData());
-  }
-
-  void moveUp(int index) {
-    if (index > 0) {
-      setState(() {
-        final item = cdb.myShops.removeAt(index);
-        cdb.myShops.insert(index - 1, item);
-        cdb.updateDataBase();
-      });
-    }
-  }
-
-  void moveDown(int index) {
-    if (index + 1 < cdb.myShops.length) {
-      setState(() {
-        final item = cdb.myShops.removeAt(index);
-        cdb.myShops.insert(index + 1, item);
-        cdb.updateDataBase();
-      });
-    }
   }
 
   Future<void> showCardListViewOptionsDialog() async {
@@ -301,41 +270,11 @@ class _HomePageState extends State<Homepage> {
     const childAspectRatio = 1.4;
     const gridPadding = 8.0;
 
-    final loyaltyCards = cdb
+    final sliverChildren = cdb
         .getAll()
         .where((card) => card.tags.contains(tagFilter.value))
+        .map((card) => _card(theme, card))
         .toList(growable: true);
-
-    final sliverChildren = List.generate(loyaltyCards.length, (index) {
-      final card = loyaltyCards[index];
-      return CardTile(
-        key: ValueKey(card.uniqueId),
-        shopName: card.name,
-        deleteFunction: (context) => deleteCard(theme, index),
-        cardData: card.data,
-        cardTileColor: card.color ?? Colors.grey,
-        barcodeType: card.barcodeType,
-        hasPassword: card.requiresAuth,
-        editFunction: (context) => editCard(theme, index),
-        moveUpFunction: (context) => moveUp(index),
-        moveDownFunction: (context) => moveDown(index),
-        duplicateFunction: (context) => duplicateCard(index),
-        labelSize: numberOfColumns.value == 1 ? 50 : 50 / numberOfColumns.value,
-        borderSize:
-            numberOfColumns.value == 1 ? 15 : 20 / numberOfColumns.value,
-        marginSize:
-            numberOfColumns.value == 1 ? 10 : 20 / numberOfColumns.value,
-        tags: card.tags.toList(growable: false),
-        reorderMode: isInReorderingMode.value,
-        note: card.notes ?? 'Card notes are displayed here...',
-        uniqueId: card.uniqueId,
-        frontImagePath: card.frontImagePath ?? '',
-        backImagePath: card.backImagePath ?? '',
-        useFrontFaceOverlay: card.useFrontFaceOverlay,
-        hideTitle: card.hideTitle,
-        pointsAmount: card.points,
-      );
-    });
 
     if (isInReorderingMode.value) {
       return SliverPadding(
@@ -345,9 +284,7 @@ class _HomePageState extends State<Homepage> {
           childAspectRatio: childAspectRatio,
           children: sliverChildren,
           onReorder: (oldIndex, newIndex) {
-            final item = cdb.myShops.removeAt(oldIndex);
-            cdb.myShops.insert(newIndex, item);
-            cdb.updateDataBase();
+            cdb.moveByIndex(oldIndex, newIndex);
             setState(() {});
           },
         ),
@@ -367,6 +304,43 @@ class _HomePageState extends State<Homepage> {
         ),
       );
     }
+  }
+
+  Widget _card(ThemeData theme, LoyaltyCard card) {
+    return CardTile(
+      key: ValueKey(card.uniqueId),
+      shopName: card.name,
+      deleteFunction: (context) => deleteCard(theme, card),
+      cardData: card.data,
+      cardTileColor: card.color ?? Colors.grey,
+      barcodeType: card.barcodeType,
+      hasPassword: card.requiresAuth,
+      editFunction: (context) => editCard(theme, card),
+      moveUpFunction: (context) {
+        cdb.move(card.uniqueId, (index) => index - 1);
+        setState(() {});
+      },
+      moveDownFunction: (context) {
+        cdb.move(card.uniqueId, (index) => index + 1);
+        setState(() {});
+      },
+      duplicateFunction: (context) {
+        cdb.duplicate(card.uniqueId);
+        setState(() {});
+      },
+      labelSize: numberOfColumns.value == 1 ? 50 : 50 / numberOfColumns.value,
+      borderSize: numberOfColumns.value == 1 ? 15 : 20 / numberOfColumns.value,
+      marginSize: numberOfColumns.value == 1 ? 10 : 20 / numberOfColumns.value,
+      tags: card.tags.toList(growable: false),
+      reorderMode: isInReorderingMode.value,
+      note: card.notes ?? 'Card notes are displayed here...',
+      uniqueId: card.uniqueId,
+      frontImagePath: card.frontImagePath ?? '',
+      backImagePath: card.backImagePath ?? '',
+      useFrontFaceOverlay: card.useFrontFaceOverlay,
+      hideTitle: card.hideTitle,
+      pointsAmount: card.points,
+    );
   }
 
   Widget _addCardButton() {

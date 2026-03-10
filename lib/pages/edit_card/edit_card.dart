@@ -13,10 +13,8 @@ class EditCard extends StatefulWidget {
   const EditCard({
     super.key,
     required this.card,
-    this.cardIndexInDb,
   });
 
-  final int? cardIndexInDb;
   final LoyaltyCard card;
 
   @override
@@ -37,14 +35,7 @@ class _EditCardState extends State<EditCard> {
       return;
     }
 
-    final dbCard = card.seal().toDbModel();
-    final cardIndexInDb = widget.cardIndexInDb;
-    if (cardIndexInDb == null) {
-      cdb.myShops.add(dbCard);
-    } else {
-      cdb.myShops[cardIndexInDb] = dbCard;
-    }
-    cdb.updateDataBase();
+    cdb.upsert(card.seal());
     Navigator.pop(context);
   }
 
@@ -170,7 +161,7 @@ class _EditCardState extends State<EditCard> {
         ),
       ],
       title: Text(
-        widget.cardIndexInDb == null ? 'New card' : 'Edit card',
+        cdb.exists(widget.card.uniqueId) ? 'Edit card' : 'New card',
         style: theme.textTheme.titleLarge?.copyWith(),
       ),
       centerTitle: true,
