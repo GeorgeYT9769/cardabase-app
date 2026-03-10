@@ -270,11 +270,12 @@ class _HomePageState extends State<Homepage> {
     const childAspectRatio = 1.4;
     const gridPadding = 8.0;
 
-    final sliverChildren = cdb
-        .getAll()
-        .where((card) => card.tags.contains(tagFilter.value))
-        .map((card) => _card(theme, card))
-        .toList(growable: true);
+    var cards = cdb.getAll();
+    if (tagFilter.value != null) {
+      cards = cards.where((card) => card.tags.contains(tagFilter.value));
+    }
+    final sliverChildren =
+        cards.map((card) => _card(theme, card)).toList(growable: true);
 
     if (isInReorderingMode.value) {
       return SliverPadding(
