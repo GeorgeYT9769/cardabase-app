@@ -132,15 +132,18 @@ class CardListViewOptionsDialog extends StatelessWidget {
           decelerationRate: ScrollDecelerationRate.fast,
         ),
         scrollDirection: Axis.horizontal,
-        child: Row(
-          children: allTags
-              .map(
-                (tag) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                  child: _tag(theme, tag, tagFilter.value == tag),
-                ),
-              )
-              .toList(growable: false),
+        child: ValueListenableBuilder(
+          valueListenable: tagFilter,
+          builder: (context, tagFilter, _) => Row(
+            children: allTags
+                .map(
+                  (tag) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: _tag(theme, tag, tagFilter == tag),
+                  ),
+                )
+                .toList(growable: false),
+          ),
         ),
       ),
       const SizedBox(height: 5),
