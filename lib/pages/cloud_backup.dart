@@ -7,6 +7,8 @@ import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:cardabase/data/cardabase_db.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 
+import '../util/widgets/custom_snack_bar.dart';
+
 class CloudBackup extends StatefulWidget {
   const CloudBackup({super.key});
 
@@ -56,49 +58,11 @@ class _CloudBackupState extends State<CloudBackup> {
     }
   }
 
-  void _showSnackbar(String message, bool isError) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        content: Row(
-          children: [
-            Icon(
-              isError ? Icons.error : Icons.check,
-              size: 15,
-              color: Colors.white,
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                message,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontSize: 16,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-            ),
-          ],
-        ),
-        duration: const Duration(milliseconds: 3000),
-        padding: const EdgeInsets.all(5.0),
-        margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
-        behavior: SnackBarBehavior.floating,
-        dismissDirection: DismissDirection.vertical,
-        backgroundColor: isError
-            ? const Color.fromARGB(255, 237, 67, 55)
-            : const Color.fromARGB(255, 92, 184, 92),
-      ),
-    );
-  }
-
   Future<void> uploadCardabase() async {
     final Box myBox = Hive.box('mybox');
     final List cards = myBox.get('CARDLIST', defaultValue: []);
     if (cards.isEmpty) {
-      _showSnackbar('No cards to upload', true);
+      buildCustomSnackBar('No cards to upload', false);
       return;
     }
 
@@ -144,10 +108,10 @@ class _CloudBackupState extends State<CloudBackup> {
 
     if (failCount == 0) {
       VibrationProvider.vibrateSuccess();
-      _showSnackbar('Successfully uploaded $successCount cards', false);
+      buildCustomSnackBar('Successfully uploaded $successCount cards', true);
     } else {
       VibrationProvider.vibrateSuccess();
-      _showSnackbar('Uploaded $successCount cards. Failed on $failCount.', failCount > 0);
+      buildCustomSnackBar('Uploaded $successCount cards. Failed on $failCount.', failCount < 0);
     }
   }
 
@@ -174,16 +138,16 @@ class _CloudBackupState extends State<CloudBackup> {
         cdb.loadData();
         
         VibrationProvider.vibrateSuccess();
-        _showSnackbar('Successfully downloaded ${downloadedCards.length} cards', false);
+        buildCustomSnackBar('Successfully downloaded ${downloadedCards.length} cards', true);
       } else {
         VibrationProvider.vibrateSuccess();
-        _showSnackbar('Failed to download from server', true);
+        buildCustomSnackBar('Failed to download from server', false);
       }
       httpClient.close();
     } catch (e) {
       debugPrint('Failed to download cards: $e');
       VibrationProvider.vibrateSuccess();
-      _showSnackbar('Error downloading cards: check connection', true);
+      buildCustomSnackBar('Error downloading cards: check connection', false);
     }
   }
 
@@ -270,19 +234,19 @@ class _CloudBackupState extends State<CloudBackup> {
       
       httpClient.close();
       VibrationProvider.vibrateSuccess();
-      _showSnackbar('Permanently deleted $deletedCount cards from cloud', false);
+      buildCustomSnackBar('Permanently deleted $deletedCount cards from cloud', true);
 
     } catch (e) {
       debugPrint('Failed to delete cards: $e');
       VibrationProvider.vibrateSuccess();
-      _showSnackbar('Failed to delete cards from cloud', true);
+      buildCustomSnackBar('Failed to delete cards from cloud', false);
     }
   }
 
   Future<void> logIn() async {
     final String ip = ipAddress.text.trim();
     if (ip.isEmpty) {
-      _showSnackbar('IP Address is required', true);
+      buildCustomSnackBar('IP Address is required', false);
       return;
     }
 
@@ -308,16 +272,16 @@ class _CloudBackupState extends State<CloudBackup> {
           hasCloudSetUp = true;
         });
         VibrationProvider.vibrateSuccess();
-        _showSnackbar('Successfully connected to server', false);
+        buildCustomSnackBar('Successfully connected to server', true);
       } else {
         VibrationProvider.vibrateSuccess();
-        _showSnackbar('Server returned status ${response.statusCode}', true);
+        buildCustomSnackBar('Server returned status ${response.statusCode}', false);
       }
       httpClient.close();
     } catch (e) {
       debugPrint('Login failed: $e');
       VibrationProvider.vibrateSuccess();
-      _showSnackbar('Could not connect to server', true);
+      buildCustomSnackBar('Could not connect to server', false);
     }
   }
 
@@ -333,7 +297,7 @@ class _CloudBackupState extends State<CloudBackup> {
     });
     
     VibrationProvider.vibrateSuccess();
-    _showSnackbar('Logged out and cleared cloud configuration', false);
+    buildCustomSnackBar('Logged out and cleared cloud configuration', true);
   }
 
 
