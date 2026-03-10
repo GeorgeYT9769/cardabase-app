@@ -7,6 +7,7 @@ import 'package:cardabase/pages/home/password_challenge_dialog.dart';
 import 'package:cardabase/pages/settings.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
 import 'package:cardabase/util/card_tile.dart';
+import 'package:cardabase/util/widgets/multi_listenable_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
@@ -34,7 +35,6 @@ class _HomePageState extends State<Homepage> {
     super.initState();
     loadSettings();
     cdb.loadData();
-    tagFilter.addListener(applyTagFilter);
     numberOfColumns.addListener(saveAndApplyNumberOfColumns);
     sortingStyle.addListener(saveAndApplySortingStyle);
   }
@@ -43,34 +43,28 @@ class _HomePageState extends State<Homepage> {
     numberOfColumns.value =
         settingsBox.get('columnAmount', defaultValue: 1) as int;
 
-    final storedSortingStyle = settingsBox.get('sort');
-    if (storedSortingStyle is String) {
-      sortingStyle.value = SortingStyle.values.firstWhere(
-        (value) => value.toString().toLowerCase() == storedSortingStyle,
-        orElse: () => SortingStyle.oldest,
-      );
-    }
+    sortingStyle.value =
+        SortingStyle.fromDbValue(settingsBox.get('sort') ?? '');
   }
 
   @override
   void dispose() {
-    super.dispose();
     isInReorderingMode.dispose();
-    tagFilter.dispose();
     numberOfColumns.dispose();
     sortingStyle.dispose();
+    super.dispose();
   }
 
-  void applyTagFilter() {
-    cdb.myShops = cdb.myShops.where((shop) {
-      final tags = shop['tags'];
-      if (tags is List) {
-        return tags.contains(tagFilter.value);
-      }
-      return false;
-    }).toList();
-    setState(() {});
-  }
+  // void applyTagFilter() {
+  //   cdb.myShops = cdb.myShops.where((shop) {
+  //     final tags = shop['tags'];
+  //     if (tags is List) {
+  //       return tags.contains(tagFilter.value);
+  //     }
+  //     return false;
+  //   }).toList();
+  //   setState(() {});
+  // }
 
   void saveAndApplyNumberOfColumns() {
     settingsBox.put('columnAmount', numberOfColumns.value);
@@ -97,7 +91,7 @@ class _HomePageState extends State<Homepage> {
           return a['uniqueId'].compareTo(b['uniqueId']);
         });
     }
-    settingsBox.put('sort', value.toString().toLowerCase());
+    settingsBox.put('sort', value.toDbValue());
     cdb.updateDataBase();
     setState(() {});
   }
@@ -128,6 +122,7 @@ class _HomePageState extends State<Homepage> {
 
   void duplicateCard(int index) {
     setState(() => cdb.myShops.insert(index + 1, cdb.myShops[index]));
+    cdb.updateDataBase();
   }
 
   Future<void> addCard() async {
@@ -286,12 +281,12 @@ class _HomePageState extends State<Homepage> {
                 floating: true,
                 snap: true,
               ),
-              ValueListenableBuilder(
-                valueListenable: isInReorderingMode,
-                builder: (context, value, __) => _buildContentSliver(
-                  context,
-                  theme,
-                ),
+              MultiListenableBuilder(
+                listenables: [
+                  isInReorderingMode,
+                  tagFilter,
+                ],
+                builder: (context) => _buildContentSliver(context, theme),
               ),
             ],
           );
@@ -317,7 +312,11 @@ class _HomePageState extends State<Homepage> {
     const childAspectRatio = 1.4;
     const gridPadding = 8.0;
 
-    final loyaltyCards = cdb.getAll().toList(growable: true);
+    final loyaltyCards = cdb
+        .getAll()
+        .where((card) => card.tags.contains(tagFilter.value))
+        .toList(growable: true);
+
     final sliverChildren = List.generate(loyaltyCards.length, (index) {
       final card = loyaltyCards[index];
       return CardTile(

@@ -40,6 +40,12 @@ class _PasswordChallengeDialogState extends State<PasswordChallengeDialog> {
   }
 
   @override
+  void dispose() {
+    password.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return AlertDialog(

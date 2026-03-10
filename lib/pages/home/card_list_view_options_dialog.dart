@@ -62,7 +62,13 @@ class CardListViewOptionsDialog extends StatelessWidget {
               ),
               _divider(theme),
               const SizedBox(height: 10),
-              _optionTitle(theme, 'Columns: ${numberOfColumns.value}'),
+              ValueListenableBuilder(
+                valueListenable: numberOfColumns,
+                builder: (context, value, _) => _optionTitle(
+                  theme,
+                  'Columns: $value',
+                ),
+              ),
               const SizedBox(height: 10),
               NumberOfColumnsSlider(controller: numberOfColumns),
             ],
