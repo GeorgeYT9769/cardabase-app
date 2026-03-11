@@ -1,11 +1,11 @@
 import 'package:cardabase/data/cardabase_db.dart';
 import 'package:cardabase/data/loyalty_card.dart';
 import 'package:cardabase/pages/edit_card/edit_card_form.dart';
-import 'package:cardabase/pages/edit_card/error_snack_bar.dart';
 import 'package:cardabase/pages/edit_card/form_fields/save_button.dart';
 import 'package:cardabase/pages/edit_card/verify_code.dart';
 import 'package:cardabase/util/read_barcode.dart';
 import 'package:cardabase/util/vibration_provider.dart';
+import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
@@ -53,13 +53,21 @@ class _EditCardState extends State<EditCard> {
     VibrationProvider.vibrateSuccess();
 
     if (card.name.text.isEmpty == true) {
-      showErrorSnackBar(context, 'Card Name cannot be empty!');
+      ScaffoldMessenger.of(context).showSnackBar(
+        buildCustomSnackBar('Card Name cannot be empty!', false),
+      );
     } else if (card.data.text.isEmpty == true) {
-      showErrorSnackBar(context, 'Card ID cannot be empty!');
+      ScaffoldMessenger.of(context).showSnackBar(
+        buildCustomSnackBar('Card ID cannot be empty!', false),
+      );
     } else if (validBarcode(card.barcodeType.value)(card.data.text) != null) {
-      showErrorSnackBar(context, 'Card ID contains a mistake!');
+      ScaffoldMessenger.of(context).showSnackBar(
+        buildCustomSnackBar('Invalid Card ID!', false),
+      );
     } else {
-      showErrorSnackBar(context, 'Unknown error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        buildCustomSnackBar('Something went wrong!', false),
+      );
     }
   }
 

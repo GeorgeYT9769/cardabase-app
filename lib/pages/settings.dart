@@ -19,6 +19,7 @@ import 'package:hive_ce/hive.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../util/widgets/custom_snack_bar.dart';
 import 'cloud_backup.dart';
 
 final settingsbox = Hive.box('settingsBox');
@@ -452,52 +453,13 @@ class _SettingsState extends State<Settings> {
                           setState2(() {
                             isSending = true;
                           });
-
                           final sent = await _sendToDiscordWebhook(text);
-
                           if (!context.mounted) return;
-
                           Navigator.pop(context);
-
                           ScaffoldMessenger.of(this.context).showSnackBar(
-                            SnackBar(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              content: Row(
-                                children: [
-                                  Icon(
-                                    sent ? Icons.check : Icons.error,
-                                    size: 15,
-                                    color: Colors.white,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    sent
-                                        ? 'Bug report sent!'
-                                        : 'Failed to send report',
-                                    style:
-                                        theme.textTheme.bodyLarge?.copyWith(
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              duration:
-                                  const Duration(milliseconds: 3000),
-                              padding: const EdgeInsets.all(5.0),
-                              margin: const EdgeInsets.fromLTRB(
-                                  20, 0, 20, 30),
-                              behavior: SnackBarBehavior.floating,
-                              dismissDirection:
-                                  DismissDirection.vertical,
-                              backgroundColor: sent
-                                  ? const Color.fromARGB(
-                                      255, 92, 184, 92)
-                                  : const Color.fromARGB(
-                                      255, 237, 67, 55),
+                            buildCustomSnackBar(
+                              sent ? 'Bug report sent!' : 'Bug report failed!',
+                              sent,
                             ),
                           );
                         },
@@ -566,33 +528,7 @@ class _SettingsState extends State<Settings> {
       didReset = true;
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        content: Row(
-          children: [
-            const Icon(
-              Icons.check,
-              size: 15,
-              color: Colors.white,
-            ),
-            const SizedBox(width: 10),
-            Text(
-              'Cardabase was reset!',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                fontSize: 18,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        duration: const Duration(milliseconds: 3000),
-        padding: const EdgeInsets.all(5.0),
-        margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
-        behavior: SnackBarBehavior.floating,
-        dismissDirection: DismissDirection.vertical,
-        backgroundColor: const Color.fromARGB(255, 92, 184, 92),
-      ),
+      buildCustomSnackBar('Cardabase was reset!', true),
     );
     Navigator.of(context).pop(true);
   }
@@ -655,35 +591,7 @@ class _SettingsState extends State<Settings> {
                   } else {
                     VibrationProvider.vibrateSuccess();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        content: Row(
-                          children: [
-                            const Icon(
-                              Icons.error,
-                              size: 15,
-                              color: Colors.white,
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              'Incorrect password!',
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                fontSize: 18,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        duration: const Duration(milliseconds: 3000),
-                        padding: const EdgeInsets.all(5.0),
-                        margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-                        behavior: SnackBarBehavior.floating,
-                        dismissDirection: DismissDirection.vertical,
-                        backgroundColor: const Color.fromARGB(255, 237, 67, 55),
-                      ),
+                      buildCustomSnackBar('Incorrect password!', false),
                     );
                   }
                 },
@@ -721,7 +629,7 @@ class _SettingsState extends State<Settings> {
       showExportTypeDialog(context);
     }
   }
-  //TODO: unite all the passwords dialogs and toasts dialog
+  //TODO: unite all the passwords dialogs
   //TODO: add fingerprint verification
 
   void showDialogDelete(BuildContext context, ThemeData theme) {
@@ -790,36 +698,7 @@ class _SettingsState extends State<Settings> {
                     } else {
                       VibrationProvider.vibrateSuccess();
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          content: Row(
-                            children: [
-                              const Icon(
-                                Icons.error,
-                                size: 15,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                'Incorrect password!',
-                                style: theme.textTheme.bodyLarge?.copyWith(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          duration: const Duration(milliseconds: 3000),
-                          padding: const EdgeInsets.all(5.0),
-                          margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-                          behavior: SnackBarBehavior.floating,
-                          dismissDirection: DismissDirection.vertical,
-                          backgroundColor:
-                              const Color.fromARGB(255, 237, 67, 55),
-                        ),
+                        buildCustomSnackBar('Incorrect password!', false),
                       );
                     }
                   } else {

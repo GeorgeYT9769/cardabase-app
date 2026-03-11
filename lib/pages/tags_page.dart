@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
+import '../util/widgets/custom_snack_bar.dart';
+
 class TagsPage extends StatefulWidget {
   const TagsPage({super.key});
 
@@ -99,34 +101,7 @@ class _TagsPageState extends State<TagsPage> {
       box.put('tags', tags);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          content: Row(
-            children: [
-              const Icon(
-                Icons.error,
-                size: 15,
-                color: Colors.white,
-              ),
-              const SizedBox(width: 10),
-              Text(
-                'Tag already exists!',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontSize: 18,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          duration: const Duration(milliseconds: 3000),
-          padding: const EdgeInsets.all(5.0),
-          margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-          behavior: SnackBarBehavior.floating,
-          dismissDirection: DismissDirection.vertical,
-          backgroundColor: const Color.fromARGB(255, 237, 67, 55),
-        ),
+        buildCustomSnackBar('Tag already exists!', false),
       );
     }
   }
@@ -140,34 +115,7 @@ class _TagsPageState extends State<TagsPage> {
       box.put('tags', tags);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          content: Row(
-            children: [
-              const Icon(
-                Icons.error,
-                size: 15,
-                color: Colors.white,
-              ),
-              const SizedBox(width: 10),
-              Text(
-                'Tag does not exist!',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontSize: 18,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          duration: const Duration(milliseconds: 3000),
-          padding: const EdgeInsets.all(5.0),
-          margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-          behavior: SnackBarBehavior.floating,
-          dismissDirection: DismissDirection.vertical,
-          backgroundColor: const Color.fromARGB(255, 237, 67, 55),
-        ),
+        buildCustomSnackBar('Tag does not exist!', false),
       );
     }
   }

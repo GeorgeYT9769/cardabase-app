@@ -62,7 +62,10 @@ class _CloudBackupState extends State<CloudBackup> {
     final Box myBox = Hive.box('mybox');
     final List cards = myBox.get('CARDLIST', defaultValue: []);
     if (cards.isEmpty) {
-      buildCustomSnackBar('No cards to upload', false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        buildCustomSnackBar('No cards to upload', false),
+      );
+
       return;
     }
 
@@ -108,10 +111,14 @@ class _CloudBackupState extends State<CloudBackup> {
 
     if (failCount == 0) {
       VibrationProvider.vibrateSuccess();
-      buildCustomSnackBar('Successfully uploaded $successCount cards', true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        buildCustomSnackBar('Successfully uploaded $successCount cards', true),
+      );
     } else {
       VibrationProvider.vibrateSuccess();
-      buildCustomSnackBar('Uploaded $successCount cards. Failed on $failCount.', failCount < 0);
+      ScaffoldMessenger.of(context).showSnackBar(
+          buildCustomSnackBar('Uploaded $successCount cards. Failed on $failCount.', failCount < 0),
+      );
     }
   }
 
@@ -138,16 +145,22 @@ class _CloudBackupState extends State<CloudBackup> {
         cdb.loadData();
         
         VibrationProvider.vibrateSuccess();
-        buildCustomSnackBar('Successfully downloaded ${downloadedCards.length} cards', true);
+        ScaffoldMessenger.of(context).showSnackBar(
+          buildCustomSnackBar('Successfully downloaded ${downloadedCards.length} cards', true),
+        );
       } else {
         VibrationProvider.vibrateSuccess();
-        buildCustomSnackBar('Failed to download from server', false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          buildCustomSnackBar('Failed to download from server', false),
+        );
       }
       httpClient.close();
     } catch (e) {
       debugPrint('Failed to download cards: $e');
       VibrationProvider.vibrateSuccess();
-      buildCustomSnackBar('Error downloading cards: check connection', false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        buildCustomSnackBar('Error downloading cards: check connection', false),
+      );
     }
   }
 
@@ -234,19 +247,24 @@ class _CloudBackupState extends State<CloudBackup> {
       
       httpClient.close();
       VibrationProvider.vibrateSuccess();
-      buildCustomSnackBar('Permanently deleted $deletedCount cards from cloud', true);
-
+      ScaffoldMessenger.of(context).showSnackBar(
+        buildCustomSnackBar('Permanently deleted $deletedCount cards from cloud', true),
+      );
     } catch (e) {
       debugPrint('Failed to delete cards: $e');
       VibrationProvider.vibrateSuccess();
-      buildCustomSnackBar('Failed to delete cards from cloud', false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        buildCustomSnackBar('Failed to delete cards from cloud', false),
+      );
     }
   }
 
   Future<void> logIn() async {
     final String ip = ipAddress.text.trim();
     if (ip.isEmpty) {
-      buildCustomSnackBar('IP Address is required', false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        buildCustomSnackBar('IP Address is required', false),
+      );
       return;
     }
 
@@ -272,16 +290,23 @@ class _CloudBackupState extends State<CloudBackup> {
           hasCloudSetUp = true;
         });
         VibrationProvider.vibrateSuccess();
-        buildCustomSnackBar('Successfully connected to server', true);
+        ScaffoldMessenger.of(context).showSnackBar(
+          buildCustomSnackBar('Successfully connected to server', true),
+        );
       } else {
         VibrationProvider.vibrateSuccess();
-        buildCustomSnackBar('Server returned status ${response.statusCode}', false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          buildCustomSnackBar('Server returned status ${response.statusCode}', false),
+        );
+
       }
       httpClient.close();
     } catch (e) {
       debugPrint('Login failed: $e');
       VibrationProvider.vibrateSuccess();
-      buildCustomSnackBar('Could not connect to server', false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        buildCustomSnackBar('Could not connect to server', false),
+      );
     }
   }
 
@@ -297,7 +322,9 @@ class _CloudBackupState extends State<CloudBackup> {
     });
     
     VibrationProvider.vibrateSuccess();
-    buildCustomSnackBar('Logged out and cleared cloud configuration', true);
+    ScaffoldMessenger.of(context).showSnackBar(
+      buildCustomSnackBar('Logged out and cleared cloud configuration', true),
+    );
   }
 
 
