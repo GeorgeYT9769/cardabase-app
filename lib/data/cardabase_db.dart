@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cardabase/data/loyalty_card.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
@@ -24,17 +26,21 @@ class CardabaseDb {
 
   LoyaltyCard? remove(String id) {
     final index = _indexOf(id);
-    final removed = myShops.removeAt(index);
-    if (removed == null) {
+    if (index < 0) {
       return null;
     }
+    final removed = myShops.removeAt(index);
     updateDataBase();
     return _mapEntryToModel(removed);
   }
 
   void move(String id, int Function(int oldIndex) indexManipulator) {
     final index = _indexOf(id);
-    moveByIndex(index, indexManipulator(index));
+    if (index < 0) {
+      throw Exception('no card found with the given id');
+    }
+    final newIndex = max(0, min(indexManipulator(index), myShops.length - 1));
+    moveByIndex(index, newIndex);
   }
 
   void moveByIndex(int oldIndex, int newIndex) {
@@ -45,6 +51,9 @@ class CardabaseDb {
 
   void duplicate(String id) {
     final index = _indexOf(id);
+    if (index < 0) {
+      throw Exception('no card found with the given id');
+    }
     myShops.insert(index + 1, myShops[index]);
     updateDataBase();
   }
