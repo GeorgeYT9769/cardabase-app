@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:cardabase/data/loyalty_card.dart';
 import 'package:cardabase/pages/edit_card/barcode_type_selector_dialog.dart';
-import 'package:cardabase/pages/edit_card/error_snack_bar.dart';
 import 'package:cardabase/pages/edit_card/form_fields/barcode_type_selector_button.dart';
 import 'package:cardabase/pages/edit_card/form_fields/card_data_form_field.dart';
 import 'package:cardabase/pages/edit_card/form_fields/card_name_form_field.dart';
@@ -13,6 +12,7 @@ import 'package:cardabase/pages/edit_card/form_fields/points_form_field.dart';
 import 'package:cardabase/pages/edit_card/form_fields/take_picture_button.dart';
 import 'package:cardabase/util/read_barcode.dart';
 import 'package:cardabase/util/widgets/color_picker_dialog.dart';
+import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:cardabase/util/widgets/multi_listenable_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_ce/hive.dart';
@@ -91,9 +91,8 @@ class _EditCardFormState extends State<EditCardForm> {
         widget.card.barcodeType.value = card.barcodeType;
         widget.card.requiresAuth.value = card.requiresAuth;
       } on FormatException {
-        showErrorSnackBar(
-          context,
-          'Scanned code is not a valid Cardabase share code.',
+        ScaffoldMessenger.of(context).showSnackBar(
+          buildCustomSnackBar('Scanned code is not a valid Cardabase share code.', false),
         );
       }
     }

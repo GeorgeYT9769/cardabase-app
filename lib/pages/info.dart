@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cardabase/pages/news.dart';
 import 'package:cardabase/util/expressive_loading_indicator.dart';
+import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:http/http.dart' as http;
@@ -92,7 +93,7 @@ class _InfoScreenState extends State<InfoScreen> {
   Future<void> _launchUrl(String url) async {
     if (!await launchUrl(Uri.parse(url))) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not open $url')),
+        buildCustomSnackBar('Could not launch $url', false),
       );
     }
   }

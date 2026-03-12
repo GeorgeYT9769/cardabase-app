@@ -4,6 +4,8 @@ import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:password_strength_checker/password_strength_checker.dart';
 
+import '../util/widgets/custom_snack_bar.dart';
+
 class PasswordScreen extends StatefulWidget {
   const PasswordScreen({super.key});
 
@@ -33,99 +35,18 @@ class _PasswordScreenState extends State<PasswordScreen> {
         });
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            content: Row(
-              children: [
-                const Icon(
-                  Icons.check,
-                  size: 15,
-                  color: Colors.white,
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  'Success!',
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontSize: 18,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            duration: const Duration(milliseconds: 3000),
-            padding: const EdgeInsets.all(5.0),
-            margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
-            behavior: SnackBarBehavior.floating,
-            dismissDirection: DismissDirection.vertical,
-            backgroundColor: const Color.fromARGB(255, 92, 184, 92),
-          ),
+          buildCustomSnackBar('Success!', true),
         );
       } else {
         VibrationProvider.vibrateSuccess();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            content: Row(
-              children: [
-                const Icon(
-                  Icons.error,
-                  size: 15,
-                  color: Colors.white,
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  'Passwords does not match!',
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontSize: 18,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            duration: const Duration(milliseconds: 3000),
-            padding: const EdgeInsets.all(5.0),
-            margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
-            behavior: SnackBarBehavior.floating,
-            dismissDirection: DismissDirection.vertical,
-            backgroundColor: const Color.fromARGB(255, 237, 67, 55),
-          ),
+          buildCustomSnackBar('Passwords do not match!', false),
         );
       }
     } else {
       VibrationProvider.vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          content: Row(
-            children: [
-              const Icon(
-                Icons.error,
-                size: 15,
-                color: Colors.white,
-              ),
-              const SizedBox(width: 10),
-              Text(
-                'Password cannot be empty!',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontSize: 18,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          duration: const Duration(milliseconds: 3000),
-          padding: const EdgeInsets.all(5.0),
-          margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
-          behavior: SnackBarBehavior.floating,
-          dismissDirection: DismissDirection.vertical,
-          backgroundColor: const Color.fromARGB(255, 237, 67, 55),
-        ),
+        buildCustomSnackBar('Password cannot be empty!', false),
       );
     }
   }
@@ -140,66 +61,12 @@ class _PasswordScreenState extends State<PasswordScreen> {
       });
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          content: Row(
-            children: [
-              const Icon(
-                Icons.check,
-                size: 15,
-                color: Colors.white,
-              ),
-              const SizedBox(width: 10),
-              Text(
-                'Success!',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontSize: 18,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          duration: const Duration(milliseconds: 3000),
-          padding: const EdgeInsets.all(5.0),
-          margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
-          behavior: SnackBarBehavior.floating,
-          dismissDirection: DismissDirection.vertical,
-          backgroundColor: const Color.fromARGB(255, 92, 184, 92),
-        ),
+        buildCustomSnackBar('Success!', true),
       );
     } else {
       VibrationProvider.vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          content: Row(
-            children: [
-              const Icon(
-                Icons.error,
-                size: 15,
-                color: Colors.white,
-              ),
-              const SizedBox(width: 10),
-              Text(
-                'Incorrect password!',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontSize: 18,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          duration: const Duration(milliseconds: 3000),
-          padding: const EdgeInsets.all(5.0),
-          margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
-          behavior: SnackBarBehavior.floating,
-          dismissDirection: DismissDirection.vertical,
-          backgroundColor: const Color.fromARGB(255, 237, 67, 55),
-        ),
+        buildCustomSnackBar('Incorrect password!', false),
       );
     }
   }

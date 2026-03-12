@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:cardabase/pages/card_details/card_details_page.dart';
 import 'package:cardabase/util/vibration_provider.dart';
+import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
@@ -218,37 +219,7 @@ class _CardTileState extends State<CardTile> {
                     } else {
                       VibrationProvider.vibrateSuccess();
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          content: Row(
-                            children: [
-                              const Icon(
-                                Icons.error,
-                                size: 15,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                'Incorrect password!',
-                                style: theme.textTheme.bodyLarge?.copyWith(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          duration: const Duration(milliseconds: 3000),
-                          padding: const EdgeInsets.all(5.0),
-                          margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-                          behavior: SnackBarBehavior.floating,
-                          dismissDirection: DismissDirection.vertical,
-                          backgroundColor:
-                              const Color.fromARGB(255, 237, 67, 55),
-                          elevation: 0.0,
-                        ),
+                        buildCustomSnackBar('Incorrect password!', false),
                       );
                     }
                   },
@@ -404,31 +375,7 @@ class _CardTileState extends State<CardTile> {
     });
     if (success == true) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          content: Row(
-            children: [
-              const Icon(Icons.check, size: 15, color: Colors.white),
-              const SizedBox(width: 10),
-              Text(
-                'Widget updated!',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontSize: 18,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          duration: const Duration(milliseconds: 3000),
-          padding: const EdgeInsets.all(5.0),
-          margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
-          behavior: SnackBarBehavior.floating,
-          dismissDirection: DismissDirection.vertical,
-          backgroundColor: const Color.fromARGB(255, 92, 184, 92),
-        ),
+        buildCustomSnackBar('Widget updated!', true),
       );
     }
   }
@@ -490,37 +437,7 @@ class _CardTileState extends State<CardTile> {
                   } else {
                     VibrationProvider.vibrateSuccess();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        content: Row(
-                          children: [
-                            const Icon(
-                              Icons.error,
-                              size: 15,
-                              color: Colors.white,
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              'Incorrect password!',
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                fontSize: 18,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        duration: const Duration(milliseconds: 3000),
-                        padding: const EdgeInsets.all(5.0),
-                        margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-                        behavior: SnackBarBehavior.floating,
-                        dismissDirection: DismissDirection.vertical,
-                        backgroundColor:
-                            const Color.fromARGB(255, 237, 67, 55),
-                        elevation: 0.0,
-                      ),
+                      buildCustomSnackBar('Incorrect password!', false),
                     );
                   }
                 },
