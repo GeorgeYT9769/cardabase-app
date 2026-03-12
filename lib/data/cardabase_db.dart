@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cardabase/data/loyalty_card.dart';
+import 'package:cardabase/data/unique_id.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
 class CardabaseDb {
@@ -54,7 +55,9 @@ class CardabaseDb {
     if (index < 0) {
       throw Exception('no card found with the given id');
     }
-    myShops.insert(index + 1, myShops[index]);
+    final card = getAt(index).editable();
+    card.uniqueId.value = generateUniqueId();
+    myShops.insert(index + 1, card.seal().toDbModel());
     updateDataBase();
   }
 
