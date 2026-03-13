@@ -124,7 +124,7 @@ class _HomePageState extends State<Homepage> {
 
   Future<void> editCard(ThemeData theme, LoyaltyCard card) async {
     if (passwordBox.isNotEmpty && card.requiresAuth) {
-      final success = await showDialog(
+      final success = await showDialog<bool>(
         context: context,
         builder: (context) => PasswordChallengeDialog(
           challengeButtonChild: Text(
@@ -137,7 +137,7 @@ class _HomePageState extends State<Homepage> {
         ),
       ).then((value) => value ?? false);
 
-      if (!success || !mounted) {
+      if (success != true || !mounted) {
         return;
       }
     }
