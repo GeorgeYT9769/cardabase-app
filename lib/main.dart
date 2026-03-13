@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:cardabase/data/loyalty_card.dart';
 import 'package:cardabase/pages/edit_card/edit_card.dart';
-import 'package:cardabase/pages/home_page.dart';
+import 'package:cardabase/pages/home/home_page.dart';
 import 'package:cardabase/pages/settings.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
 import 'package:cardabase/theme/color_schemes.g.dart';
