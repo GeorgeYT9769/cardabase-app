@@ -160,6 +160,7 @@ class EditableThemeSettings {
     useDarkMode.dispose();
     useExtraDark.dispose();
     useSystemFont.dispose();
+    loyaltyCardEffect.dispose();
   }
 }
 
@@ -191,6 +192,11 @@ class EditableLoyaltyCardEffectSettings {
       isEnabled: isEnabled.value,
       effect: effect.value,
     );
+  }
+
+  void dispose() {
+    isEnabled.dispose();
+    effect.dispose();
   }
 }
 
