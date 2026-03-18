@@ -61,9 +61,15 @@ class _AddTagDialogState extends State<AddTagDialog> {
           const SizedBox(height: 20),
           Center(
             child: OutlinedButton(
-              onPressed: () => Navigator.of(context).pop(
-                _controller.text.trim(),
-              ),
+              onPressed: () {
+                final trimmed = _controller.text.trim();
+                if (trimmed.isEmpty) {
+                  return;
+                }
+                Navigator.of(context).pop(
+                  _controller.text.trim(),
+                );
+              },
               style: OutlinedButton.styleFrom(
                 elevation: 0.0,
                 side: BorderSide(

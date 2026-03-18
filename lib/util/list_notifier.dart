@@ -71,7 +71,10 @@ class ListNotifier<T> extends ChangeNotifier
   List<R> cast<R>() => _value.cast();
 
   @override
-  void clear() => _value.clear();
+  void clear() {
+    _value.clear();
+    notifyListeners();
+  }
 
   @override
   bool contains(Object? element) => _value.contains(element);

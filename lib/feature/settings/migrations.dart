@@ -21,6 +21,11 @@ Future<void> migrateSettingsTo202603(Box oldBox, Box<Settings> newBox) {
     _ => SortingStyle.oldest,
   };
 
+  final tags = (oldBox.get('tags') as List?)
+          ?.whereType<String>()
+          .toList(growable: false) ??
+      [];
+
   return newBox.add(
     Settings(
       lastSeenAppVersion: oldBox.get('lastSeenAppVersion') as String?,
@@ -46,7 +51,7 @@ Future<void> migrateSettingsTo202603(Box oldBox, Box<Settings> newBox) {
       ),
       useAutoBrightness: oldBox.get('setBrightness') as bool? ?? true,
       vibrateOnDifferentActions: oldBox.get('setVibration') as bool? ?? true,
-      tags: oldBox.get('tags') as List<String>? ?? [],
+      tags: tags,
       cardListViewOptions: CardListViewOptions(
         numberOfColumns: oldBox.get('columnAmount') as int? ?? 1,
         sortingStyle: sortingStyle,

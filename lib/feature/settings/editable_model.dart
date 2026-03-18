@@ -1,6 +1,5 @@
 import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/util/list_notifier.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
 class EditableSettings {

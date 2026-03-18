@@ -36,6 +36,29 @@ class _HomePageState extends State<Homepage> {
     cdb.loadData();
   }
 
+  void saveAndApplySortingStyle() {
+    switch (_settingsBox.value.cardListViewOptions.sortingStyle) {
+      case SortingStyle.nameAz:
+        cdb.myShops.sort((a, b) {
+          return a['cardName'].compareTo(b['cardName']);
+        });
+      case SortingStyle.nameZa:
+        cdb.myShops.sort((a, b) {
+          return b['cardName'].compareTo(a['cardName']);
+        });
+      case SortingStyle.latest:
+        cdb.myShops.sort((a, b) {
+          return b['uniqueId'].compareTo(a['uniqueId']);
+        });
+      case SortingStyle.oldest:
+        cdb.myShops.sort((a, b) {
+          return a['uniqueId'].compareTo(b['uniqueId']);
+        });
+    }
+    cdb.updateDataBase();
+    setState(() {});
+  }
+
   Future<void> deleteCard(ThemeData theme, LoyaltyCard card) async {
     if (passwordBox.isNotEmpty && card.requiresAuth) {
       final success = await showDialog<bool>(
@@ -122,6 +145,7 @@ class _HomePageState extends State<Homepage> {
         this.isInReorderingMode = isInReorderingMode.value;
         this.tagFilter = tagFilter.value;
       });
+      saveAndApplySortingStyle();
     } finally {
       isInReorderingMode.dispose();
       tagFilter.dispose();
