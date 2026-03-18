@@ -106,21 +106,27 @@ class _HomePageState extends State<Homepage> {
     final tagFilter = ValueNotifier(this.tagFilter);
     final editableSettings = settings.editable();
 
-    await showDialog(
-      context: context,
-      builder: (context) => CardListViewOptionsDialog(
-        allTags: settings.tags,
-        isInReorderingMode: isInReorderingMode,
-        tagFilter: tagFilter,
-        sortingStyle: editableSettings.cardListViewOptions.sortingStyle,
-        numberOfColumns: editableSettings.cardListViewOptions.numberOfColumns,
-      ),
-    );
-    await _settingsBox.save(editableSettings.seal());
-    setState(() {
-      this.isInReorderingMode = isInReorderingMode.value;
-      this.tagFilter = tagFilter.value;
-    });
+    try {
+      await showDialog(
+        context: context,
+        builder: (context) => CardListViewOptionsDialog(
+          allTags: settings.tags,
+          isInReorderingMode: isInReorderingMode,
+          tagFilter: tagFilter,
+          sortingStyle: editableSettings.cardListViewOptions.sortingStyle,
+          numberOfColumns: editableSettings.cardListViewOptions.numberOfColumns,
+        ),
+      );
+      await _settingsBox.save(editableSettings.seal());
+      setState(() {
+        this.isInReorderingMode = isInReorderingMode.value;
+        this.tagFilter = tagFilter.value;
+      });
+    } finally {
+      isInReorderingMode.dispose();
+      tagFilter.dispose();
+      editableSettings.dispose();
+    }
   }
 
   Future<void> navigateToWelcomeScreen() {

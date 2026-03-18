@@ -73,6 +73,7 @@ class EditableSettings {
     useAutoBrightness.dispose();
     vibrateOnDifferentActions.dispose();
     tags.dispose();
+    cardListViewOptions.dispose();
   }
 }
 
@@ -144,6 +145,7 @@ class EditableThemeSettings {
     useDarkMode.value = value.useDarkMode;
     useExtraDark.value = value.useExtraDark;
     useSystemFont.value = value.useSystemFont;
+    loyaltyCardEffect.loadValue(value.loyaltyCardEffect);
   }
 
   ThemeSettings seal() {

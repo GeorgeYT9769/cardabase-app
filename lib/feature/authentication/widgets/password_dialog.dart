@@ -17,7 +17,7 @@ class _PasswordDialogState extends State<PasswordDialog> {
 
   Future<void> onExportPressed() async {
     if (_password.text != _passwordBox.get('PW')) {
-      GetIt.I<VibrationProvider>().vibrateSuccess();
+      GetIt.I<VibrationProvider>().vibrateError();
       ScaffoldMessenger.of(context).showSnackBar(
         buildCustomSnackBar('Incorrect password!', false),
       );

@@ -18,7 +18,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_ce/hive.dart';
-import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -317,7 +316,7 @@ class _SettingsPageState extends State<SettingsPage> {
         aboutSettingHeader: 'Vibrate on different actions',
         settingAction: () async {
           _settings.vibrateOnDifferentActions.value = !isEnabled;
-          _settingsBox.save(_settings.seal());
+          await _settingsBox.save(_settings.seal());
         },
         settingHeader: 'Vibrate',
         iconColor: isEnabled ? Colors.green : Colors.red,
@@ -334,7 +333,7 @@ class _SettingsPageState extends State<SettingsPage> {
         aboutSettingHeader: 'Use System font everywhere',
         settingAction: () async {
           _settings.theme.useSystemFont.value = !useSystemFont;
-          _settingsBox.save(_settings.seal());
+          await _settingsBox.save(_settings.seal());
         },
         settingHeader: 'Use System Font',
         iconColor: useSystemFont ? Colors.green : Colors.red,

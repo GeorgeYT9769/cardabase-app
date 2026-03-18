@@ -13,6 +13,7 @@ extension SettingsGetItExtensions on GetIt {
         final newSettingsBox = await hive.openBox<Settings>('settings202603');
 
         await migrateSettingsTo202603(oldSettingsBox, newSettingsBox);
+        await oldSettingsBox.close();
 
         return newSettingsBox;
       },
