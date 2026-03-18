@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:cardabase/data/loyalty_card.dart';
+import 'package:cardabase/feature/settings/get_it.dart';
+import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/pages/edit_card/barcode_type_selector_dialog.dart';
 import 'package:cardabase/pages/edit_card/form_fields/barcode_type_selector_button.dart';
 import 'package:cardabase/pages/edit_card/form_fields/card_data_form_field.dart';
@@ -15,7 +17,8 @@ import 'package:cardabase/util/widgets/color_picker_dialog.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:cardabase/util/widgets/multi_listenable_builder.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_ce/hive.dart';
+import 'package:get_it/get_it.dart';
+import 'package:hive_ce_flutter/adapters.dart';
 
 class EditCardForm extends StatefulWidget {
   const EditCardForm({
@@ -33,9 +36,6 @@ class EditCardForm extends StatefulWidget {
 
 class _EditCardFormState extends State<EditCardForm> {
   final passwordBox = Hive.box('password');
-
-  late final allTags =
-      Hive.box('settingsBox').get('tags', defaultValue: []) as List<dynamic>;
 
   Color get textColor {
     final bg = widget.card.color.value;
@@ -92,7 +92,8 @@ class _EditCardFormState extends State<EditCardForm> {
         widget.card.requiresAuth.value = card.requiresAuth;
       } on FormatException {
         ScaffoldMessenger.of(context).showSnackBar(
-          buildCustomSnackBar('Scanned code is not a valid Cardabase share code.', false),
+          buildCustomSnackBar(
+              'Scanned code is not a valid Cardabase share code.', false),
         );
       }
     }
@@ -279,86 +280,11 @@ class _EditCardFormState extends State<EditCardForm> {
   }
 
   Widget _other(ThemeData theme) {
-    return Container(
+    return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          if (allTags.isEmpty)
-            const SizedBox.shrink()
-          else
-            Row(
-              children: [
-                Text(
-                  'Tags:',
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: theme.colorScheme.inverseSurface,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: SizedBox(
-                    height: 40,
-                    child: ListView.builder(
-                      physics: const BouncingScrollPhysics(
-                        decelerationRate: ScrollDecelerationRate.fast,
-                      ),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: allTags.length,
-                      itemBuilder: (context, chipIndex) {
-                        final tag = allTags[chipIndex] as String;
-                        final isSelected = widget.card.tags.value.contains(tag);
-                        return Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-                          child: ActionChip(
-                            label: Text(tag),
-                            onPressed: () {
-                              setState(() {
-                                if (isSelected) {
-                                  widget.card.tags.value = {
-                                    ...widget.card.tags.value
-                                        .where((t) => t == tag),
-                                  };
-                                } else {
-                                  widget.card.tags.value = {
-                                    ...widget.card.tags.value,
-                                    tag,
-                                  };
-                                }
-                              });
-                            },
-                            labelStyle: theme.textTheme.bodyLarge?.copyWith(
-                              color: isSelected
-                                  ? theme.colorScheme.onPrimary
-                                  : theme.colorScheme.inverseSurface,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            backgroundColor: isSelected
-                                ? theme.colorScheme.primary
-                                : theme.colorScheme.surface,
-                            side: BorderSide(
-                              color: isSelected
-                                  ? theme.colorScheme.primary
-                                  : theme.colorScheme.primary
-                                      .withValues(alpha: 0.3),
-                              width: isSelected ? 2 : 1,
-                            ),
-                            avatar: isSelected
-                                ? Icon(
-                                    Icons.check,
-                                    size: 18,
-                                    color: theme.colorScheme.onPrimary,
-                                  )
-                                : null,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          _tagsEditor(theme),
           const SizedBox(height: 15),
           TakePictureButton(
             picturePath: widget.card.frontImagePath,
@@ -463,6 +389,91 @@ class _EditCardFormState extends State<EditCardForm> {
           const SizedBox(height: 100),
         ],
       ),
+    );
+  }
+
+  Widget _tagsEditor(ThemeData theme) {
+    return ValueListenableBuilder(
+      valueListenable: GetIt.I<SettingsBox>().listenable(),
+      builder: (context, settingsBox, _) {
+        final allTags = settingsBox.value.tags;
+        if (allTags.isEmpty) {
+          return const SizedBox.shrink();
+        }
+        return Row(
+          children: [
+            Text(
+              'Tags:',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.inverseSurface,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: SizedBox(
+                height: 40,
+                child: ListView.builder(
+                  physics: const BouncingScrollPhysics(
+                    decelerationRate: ScrollDecelerationRate.fast,
+                  ),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: allTags.length,
+                  itemBuilder: (context, chipIndex) {
+                    final tag = allTags[chipIndex] as String;
+                    final isSelected = widget.card.tags.value.contains(tag);
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                      child: ActionChip(
+                        label: Text(tag),
+                        onPressed: () {
+                          setState(() {
+                            if (isSelected) {
+                              widget.card.tags.value = {
+                                ...widget.card.tags.value
+                                    .where((t) => t == tag),
+                              };
+                            } else {
+                              widget.card.tags.value = {
+                                ...widget.card.tags.value,
+                                tag,
+                              };
+                            }
+                          });
+                        },
+                        labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                          color: isSelected
+                              ? theme.colorScheme.onPrimary
+                              : theme.colorScheme.inverseSurface,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        backgroundColor: isSelected
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.surface,
+                        side: BorderSide(
+                          color: isSelected
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.primary
+                                  .withValues(alpha: 0.3),
+                          width: isSelected ? 2 : 1,
+                        ),
+                        avatar: isSelected
+                            ? Icon(
+                                Icons.check,
+                                size: 18,
+                                color: theme.colorScheme.onPrimary,
+                              )
+                            : null,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

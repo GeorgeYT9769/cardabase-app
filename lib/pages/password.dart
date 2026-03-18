@@ -1,6 +1,7 @@
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
+import 'package:get_it/get_it.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:password_strength_checker/password_strength_checker.dart';
 
@@ -38,13 +39,13 @@ class _PasswordScreenState extends State<PasswordScreen> {
           buildCustomSnackBar('Success!', true),
         );
       } else {
-        VibrationProvider.vibrateSuccess();
+        GetIt.I<VibrationProvider>().vibrateSuccess();
         ScaffoldMessenger.of(context).showSnackBar(
           buildCustomSnackBar('Passwords do not match!', false),
         );
       }
     } else {
-      VibrationProvider.vibrateSuccess();
+      GetIt.I<VibrationProvider>().vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
         buildCustomSnackBar('Password cannot be empty!', false),
       );
@@ -64,7 +65,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
         buildCustomSnackBar('Success!', true),
       );
     } else {
-      VibrationProvider.vibrateSuccess();
+      GetIt.I<VibrationProvider>().vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
         buildCustomSnackBar('Incorrect password!', false),
       );

@@ -36,6 +36,7 @@ dependencies:
   flutter_bounceable: ^1.1.0
   flutter_colorpicker: ^1.0.3
   flutter_launcher_icons: ^0.14.4
+  get_it: ">=9.0.0 <=10.0.0"
   haptic_feedback: ^0.6.4+3
   hive_ce: ">=2.19.3 <3.0.0"
   hive_ce_flutter: ">=2.3.4 <3.0.0"

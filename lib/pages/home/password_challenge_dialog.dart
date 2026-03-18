@@ -2,6 +2,7 @@ import 'package:cardabase/pages/home/form_fields/password_form_field.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:hive_ce/hive.dart';
 
 class PasswordChallengeDialog extends StatefulWidget {
@@ -26,7 +27,7 @@ class _PasswordChallengeDialogState extends State<PasswordChallengeDialog> {
     // TODO(wim): use proper password validation
     final expectedPassword = passwordBox.get('PW');
     if (password.text != expectedPassword) {
-      VibrationProvider.vibrateSuccess();
+      GetIt.I<VibrationProvider>().vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
         buildCustomSnackBar('Incorrect password!', false),
       );

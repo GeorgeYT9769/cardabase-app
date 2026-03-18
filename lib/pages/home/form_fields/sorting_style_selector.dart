@@ -1,29 +1,5 @@
+import 'package:cardabase/feature/settings/model.dart';
 import 'package:flutter/material.dart';
-
-enum SortingStyle {
-  nameAz,
-  nameZa,
-  latest,
-  oldest;
-
-  String toDbValue() {
-    return switch (this) {
-      SortingStyle.nameAz => 'nameaz',
-      SortingStyle.nameZa => 'nameza',
-      SortingStyle.latest => 'latest',
-      SortingStyle.oldest => 'oldest',
-    };
-  }
-
-  static SortingStyle fromDbValue(String value) {
-    return switch (value) {
-      'nameaz' => SortingStyle.nameAz,
-      'nameza' => SortingStyle.nameZa,
-      'latest' => SortingStyle.latest,
-      _ => SortingStyle.oldest,
-    };
-  }
-}
 
 class SortingStyleSelector extends StatelessWidget {
   const SortingStyleSelector({

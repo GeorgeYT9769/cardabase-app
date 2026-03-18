@@ -6,7 +6,7 @@ const int _asciiDigit9 = 57; // 48+9
 FormFieldValidator<TIn> isNotEmpty<TIn>() {
   return (value) {
     if (value == null ||
-        value == '' ||
+        value is String && value.trim() == '' ||
         value is List && value.length == 0 ||
         value is Map && value.length == 0) {
       return 'Value cannot be empty';

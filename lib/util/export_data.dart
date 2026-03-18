@@ -4,6 +4,7 @@ import 'package:cardabase/util/vibration_provider.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get_it/get_it.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -35,7 +36,7 @@ Future<void> exportCardList(
       final directory = Directory('/storage/emulated/0/Download');
       final cardList = cardBox.get('CARDLIST') as List?;
       if (cardList == null || cardList.isEmpty) {
-        VibrationProvider.vibrateSuccess();
+        GetIt.I<VibrationProvider>().vibrateSuccess();
         ScaffoldMessenger.of(context).showSnackBar(
           buildCustomSnackBar('No data!', false),
         );
@@ -79,7 +80,8 @@ Future<void> exportCardList(
       }
 
       if (toFile) {
-        final filePath = '${directory.path}/Cardabase/Cardabase_backup_$timestamp.txt';
+        final filePath =
+            '${directory.path}/Cardabase/Cardabase_backup_$timestamp.txt';
         final file = File(filePath);
         await file.writeAsString(txtBuffer.toString());
         ScaffoldMessenger.of(context).showSnackBar(
@@ -92,13 +94,13 @@ Future<void> exportCardList(
         );
       }
     } catch (e) {
-      VibrationProvider.vibrateSuccess();
+      GetIt.I<VibrationProvider>().vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
         buildCustomSnackBar('Error!', false),
       );
     }
   } else {
-    VibrationProvider.vibrateSuccess();
+    GetIt.I<VibrationProvider>().vibrateSuccess();
     ScaffoldMessenger.of(context).showSnackBar(
       buildCustomSnackBar('No permission!', false),
     );
@@ -120,7 +122,7 @@ Future<void> showExportTypeDialog(BuildContext context) async {
         ),
         content: SizedBox(
           height: 150,
-          child: ListView(
+          child: Column(
             children: [
               OutlinedButton(
                 onPressed: () {
