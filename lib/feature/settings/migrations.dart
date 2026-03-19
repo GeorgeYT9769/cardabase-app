@@ -31,8 +31,9 @@ Future<void> migrateSettingsTo202603(Box oldBox, Box<Settings> newBox) {
       lastSeenAppVersion: oldBox.get('lastSeenAppVersion') as String?,
       autoBackups: AutoBackupSettings(
         isEnabled: oldBox.get('autoBackups') as bool? ?? false,
-        lastUpdate:
-            lastAutoUpdate == null ? null : DateTime.tryParse(lastAutoUpdate),
+        lastUpdate: lastAutoUpdate == null
+            ? null
+            : DateTime.tryParse(lastAutoUpdate)?.toUtc(),
         interval: Duration(days: oldBox.get('autoBackupInterval') as int? ?? 7),
       ),
       theme: ThemeSettings(

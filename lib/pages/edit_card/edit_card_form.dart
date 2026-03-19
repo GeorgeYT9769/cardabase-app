@@ -432,7 +432,7 @@ class _EditCardFormState extends State<EditCardForm> {
                             if (isSelected) {
                               widget.card.tags.value = {
                                 ...widget.card.tags.value
-                                    .where((t) => t == tag),
+                                    .where((t) => t != tag),
                               };
                             } else {
                               widget.card.tags.value = {
