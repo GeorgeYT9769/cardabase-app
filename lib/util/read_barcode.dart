@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
@@ -126,7 +127,7 @@ class _QRBarReaderState extends State<QRBarReader> {
 
   Widget _buildQrView(BuildContext context) {
     final scanArea = (MediaQuery.of(context).size.width < 400 ||
-        MediaQuery.of(context).size.height < 400)
+            MediaQuery.of(context).size.height < 400)
         ? 200.0
         : 400.0;
     return QRView(
@@ -197,7 +198,7 @@ class _QRBarReaderState extends State<QRBarReader> {
 
   Future<void> _pickImage() async {
     final imageFile =
-    await ImagePicker().pickImage(source: ImageSource.gallery);
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (imageFile == null) return;
 
     final bytes = await imageFile.readAsBytes();
@@ -213,7 +214,7 @@ class _QRBarReaderState extends State<QRBarReader> {
         'format': 'QR_CODE',
       });
     } else {
-      VibrationProvider.vibrateError();
+      GetIt.I<VibrationProvider>().vibrateError();
       ScaffoldMessenger.of(context).showSnackBar(
         buildCustomSnackBar('Error', false),
       );
@@ -223,7 +224,7 @@ class _QRBarReaderState extends State<QRBarReader> {
   void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
     if (!p) {
       if (!_permissionDeniedShown) {
-        VibrationProvider.vibrateError();
+        GetIt.I<VibrationProvider>().vibrateError();
         controller?.pauseCamera();
         Navigator.of(context).pop();
         if (mounted) {

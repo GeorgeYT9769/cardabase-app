@@ -1,5 +1,7 @@
 import 'package:cardabase/data/cardabase_db.dart';
 import 'package:cardabase/data/loyalty_card.dart';
+import 'package:cardabase/feature/settings/get_it.dart';
+import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/pages/edit_card/edit_card_form.dart';
 import 'package:cardabase/pages/edit_card/form_fields/save_button.dart';
 import 'package:cardabase/pages/edit_card/verify_code.dart';
@@ -7,6 +9,7 @@ import 'package:cardabase/util/read_barcode.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
 class EditCard extends StatefulWidget {
@@ -24,7 +27,6 @@ class EditCard extends StatefulWidget {
 class _EditCardState extends State<EditCard> {
   final _formKey = GlobalKey<FormState>();
 
-  final settingsBox = Hive.box('settingsBox');
   final CardabaseDb cdb = CardabaseDb();
 
   final card = LoyaltyCard.empty().editable();
@@ -40,8 +42,7 @@ class _EditCardState extends State<EditCard> {
   }
 
   void showValidationError() {
-    // TODO(wim): why do we vibrate success while there is an error?
-    VibrationProvider.vibrateSuccess();
+    GetIt.I<VibrationProvider>().vibrateError();
 
     if (card.name.text.isEmpty == true) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -142,23 +143,17 @@ class _EditCardState extends State<EditCard> {
       ),
       actions: [
         ValueListenableBuilder(
-          valueListenable: settingsBox.listenable(),
-          builder: (context, settingsBox, _) {
-            // TODO(wim): wrap this to make it type-safe
-            final showLegacyCardButton = settingsBox.get(
-              'developerOptions',
-              defaultValue: false,
-            ) as bool;
-            return showLegacyCardButton
-                ? IconButton(
-                    icon: Icon(
-                      Icons.credit_card_off,
-                      color: theme.colorScheme.secondary,
-                    ),
-                    onPressed: _addLegacyCard,
-                  )
-                : const SizedBox.shrink();
-          },
+          valueListenable: GetIt.I<SettingsBox>().listenable(),
+          builder: (context, settingsBox, _) =>
+              settingsBox.value.developerOptions.isEnabled
+                  ? IconButton(
+                      icon: Icon(
+                        Icons.credit_card_off,
+                        color: theme.colorScheme.secondary,
+                      ),
+                      onPressed: _addLegacyCard,
+                    )
+                  : const SizedBox.shrink(),
         ),
         IconButton(
           icon: Icon(

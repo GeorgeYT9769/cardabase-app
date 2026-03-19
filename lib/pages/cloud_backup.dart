@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-import 'package:flutter_bounceable/flutter_bounceable.dart';
-import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:cardabase/data/cardabase_db.dart';
 import 'package:cardabase/util/vibration_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bounceable/flutter_bounceable.dart';
+import 'package:get_it/get_it.dart';
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
 import '../util/widgets/custom_snack_bar.dart';
 
@@ -17,7 +18,6 @@ class CloudBackup extends StatefulWidget {
 }
 
 class _CloudBackupState extends State<CloudBackup> {
-
   bool hideCloudPassword = true;
   bool hideStoragePassword = true;
   bool hasCloudSetUp = false;
@@ -37,7 +37,6 @@ class _CloudBackupState extends State<CloudBackup> {
       hideStoragePassword = !hideStoragePassword;
     });
   }
-
 
   @override
   void initState() {
@@ -71,7 +70,7 @@ class _CloudBackupState extends State<CloudBackup> {
 
     final String ip = ipAddress.text.trim();
     if (ip.isEmpty) return;
-    
+
     //port 5054
     final host = ip.contains(':') ? ip : '$ip:5054';
 
@@ -80,7 +79,7 @@ class _CloudBackupState extends State<CloudBackup> {
 
     for (var card in cards) {
       if (card is! Map) continue;
-      
+
       final String uniqueId = card['uniqueId'] ?? '';
       if (uniqueId.isEmpty) {
         failCount++;
@@ -92,10 +91,10 @@ class _CloudBackupState extends State<CloudBackup> {
         final httpClient = HttpClient();
         final request = await httpClient.putUrl(uri);
         request.headers.set('Content-Type', 'application/json');
-        
+
         final jsonData = jsonEncode(card);
         request.write(jsonData);
-        
+
         final response = await request.close();
         if (response.statusCode == 200) {
           successCount++;
@@ -110,14 +109,16 @@ class _CloudBackupState extends State<CloudBackup> {
     }
 
     if (failCount == 0) {
-      VibrationProvider.vibrateSuccess();
+      GetIt.I<VibrationProvider>().vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
         buildCustomSnackBar('Successfully uploaded $successCount cards', true),
       );
     } else {
-      VibrationProvider.vibrateSuccess();
+      GetIt.I<VibrationProvider>().vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
-          buildCustomSnackBar('Uploaded $successCount cards. Failed on $failCount.', failCount < 0),
+        buildCustomSnackBar(
+            'Uploaded $successCount cards. Failed on $failCount.',
+            failCount < 0),
       );
     }
   }
@@ -125,31 +126,32 @@ class _CloudBackupState extends State<CloudBackup> {
   Future<void> downloadCardabase() async {
     final String ip = ipAddress.text.trim();
     if (ip.isEmpty) return;
-    
+
     final host = ip.contains(':') ? ip : '$ip:5054';
-    
+
     try {
       final uri = Uri.parse('http://$host/cards');
       final httpClient = HttpClient();
       final request = await httpClient.getUrl(uri);
-      
+
       final response = await request.close();
       if (response.statusCode == 200) {
         final responseBody = await response.transform(utf8.decoder).join();
         final List<dynamic> downloadedCards = jsonDecode(responseBody);
-        
+
         final Box myBox = Hive.box('mybox');
         myBox.put('CARDLIST', downloadedCards);
-        
+
         final CardabaseDb cdb = CardabaseDb();
         cdb.loadData();
-        
-        VibrationProvider.vibrateSuccess();
+
+        GetIt.I<VibrationProvider>().vibrateSuccess();
         ScaffoldMessenger.of(context).showSnackBar(
-          buildCustomSnackBar('Successfully downloaded ${downloadedCards.length} cards', true),
+          buildCustomSnackBar(
+              'Successfully downloaded ${downloadedCards.length} cards', true),
         );
       } else {
-        VibrationProvider.vibrateSuccess();
+        GetIt.I<VibrationProvider>().vibrateSuccess();
         ScaffoldMessenger.of(context).showSnackBar(
           buildCustomSnackBar('Failed to download from server', false),
         );
@@ -157,7 +159,7 @@ class _CloudBackupState extends State<CloudBackup> {
       httpClient.close();
     } catch (e) {
       debugPrint('Failed to download cards: $e');
-      VibrationProvider.vibrateSuccess();
+      GetIt.I<VibrationProvider>().vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
         buildCustomSnackBar('Error downloading cards: check connection', false),
       );
@@ -171,15 +173,15 @@ class _CloudBackupState extends State<CloudBackup> {
         title: Text(
           'Confirm Deletion',
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: Theme.of(context).colorScheme.inverseSurface,
-            fontSize: 25,
-          ),
+                color: Theme.of(context).colorScheme.inverseSurface,
+                fontSize: 25,
+              ),
         ),
         content: Text(
           'Are you sure you want to permanently delete ALL cards from the cloud server?',
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: Theme.of(context).colorScheme.tertiary,
-          ),
+                color: Theme.of(context).colorScheme.tertiary,
+              ),
         ),
         actions: [
           TextButton(
@@ -187,9 +189,9 @@ class _CloudBackupState extends State<CloudBackup> {
             child: Text(
               'CANCEL',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.secondary,
-              ),
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
             ),
           ),
           OutlinedButton(
@@ -200,9 +202,9 @@ class _CloudBackupState extends State<CloudBackup> {
             child: Text(
               'DELETE',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Colors.red,
-              ),
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
+                  ),
             ),
           ),
         ],
@@ -213,7 +215,7 @@ class _CloudBackupState extends State<CloudBackup> {
 
     final String ip = ipAddress.text.trim();
     if (ip.isEmpty) return;
-    
+
     final host = ip.contains(':') ? ip : '$ip:5054';
 
     try {
@@ -222,37 +224,38 @@ class _CloudBackupState extends State<CloudBackup> {
       final httpClient = HttpClient();
       final getReq = await httpClient.getUrl(uri);
       final getRes = await getReq.close();
-      
+
       if (getRes.statusCode != 200) {
         throw Exception('Failed to fetch cards for deletion');
       }
-      
+
       final responseBody = await getRes.transform(utf8.decoder).join();
       final List<dynamic> cards = jsonDecode(responseBody);
-      
+
       //delete each card
       int deletedCount = 0;
       for (var card in cards) {
         final String cardId = card['id'] ?? card['uniqueId'] ?? '';
         if (cardId.isEmpty) continue;
-        
+
         final deleteUri = Uri.parse('http://$host/cards/$cardId');
         final deleteReq = await httpClient.deleteUrl(deleteUri);
         final deleteRes = await deleteReq.close();
-        
+
         if (deleteRes.statusCode == 200) {
           deletedCount++;
         }
       }
-      
+
       httpClient.close();
-      VibrationProvider.vibrateSuccess();
+      GetIt.I<VibrationProvider>().vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar('Permanently deleted $deletedCount cards from cloud', true),
+        buildCustomSnackBar(
+            'Permanently deleted $deletedCount cards from cloud', true),
       );
     } catch (e) {
       debugPrint('Failed to delete cards: $e');
-      VibrationProvider.vibrateSuccess();
+      GetIt.I<VibrationProvider>().vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
         buildCustomSnackBar('Failed to delete cards from cloud', false),
       );
@@ -269,7 +272,7 @@ class _CloudBackupState extends State<CloudBackup> {
     }
 
     final host = ip.contains(':') ? ip : '$ip:5054';
-    
+
     //verify server is reachable
     try {
       final uri = Uri.parse('http://$host/healthz');
@@ -277,7 +280,7 @@ class _CloudBackupState extends State<CloudBackup> {
       httpClient.connectionTimeout = const Duration(seconds: 5);
       final request = await httpClient.getUrl(uri);
       final response = await request.close();
-      
+
       if (response.statusCode == 200) {
         final passwordBox = Hive.box('password');
         passwordBox.put('CLOUD', {
@@ -289,21 +292,21 @@ class _CloudBackupState extends State<CloudBackup> {
         setState(() {
           hasCloudSetUp = true;
         });
-        VibrationProvider.vibrateSuccess();
+        GetIt.I<VibrationProvider>().vibrateSuccess();
         ScaffoldMessenger.of(context).showSnackBar(
           buildCustomSnackBar('Successfully connected to server', true),
         );
       } else {
-        VibrationProvider.vibrateSuccess();
+        GetIt.I<VibrationProvider>().vibrateSuccess();
         ScaffoldMessenger.of(context).showSnackBar(
-          buildCustomSnackBar('Server returned status ${response.statusCode}', false),
+          buildCustomSnackBar(
+              'Server returned status ${response.statusCode}', false),
         );
-
       }
       httpClient.close();
     } catch (e) {
       debugPrint('Login failed: $e');
-      VibrationProvider.vibrateSuccess();
+      GetIt.I<VibrationProvider>().vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
         buildCustomSnackBar('Could not connect to server', false),
       );
@@ -313,29 +316,26 @@ class _CloudBackupState extends State<CloudBackup> {
   void logOut() {
     final passwordBox = Hive.box('password');
     passwordBox.delete('CLOUD');
-    
+
     setState(() {
       ipAddress.clear();
       cloudPassword.clear();
       storagePassword.clear();
       hasCloudSetUp = false;
     });
-    
-    VibrationProvider.vibrateSuccess();
+
+    GetIt.I<VibrationProvider>().vibrateSuccess();
     ScaffoldMessenger.of(context).showSnackBar(
       buildCustomSnackBar('Logged out and cleared cloud configuration', true),
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
-
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor:
-        theme.colorScheme.surface,
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         actions: [
@@ -364,393 +364,393 @@ class _CloudBackupState extends State<CloudBackup> {
         backgroundColor: theme.colorScheme.surface,
       ),
       body: hasCloudSetUp
-      ? Container(
-        padding: const EdgeInsets.all(20),
-        child: ListView(
-          children: [
-            Text(
-              'MANAGE YOUR CLOUD SERVER',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: theme.colorScheme.inverseSurface,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'You are set up. You can enjoy features of your own self-hosted cloud.',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-                color: theme.colorScheme.inverseSurface,
-              ),
-              textAlign: TextAlign.justify,
-            ),
-            const SizedBox(height: 30),
-            Text(
-              'Save your cards to cloud:',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.inverseSurface,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Bounceable(
-              onTap: () {},
-              child: SizedBox(
-                height: 70,
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.all(15),
-                    side: BorderSide(
-                      color: theme.colorScheme.primary,
+          ? Container(
+              padding: const EdgeInsets.all(20),
+              child: ListView(
+                children: [
+                  Text(
+                    'MANAGE YOUR CLOUD SERVER',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: theme.colorScheme.inverseSurface,
                     ),
-                    backgroundColor: Colors.transparent,
-                    elevation: 0.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    minimumSize: const Size.fromHeight(100),
+                    textAlign: TextAlign.center,
                   ),
-                  onPressed: () => uploadCardabase(),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.upload,
-                        color: theme.colorScheme.inverseSurface,
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        'Upload Cardabase',
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: theme.colorScheme.inverseSurface,
-                          fontWeight: FontWeight.bold,
+                  const SizedBox(height: 10),
+                  Text(
+                    'You are set up. You can enjoy features of your own self-hosted cloud.',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: theme.colorScheme.inverseSurface,
+                    ),
+                    textAlign: TextAlign.justify,
+                  ),
+                  const SizedBox(height: 30),
+                  Text(
+                    'Save your cards to cloud:',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.inverseSurface,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Bounceable(
+                    onTap: () {},
+                    child: SizedBox(
+                      height: 70,
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.all(15),
+                          side: BorderSide(
+                            color: theme.colorScheme.primary,
+                          ),
+                          backgroundColor: Colors.transparent,
+                          elevation: 0.0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          minimumSize: const Size.fromHeight(100),
+                        ),
+                        onPressed: () => uploadCardabase(),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.upload,
+                              color: theme.colorScheme.inverseSurface,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              'Upload Cardabase',
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: theme.colorScheme.inverseSurface,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 30),
-            Text(
-              'Get your cards from cloud:',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.inverseSurface,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Bounceable(
-              onTap: () {},
-              child: SizedBox(
-                height: 70,
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.all(15),
-                    side: BorderSide(
-                      color: theme.colorScheme.primary,
                     ),
-                    backgroundColor: Colors.transparent,
-                    elevation: 0.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    minimumSize: const Size.fromHeight(100),
                   ),
-                  onPressed: () => downloadCardabase(),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.download,
-                        color: theme.colorScheme.inverseSurface,
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        'Download Cardabase',
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: theme.colorScheme.inverseSurface,
-                          fontWeight: FontWeight.bold,
+                  const SizedBox(height: 30),
+                  Text(
+                    'Get your cards from cloud:',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.inverseSurface,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Bounceable(
+                    onTap: () {},
+                    child: SizedBox(
+                      height: 70,
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.all(15),
+                          side: BorderSide(
+                            color: theme.colorScheme.primary,
+                          ),
+                          backgroundColor: Colors.transparent,
+                          elevation: 0.0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          minimumSize: const Size.fromHeight(100),
+                        ),
+                        onPressed: () => downloadCardabase(),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.download,
+                              color: theme.colorScheme.inverseSurface,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              'Download Cardabase',
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: theme.colorScheme.inverseSurface,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 25),
-            Divider(
-              color: theme.colorScheme.primary,
-              thickness: 1.0,
-            ),
-            const SizedBox(height: 15),
-            Text(
-              'Remove server configuration:',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.inverseSurface,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Bounceable(
-              onTap: () {},
-              child: SizedBox(
-                height: 70,
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.all(15),
-                    side: BorderSide(
-                      color: theme.colorScheme.primary,
                     ),
-                    backgroundColor: Colors.transparent,
-                    elevation: 0.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    minimumSize: const Size.fromHeight(100),
                   ),
-                  onPressed: () => logOut(),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.logout,
-                        color: theme.colorScheme.inverseSurface,
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        'Log Out',
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: theme.colorScheme.inverseSurface,
-                          fontWeight: FontWeight.bold,
+                  const SizedBox(height: 25),
+                  Divider(
+                    color: theme.colorScheme.primary,
+                    thickness: 1.0,
+                  ),
+                  const SizedBox(height: 15),
+                  Text(
+                    'Remove server configuration:',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.inverseSurface,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Bounceable(
+                    onTap: () {},
+                    child: SizedBox(
+                      height: 70,
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.all(15),
+                          side: BorderSide(
+                            color: theme.colorScheme.primary,
+                          ),
+                          backgroundColor: Colors.transparent,
+                          elevation: 0.0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          minimumSize: const Size.fromHeight(100),
+                        ),
+                        onPressed: () => logOut(),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.logout,
+                              color: theme.colorScheme.inverseSurface,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              'Log Out',
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: theme.colorScheme.inverseSurface,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 30),
-            Text(
-              'Delete your cards from cloud (forever!):',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.inverseSurface,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Bounceable(
-              onTap: () {},
-              child: SizedBox(
-                height: 70,
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.all(15),
-                    side: BorderSide(
-                      color: Colors.red,
                     ),
-                    backgroundColor: Colors.transparent,
-                    elevation: 0.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    minimumSize: const Size.fromHeight(100),
                   ),
-                  onPressed: () => deleteCardabase(),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.delete_forever,
-                        color: Colors.red,
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        'DELETE CARDABASE',
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
+                  const SizedBox(height: 30),
+                  Text(
+                    'Delete your cards from cloud (forever!):',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.inverseSurface,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Bounceable(
+                    onTap: () {},
+                    child: SizedBox(
+                      height: 70,
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.all(15),
+                          side: BorderSide(
+                            color: Colors.red,
+                          ),
+                          backgroundColor: Colors.transparent,
+                          elevation: 0.0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          minimumSize: const Size.fromHeight(100),
+                        ),
+                        onPressed: () => deleteCardabase(),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.delete_forever,
+                              color: Colors.red,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              'DELETE CARDABASE',
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      )
-      : Container(
-        padding: const EdgeInsets.all(20),
-        child: ListView(
-          children: [
-            Text(
-              'SET UP CLOUD SERVER',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                color: theme.colorScheme.inverseSurface,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Backup your cards into your own self-hosted cloud storage. No personal information will be stored. Just you, your cards and the self-hosted cloud storage.',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-                color: theme.colorScheme.inverseSurface,
-              ),
-              textAlign: TextAlign.justify,
-            ),
-            const SizedBox(height: 20),
-            TextFormField(
-              controller: ipAddress,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(width: 2.0),
-                ),
-                focusColor: theme.colorScheme.primary,
-                enabledBorder: OutlineInputBorder(
-                  borderSide:
-                  BorderSide(color: theme.colorScheme.primary),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                labelText: 'IP Address of the server',
-                labelStyle: theme.textTheme.bodyLarge
-                    ?.copyWith(color: theme.colorScheme.secondary),
-                prefixIcon: Icon(
-                  Icons.numbers,
-                  color: theme.colorScheme.secondary,
-                ),
-              ),
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.tertiary,
-                fontWeight: FontWeight.bold,
-              ),
-              keyboardType: TextInputType.visiblePassword,
-              obscureText: false,
-            ),
-            const SizedBox(height: 20),
-            TextFormField(
-              controller: cloudPassword,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(width: 2.0),
-                ),
-                focusColor: theme.colorScheme.primary,
-                enabledBorder: OutlineInputBorder(
-                  borderSide:
-                  BorderSide(color: theme.colorScheme.primary),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                labelText: 'Cloud password',
-                labelStyle: theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colorScheme.secondary,
-                ),
-                prefixIcon: Icon(
-                  Icons.password,
-                  color: theme.colorScheme.secondary,
-                ),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    hideCloudPassword
-                        ? Icons.visibility_off
-                        : Icons.visibility,
-                    color: theme.colorScheme.secondary,
-                  ),
-                  onPressed: changeCloudPasswordVisibilityFunc,
-                ),
-              ),
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.inverseSurface,
-                fontWeight: FontWeight.bold,
-              ),
-              keyboardType: TextInputType.visiblePassword,
-              obscureText: hideCloudPassword,
-            ),
-            const SizedBox(height: 20),
-            TextFormField(
-              controller: storagePassword,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(width: 2.0),
-                ),
-                focusColor: theme.colorScheme.primary,
-                enabledBorder: OutlineInputBorder(
-                  borderSide:
-                  BorderSide(color: theme.colorScheme.primary),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                labelText: 'Storage password',
-                labelStyle: theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colorScheme.secondary,
-                ),
-                prefixIcon: Icon(
-                  Icons.password,
-                  color: theme.colorScheme.secondary,
-                ),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    hideStoragePassword
-                        ? Icons.visibility_off
-                        : Icons.visibility,
-                    color: theme.colorScheme.secondary,
-                  ),
-                  onPressed: changeStoragePasswordVisibilityFunc,
-                ),
-              ),
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.inverseSurface,
-                fontWeight: FontWeight.bold,
-              ),
-              keyboardType: TextInputType.visiblePassword,
-              obscureText: hideStoragePassword,
-            ),
-            const SizedBox(height: 20),
-            Bounceable(
-              onTap: () {},
-              child: SizedBox(
-                height: 70,
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.all(15),
-                    side: BorderSide(
-                      color: theme.colorScheme.primary,
                     ),
-                    backgroundColor: Colors.transparent,
-                    elevation: 0.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    minimumSize: const Size.fromHeight(100),
                   ),
-                  onPressed: () => logIn(),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.login,
-                        color: theme.colorScheme.inverseSurface,
+                ],
+              ),
+            )
+          : Container(
+              padding: const EdgeInsets.all(20),
+              child: ListView(
+                children: [
+                  Text(
+                    'SET UP CLOUD SERVER',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: theme.colorScheme.inverseSurface,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Backup your cards into your own self-hosted cloud storage. No personal information will be stored. Just you, your cards and the self-hosted cloud storage.',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: theme.colorScheme.inverseSurface,
+                    ),
+                    textAlign: TextAlign.justify,
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: ipAddress,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(width: 2.0),
                       ),
-                      const SizedBox(width: 10),
-                      Text(
-                        'Log In',
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: theme.colorScheme.inverseSurface,
-                          fontWeight: FontWeight.bold,
+                      focusColor: theme.colorScheme.primary,
+                      enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: theme.colorScheme.primary),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      labelText: 'IP Address of the server',
+                      labelStyle: theme.textTheme.bodyLarge
+                          ?.copyWith(color: theme.colorScheme.secondary),
+                      prefixIcon: Icon(
+                        Icons.numbers,
+                        color: theme.colorScheme.secondary,
+                      ),
+                    ),
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.tertiary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    keyboardType: TextInputType.visiblePassword,
+                    obscureText: false,
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: cloudPassword,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(width: 2.0),
+                      ),
+                      focusColor: theme.colorScheme.primary,
+                      enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: theme.colorScheme.primary),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      labelText: 'Cloud password',
+                      labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                        color: theme.colorScheme.secondary,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.password,
+                        color: theme.colorScheme.secondary,
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          hideCloudPassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: theme.colorScheme.secondary,
+                        ),
+                        onPressed: changeCloudPasswordVisibilityFunc,
+                      ),
+                    ),
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.inverseSurface,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    keyboardType: TextInputType.visiblePassword,
+                    obscureText: hideCloudPassword,
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: storagePassword,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(width: 2.0),
+                      ),
+                      focusColor: theme.colorScheme.primary,
+                      enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: theme.colorScheme.primary),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      labelText: 'Storage password',
+                      labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                        color: theme.colorScheme.secondary,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.password,
+                        color: theme.colorScheme.secondary,
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          hideStoragePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: theme.colorScheme.secondary,
+                        ),
+                        onPressed: changeStoragePasswordVisibilityFunc,
+                      ),
+                    ),
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.inverseSurface,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    keyboardType: TextInputType.visiblePassword,
+                    obscureText: hideStoragePassword,
+                  ),
+                  const SizedBox(height: 20),
+                  Bounceable(
+                    onTap: () {},
+                    child: SizedBox(
+                      height: 70,
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.all(15),
+                          side: BorderSide(
+                            color: theme.colorScheme.primary,
+                          ),
+                          backgroundColor: Colors.transparent,
+                          elevation: 0.0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          minimumSize: const Size.fromHeight(100),
+                        ),
+                        onPressed: () => logIn(),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.login,
+                              color: theme.colorScheme.inverseSurface,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              'Log In',
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: theme.colorScheme.inverseSurface,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }

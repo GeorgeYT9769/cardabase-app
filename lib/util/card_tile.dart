@@ -1,11 +1,15 @@
 import 'dart:io';
+
 import 'package:barcode_widget/barcode_widget.dart';
+import 'package:cardabase/feature/settings/get_it.dart';
+import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/pages/card_details/card_details_page.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
+import 'package:get_it/get_it.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
 class CardTile extends StatefulWidget {
@@ -66,7 +70,6 @@ class CardTile extends StatefulWidget {
 
 class _CardTileState extends State<CardTile> {
   final passwordbox = Hive.box('password');
-  final settingsbox = Hive.box('settingsBox');
 
   ImageProvider? frontImage;
   ImageProvider? backImage;
@@ -217,7 +220,7 @@ class _CardTileState extends State<CardTile> {
                         );
                       });
                     } else {
-                      VibrationProvider.vibrateSuccess();
+                      GetIt.I<VibrationProvider>().vibrateSuccess();
                       ScaffoldMessenger.of(context).showSnackBar(
                         buildCustomSnackBar('Incorrect password!', false),
                       );
@@ -328,12 +331,16 @@ class _CardTileState extends State<CardTile> {
                               }
                             },
                           ),
-                        Builder(
-                          builder: (context) {
-                            final effect = settingsbox.get('effectChosen', defaultValue: 'none') as String;
-                            final useEffects = settingsbox.get('effect', defaultValue: false) as bool;
-                            if (!useEffects || effect == 'none') return const SizedBox.shrink();
-                            return _buildEffectOverlay(effect, widget.borderSize);
+                        ValueListenableBuilder(
+                          valueListenable: GetIt.I<SettingsBox>().listenable(),
+                          builder: (context, settingsBox, _) {
+                            final settings = settingsBox.value;
+                            if (!settings.theme.loyaltyCardEffect.isEnabled) {
+                              return const SizedBox.shrink();
+                            }
+                            return _buildEffectOverlay(
+                                settings.theme.loyaltyCardEffect.effect,
+                                widget.borderSize);
                           },
                         ),
                         Padding(
@@ -435,7 +442,7 @@ class _CardTileState extends State<CardTile> {
                       _setWidgetCard(context, theme);
                     });
                   } else {
-                    VibrationProvider.vibrateSuccess();
+                    GetIt.I<VibrationProvider>().vibrateSuccess();
                     ScaffoldMessenger.of(context).showSnackBar(
                       buildCustomSnackBar('Incorrect password!', false),
                     );
@@ -468,7 +475,7 @@ class _CardTileState extends State<CardTile> {
   }
 
   void _showBottomSheet(BuildContext context, ThemeData theme) {
-    VibrationProvider.vibrateSuccess();
+    GetIt.I<VibrationProvider>().vibrateSuccess();
     showModalBottomSheet(
       context: context,
       elevation: 0.0,
@@ -560,9 +567,9 @@ class _CardTileState extends State<CardTile> {
     );
   }
 
-  Widget _buildEffectOverlay(String effect, double borderRadius) {
+  Widget _buildEffectOverlay(LoyaltyCardEffect effect, double borderRadius) {
     switch (effect) {
-      case 'grain':
+      case LoyaltyCardEffect.grain:
         return ClipRRect(
           borderRadius: BorderRadius.circular(borderRadius),
           child: Image.asset(
@@ -572,32 +579,32 @@ class _CardTileState extends State<CardTile> {
             colorBlendMode: BlendMode.srcOver,
           ),
         );
-      case 'snowy':
+      case LoyaltyCardEffect.snowy:
         return _SnowyOverlay(borderRadius: borderRadius);
-      case 'glitter':
+      case LoyaltyCardEffect.glitter:
         return _GlitterOverlay(borderRadius: borderRadius);
-      default:
-        return const SizedBox.shrink();
     }
   }
 }
 
 class _SnowyOverlay extends StatefulWidget {
   final double borderRadius;
-  const _SnowyOverlay({Key? key, required this.borderRadius}) : super(key: key);
+  const _SnowyOverlay({super.key, required this.borderRadius});
 
   @override
   State<_SnowyOverlay> createState() => _SnowyOverlayState();
 }
 
-class _SnowyOverlayState extends State<_SnowyOverlay> with SingleTickerProviderStateMixin {
+class _SnowyOverlayState extends State<_SnowyOverlay>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 2))
-      ..repeat();
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 2))
+          ..repeat();
   }
 
   @override
@@ -643,12 +650,13 @@ class _SnowyPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_SnowyPainter oldDelegate) => oldDelegate.progress != progress;
+  bool shouldRepaint(_SnowyPainter oldDelegate) =>
+      oldDelegate.progress != progress;
 }
 
 class _GlitterOverlay extends StatefulWidget {
   final double borderRadius;
-  const _GlitterOverlay({Key? key, required this.borderRadius}) : super(key: key);
+  const _GlitterOverlay({super.key, required this.borderRadius});
 
   @override
   State<_GlitterOverlay> createState() => _GlitterOverlayState();
@@ -685,7 +693,20 @@ class _GlitterStar {
 
   _GlitterStar(this.x, this.y, this.size, this.color, this.symbol);
 
-  static final List<String> symbols = ['*', '✦', '✬', '✯', '˚', '｡', '❀', '+', '-', '/', '♪', '♫',];
+  static final List<String> symbols = [
+    '*',
+    '✦',
+    '✬',
+    '✯',
+    '˚',
+    '｡',
+    '❀',
+    '+',
+    '-',
+    '/',
+    '♪',
+    '♫',
+  ];
 
   static _GlitterStar random() {
     final rnd = UniqueKey().hashCode;
@@ -719,11 +740,11 @@ class _GlitterPainter extends CustomPainter {
         textDirection: TextDirection.ltr,
       );
       textPainter.layout();
-      textPainter.paint(canvas, Offset(px - textPainter.width / 2, py - textPainter.height / 2));
+      textPainter.paint(canvas,
+          Offset(px - textPainter.width / 2, py - textPainter.height / 2));
     }
   }
 
   @override
   bool shouldRepaint(_GlitterPainter oldDelegate) => false;
 }
-

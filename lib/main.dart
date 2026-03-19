@@ -1,14 +1,18 @@
 import 'dart:async';
 
 import 'package:cardabase/data/loyalty_card.dart';
+import 'package:cardabase/feature/settings/auto_update.dart';
+import 'package:cardabase/feature/settings/get_it.dart';
+import 'package:cardabase/feature/settings/model.dart';
+import 'package:cardabase/feature/settings/widgets/settings_page.dart';
+import 'package:cardabase/get_it.dart';
 import 'package:cardabase/pages/edit_card/edit_card.dart';
 import 'package:cardabase/pages/home/home_page.dart';
-import 'package:cardabase/pages/settings.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
-import 'package:cardabase/theme/color_schemes.g.dart';
-import 'package:cardabase/util/export_data.dart';
+import 'package:cardabase/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get_it/get_it.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:quick_actions/quick_actions.dart';
@@ -84,62 +88,40 @@ void main() async {
     return Center(
       child: Text(
         'Oops! Something went wrong:\n${details.exception}\nPlease send a screenshot of this error to the developer.',
-        style: const TextStyle(
-          color: Colors.red,
-          fontSize: 18,
-        ),
+        style: const TextStyle(color: Colors.red, fontSize: 18),
         textAlign: TextAlign.center,
       ),
     );
   };
 
-  await Hive.initFlutter();
-  await Hive.openBox('mybox'); //storage for cards
-  await Hive.openBox('settingsBox'); // storage for settings
-  await Hive.openBox('password'); // storage for password
+  GetIt.I
+    ..registerPackageInfo()
+    ..registerHaptics()
+    ..registerHive()
+    ..registerSettings();
 
-  final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-  final String currentAppVersion = packageInfo.version;
-  final lastSeenAppVersion =
-      Hive.box('settingsBox').get('lastSeenAppVersion') as String?;
-  // Read auto-backup settings safely
-  final autoBackups =
-      Hive.box('settingsBox').get('autoBackups') as bool? ?? false;
-  final lastAutoUpdate =
-      Hive.box('settingsBox').get('lastAutoUpdate') as String?;
-  final autoBackupInterval =
-      Hive.box('settingsBox').get('autoBackupInterval') as int? ?? 7;
+  final packageInfo = await GetIt.I.getAsync<PackageInfo>();
+  final settingsBox = await GetIt.I.getAsync<SettingsBox>();
+  await GetIt.I.getAsync<Box>(instanceName: 'loyaltyCardsBox');
+  await GetIt.I.getAsync<Box>(instanceName: 'passwordBox');
+  final currentAppVersion = packageInfo.version;
 
   Widget initialScreen;
 
-  if (lastSeenAppVersion == null || lastSeenAppVersion != currentAppVersion) {
+  if (settingsBox.value.lastSeenAppVersion != currentAppVersion) {
     initialScreen = WelcomeScreen(currentAppVersion: currentAppVersion);
   } else {
     initialScreen = const Homepage();
   }
 
-  runApp(
-    Main(initialScreen: initialScreen),
-  );
+  runApp(Main(initialScreen: initialScreen));
 
-  if (autoBackups && lastAutoUpdate != null) {
-    try {
-      final DateTime lastDt = DateTime.parse(lastAutoUpdate);
-      final int daysSince = DateTime.now().difference(lastDt).inDays;
-      if (daysSince >= autoBackupInterval) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (navigatorKey.currentContext != null &&
-              navigatorKey.currentContext!.mounted) {
-            exportCardList(navigatorKey.currentContext!, toFile: true);
-            Hive.box('settingsBox')
-                .put('lastAutoUpdate', DateTime.now().toString());
-          }
-        });
-      }
-    } catch (e) {
-      // If parsing fails, ignore and do not attempt export
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    final context = navigatorKey.currentContext;
+    if (context != null && context.mounted) {
+      autoUpdateAfterInterval(context, settingsBox);
     }
-  }
+  });
 }
 
 class Main extends StatefulWidget {
@@ -170,8 +152,9 @@ class _MainState extends State<Main> {
           );
         }
         if (shortcutType == 'info') {
-          navigatorKey.currentState!
-              .push(MaterialPageRoute(builder: (context) => const Settings()));
+          navigatorKey.currentState!.push(
+            MaterialPageRoute(builder: (context) => const SettingsPage()),
+          );
         }
       }
     });
@@ -204,70 +187,16 @@ class _MainState extends State<Main> {
     ]);
 
     return ValueListenableBuilder(
-      valueListenable: Hive.box('settingsBox').listenable(),
-      builder: (context, box, child) {
-        final isDarkMode = box.get('isDarkMode', defaultValue: false) as bool;
-        final useSystemFont =
-            box.get('useSystemFont', defaultValue: false) as bool;
-        final useExtraDark = box.get('useExtraDark', defaultValue: false)
-            as bool; // Retrieve new setting
-
-        final ColorScheme extraDarkColorScheme = darkColorScheme.copyWith(
-          surface: Colors.black,
-        );
-
-        final String? textFont = useSystemFont ? null : 'Roboto';
-
+      valueListenable: GetIt.I.get<SettingsBox>().listenable(),
+      builder: (context, settingsBox, child) {
+        final settings = settingsBox.value;
         return MaterialApp(
           navigatorKey: navigatorKey,
           debugShowCheckedModeBanner: false,
-          themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
-          theme: ThemeData(
-            useMaterial3: true,
-            colorScheme: lightColorScheme,
-            pageTransitionsTheme: const PageTransitionsTheme(
-              builders: <TargetPlatform, PageTransitionsBuilder>{
-                TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
-              },
-            ),
-            fontFamily: textFont,
-            textTheme: TextTheme(
-              titleLarge: TextStyle(
-                fontFamily: useSystemFont ? null : 'xirod',
-                letterSpacing: useSystemFont ? 3 : 5,
-                fontSize: useSystemFont ? 25 : 17,
-                fontWeight: FontWeight.w900,
-                color: const Color(0xFF0062A1), //tertiary
-              ),
-              bodyLarge: TextStyle(
-                fontFamily: textFont,
-                color: const Color(0xFF003062),
-              ),
-            ),
-          ),
-          darkTheme: ThemeData(
-            useMaterial3: true,
-            colorScheme: useExtraDark ? extraDarkColorScheme : darkColorScheme,
-            pageTransitionsTheme: const PageTransitionsTheme(
-              builders: <TargetPlatform, PageTransitionsBuilder>{
-                TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
-              },
-            ),
-            fontFamily: textFont,
-            textTheme: TextTheme(
-              titleLarge: TextStyle(
-                fontFamily: useSystemFont ? null : 'xirod',
-                letterSpacing: useSystemFont ? 3 : 5,
-                fontSize: useSystemFont ? 25 : 17,
-                fontWeight: FontWeight.w900,
-                color: const Color(0xFF9CCAFF), //tertiary
-              ),
-              bodyLarge: TextStyle(
-                fontFamily: textFont,
-                color: const Color(0xFFD6E3FF), //inverseSurface
-              ),
-            ),
-          ),
+          themeMode:
+              settings.theme.useDarkMode ? ThemeMode.dark : ThemeMode.light,
+          theme: lightTheme(settings.theme),
+          darkTheme: darkTheme(settings.theme),
           home: widget.initialScreen,
         );
       },

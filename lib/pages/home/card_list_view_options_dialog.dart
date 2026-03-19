@@ -1,8 +1,10 @@
+import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/pages/home/form_fields/number_of_columns_slider.dart';
 import 'package:cardabase/pages/home/form_fields/sorting_style_selector.dart';
 import 'package:cardabase/util/setting_tile.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 class CardListViewOptionsDialog extends StatelessWidget {
   const CardListViewOptionsDialog({
@@ -51,7 +53,7 @@ class CardListViewOptionsDialog extends StatelessWidget {
                 builder: (context, value, _) => MySetting(
                   aboutSettingHeader: 'Reorder Cards',
                   settingAction: () {
-                    VibrationProvider.vibrateSuccess();
+                    GetIt.I<VibrationProvider>().vibrateSuccess();
                     isInReorderingMode.value = !value;
                   },
                   settingHeader: 'Reorder',

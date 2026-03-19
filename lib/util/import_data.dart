@@ -2,6 +2,7 @@ import 'package:cardabase/data/cardabase_db.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 CardabaseDb cdb = CardabaseDb();
 
@@ -68,7 +69,7 @@ Future<bool> showImportDialog(BuildContext context) async {
           onPressed: () {
             final input = textController.text.trim();
             if (input.isEmpty) {
-              VibrationProvider.vibrateSuccess();
+              GetIt.I<VibrationProvider>().vibrateSuccess();
               ScaffoldMessenger.of(context).showSnackBar(
                 buildCustomSnackBar('No data!', false),
               );
@@ -103,14 +104,27 @@ Future<bool> showImportDialog(BuildContext context) async {
                     final newMap = {
                       'cardName': cardMap['cardName'] ?? '',
                       'cardId': cardMap['cardId'] ?? '',
-                      'redValue': int.tryParse(cardMap['redValue'] as String? ?? '0') ?? 0,
-                      'greenValue': int.tryParse(cardMap['greenValue'] as String? ?? '0',) ?? 0,
-                      'blueValue': int.tryParse(cardMap['blueValue'] as String? ?? '0',) ?? 0,
+                      'redValue':
+                          int.tryParse(cardMap['redValue'] as String? ?? '0') ??
+                              0,
+                      'greenValue': int.tryParse(
+                            cardMap['greenValue'] as String? ?? '0',
+                          ) ??
+                          0,
+                      'blueValue': int.tryParse(
+                            cardMap['blueValue'] as String? ?? '0',
+                          ) ??
+                          0,
                       'cardType': cardMap['cardType'] ?? '',
-                      'hasPassword': ((cardMap['hasPassword'] as String?)?.toLowerCase() == 'true'),
+                      'hasPassword':
+                          ((cardMap['hasPassword'] as String?)?.toLowerCase() ==
+                              'true'),
                       'uniqueId': uniqueId + importedCount.toString(),
                       'note': cardMap['note'] ?? '',
-                      'pointsAmount': int.tryParse(cardMap['pointsAmount'] as String? ?? '0',) ?? 0,
+                      'pointsAmount': int.tryParse(
+                            cardMap['pointsAmount'] as String? ?? '0',
+                          ) ??
+                          0,
                     };
                     newCards.add(newMap);
                     importedCount++;

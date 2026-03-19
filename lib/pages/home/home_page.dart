@@ -1,15 +1,16 @@
 import 'package:cardabase/data/cardabase_db.dart';
 import 'package:cardabase/data/loyalty_card.dart';
+import 'package:cardabase/feature/settings/get_it.dart';
+import 'package:cardabase/feature/settings/model.dart';
+import 'package:cardabase/feature/settings/widgets/settings_page.dart';
 import 'package:cardabase/pages/edit_card/edit_card.dart';
 import 'package:cardabase/pages/home/card_list_view_options_dialog.dart';
-import 'package:cardabase/pages/home/form_fields/sorting_style_selector.dart';
 import 'package:cardabase/pages/home/password_challenge_dialog.dart';
-import 'package:cardabase/pages/settings.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
 import 'package:cardabase/util/card_tile.dart';
-import 'package:cardabase/util/widgets/multi_listenable_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
+import 'package:get_it/get_it.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 
@@ -21,48 +22,22 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomePageState extends State<Homepage> {
+  final _settingsBox = GetIt.I<SettingsBox>();
+
   final CardabaseDb cdb = CardabaseDb();
   final passwordBox = Hive.box('password');
-  final settingsBox = Hive.box('settingsBox');
 
-  final isInReorderingMode = ValueNotifier<bool>(false);
-  final tagFilter = ValueNotifier<String?>(null);
-  final numberOfColumns = ValueNotifier<int>(1);
-  final sortingStyle = ValueNotifier<SortingStyle>(SortingStyle.oldest);
+  bool isInReorderingMode = false;
+  String? tagFilter;
 
   @override
   void initState() {
     super.initState();
-    loadSettings();
     cdb.loadData();
-    numberOfColumns.addListener(saveAndApplyNumberOfColumns);
-    sortingStyle.addListener(saveAndApplySortingStyle);
-  }
-
-  void loadSettings() {
-    numberOfColumns.value =
-        settingsBox.get('columnAmount', defaultValue: 1) as int;
-
-    sortingStyle.value =
-        SortingStyle.fromDbValue(settingsBox.get('sort') ?? '');
-  }
-
-  @override
-  void dispose() {
-    isInReorderingMode.dispose();
-    numberOfColumns.dispose();
-    sortingStyle.dispose();
-    super.dispose();
-  }
-
-  void saveAndApplyNumberOfColumns() {
-    settingsBox.put('columnAmount', numberOfColumns.value);
-    setState(() {});
   }
 
   void saveAndApplySortingStyle() {
-    final value = sortingStyle.value;
-    switch (sortingStyle.value) {
+    switch (_settingsBox.value.cardListViewOptions.sortingStyle) {
       case SortingStyle.nameAz:
         cdb.myShops.sort((a, b) {
           return a['cardName'].compareTo(b['cardName']);
@@ -80,7 +55,6 @@ class _HomePageState extends State<Homepage> {
           return a['uniqueId'].compareTo(b['uniqueId']);
         });
     }
-    settingsBox.put('sort', value.toDbValue());
     cdb.updateDataBase();
     setState(() {});
   }
@@ -150,17 +124,33 @@ class _HomePageState extends State<Homepage> {
   }
 
   Future<void> showCardListViewOptionsDialog() async {
-    await showDialog(
-      context: context,
-      builder: (context) => CardListViewOptionsDialog(
-        allTags:
-            settingsBox.get('tags', defaultValue: <String>[]) as List<String>,
-        isInReorderingMode: isInReorderingMode,
-        tagFilter: tagFilter,
-        sortingStyle: sortingStyle,
-        numberOfColumns: numberOfColumns,
-      ),
-    );
+    final settings = _settingsBox.value;
+    final isInReorderingMode = ValueNotifier(this.isInReorderingMode);
+    final tagFilter = ValueNotifier(this.tagFilter);
+    final editableSettings = settings.editable();
+
+    try {
+      await showDialog(
+        context: context,
+        builder: (context) => CardListViewOptionsDialog(
+          allTags: settings.tags,
+          isInReorderingMode: isInReorderingMode,
+          tagFilter: tagFilter,
+          sortingStyle: editableSettings.cardListViewOptions.sortingStyle,
+          numberOfColumns: editableSettings.cardListViewOptions.numberOfColumns,
+        ),
+      );
+      await _settingsBox.save(editableSettings.seal());
+      setState(() {
+        this.isInReorderingMode = isInReorderingMode.value;
+        this.tagFilter = tagFilter.value;
+      });
+      saveAndApplySortingStyle();
+    } finally {
+      isInReorderingMode.dispose();
+      tagFilter.dispose();
+      editableSettings.dispose();
+    }
   }
 
   Future<void> navigateToWelcomeScreen() {
@@ -178,7 +168,7 @@ class _HomePageState extends State<Homepage> {
     final result = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
-        builder: (context) => const Settings(),
+        builder: (context) => const SettingsPage(),
       ),
     );
     if (!mounted) {
@@ -198,10 +188,9 @@ class _HomePageState extends State<Homepage> {
       floatingActionButton: _addCardButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: ValueListenableBuilder(
-        valueListenable: settingsBox.listenable(),
-        builder: (context, box, child) {
-          final showLegacyCardButton =
-              settingsBox.get('developerOptions', defaultValue: false) as bool;
+        valueListenable: _settingsBox.listenable(),
+        builder: (context, settingsBox, _) {
+          final settings = settingsBox.value;
           return CustomScrollView(
             physics: const BouncingScrollPhysics(
               decelerationRate: ScrollDecelerationRate.fast,
@@ -213,7 +202,7 @@ class _HomePageState extends State<Homepage> {
                   onPressed: showCardListViewOptionsDialog,
                 ),
                 actions: [
-                  if (showLegacyCardButton)
+                  if (settings.developerOptions.isEnabled)
                     IconButton(
                       icon: Icon(
                         Icons.web_stories,
@@ -239,13 +228,7 @@ class _HomePageState extends State<Homepage> {
                 floating: true,
                 snap: true,
               ),
-              MultiListenableBuilder(
-                listenables: [
-                  isInReorderingMode,
-                  tagFilter,
-                ],
-                builder: (context) => _buildContentSliver(context, theme),
-              ),
+              _buildContentSliver(context, theme),
             ],
           );
         },
@@ -270,18 +253,22 @@ class _HomePageState extends State<Homepage> {
     const childAspectRatio = 1.4;
     const gridPadding = 8.0;
 
-    var cards = cdb.getAll();
-    if (tagFilter.value != null) {
-      cards = cards.where((card) => card.tags.contains(tagFilter.value));
-    }
-    final sliverChildren =
-        cards.map((card) => _card(theme, card)).toList(growable: true);
+    final numberOfColumns =
+        _settingsBox.value.cardListViewOptions.numberOfColumns;
 
-    if (isInReorderingMode.value) {
+    var cards = cdb.getAll();
+    if (tagFilter != null) {
+      cards = cards.where((card) => card.tags.contains(tagFilter));
+    }
+    final sliverChildren = cards
+        .map((card) => _card(theme, card, numberOfColumns))
+        .toList(growable: true);
+
+    if (isInReorderingMode) {
       return SliverPadding(
         padding: const EdgeInsets.all(gridPadding),
         sliver: ReorderableSliverGridView.count(
-          crossAxisCount: numberOfColumns.value,
+          crossAxisCount: numberOfColumns,
           childAspectRatio: childAspectRatio,
           children: sliverChildren,
           onReorder: (oldIndex, newIndex) {
@@ -299,7 +286,7 @@ class _HomePageState extends State<Homepage> {
             childCount: sliverChildren.length,
           ),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: numberOfColumns.value,
+            crossAxisCount: numberOfColumns,
             childAspectRatio: childAspectRatio,
           ),
         ),
@@ -307,7 +294,7 @@ class _HomePageState extends State<Homepage> {
     }
   }
 
-  Widget _card(ThemeData theme, LoyaltyCard card) {
+  Widget _card(ThemeData theme, LoyaltyCard card, int numberOfColumns) {
     return CardTile(
       key: ValueKey(card.uniqueId),
       shopName: card.name,
@@ -329,11 +316,11 @@ class _HomePageState extends State<Homepage> {
         cdb.duplicate(card.uniqueId);
         setState(() {});
       },
-      labelSize: numberOfColumns.value == 1 ? 50 : 50 / numberOfColumns.value,
-      borderSize: numberOfColumns.value == 1 ? 15 : 20 / numberOfColumns.value,
-      marginSize: numberOfColumns.value == 1 ? 10 : 20 / numberOfColumns.value,
+      labelSize: numberOfColumns == 1 ? 50 : 50 / numberOfColumns,
+      borderSize: numberOfColumns == 1 ? 15 : 20 / numberOfColumns,
+      marginSize: numberOfColumns == 1 ? 10 : 20 / numberOfColumns,
       tags: card.tags.toList(growable: false),
-      reorderMode: isInReorderingMode.value,
+      reorderMode: isInReorderingMode,
       note: card.notes ?? 'Card notes are displayed here...',
       uniqueId: card.uniqueId,
       frontImagePath: card.frontImagePath ?? '',

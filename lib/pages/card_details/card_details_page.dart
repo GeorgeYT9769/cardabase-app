@@ -1,9 +1,11 @@
 import 'package:barcode_widget/barcode_widget.dart';
+import 'package:cardabase/feature/settings/get_it.dart';
+import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/pages/card_details/card_face.dart';
 import 'package:cardabase/pages/card_details/share_card_dialog.dart';
-import 'package:cardabase/pages/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
+import 'package:get_it/get_it.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 
 class CardDetailsPage extends StatefulWidget {
@@ -38,13 +40,12 @@ class CardDetailsPage extends StatefulWidget {
 
 class _CardDetailsPageState extends State<CardDetailsPage> {
   double? _previousBrightness;
-  final setBrightness =
-      settingsbox.get('setBrightness', defaultValue: true) as bool;
+  final settingsBox = GetIt.I.get<SettingsBox>();
 
   @override
   void initState() {
     super.initState();
-    if (setBrightness == false) {
+    if (settingsBox.value.useAutoBrightness == false) {
       _increaseBrightness();
     }
   }

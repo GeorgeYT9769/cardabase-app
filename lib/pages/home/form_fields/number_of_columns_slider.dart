@@ -1,5 +1,6 @@
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 class NumberOfColumnsSlider extends StatelessWidget {
   const NumberOfColumnsSlider({
@@ -20,7 +21,7 @@ class NumberOfColumnsSlider extends StatelessWidget {
         max: 5,
         divisions: 4,
         onChanged: (double newValue) {
-          VibrationProvider.vibrateSuccess();
+          GetIt.I<VibrationProvider>().vibrateSuccess();
           controller.value = newValue.round();
         },
       ),

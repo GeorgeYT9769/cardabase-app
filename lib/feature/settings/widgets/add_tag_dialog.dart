@@ -1,19 +1,27 @@
-import 'package:cardabase/util/vibration_provider.dart';
-import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
-import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
-Future<bool> showPasswordVerificationDialog(BuildContext context) async {
-  final theme = Theme.of(context);
-  final TextEditingController controller = TextEditingController();
-  final passwordbox = Hive.box('password');
+class AddTagDialog extends StatefulWidget {
+  const AddTagDialog({super.key});
 
-  final result = await showDialog<bool>(
-    context: context,
-    builder: (context) => AlertDialog(
+  @override
+  State<AddTagDialog> createState() => _AddTagDialogState();
+}
+
+class _AddTagDialogState extends State<AddTagDialog> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return AlertDialog(
       title: Text(
-        'Enter Password',
+        'Add a tag',
         style: theme.textTheme.bodyLarge?.copyWith(
           color: theme.colorScheme.inverseSurface,
           fontSize: 30,
@@ -23,8 +31,7 @@ Future<bool> showPasswordVerificationDialog(BuildContext context) async {
         mainAxisSize: MainAxisSize.min,
         children: [
           TextFormField(
-            controller: controller,
-            obscureText: true,
+            controller: _controller,
             decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -41,10 +48,10 @@ Future<bool> showPasswordVerificationDialog(BuildContext context) async {
                 color: theme.colorScheme.secondary,
               ),
               prefixIcon: Icon(
-                Icons.password,
+                Icons.label,
                 color: theme.colorScheme.secondary,
               ),
-              labelText: 'Password',
+              labelText: 'Tag',
             ),
             style: theme.textTheme.bodyLarge?.copyWith(
               color: theme.colorScheme.tertiary,
@@ -55,18 +62,13 @@ Future<bool> showPasswordVerificationDialog(BuildContext context) async {
           Center(
             child: OutlinedButton(
               onPressed: () {
-                if (controller.text == passwordbox.get('PW')) {
-                  FocusScope.of(context).unfocus();
-
-                  Future.delayed(const Duration(milliseconds: 100), () {
-                    Navigator.pop(context, true);
-                  });
-                } else {
-                  GetIt.I<VibrationProvider>().vibrateSuccess();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    buildCustomSnackBar('Incorrect password!', false),
-                  );
+                final trimmed = _controller.text.trim();
+                if (trimmed.isEmpty) {
+                  return;
                 }
+                Navigator.of(context).pop(
+                  _controller.text.trim(),
+                );
               },
               style: OutlinedButton.styleFrom(
                 elevation: 0.0,
@@ -79,18 +81,17 @@ Future<bool> showPasswordVerificationDialog(BuildContext context) async {
                 ),
               ),
               child: Text(
-                'VERIFY',
+                'ADD',
                 style: theme.textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
+                  color: theme.colorScheme.tertiary,
                 ),
               ),
             ),
           ),
         ],
       ),
-    ),
-  );
-
-  return result ?? false;
+    );
+  }
 }
