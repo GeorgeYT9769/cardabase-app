@@ -38,7 +38,9 @@ class _BugReportDialogState extends State<BugReportDialog> {
         ),
       );
     } finally {
-      setState(() => isSending = false);
+      if (mounted) {
+        setState(() => isSending = false);
+      }
     }
   }
 
