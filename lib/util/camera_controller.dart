@@ -189,10 +189,33 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Stack(
       children: [
         Scaffold(
-          appBar: AppBar(title: const Text('Photo')),
+          appBar: AppBar(
+            title: Text(
+              'Camera',
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: theme.colorScheme.tertiary,
+              ),
+            ),
+            automaticallyImplyLeading: false,
+            actions: [
+              IconButton(
+                icon: Icon(
+                  Icons.arrow_back_ios_new,
+                  color: theme.colorScheme.secondary,
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+            centerTitle: true,
+            elevation: 0.0,
+            backgroundColor: theme.colorScheme.surface,
+          ),
           body: FutureBuilder<void>(
             future: _initializeControllerFuture,
             builder: (context, snapshot) {

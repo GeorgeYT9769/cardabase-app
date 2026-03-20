@@ -559,7 +559,7 @@ class _CardTileState extends State<CardTile> {
                   widget.deleteFunction(context);
                 },
               ),
-              const SizedBox(height: 70),
+              const SizedBox(height: 100),
             ],
           ),
         );

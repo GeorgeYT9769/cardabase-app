@@ -4,6 +4,7 @@ import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/feature/settings/widgets/add_tag_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../../util/widgets/custom_snack_bar.dart';
@@ -121,22 +122,30 @@ class _TagsPageState extends State<TagsPage> {
   }
 
   Widget _tag(ThemeData theme, int tagIndex) {
-    return ListTile(
-      title: Text(
-        _settings.tags[tagIndex],
-        style: theme.textTheme.bodyLarge?.copyWith(
-          color: theme.colorScheme.inverseSurface,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
+    return Slidable(
+      endActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        children: [
+          SlidableAction(
+            icon: Icons.delete,
+            backgroundColor: Colors.red,
+            onPressed: (context) {
+              _settings.tags.removeAt(tagIndex);
+              _settingsBox.save(_settings.seal());
+            },
+          ),
+        ],
       ),
-      leading: Icon(Icons.label, color: theme.colorScheme.secondary),
-      trailing: IconButton(
-        icon: Icon(Icons.delete, color: theme.colorScheme.secondary),
-        onPressed: () {
-          _settings.tags.removeAt(tagIndex);
-          _settingsBox.save(_settings.seal());
-        },
+      child: ListTile(
+        title: Text(
+          _settings.tags[tagIndex],
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: theme.colorScheme.inverseSurface,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        leading: Icon(Icons.label, color: theme.colorScheme.secondary),
       ),
     );
   }
