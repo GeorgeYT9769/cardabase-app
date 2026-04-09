@@ -123,6 +123,19 @@ class _TagsPageState extends State<TagsPage> {
 
   Widget _tag(ThemeData theme, int tagIndex) {
     return Slidable(
+      startActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        children: [
+          SlidableAction(
+            icon: Icons.delete,
+            backgroundColor: Colors.red,
+            onPressed: (context) {
+              _settings.tags.removeAt(tagIndex);
+              _settingsBox.save(_settings.seal());
+            },
+          ),
+        ],
+      ),
       endActionPane: ActionPane(
         motion: const ScrollMotion(),
         children: [

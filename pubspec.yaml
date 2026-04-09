@@ -31,6 +31,7 @@ dependencies:
   barcode_widget: ^2.0.4
   camera: ^0.11.3
   cupertino_icons: ^1.0.2
+  file_picker: ^11.0.2
   flutter:
     sdk: flutter
   flutter_bounceable: ^1.1.0

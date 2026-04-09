@@ -17,6 +17,7 @@ class Settings {
     required this.vibrateOnDifferentActions,
     required this.tags,
     required this.cardListViewOptions,
+    this.customExportPath,
   });
 
   const Settings.defaultValue()
@@ -29,6 +30,7 @@ class Settings {
           vibrateOnDifferentActions: true,
           tags: const [],
           cardListViewOptions: const CardListViewOptions.defaultValue(),
+          customExportPath: null,
         );
 
   @HiveField(0)
@@ -47,6 +49,8 @@ class Settings {
   final List<String> tags;
   @HiveField(7)
   final CardListViewOptions cardListViewOptions;
+  @HiveField(8)
+  final String? customExportPath;
 
   EditableSettings editable() => EditableSettings.fromValue(this);
 }
