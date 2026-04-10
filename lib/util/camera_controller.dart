@@ -201,14 +201,14 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
             forceMaterialTransparency: true,
             actions: [
               Container(
-                margin: EdgeInsets.fromLTRB(0,5,15,0),
+                margin: EdgeInsets.fromLTRB(0,5,5,0),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.surface.withValues(alpha: .4),
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
                   style: ButtonStyle(
-                    iconSize: const WidgetStatePropertyAll(30),
+                    iconSize: const WidgetStatePropertyAll(24),
                     iconColor: WidgetStatePropertyAll(
                       theme.colorScheme.inverseSurface,
                     ),

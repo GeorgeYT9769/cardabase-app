@@ -30,7 +30,7 @@ class Settings {
           vibrateOnDifferentActions: true,
           tags: const [],
           cardListViewOptions: const CardListViewOptions.defaultValue(),
-          customExportPath: null,
+          customExportPath: '/storage/emulated/0/Download/Cardabase',
         );
 
   @HiveField(0)

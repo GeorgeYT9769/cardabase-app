@@ -81,10 +81,11 @@ Future<void> exportCardList(
       }
 
       if (toFile) {
+        const defaultPath = '/storage/emulated/0/Download/Cardabase';
         final exportDir =
             (customPath != null && customPath.isNotEmpty)
                 ? customPath
-                : '/storage/emulated/0/Download/Cardabase';
+                : defaultPath;
 
         final directory = Directory(exportDir);
         if (!await directory.exists()) {
@@ -95,10 +96,9 @@ Future<void> exportCardList(
         final file = File(filePath);
         await file.writeAsString(txtBuffer.toString());
 
-        final label =
-            (customPath != null && customPath.isNotEmpty)
-                ? 'Exported to Custom Path'
-                : 'Exported to Downloads';
+        final label = (exportDir == defaultPath)
+            ? 'Exported to Downloads'
+            : 'Exported to Custom Path';
         ScaffoldMessenger.of(context).showSnackBar(
           buildCustomSnackBar(label, true),
         );
@@ -146,9 +146,21 @@ class _ExportDialogState extends State<_ExportDialog> {
   @override
   void initState() {
     super.initState();
-    _pathController = TextEditingController(
-      text: _settingsBox.value.customExportPath ?? '',
-    );
+    // Always start with default path if not set or empty or only base path
+    final initialPath = _settingsBox.value.customExportPath;
+    if (initialPath == null || initialPath.isEmpty) {
+      _pathController = TextEditingController(
+        text: '/storage/emulated/0/Download/Cardabase',
+      );
+    } else if (initialPath.trim().length < '/storage/emulated/0/'.length) {
+      _pathController = TextEditingController(
+        text: '/storage/emulated/0/',
+      );
+    } else {
+      _pathController = TextEditingController(
+        text: initialPath,
+      );
+    }
   }
 
   @override
@@ -158,6 +170,11 @@ class _ExportDialogState extends State<_ExportDialog> {
   }
 
   Future<void> _savePath(String path) async {
+    // Prevent erasing the base path
+    String safePath = path;
+    if (safePath.trim().isEmpty) {
+      safePath = '/storage/emulated/0/Download/Cardabase';
+    }
     final current = _settingsBox.value;
     await _settingsBox.save(
       Settings(
@@ -169,7 +186,7 @@ class _ExportDialogState extends State<_ExportDialog> {
         vibrateOnDifferentActions: current.vibrateOnDifferentActions,
         tags: current.tags,
         cardListViewOptions: current.cardListViewOptions,
-        customExportPath: path.isEmpty ? null : path,
+        customExportPath: safePath,
       ),
     );
   }
@@ -217,11 +234,12 @@ class _ExportDialogState extends State<_ExportDialog> {
                 ],
               ),
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 40),
             OutlinedButton(
-              onPressed: () {
+              onPressed: () async {
                 final path = _pathController.text.trim();
-                Navigator.of(context).pop();
+                await _savePath(path);
+                if (context.mounted) Navigator.of(context).pop();
                 exportCardList(
                   widget.parentContext,
                   toFile: true,
@@ -238,13 +256,28 @@ class _ExportDialogState extends State<_ExportDialog> {
                 ],
               ),
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 5),
             TextField(
               controller: _pathController,
-              onChanged: (value) => _savePath(value.trim()),
+              onChanged: (value) {
+                final trimmed = value.trim();
+                if (trimmed.length < '/storage/emulated/0/'.length || !trimmed.startsWith('/storage/emulated/0/')) {
+                  if (_pathController.text != '/storage/emulated/0/') {
+                    setState(() {
+                      _pathController.text = '/storage/emulated/0/';
+                      _pathController.selection = TextSelection.fromPosition(
+                        TextPosition(offset: _pathController.text.length),
+                      );
+                    });
+                    _savePath('/storage/emulated/0/');
+                  }
+                } else if (_settingsBox.value.customExportPath != trimmed) {
+                  _savePath(trimmed);
+                }
+              },
               style: theme.textTheme.bodySmall?.copyWith(fontSize: 12),
               decoration: InputDecoration(
-                hintText: '/storage/emulated/0/SomeDir/...',
+                hintText: '/storage/emulated/0/Download/Cardabase',
                 hintStyle: theme.textTheme.bodySmall?.copyWith(
                   fontSize: 11,
                   color: theme.colorScheme.outline,
@@ -268,23 +301,33 @@ class _ExportDialogState extends State<_ExportDialog> {
                     width: 2.0,
                   ),
                 ),
-                suffixIcon: _pathController.text.isNotEmpty
+                suffixIcon: _pathController.text.trim() == '/storage/emulated/0/Download/Cardabase'
                   ? IconButton(
-                      icon: const Icon(Icons.clear, size: 18),
-                      tooltip: 'Clear custom path',
+                      icon: const Icon(Icons.close, size: 18),
+                      tooltip: 'Reset to base path',
                       onPressed: () async {
-                        setState(() => _pathController.clear());
-                        await _savePath('');
+                        setState(() {
+                          _pathController.text = '/storage/emulated/0/';
+                          _pathController.selection = TextSelection.fromPosition(
+                            TextPosition(offset: _pathController.text.length),
+                          );
+                        });
+                        await _savePath('/storage/emulated/0/');
                       },
                     )
                   : IconButton(
-                      icon: const Icon(Icons.transit_enterexit, size: 18),
-                      tooltip: 'Set default custom path',
+                      icon: const Icon(Icons.restart_alt, size: 18),
+                      tooltip: 'Reset to Downloads path',
                       onPressed: () async {
-                        setState(() => _pathController.text = '/storage/emulated/0/');
-                        await _savePath('/storage/emulated/0/');
+                        setState(() {
+                          _pathController.text = '/storage/emulated/0/Download/Cardabase';
+                          _pathController.selection = TextSelection.fromPosition(
+                            TextPosition(offset: _pathController.text.length),
+                          );
+                        });
+                        await _savePath('/storage/emulated/0/Download/Cardabase');
                       },
-                  ),
+                    ),
               ),
             ),
           ],

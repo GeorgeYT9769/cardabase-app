@@ -49,14 +49,14 @@ class _QRBarReaderState extends State<QRBarReader> {
         forceMaterialTransparency: true,
         actions: [
           Container(
-            margin: EdgeInsets.fromLTRB(0,5,15,0),
+            margin: EdgeInsets.fromLTRB(0,5,5,0),
             decoration: BoxDecoration(
               color: theme.colorScheme.surface.withValues(alpha: .4),
               shape: BoxShape.circle,
             ),
             child: IconButton(
               style: ButtonStyle(
-                iconSize: const WidgetStatePropertyAll(30),
+                iconSize: const WidgetStatePropertyAll(24),
                 iconColor: WidgetStatePropertyAll(
                   theme.colorScheme.inverseSurface,
                 ),
@@ -83,6 +83,7 @@ class _QRBarReaderState extends State<QRBarReader> {
           color: theme.colorScheme.surface.withValues(alpha: .4),
         ),
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Container(
@@ -94,7 +95,7 @@ class _QRBarReaderState extends State<QRBarReader> {
                     theme.colorScheme.inverseSurface,
                   ),
                 ),
-                icon: const Icon(Icons.cameraswitch),
+                icon: const Icon(Icons.cameraswitch, size: 30,),
                 onPressed: () async {
                   await controller?.flipCamera();
                   if (mounted) setState(() {});
@@ -110,7 +111,7 @@ class _QRBarReaderState extends State<QRBarReader> {
                     theme.colorScheme.inverseSurface,
                   ),
                 ),
-                icon: const Icon(Icons.flash_on),
+                icon: const Icon(Icons.flash_on, size: 30,),
                 onPressed: () async {
                   await controller?.toggleFlash();
                   if (mounted) setState(() {});
@@ -126,7 +127,7 @@ class _QRBarReaderState extends State<QRBarReader> {
                     theme.colorScheme.inverseSurface,
                   ),
                 ),
-                icon: const Icon(Icons.photo),
+                icon: const Icon(Icons.photo, size: 30,),
                 onPressed: _pickImage,
               ),
             ),
