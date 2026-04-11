@@ -220,7 +220,7 @@ class _CardTileState extends State<CardTile> {
                         );
                       });
                     } else {
-                      GetIt.I<VibrationProvider>().vibrateSuccess();
+                      GetIt.I<VibrationProvider>().vibrateError();
                       ScaffoldMessenger.of(context).showSnackBar(
                         buildCustomSnackBar('Incorrect password!', false),
                       );
@@ -442,7 +442,7 @@ class _CardTileState extends State<CardTile> {
                       _setWidgetCard(context, theme);
                     });
                   } else {
-                    GetIt.I<VibrationProvider>().vibrateSuccess();
+                    GetIt.I<VibrationProvider>().vibrateError();
                     ScaffoldMessenger.of(context).showSnackBar(
                       buildCustomSnackBar('Incorrect password!', false),
                     );
@@ -475,7 +475,7 @@ class _CardTileState extends State<CardTile> {
   }
 
   void _showBottomSheet(BuildContext context, ThemeData theme) {
-    GetIt.I<VibrationProvider>().vibrateSuccess();
+    GetIt.I<VibrationProvider>().vibrateSelection();
     showModalBottomSheet(
       context: context,
       elevation: 0.0,

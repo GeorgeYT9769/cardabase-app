@@ -36,15 +36,35 @@ class _HomePageState extends State<Homepage> {
     cdb.loadData();
   }
 
+  String removeDiacritics(String str) {
+    var withDia = 'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž';
+    var withoutDia = 'AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz';
+
+    for (int i = 0; i < withDia.length; i++) {
+      str = str.replaceAll(withDia[i], withoutDia[i]);
+    }
+    return str;
+  }
+
   void saveAndApplySortingStyle() {
-    switch (_settingsBox.value.cardListViewOptions.sortingStyle) {
+    final sortOptions = _settingsBox.value.cardListViewOptions;
+    switch (sortOptions.sortingStyle) {
       case SortingStyle.nameAz:
-        cdb.myShops.sort((a, b) {
-          return a['cardName'].compareTo(b['cardName']);
-        });
       case SortingStyle.nameZa:
         cdb.myShops.sort((a, b) {
-          return b['cardName'].compareTo(a['cardName']);
+          String nameA = a['cardName'] as String;
+          String nameB = b['cardName'] as String;
+          if (sortOptions.sortNameIgnoreAccents) {
+            nameA = removeDiacritics(nameA);
+            nameB = removeDiacritics(nameB);
+          }
+          if (sortOptions.sortNameCaseInsensitive) {
+            nameA = nameA.toLowerCase();
+            nameB = nameB.toLowerCase();
+          }
+          return sortOptions.sortingStyle == SortingStyle.nameAz
+              ? nameA.compareTo(nameB)
+              : nameB.compareTo(nameA);
         });
       case SortingStyle.latest:
         cdb.myShops.sort((a, b) {
@@ -138,6 +158,8 @@ class _HomePageState extends State<Homepage> {
           tagFilter: tagFilter,
           sortingStyle: editableSettings.cardListViewOptions.sortingStyle,
           numberOfColumns: editableSettings.cardListViewOptions.numberOfColumns,
+          sortNameCaseInsensitive: editableSettings.cardListViewOptions.sortNameCaseInsensitive,
+          sortNameIgnoreAccents: editableSettings.cardListViewOptions.sortNameIgnoreAccents,
         ),
       );
       await _settingsBox.save(editableSettings.seal());

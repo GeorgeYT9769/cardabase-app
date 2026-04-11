@@ -37,7 +37,7 @@ Future<void> exportCardList(
     try {
       final cardList = cardBox.get('CARDLIST') as List?;
       if (cardList == null || cardList.isEmpty) {
-        GetIt.I<VibrationProvider>().vibrateSuccess();
+        GetIt.I<VibrationProvider>().vibrateError();
         ScaffoldMessenger.of(context).showSnackBar(
           buildCustomSnackBar('No data!', false),
         );
@@ -109,13 +109,13 @@ Future<void> exportCardList(
         );
       }
     } catch (e) {
-      GetIt.I<VibrationProvider>().vibrateSuccess();
+      GetIt.I<VibrationProvider>().vibrateError();
       ScaffoldMessenger.of(context).showSnackBar(
         buildCustomSnackBar('Error!', false),
       );
     }
   } else {
-    GetIt.I<VibrationProvider>().vibrateSuccess();
+    GetIt.I<VibrationProvider>().vibrateError();
     ScaffoldMessenger.of(context).showSnackBar(
       buildCustomSnackBar('No permission!', false),
     );

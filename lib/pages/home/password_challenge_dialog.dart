@@ -27,7 +27,7 @@ class _PasswordChallengeDialogState extends State<PasswordChallengeDialog> {
     // TODO(wim): use proper password validation
     final expectedPassword = passwordBox.get('PW');
     if (password.text != expectedPassword) {
-      GetIt.I<VibrationProvider>().vibrateSuccess();
+      GetIt.I<VibrationProvider>().vibrateError();
       ScaffoldMessenger.of(context).showSnackBar(
         buildCustomSnackBar('Incorrect password!', false),
       );

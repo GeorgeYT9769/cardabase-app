@@ -1,5 +1,7 @@
+import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
+import 'package:get_it/get_it.dart';
 
 class MySetting extends StatelessWidget {
   final String settingHeader;
@@ -29,6 +31,7 @@ class MySetting extends StatelessWidget {
         alignment: Alignment.center,
         child: GestureDetector(
           onLongPress: () {
+            GetIt.I<VibrationProvider>().vibrateSelection();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 shape: RoundedRectangleBorder(

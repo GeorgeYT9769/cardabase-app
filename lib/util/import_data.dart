@@ -69,7 +69,7 @@ Future<bool> showImportDialog(BuildContext context) async {
           onPressed: () {
             final input = textController.text.trim();
             if (input.isEmpty) {
-              GetIt.I<VibrationProvider>().vibrateSuccess();
+              GetIt.I<VibrationProvider>().vibrateError();
               ScaffoldMessenger.of(context).showSnackBar(
                 buildCustomSnackBar('No data!', false),
               );

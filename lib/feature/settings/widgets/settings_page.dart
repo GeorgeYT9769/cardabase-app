@@ -162,6 +162,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 _subtitle(
                   theme,
                   'App Settings',
+                   theme.colorScheme.inverseSurface,
                 ),
                 _themeSetting(theme),
                 _extraDarkSetting(theme),
@@ -175,11 +176,18 @@ class _SettingsPageState extends State<SettingsPage> {
                 _exportCardsButton(theme),
                 _cloudBackupSettingsButton(theme),
                 _autoBackupSettingsButton(theme),
+                const SizedBox(height: 10),
+                _subtitle(
+                  theme,
+                  '! Danger Zone !',
+                  Colors.red,
+                ),
                 _deleteDatabaseButton(theme),
                 const SizedBox(height: 10),
                 _subtitle(
                   theme,
                   'Social Networks',
+                  theme.colorScheme.inverseSurface,
                 ),
                 _aboutButton(theme),
                 _discordLink(theme),
@@ -211,7 +219,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _subtitle(ThemeData theme, String title) {
+  Widget _subtitle(ThemeData theme, String title, Color textColor) {
     return Container(
       margin: const EdgeInsets.only(top: 10, left: 20),
       child: Column(
@@ -223,7 +231,7 @@ class _SettingsPageState extends State<SettingsPage> {
             style: theme.textTheme.bodyLarge?.copyWith(
               fontWeight: FontWeight.bold,
               fontSize: 23,
-              color: theme.colorScheme.inverseSurface,
+              color: textColor,
             ),
           ),
         ],

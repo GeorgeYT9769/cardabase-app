@@ -232,32 +232,44 @@ class EditableCardListViewOptions {
   const EditableCardListViewOptions({
     required this.numberOfColumns,
     required this.sortingStyle,
+    required this.sortNameCaseInsensitive,
+    required this.sortNameIgnoreAccents,
   });
 
   factory EditableCardListViewOptions.fromValue(CardListViewOptions value) {
     return EditableCardListViewOptions(
       numberOfColumns: ValueNotifier(value.numberOfColumns),
       sortingStyle: ValueNotifier(value.sortingStyle),
+      sortNameCaseInsensitive: ValueNotifier((value.sortNameCaseInsensitive as bool?) ?? false),
+      sortNameIgnoreAccents: ValueNotifier((value.sortNameIgnoreAccents as bool?) ?? false),
     );
   }
 
   final ValueNotifier<int> numberOfColumns;
   final ValueNotifier<SortingStyle> sortingStyle;
+  final ValueNotifier<bool> sortNameCaseInsensitive;
+  final ValueNotifier<bool> sortNameIgnoreAccents;
 
   void loadValue(CardListViewOptions value) {
     numberOfColumns.value = value.numberOfColumns;
     sortingStyle.value = value.sortingStyle;
+    sortNameCaseInsensitive.value = (value.sortNameCaseInsensitive as bool?) ?? false;
+    sortNameIgnoreAccents.value = (value.sortNameIgnoreAccents as bool?) ?? false;
   }
 
   CardListViewOptions seal() {
     return CardListViewOptions(
       numberOfColumns: numberOfColumns.value,
       sortingStyle: sortingStyle.value,
+      sortNameCaseInsensitive: sortNameCaseInsensitive.value,
+      sortNameIgnoreAccents: sortNameIgnoreAccents.value,
     );
   }
 
   void dispose() {
     numberOfColumns.dispose();
     sortingStyle.dispose();
+    sortNameCaseInsensitive.dispose();
+    sortNameIgnoreAccents.dispose();
   }
 }

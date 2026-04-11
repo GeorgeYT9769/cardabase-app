@@ -39,13 +39,13 @@ class _PasswordScreenState extends State<PasswordScreen> {
           buildCustomSnackBar('Success!', true),
         );
       } else {
-        GetIt.I<VibrationProvider>().vibrateSuccess();
+        GetIt.I<VibrationProvider>().vibrateError();
         ScaffoldMessenger.of(context).showSnackBar(
           buildCustomSnackBar('Passwords do not match!', false),
         );
       }
     } else {
-      GetIt.I<VibrationProvider>().vibrateSuccess();
+      GetIt.I<VibrationProvider>().vibrateError();
       ScaffoldMessenger.of(context).showSnackBar(
         buildCustomSnackBar('Password cannot be empty!', false),
       );

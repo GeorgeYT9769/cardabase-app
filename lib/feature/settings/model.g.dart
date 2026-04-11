@@ -232,17 +232,23 @@ class CardListViewOptionsAdapter extends TypeAdapter<CardListViewOptions> {
     return CardListViewOptions(
       numberOfColumns: (fields[0] as num).toInt(),
       sortingStyle: fields[1] as SortingStyle,
+      sortNameCaseInsensitive: fields[2] == null ? false : fields[2] as bool,
+      sortNameIgnoreAccents: fields[3] == null ? false : fields[3] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, CardListViewOptions obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.numberOfColumns)
       ..writeByte(1)
-      ..write(obj.sortingStyle);
+      ..write(obj.sortingStyle)
+      ..writeByte(2)
+      ..write(obj.sortNameCaseInsensitive)
+      ..writeByte(3)
+      ..write(obj.sortNameIgnoreAccents);
   }
 
   @override

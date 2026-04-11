@@ -172,18 +172,26 @@ class CardListViewOptions {
   const CardListViewOptions({
     required this.numberOfColumns,
     required this.sortingStyle,
+    required this.sortNameCaseInsensitive,
+    required this.sortNameIgnoreAccents,
   });
 
   const CardListViewOptions.defaultValue()
       : this(
           numberOfColumns: 1,
           sortingStyle: SortingStyle.latest,
+          sortNameCaseInsensitive: false,
+          sortNameIgnoreAccents: false,
         );
 
   @HiveField(0)
   final int numberOfColumns;
   @HiveField(1)
   final SortingStyle sortingStyle;
+  @HiveField(2, defaultValue: false)
+  final bool sortNameCaseInsensitive;
+  @HiveField(3, defaultValue: false)
+  final bool sortNameIgnoreAccents;
 
   EditableCardListViewOptions editable() {
     return EditableCardListViewOptions.fromValue(this);

@@ -56,6 +56,8 @@ Future<void> migrateSettingsTo202603(Box oldBox, Box<Settings> newBox) {
       cardListViewOptions: CardListViewOptions(
         numberOfColumns: oldBox.get('columnAmount') as int? ?? 1,
         sortingStyle: sortingStyle,
+        sortNameCaseInsensitive: false,
+        sortNameIgnoreAccents: false,
       ),
     ),
   );
