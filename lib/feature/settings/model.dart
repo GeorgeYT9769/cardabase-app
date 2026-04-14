@@ -1,4 +1,5 @@
-import 'package:cardabase/data/hive_type_ids.dart';
+import 'package:cardabase/data/hive.dart';
+import 'package:cardabase/feature/cards/card_list_view_options.dart';
 import 'package:cardabase/feature/settings/editable_model.dart';
 import 'package:hive_ce/hive.dart';
 
@@ -148,40 +149,5 @@ class DeveloperOptions {
 
   EditableDeveloperOptions editable() {
     return EditableDeveloperOptions.fromValue(this);
-  }
-}
-
-@HiveType(typeId: HiveTypeIds.sortingStyle)
-enum SortingStyle {
-  @HiveField(0)
-  nameAz,
-  @HiveField(1)
-  nameZa,
-  @HiveField(2)
-  latest,
-  @HiveField(3)
-  oldest
-}
-
-@HiveType(typeId: HiveTypeIds.cardListViewOptions)
-class CardListViewOptions {
-  const CardListViewOptions({
-    required this.numberOfColumns,
-    required this.sortingStyle,
-  });
-
-  const CardListViewOptions.defaultValue()
-      : this(
-          numberOfColumns: 1,
-          sortingStyle: SortingStyle.latest,
-        );
-
-  @HiveField(0)
-  final int numberOfColumns;
-  @HiveField(1)
-  final SortingStyle sortingStyle;
-
-  EditableCardListViewOptions editable() {
-    return EditableCardListViewOptions.fromValue(this);
   }
 }

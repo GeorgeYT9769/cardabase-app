@@ -1,7 +1,11 @@
+import 'package:cardabase/feature/cards/card_list_view_options.dart';
 import 'package:cardabase/feature/settings/model.dart';
 import 'package:hive_ce/hive.dart';
 
-Future<void> migrateSettingsTo202603(Box oldBox, Box<Settings> newBox) {
+Future<void> migrateSettingsTo202603(
+  Box oldBox,
+  Box<Settings> newBox,
+) {
   if (newBox.isNotEmpty) {
     return Future.value();
   }
@@ -56,6 +60,9 @@ Future<void> migrateSettingsTo202603(Box oldBox, Box<Settings> newBox) {
       cardListViewOptions: CardListViewOptions(
         numberOfColumns: oldBox.get('columnAmount') as int? ?? 1,
         sortingStyle: sortingStyle,
+        // this field is added after the migration, it won't be used so we
+        // just leave it empty for now. The cards migration will populate it.
+        customOrder: [],
       ),
     ),
   );

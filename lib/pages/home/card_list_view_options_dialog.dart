@@ -1,4 +1,4 @@
-import 'package:cardabase/feature/settings/model.dart';
+import 'package:cardabase/feature/cards/card_list_view_options.dart';
 import 'package:cardabase/pages/home/form_fields/number_of_columns_slider.dart';
 import 'package:cardabase/pages/home/form_fields/sorting_style_selector.dart';
 import 'package:cardabase/util/setting_tile.dart';

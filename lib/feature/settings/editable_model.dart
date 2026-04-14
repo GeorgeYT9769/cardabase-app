@@ -1,3 +1,4 @@
+import 'package:cardabase/feature/cards/edit/editable_card_list_view_options.dart';
 import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/util/list_notifier.dart';
 import 'package:flutter/foundation.dart';
@@ -219,39 +220,5 @@ class EditableDeveloperOptions {
 
   void dispose() {
     isEnabled.dispose();
-  }
-}
-
-class EditableCardListViewOptions {
-  const EditableCardListViewOptions({
-    required this.numberOfColumns,
-    required this.sortingStyle,
-  });
-
-  factory EditableCardListViewOptions.fromValue(CardListViewOptions value) {
-    return EditableCardListViewOptions(
-      numberOfColumns: ValueNotifier(value.numberOfColumns),
-      sortingStyle: ValueNotifier(value.sortingStyle),
-    );
-  }
-
-  final ValueNotifier<int> numberOfColumns;
-  final ValueNotifier<SortingStyle> sortingStyle;
-
-  void loadValue(CardListViewOptions value) {
-    numberOfColumns.value = value.numberOfColumns;
-    sortingStyle.value = value.sortingStyle;
-  }
-
-  CardListViewOptions seal() {
-    return CardListViewOptions(
-      numberOfColumns: numberOfColumns.value,
-      sortingStyle: sortingStyle.value,
-    );
-  }
-
-  void dispose() {
-    numberOfColumns.dispose();
-    sortingStyle.dispose();
   }
 }

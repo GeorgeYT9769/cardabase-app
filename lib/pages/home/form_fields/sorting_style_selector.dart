@@ -1,4 +1,4 @@
-import 'package:cardabase/feature/settings/model.dart';
+import 'package:cardabase/feature/cards/card_list_view_options.dart';
 import 'package:flutter/material.dart';
 
 class SortingStyleSelector extends StatelessWidget {
@@ -25,6 +25,7 @@ class SortingStyleSelector extends StatelessWidget {
                     SortingStyle.nameZa => 'Name Z-0',
                     SortingStyle.latest => 'Latest',
                     SortingStyle.oldest => 'Oldest',
+                    SortingStyle.custom => 'Custom',
                   },
                   style: ButtonStyle(
                     elevation: WidgetStateProperty.all(0.0),

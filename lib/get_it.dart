@@ -1,3 +1,4 @@
+import 'package:cardabase/feature/cards/barcode_type_type_adapter.dart';
 import 'package:cardabase/hive_registrar.g.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:get_it/get_it.dart';
@@ -8,15 +9,10 @@ extension GetItExtensions on GetIt {
   void registerHive() {
     registerLazySingletonAsync<HiveInterface>(() async {
       await Hive.initFlutter();
+      Hive.registerAdapter(const BarcodeTypeAdapter());
       Hive.registerAdapters();
       return Hive;
     });
-
-    registerLazySingletonAsync(
-      () => getAsync<HiveInterface>().then((hive) => hive.openBox('mybox')),
-      instanceName: 'loyaltyCardsBox',
-      dispose: (box) => box.close(),
-    );
 
     registerLazySingletonAsync(
       () => getAsync<HiveInterface>().then((hive) => hive.openBox('password')),

@@ -1,17 +1,19 @@
 import 'dart:io';
 
 import 'package:barcode_widget/barcode_widget.dart';
-import 'package:cardabase/data/loyalty_card.dart';
+import 'package:cardabase/feature/cards/edit/editable_loyalty_card.dart';
+import 'package:cardabase/feature/cards/edit/widgets/barcode_type_selector_dialog.dart';
+import 'package:cardabase/feature/cards/edit/widgets/form_fields/barcode_type_selector_button.dart';
+import 'package:cardabase/feature/cards/edit/widgets/form_fields/card_data_form_field.dart';
+import 'package:cardabase/feature/cards/edit/widgets/form_fields/card_name_form_field.dart';
+import 'package:cardabase/feature/cards/edit/widgets/form_fields/color_picker_button.dart';
+import 'package:cardabase/feature/cards/edit/widgets/form_fields/notes_form_field.dart';
+import 'package:cardabase/feature/cards/edit/widgets/form_fields/points_form_field.dart';
+import 'package:cardabase/feature/cards/edit/widgets/form_fields/take_picture_button.dart'
+    show TakePictureButton;
+import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
-import 'package:cardabase/pages/edit_card/barcode_type_selector_dialog.dart';
-import 'package:cardabase/pages/edit_card/form_fields/barcode_type_selector_button.dart';
-import 'package:cardabase/pages/edit_card/form_fields/card_data_form_field.dart';
-import 'package:cardabase/pages/edit_card/form_fields/card_name_form_field.dart';
-import 'package:cardabase/pages/edit_card/form_fields/color_picker_button.dart';
-import 'package:cardabase/pages/edit_card/form_fields/notes_form_field.dart';
-import 'package:cardabase/pages/edit_card/form_fields/points_form_field.dart';
-import 'package:cardabase/pages/edit_card/form_fields/take_picture_button.dart';
 import 'package:cardabase/util/read_barcode.dart';
 import 'package:cardabase/util/widgets/color_picker_dialog.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
@@ -60,13 +62,13 @@ class _EditCardFormState extends State<EditCardForm> {
     final code = result['code'] as String;
     final format = result['format'].toString();
     if (code == '-1') {
-      widget.card.data.text = '';
+      widget.card.barcode.data.text = '';
       return;
     }
 
-    widget.card.data.text = code;
+    widget.card.barcode.data.text = code;
 
-    widget.card.barcodeType.value = switch (format) {
+    widget.card.barcode.type.value = switch (format) {
       'BarcodeFormat.code39' => BarcodeType.Code39,
       'BarcodeFormat.code93' => BarcodeType.Code93,
       'BarcodeFormat.code128' => BarcodeType.Code128,
@@ -82,20 +84,39 @@ class _EditCardFormState extends State<EditCardForm> {
       _ => BarcodeType.CodeEAN13,
     };
 
+    late final LoyaltyCard? sharedCard;
     if (code.startsWith('[') && code.endsWith(']')) {
       try {
-        final card = LoyaltyCard.fromShare(code);
-        widget.card.name.text = card.name;
-        widget.card.color.value = card.color;
-        widget.card.data.text = card.data;
-        widget.card.barcodeType.value = card.barcodeType;
-        widget.card.requiresAuth.value = card.requiresAuth;
+        sharedCard = LoyaltyCard.fromLegacySharing(code);
       } on FormatException {
         ScaffoldMessenger.of(context).showSnackBar(
           buildCustomSnackBar(
-              'Scanned code is not a valid Cardabase share code.', false),
+            'Scanned code is not a valid Cardabase share code.',
+            false,
+          ),
         );
       }
+    } else if (code.startsWith('{')) {
+      try {
+        sharedCard = LoyaltyCard.fromLegacySharing(code);
+      } on FormatException {
+        ScaffoldMessenger.of(context).showSnackBar(
+          buildCustomSnackBar(
+            'Scanned code is not a valid Cardabase share code.',
+            false,
+          ),
+        );
+      }
+    } else {
+      sharedCard = null;
+    }
+
+    if (sharedCard != null) {
+      widget.card.name.text = sharedCard.name;
+      widget.card.color.value = sharedCard.color;
+      widget.card.barcode.data.text = sharedCard.barcode.data;
+      widget.card.barcode.type.value = sharedCard.barcode.type;
+      widget.card.requiresAuth.value = sharedCard.requiresAuth;
     }
   }
 
@@ -128,7 +149,7 @@ class _EditCardFormState extends State<EditCardForm> {
       return;
     }
 
-    widget.card.barcodeType.value = result;
+    widget.card.barcode.type.value = result;
   }
 
   Future<void> _showColorPickerDialog() async {
@@ -192,11 +213,11 @@ class _EditCardFormState extends State<EditCardForm> {
   Widget _card(ThemeData theme) {
     return MultiListenableBuilder(
       listenables: [
-        widget.card.useFrontFaceOverlay,
+        widget.card.useFrontImageOverlay,
         widget.card.frontImagePath,
         widget.card.name,
         widget.card.color,
-        widget.card.hideTitle,
+        widget.card.hideName,
       ],
       builder: (context) {
         final path = widget.card.frontImagePath.value;
@@ -208,7 +229,7 @@ class _EditCardFormState extends State<EditCardForm> {
           ),
           child: Stack(
             children: [
-              if (widget.card.useFrontFaceOverlay.value && path != null)
+              if (widget.card.useFrontImageOverlay.value && path != null)
                 ClipRRect(
                   borderRadius: BorderRadius.circular(15),
                   child: Image.file(
@@ -218,7 +239,7 @@ class _EditCardFormState extends State<EditCardForm> {
                     height: double.infinity,
                   ),
                 ),
-              if (!widget.card.hideTitle.value)
+              if (!widget.card.hideName.value)
                 Center(
                   child: Wrap(
                     children: [
@@ -253,16 +274,16 @@ class _EditCardFormState extends State<EditCardForm> {
           CardNameFormField(controller: widget.card.name),
           const SizedBox(height: 15),
           ValueListenableBuilder(
-            valueListenable: widget.card.barcodeType,
+            valueListenable: widget.card.barcode.type,
             builder: (context, barcodeType, _) => CardDataFormField(
-              controller: widget.card.data,
+              controller: widget.card.barcode.data,
               barcodeType: barcodeType,
               onScanButtonPressed: _scanCard,
             ),
           ),
           const SizedBox(height: 15),
           ValueListenableBuilder(
-            valueListenable: widget.card.barcodeType,
+            valueListenable: widget.card.barcode.type,
             builder: (context, barcodeType, _) => BarcodeTypeSelectorButton(
               barcodeType: barcodeType,
               onPressed: _showBarcodeSelectorDialog,
@@ -311,7 +332,7 @@ class _EditCardFormState extends State<EditCardForm> {
           ),
           const SizedBox(height: 15),
           ValueListenableBuilder(
-            valueListenable: widget.card.useFrontFaceOverlay,
+            valueListenable: widget.card.useFrontImageOverlay,
             builder: (context, value, _) => CheckboxListTile(
               value: value,
               title: Text(
@@ -330,12 +351,12 @@ class _EditCardFormState extends State<EditCardForm> {
                 borderRadius: BorderRadius.circular(5),
               ),
               onChanged: (checked) {
-                widget.card.useFrontFaceOverlay.value = checked ?? false;
+                widget.card.useFrontImageOverlay.value = checked ?? false;
               },
             ),
           ),
           ValueListenableBuilder(
-            valueListenable: widget.card.hideTitle,
+            valueListenable: widget.card.hideName,
             builder: (context, value, _) => CheckboxListTile(
               value: value,
               title: Text(
@@ -355,7 +376,7 @@ class _EditCardFormState extends State<EditCardForm> {
                 borderRadius: BorderRadius.circular(5),
               ),
               onChanged: (checked) {
-                widget.card.hideTitle.value = checked ?? false;
+                widget.card.hideName.value = checked ?? false;
               },
             ),
           ),
@@ -421,7 +442,7 @@ class _EditCardFormState extends State<EditCardForm> {
                   scrollDirection: Axis.horizontal,
                   itemCount: allTags.length,
                   itemBuilder: (context, chipIndex) {
-                    final tag = allTags[chipIndex] as String;
+                    final tag = allTags[chipIndex];
                     final isSelected = widget.card.tags.value.contains(tag);
                     return Padding(
                       padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
@@ -430,15 +451,14 @@ class _EditCardFormState extends State<EditCardForm> {
                         onPressed: () {
                           setState(() {
                             if (isSelected) {
-                              widget.card.tags.value = {
-                                ...widget.card.tags.value
-                                    .where((t) => t != tag),
-                              };
+                              widget.card.tags.value = widget.card.tags.value
+                                  .where((t) => t != tag)
+                                  .toList(growable: false);
                             } else {
-                              widget.card.tags.value = {
+                              widget.card.tags.value = [
                                 ...widget.card.tags.value,
                                 tag,
-                              };
+                              ];
                             }
                           });
                         },

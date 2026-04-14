@@ -1,8 +1,11 @@
-import 'package:barcode_widget/barcode_widget.dart';
+import 'dart:io';
+
+import 'package:cardabase/feature/cards/loyalty_card.dart';
+import 'package:cardabase/feature/cards/widgets/card_face.dart';
+import 'package:cardabase/feature/cards/widgets/share_card_dialog.dart';
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
-import 'package:cardabase/pages/card_details/card_face.dart';
-import 'package:cardabase/pages/card_details/share_card_dialog.dart';
+import 'package:cardabase/util/color_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get_it/get_it.dart';
@@ -11,28 +14,10 @@ import 'package:screen_brightness/screen_brightness.dart';
 class CardDetailsPage extends StatefulWidget {
   const CardDetailsPage({
     super.key,
-    required this.cardData,
-    required this.title,
-    required this.borderColor,
-    required this.barcodeType,
-    required this.hasPassword,
-    required this.tags,
-    required this.note,
-    required this.frontImage,
-    required this.backImage,
-    required this.pointsAmount,
+    required this.loyaltyCard,
   });
 
-  final String cardData;
-  final String title;
-  final Color borderColor;
-  final BarcodeType barcodeType;
-  final bool hasPassword;
-  final List tags;
-  final String note;
-  final ImageProvider? frontImage;
-  final ImageProvider? backImage;
-  final int pointsAmount;
+  final LoyaltyCard loyaltyCard;
 
   @override
   State<CardDetailsPage> createState() => _CardDetailsPageState();
@@ -68,13 +53,10 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
     }
   }
 
-  Color getContrastingTextColor(Color bg) {
-    return bg.computeLuminance() > 0.7 ? Colors.black : Colors.white;
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final textColor = widget.loyaltyCard.color?.contrastingTextColor;
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: _appBar(theme),
@@ -88,23 +70,23 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
             margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
-              color: widget.borderColor,
+              color: widget.loyaltyCard.color,
             ),
             child: Column(
               children: [
                 Text(
-                  widget.title,
+                  widget.loyaltyCard.name,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyLarge?.copyWith(
-                    color: getContrastingTextColor(widget.borderColor),
+                    color: textColor,
                     fontSize: 50,
                   ),
                 ),
                 Text(
-                  '${widget.pointsAmount} points',
+                  '${widget.loyaltyCard.points} points',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: getContrastingTextColor(widget.borderColor),
+                    color: textColor,
                     fontSize: 20,
                   ),
                 ),
@@ -120,7 +102,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
               ),
             ),
           ),
-          if (widget.note.isNotEmpty)
+          if (widget.loyaltyCard.notes != null)
             Padding(
               padding: const EdgeInsets.only(
                 left: 20,
@@ -147,10 +129,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
         onPressed: () => showDialog(
           context: context,
           builder: (context) => ShareCardDialog(
-            // TODO(wim): extract this logic somewhere central
-            // note from George: no need to share tags, the other user might not have the same tags making it useless data sitting there
-            data:
-                '[${widget.title}, ${widget.cardData}, ${(widget.borderColor.r * 255).toInt()}, ${(widget.borderColor.g * 255).toInt()}, ${(widget.borderColor.b * 255).toInt()}, ${widget.barcodeType}, ${widget.hasPassword}]',
+            data: widget.loyaltyCard.serializeForSharing(),
           ),
         ),
       ),
@@ -171,29 +150,29 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
   }
 
   Widget _card(ThemeData theme) {
-    final frontImage = widget.frontImage;
-    final backImage = widget.backImage;
+    final frontImagePath = widget.loyaltyCard.frontImagePath;
+    final backImagePath = widget.loyaltyCard.backImagePath;
     return PageView(
       controller: PageController(
-        initialPage: widget.frontImage == null ? 0 : 1,
+        initialPage: frontImagePath == null ? 0 : 1,
       ),
       children: [
-        if (frontImage != null)
+        if (frontImagePath != null)
           CardFace.image(
-            cardTileColor: widget.borderColor,
-            image: frontImage,
+            cardTileColor: widget.loyaltyCard.color,
+            image: FileImage(File(frontImagePath)),
             showWhiteOutline: false,
           ),
         CardFace.barcode(
-          cardTileColor: widget.borderColor,
-          cardData: widget.cardData,
-          barcodeType: widget.barcodeType,
+          cardTileColor: widget.loyaltyCard.color,
+          cardData: widget.loyaltyCard.barcode.data,
+          barcodeType: widget.loyaltyCard.barcode.type,
           showWhiteOutline: true,
         ),
-        if (backImage != null)
+        if (backImagePath != null)
           CardFace.image(
-            cardTileColor: widget.borderColor,
-            image: backImage,
+            cardTileColor: widget.loyaltyCard.color,
+            image: FileImage(File(backImagePath)),
             showWhiteOutline: false,
           ),
       ],
@@ -209,7 +188,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
           color: theme.colorScheme.inverseSurface,
           fontSize: 15,
         ),
-        hintText: widget.note,
+        hintText: widget.loyaltyCard.notes,
         disabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: theme.colorScheme.primary),
           borderRadius: BorderRadius.circular(10),

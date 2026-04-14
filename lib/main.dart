@@ -1,12 +1,13 @@
 import 'dart:async';
 
-import 'package:cardabase/data/loyalty_card.dart';
+import 'package:cardabase/data/unique_id.dart';
+import 'package:cardabase/feature/cards/edit/widgets/edit_card_page.dart';
+import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/settings/auto_update.dart';
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/feature/settings/widgets/settings_page.dart';
 import 'package:cardabase/get_it.dart';
-import 'package:cardabase/pages/edit_card/edit_card.dart';
 import 'package:cardabase/pages/home/home_page.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
 import 'package:cardabase/theme/theme.dart';
@@ -17,6 +18,8 @@ import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'feature/cards/get_it.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -98,11 +101,12 @@ void main() async {
     ..registerPackageInfo()
     ..registerHaptics()
     ..registerHive()
-    ..registerSettings();
+    ..registerSettings()
+    ..registerCards();
 
   final packageInfo = await GetIt.I.getAsync<PackageInfo>();
   final settingsBox = await GetIt.I.getAsync<SettingsBox>();
-  await GetIt.I.getAsync<Box>(instanceName: 'loyaltyCardsBox');
+  final cardsBox = await GetIt.I.getAsync<LoyaltyCardsBox>();
   await GetIt.I.getAsync<Box>(instanceName: 'passwordBox');
   final currentAppVersion = packageInfo.version;
 
@@ -119,7 +123,7 @@ void main() async {
   WidgetsBinding.instance.addPostFrameCallback((_) {
     final context = navigatorKey.currentContext;
     if (context != null && context.mounted) {
-      autoUpdateAfterInterval(context, settingsBox);
+      autoUpdateAfterInterval(context, settingsBox, cardsBox);
     }
   });
 }
@@ -147,7 +151,7 @@ class _MainState extends State<Main> {
         if (shortcutType == 'add_card') {
           navigatorKey.currentState!.push(
             MaterialPageRoute(
-              builder: (context) => EditCard(card: LoyaltyCard.empty()),
+              builder: (context) => EditCardPage(cardId: generateUniqueId()),
             ),
           );
         }

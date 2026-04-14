@@ -1,5 +1,8 @@
-import 'package:cardabase/data/cardabase_db.dart';
 import 'package:cardabase/feature/authentication/widgets/require_password_dialog.dart';
+import 'package:cardabase/feature/cards/export/export_cards.dart';
+import 'package:cardabase/feature/cards/export/widgets/export_dialog.dart';
+import 'package:cardabase/feature/cards/import/widgets/import_dialog.dart';
+import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/feature/settings/widgets/auto_update_settings_dialog.dart';
@@ -10,14 +13,12 @@ import 'package:cardabase/feature/settings/widgets/tags_page.dart';
 import 'package:cardabase/pages/cloud_backup.dart';
 import 'package:cardabase/pages/info.dart';
 import 'package:cardabase/pages/password.dart';
-import 'package:cardabase/util/export_data.dart';
-import 'package:cardabase/util/import_data.dart';
 import 'package:cardabase/util/setting_tile.dart';
+import 'package:cardabase/util/vibration_provider.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:hive_ce/hive.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -30,7 +31,6 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   final _settings = const Settings.defaultValue().editable();
   final _settingsBox = GetIt.I<SettingsBox>();
-  final _cdb = CardabaseDb();
 
   bool didImport = false;
   bool didReset = false;
@@ -62,8 +62,19 @@ class _SettingsPageState extends State<SettingsPage> {
       return;
     }
     if (isEnabled) {
-      await exportCardList(context, toFile: true);
-      _settings.autoBackups.lastUpdate.value = DateTime.now().toUtc();
+      final cards = GetIt.I<LoyaltyCardsBox>().values;
+      try {
+        await exportCardsAsFile(cards);
+        _settings.autoBackups.lastUpdate.value = DateTime.now().toUtc();
+      } on NoPermissionToExternalStorageException catch (_) {
+        GetIt.I<VibrationProvider>().vibrateError();
+        if (!mounted) {
+          return;
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          buildCustomSnackBar('No permission!', false),
+        );
+      }
     }
     await _settingsBox.save(_settings.seal());
   }
@@ -74,14 +85,8 @@ class _SettingsPageState extends State<SettingsPage> {
     return _settingsBox.save(_settings.seal());
   }
 
-  void resetCardabase(ThemeData theme) {
-    setState(() {
-      _cdb.myShops.removeRange(0, _cdb.myShops.length);
-      _cdb.myShops.clear();
-      Hive.box('mybox').clear();
-      _cdb.updateDataBase();
-      didReset = true;
-    });
+  Future<void> resetCardabase(ThemeData theme) async {
+    await GetIt.I<LoyaltyCardsBox>().clear();
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(buildCustomSnackBar('Cardabase was reset!', true));
@@ -390,7 +395,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return MySetting(
       aboutSettingHeader: 'Load all your cards from the export',
       settingAction: () async {
-        final imported = await showImportDialog(context);
+        final imported = await showImportCardsDialog(context);
         if (!mounted || imported != true) {
           return;
         }
@@ -412,7 +417,7 @@ class _SettingsPageState extends State<SettingsPage> {
         if (!mounted || !success) {
           return;
         }
-        await showExportTypeDialog(context);
+        await showExportCardsDialog(context);
       },
       settingHeader: 'Export Cardabase',
       settingIcon: Icons.upload,
