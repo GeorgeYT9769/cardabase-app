@@ -1,8 +1,10 @@
+import 'package:cardabase/feature/settings/get_it.dart';
+import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/pages/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_bounceable/flutter_bounceable.dart';
-import 'package:hive_ce_flutter/hive_ce_flutter.dart';
+import 'package:get_it/get_it.dart';
 
 class WelcomeScreen extends StatefulWidget {
   final String currentAppVersion;
@@ -14,6 +16,7 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
+  final settingsBox = GetIt.I<SettingsBox>();
   String? changelog;
   bool expanded = false;
 
@@ -161,9 +164,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   height: MediaQuery.of(context).size.width / 4,
                   child: OutlinedButton(
                     onPressed: () async {
-                      await Hive.box('settingsBox')
-                          .put('lastSeenAppVersion', widget.currentAppVersion);
-                      Navigator.of(context).pushReplacement(
+                      final settings = settingsBox.value.editable();
+                      settings.lastSeenAppVersion.value =
+                          widget.currentAppVersion;
+                      await settingsBox.save(settings.seal());
+                      if (!mounted) {
+                        return;
+                      }
+                      await Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
                           builder: (context) => const Homepage(),
                         ),
@@ -205,8 +213,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   height: MediaQuery.of(context).size.width / 7,
                   child: OutlinedButton(
                     onPressed: () async {
-                      await Hive.box('settingsBox')
-                          .put('lastSeenAppVersion', widget.currentAppVersion);
+                      final settings = settingsBox.value.editable();
+                      settings.lastSeenAppVersion.value =
+                          widget.currentAppVersion;
+                      await settingsBox.save(settings.seal());
+                      if (!mounted) {
+                        return;
+                      }
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
                           builder: (context) => const Homepage(),
