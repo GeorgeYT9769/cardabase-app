@@ -13,7 +13,7 @@ class EditableCardListViewOptions {
     return EditableCardListViewOptions(
       numberOfColumns: ValueNotifier(value.numberOfColumns),
       sortingStyle: ValueNotifier(value.sortingStyle),
-      customOrder: ListNotifier(value.customOrder ?? []),
+      customOrder: ListNotifier(value.customOrder),
     );
   }
 
@@ -24,7 +24,7 @@ class EditableCardListViewOptions {
   void loadValue(CardListViewOptions value) {
     numberOfColumns.value = value.numberOfColumns;
     sortingStyle.value = value.sortingStyle;
-    customOrder.value = value.customOrder ?? [];
+    customOrder.value = value.customOrder;
   }
 
   CardListViewOptions seal() {

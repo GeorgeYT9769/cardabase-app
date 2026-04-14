@@ -26,7 +26,6 @@ Future<void> showLoyaltyCardBottomSheets(
 
 class _CardBottomSheetContent extends StatefulWidget {
   const _CardBottomSheetContent({
-    super.key,
     required this.loyaltyCard,
   });
 
