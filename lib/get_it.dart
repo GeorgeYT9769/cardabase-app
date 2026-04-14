@@ -19,6 +19,12 @@ extension GetItExtensions on GetIt {
       instanceName: 'passwordBox',
       dispose: (box) => box.close(),
     );
+
+    registerLazySingletonAsync(
+      () => getAsync<HiveInterface>().then((hive) => hive.openBox('settingsBox')),
+      instanceName: 'settingsBox',
+      dispose: (box) => box.close(),
+    );
   }
 
   void registerPackageInfo() {
