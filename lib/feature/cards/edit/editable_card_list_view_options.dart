@@ -7,6 +7,8 @@ class EditableCardListViewOptions {
     required this.numberOfColumns,
     required this.sortingStyle,
     required this.customOrder,
+    required this.sortNameCaseInsensitive,
+    required this.sortNameIgnoreAccents,
   });
 
   factory EditableCardListViewOptions.fromValue(CardListViewOptions value) {
@@ -14,17 +16,23 @@ class EditableCardListViewOptions {
       numberOfColumns: ValueNotifier(value.numberOfColumns),
       sortingStyle: ValueNotifier(value.sortingStyle),
       customOrder: ListNotifier(value.customOrder),
+      sortNameCaseInsensitive: ValueNotifier(value.sortNameCaseInsensitive),
+      sortNameIgnoreAccents: ValueNotifier(value.sortNameIgnoreAccents),
     );
   }
 
   final ValueNotifier<int> numberOfColumns;
   final ValueNotifier<SortingStyle> sortingStyle;
   final ListNotifier<String> customOrder;
+  final ValueNotifier<bool> sortNameCaseInsensitive;
+  final ValueNotifier<bool> sortNameIgnoreAccents;
 
   void loadValue(CardListViewOptions value) {
     numberOfColumns.value = value.numberOfColumns;
     sortingStyle.value = value.sortingStyle;
     customOrder.value = value.customOrder;
+    sortNameCaseInsensitive.value = value.sortNameCaseInsensitive;
+    sortNameIgnoreAccents.value = value.sortNameIgnoreAccents;
   }
 
   CardListViewOptions seal() {
@@ -32,6 +40,8 @@ class EditableCardListViewOptions {
       numberOfColumns: numberOfColumns.value,
       sortingStyle: sortingStyle.value,
       customOrder: customOrder.value,
+      sortNameCaseInsensitive: sortNameCaseInsensitive.value,
+      sortNameIgnoreAccents: sortNameIgnoreAccents.value,
     );
   }
 
@@ -39,5 +49,7 @@ class EditableCardListViewOptions {
     numberOfColumns.dispose();
     sortingStyle.dispose();
     customOrder.dispose();
+    sortNameCaseInsensitive.dispose();
+    sortNameIgnoreAccents.dispose();
   }
 }

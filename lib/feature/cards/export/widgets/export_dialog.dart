@@ -3,7 +3,6 @@ import 'package:cardabase/feature/cards/export/widgets/export_button.dart';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
-import 'package:cardabase/util/string_extensions.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
@@ -40,9 +39,9 @@ class _ExportDialogState extends State<ExportDialog> {
     super.dispose();
   }
 
-  Future<void> saveCustomExportPath(String? path) async {
+  Future<void> saveCustomExportPath(String path) async {
     final settings = settingsBox.value.editable();
-    settings.customExportPath.value = path?.trim().nullWhenEmpty;
+    settings.customExportPath.value = path.trim();
     await settingsBox.save(settings.seal());
   }
 

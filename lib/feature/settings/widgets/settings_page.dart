@@ -64,7 +64,8 @@ class _SettingsPageState extends State<SettingsPage> {
     if (isEnabled) {
       final cards = GetIt.I<LoyaltyCardsBox>().values;
       try {
-        await exportCardsAsFile(cards);
+        await exportCardsAsFile(cards,
+            directoryPath: _settingsBox.value.customExportPath);
         _settings.autoBackups.lastUpdate.value = DateTime.now().toUtc();
       } on NoPermissionToExternalStorageException catch (_) {
         GetIt.I<VibrationProvider>().vibrateError();

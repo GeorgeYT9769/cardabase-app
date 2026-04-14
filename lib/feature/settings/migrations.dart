@@ -60,11 +60,13 @@ Future<void> migrateSettingsTo202603(
       cardListViewOptions: CardListViewOptions(
         numberOfColumns: oldBox.get('columnAmount') as int? ?? 1,
         sortingStyle: sortingStyle,
+        sortNameCaseInsensitive: false,
+        sortNameIgnoreAccents: false,
         // this field is added after the migration, it won't be used so we
         // just leave it empty for now. The cards migration will populate it.
         customOrder: [],
       ),
-      customExportPath: null,
+      customExportPath: Settings.defaultCardExportDirectoryPath,
     ),
   );
 }

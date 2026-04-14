@@ -25,7 +25,8 @@ class SettingsAdapter extends TypeAdapter<Settings> {
       vibrateOnDifferentActions: fields[5] as bool,
       tags: (fields[6] as List).cast<String>(),
       cardListViewOptions: fields[7] as CardListViewOptions,
-      customExportPath: fields[8] as String?,
+      customExportPath:
+          fields[8] == null ? 'Download/Cardabase' : fields[8] as String,
     );
   }
 

@@ -24,6 +24,8 @@ class CardListViewOptions {
   const CardListViewOptions({
     required this.numberOfColumns,
     required this.sortingStyle,
+    required this.sortNameCaseInsensitive,
+    required this.sortNameIgnoreAccents,
     required this.customOrder,
   });
 
@@ -31,6 +33,8 @@ class CardListViewOptions {
       : this(
           numberOfColumns: 1,
           sortingStyle: SortingStyle.latest,
+          sortNameCaseInsensitive: false,
+          sortNameIgnoreAccents: false,
           customOrder: const [],
         );
 
@@ -43,10 +47,15 @@ class CardListViewOptions {
   @HiveField(1)
   final SortingStyle sortingStyle;
 
+  @HiveField(2, defaultValue: false)
+  final bool sortNameCaseInsensitive;
+  @HiveField(3, defaultValue: false)
+  final bool sortNameIgnoreAccents;
+
   /// [customOrder] is an ordered list of the ids of the cards which are
   /// displayed. Cards of which the ids are not in this list, are appended to
   /// the end of the grid according to the [sortingStyle].
-  @HiveField(2, defaultValue: <String>[])
+  @HiveField(4, defaultValue: <String>[])
   final List<String> customOrder;
 
   EditableCardListViewOptions editable() {

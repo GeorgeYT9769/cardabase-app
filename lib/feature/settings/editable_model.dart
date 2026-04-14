@@ -42,7 +42,7 @@ class EditableSettings {
   final ValueNotifier<bool> vibrateOnDifferentActions;
   final ListNotifier<String> tags;
   final EditableCardListViewOptions cardListViewOptions;
-  final ValueNotifier<String?> customExportPath;
+  final ValueNotifier<String> customExportPath;
 
   void loadValue(Settings value) {
     lastSeenAppVersion.value = value.lastSeenAppVersion;

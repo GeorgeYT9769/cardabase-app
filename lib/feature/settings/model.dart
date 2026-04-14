@@ -52,7 +52,7 @@ class Settings {
   final List<String> tags;
   @HiveField(7)
   final CardListViewOptions cardListViewOptions;
-  @HiveField(8)
+  @HiveField(8, defaultValue: defaultCardExportDirectoryPath)
   final String customExportPath;
 
   EditableSettings editable() => EditableSettings.fromValue(this);

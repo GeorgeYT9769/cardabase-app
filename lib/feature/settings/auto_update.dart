@@ -22,7 +22,10 @@ Future<void> autoUpdateAfterInterval(
     return;
   }
 
-  await exportCardsAsFile(cardsBox.values);
+  await exportCardsAsFile(
+    cardsBox.values,
+    directoryPath: settings.customExportPath,
+  );
 
   final editableSettings = settings.editable();
   editableSettings.autoBackups.lastUpdate.value = DateTime.now().toUtc();
