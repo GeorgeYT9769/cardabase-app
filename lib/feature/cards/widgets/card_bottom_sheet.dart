@@ -177,7 +177,7 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
             ),
             onTap: _deleteCard,
           ),
-          const SizedBox(height: 70),
+          const SizedBox(height: 100),
         ],
       ),
     );

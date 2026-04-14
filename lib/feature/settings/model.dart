@@ -18,6 +18,7 @@ class Settings {
     required this.vibrateOnDifferentActions,
     required this.tags,
     required this.cardListViewOptions,
+    required this.customExportPath,
   });
 
   const Settings.defaultValue()
@@ -30,7 +31,10 @@ class Settings {
           vibrateOnDifferentActions: true,
           tags: const [],
           cardListViewOptions: const CardListViewOptions.defaultValue(),
+          customExportPath: defaultCardExportDirectoryPath,
         );
+
+  static const defaultCardExportDirectoryPath = 'Download/Cardabase';
 
   @HiveField(0)
   final String? lastSeenAppVersion;
@@ -48,6 +52,8 @@ class Settings {
   final List<String> tags;
   @HiveField(7)
   final CardListViewOptions cardListViewOptions;
+  @HiveField(8)
+  final String customExportPath;
 
   EditableSettings editable() => EditableSettings.fromValue(this);
 }

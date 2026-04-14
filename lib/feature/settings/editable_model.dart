@@ -13,6 +13,7 @@ class EditableSettings {
     required this.vibrateOnDifferentActions,
     required this.tags,
     required this.cardListViewOptions,
+    required this.customExportPath,
   });
 
   factory EditableSettings.fromValue(Settings value) {
@@ -29,6 +30,7 @@ class EditableSettings {
       cardListViewOptions: EditableCardListViewOptions.fromValue(
         value.cardListViewOptions,
       ),
+      customExportPath: ValueNotifier(value.customExportPath),
     );
   }
 
@@ -40,6 +42,7 @@ class EditableSettings {
   final ValueNotifier<bool> vibrateOnDifferentActions;
   final ListNotifier<String> tags;
   final EditableCardListViewOptions cardListViewOptions;
+  final ValueNotifier<String?> customExportPath;
 
   void loadValue(Settings value) {
     lastSeenAppVersion.value = value.lastSeenAppVersion;
@@ -50,6 +53,7 @@ class EditableSettings {
     vibrateOnDifferentActions.value = value.vibrateOnDifferentActions;
     tags.value = value.tags;
     cardListViewOptions.loadValue(value.cardListViewOptions);
+    customExportPath.value = value.customExportPath;
   }
 
   Settings seal() {
@@ -62,6 +66,7 @@ class EditableSettings {
       vibrateOnDifferentActions: vibrateOnDifferentActions.value,
       tags: tags.value,
       cardListViewOptions: cardListViewOptions.seal(),
+      customExportPath: customExportPath.value,
     );
   }
 
@@ -74,6 +79,7 @@ class EditableSettings {
     vibrateOnDifferentActions.dispose();
     tags.dispose();
     cardListViewOptions.dispose();
+    customExportPath.dispose();
   }
 }
 

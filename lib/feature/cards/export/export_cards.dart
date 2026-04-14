@@ -20,12 +20,22 @@ Future<bool> _requestStoragePermission() async {
   return false;
 }
 
-Future<void> exportCardsAsFile(Iterable<LoyaltyCard> cards) async {
+Future<void> exportCardsAsFile(
+  Iterable<LoyaltyCard> cards, {
+  required String directoryPath,
+}) async {
   if (!await _requestStoragePermission()) {
     throw NoPermissionToExternalStorageException();
   }
 
-  final directory = Directory('/storage/emulated/0/Download');
+  const rootDirectory = '/storage/emulated/0';
+  final directory = directoryPath.startsWith('/')
+      ? Directory('$rootDirectory$directoryPath')
+      : Directory('$rootDirectory/$directoryPath');
+  if (!await directory.exists()) {
+    await directory.create(recursive: true);
+  }
+
   final serializedCards = cards.serializeForExport();
   final timestamp = DateTime.now().toIso8601String();
 

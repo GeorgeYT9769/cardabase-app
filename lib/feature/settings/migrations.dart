@@ -64,6 +64,7 @@ Future<void> migrateSettingsTo202603(
         // just leave it empty for now. The cards migration will populate it.
         customOrder: [],
       ),
+      customExportPath: null,
     ),
   );
 }
