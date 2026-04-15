@@ -11,9 +11,15 @@ extension SettingsGetItExtensions on GetIt {
 
         final oldSettingsBox = await hive.openBox('settingsBox');
         final newSettingsBox = await hive.openBox<Settings>('settings202603');
+        final oldCardsBox = await hive.openBox('mybox');
 
-        await migrateSettingsTo202603(oldSettingsBox, newSettingsBox);
+        await migrateSettingsTo202603(
+          oldSettingsBox,
+          newSettingsBox,
+          oldCardsBox,
+        );
         await oldSettingsBox.close();
+        await oldCardsBox.close();
 
         return newSettingsBox;
       },

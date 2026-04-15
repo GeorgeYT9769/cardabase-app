@@ -5,6 +5,7 @@ import 'package:hive_ce/hive.dart';
 Future<void> migrateSettingsTo202603(
   Box oldBox,
   Box<Settings> newBox,
+  Box cardsBox,
 ) {
   if (newBox.isNotEmpty) {
     return Future.value();
@@ -62,11 +63,21 @@ Future<void> migrateSettingsTo202603(
         sortingStyle: sortingStyle,
         sortNameCaseInsensitive: false,
         sortNameIgnoreAccents: false,
-        // this field is added after the migration, it won't be used so we
-        // just leave it empty for now. The cards migration will populate it.
-        customOrder: [],
+        customOrder: _buildCustomOrder(cardsBox),
       ),
       customExportPath: Settings.defaultCardExportDirectoryPath,
     ),
   );
+}
+
+/// [_buildCustomOrder] builds the [CardListViewOptions.customOrder] field from
+/// the OLD cards box. Since the settings migration is ran before the new
+/// cards-box is created, we cannot assume it exists yet.
+List<String> _buildCustomOrder(Box cardsBox) {
+  return (cardsBox.get('CARDLIST') as List?)
+          ?.cast<dynamic>()
+          .map((element) => element['uniqueId'] as String?)
+          .whereType<String>()
+          .toList(growable: false) ??
+      const [];
 }
