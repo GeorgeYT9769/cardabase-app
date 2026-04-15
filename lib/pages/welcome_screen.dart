@@ -164,18 +164,22 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   height: MediaQuery.of(context).size.width / 4,
                   child: OutlinedButton(
                     onPressed: () async {
-                      final settings = settingsBox.value.editable();
-                      settings.lastSeenAppVersion.value =
+                      final editable = settingsBox.value.editable();
+                      editable.lastSeenAppVersion.value =
                           widget.currentAppVersion;
-                      await settingsBox.save(settings.seal());
+                      await settingsBox.save(editable.seal());
+                      editable.dispose();
+
                       if (!mounted) {
                         return;
                       }
-                      await Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (context) => const Homepage(),
-                        ),
-                      );
+                      if (context.mounted) {
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) => const Homepage(),
+                          ),
+                        );
+                      }
                     },
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(
@@ -213,11 +217,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   height: MediaQuery.of(context).size.width / 7,
                   child: OutlinedButton(
                     onPressed: () async {
-                      final settings = settingsBox.value.editable();
-                      settings.lastSeenAppVersion.value =
+                      final editable = settingsBox.value.editable();
+                      editable.lastSeenAppVersion.value =
                           widget.currentAppVersion;
-                      await settingsBox.save(settings.seal());
-                      if (!mounted) {
+                      await settingsBox.save(editable.seal());
+                      editable.dispose();
+
+                      if (!context.mounted) {
                         return;
                       }
                       Navigator.of(context).pushReplacement(

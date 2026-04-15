@@ -14,6 +14,8 @@ class CardListViewOptionsDialog extends StatelessWidget {
     required this.tagFilter,
     required this.sortingStyle,
     required this.numberOfColumns,
+    required this.sortNameCaseInsensitive,
+    required this.sortNameIgnoreAccents,
   });
 
   final List<String> allTags;
@@ -21,6 +23,8 @@ class CardListViewOptionsDialog extends StatelessWidget {
   final ValueNotifier<String?> tagFilter;
   final ValueNotifier<SortingStyle> sortingStyle;
   final ValueNotifier<int> numberOfColumns;
+  final ValueNotifier<bool> sortNameCaseInsensitive;
+  final ValueNotifier<bool> sortNameIgnoreAccents;
 
   @override
   Widget build(BuildContext context) {
@@ -46,22 +50,77 @@ class CardListViewOptionsDialog extends StatelessWidget {
               _optionTitle(theme, 'Sort by:'),
               const SizedBox(height: 10),
               SortingStyleSelector(controller: sortingStyle),
+              ValueListenableBuilder<SortingStyle>(
+                valueListenable: sortingStyle,
+                builder: (context, value, _) {
+                  if (value == SortingStyle.nameAz ||
+                      value == SortingStyle.nameZa) {
+                    return Column(
+                      children: [
+                        const SizedBox(height: 10),
+                        ValueListenableBuilder<bool>(
+                          valueListenable: sortNameCaseInsensitive,
+                          builder: (context, isCaseInsensitive, _) => SwitchListTile(
+                            title: Text(
+                              'Case Insensitive',
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: theme.colorScheme.inverseSurface,
+                              ),
+                            ),
+                            activeTrackColor: theme.colorScheme.primary,
+                            value: isCaseInsensitive,
+                            onChanged: (value) {
+                              GetIt.I<VibrationProvider>().vibrateSelection();
+                              sortNameCaseInsensitive.value = value;
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        ValueListenableBuilder<bool>(
+                          valueListenable: sortNameIgnoreAccents,
+                          builder: (context, ignoreAccents, _) => SwitchListTile(
+                            title: Text(
+                              'Ignore Accents',
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: theme.colorScheme.inverseSurface,
+                              ),
+                            ),
+                            activeTrackColor: theme.colorScheme.primary,
+                            value: ignoreAccents,
+                            onChanged: (value) {
+                              GetIt.I<VibrationProvider>().vibrateSelection();
+                              sortNameIgnoreAccents.value = value;
+                            },
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
               const SizedBox(height: 10),
               _divider(theme),
+              const SizedBox(height: 10),
+              _optionTitle(theme, 'Reorder Mode:'),
               ValueListenableBuilder(
                 valueListenable: isInReorderingMode,
-                builder: (context, value, _) => MySetting(
-                  aboutSettingHeader: 'Reorder Cards',
-                  settingAction: () {
-                    GetIt.I<VibrationProvider>().vibrateSuccess();
-                    isInReorderingMode.value = !value;
+                builder: (context, value, _) => SwitchListTile(
+                  title: Text(
+                    isInReorderingMode.value ? 'On' : 'Off',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.inverseSurface,
+                    ),
+                  ),
+                  activeTrackColor: theme.colorScheme.primary,
+                  value: value,
+                  onChanged: (newValue) {
+                    GetIt.I<VibrationProvider>().vibrateSelection();
+                    isInReorderingMode.value = newValue;
                   },
-                  settingHeader: 'Reorder',
-                  settingIcon: Icons.reorder,
-                  iconColor: value ? Colors.green : Colors.red,
-                  borderColor: theme.colorScheme.primary,
                 ),
               ),
+              const SizedBox(height: 10),
               _divider(theme),
               const SizedBox(height: 10),
               ValueListenableBuilder(

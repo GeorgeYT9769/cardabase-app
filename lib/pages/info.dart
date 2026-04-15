@@ -16,9 +16,14 @@ class InfoScreen extends StatefulWidget {
   @override
   State<InfoScreen> createState() => _InfoScreenState();
 }
-
 class _InfoScreenState extends State<InfoScreen> {
   String _appVersion = 'Loading...';
+  String _buildNumber = '';
+  String _buildSignature = '';
+  String _installerStore = '';
+  String? _installTime = '';
+  String? _lastUpdate = '';
+  String _packageName = '';
   String? _latestGitHubVersion;
   bool _isLoading = true;
   bool _hasError = false;
@@ -44,7 +49,16 @@ class _InfoScreenState extends State<InfoScreen> {
 
     try {
       final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      _appVersion = packageInfo.version; //"1.1.0" packageInfo.version
+      _appVersion = packageInfo.version;
+      _buildNumber = packageInfo.buildNumber;
+      _buildSignature = packageInfo.buildSignature;
+      _installTime = _formatDate(packageInfo.installTime);
+      _lastUpdate = _formatDate(packageInfo.updateTime);
+      _packageName = packageInfo.packageName;
+
+      try {
+        _installerStore = packageInfo.installerStore ?? 'Unknown';
+      } catch (_) {}
 
       final response = await http.get(Uri.parse(_githubApiUrl));
 
@@ -90,6 +104,18 @@ class _InfoScreenState extends State<InfoScreen> {
     }
   }
 
+  String? _formatDate(DateTime? date) {
+    if (date == null) return null;
+    final String day = date.day.toString().padLeft(2, '0');
+    final String month = date.month.toString().padLeft(2, '0');
+    final String year = date.year.toString();
+    final String h = date.hour.toString().padLeft(2, '0');
+    final String m = date.minute.toString().padLeft(2, '0');
+    final String s = date.second.toString().padLeft(2, '0');
+    final String ms = date.millisecond.toString().padLeft(3, '0');
+    return '$day.$month.$year $h:$m:$s:$ms';
+  }
+
   Future<void> _launchUrl(String url) async {
     if (!await launchUrl(Uri.parse(url))) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -102,36 +128,41 @@ class _InfoScreenState extends State<InfoScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'App Info',
-          style: theme.textTheme.titleLarge?.copyWith(
-                color: theme.colorScheme.tertiary,
-              ) ??
-              const TextStyle(
-                color: Colors.black,
-              ),
-        ),
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios_new,
-              color: theme.colorScheme.secondary,
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverAppBar(
+            title: Text(
+              'App Info',
+              style: theme.textTheme.titleLarge?.copyWith(
+                    color: theme.colorScheme.tertiary,
+                  ) ??
+                  const TextStyle(
+                    color: Colors.black,
+                  ),
             ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
+            automaticallyImplyLeading: false,
+            actions: [
+              IconButton(
+                icon: Icon(
+                  Icons.arrow_back_ios_new,
+                  color: theme.colorScheme.secondary,
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+            centerTitle: true,
+            elevation: 0.0,
+            backgroundColor: theme.colorScheme.surface,
+            floating: true,
+            pinned: false,
           ),
-        ],
-        centerTitle: true,
-        elevation: 0.0,
-        backgroundColor: theme.colorScheme.surface,
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
@@ -320,8 +351,132 @@ class _InfoScreenState extends State<InfoScreen> {
                         ],
                       ),
               const SizedBox(height: 50),
+              _buildAppInfoArea(theme),
             ],
           ),
+        ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppInfoArea(ThemeData theme) {
+    if (_appVersion.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'App Information',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.primary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          _infoRow(theme, 'Version', _appVersion),
+          _infoRow(theme, 'Build Number', _buildNumber),
+          _infoRow(
+            theme,
+            'Package Name',
+            _buildSignature.isEmpty ? 'Unknown' : _packageName,
+            displayValue: _buildSignature.isEmpty ? 'Unknown' : 'TAP TO SHOW',
+          ),
+          _infoRow(
+            theme,
+            'Build Signature',
+            _buildSignature.isEmpty ? 'Unknown' : _buildSignature,
+            displayValue: _buildSignature.isEmpty ? 'Unknown' : 'TAP TO SHOW',
+          ),
+          _infoRow(theme, 'Installer Store', _installerStore.isEmpty ? 'Unknown' : _installerStore),
+          _infoRow(theme, 'Install Time', _installTime ?? 'Unknown'),
+          _infoRow(theme, 'Last Update', _lastUpdate ?? 'Unknown'),
+        ],
+      ),
+    );
+  }
+
+  Widget _infoRow(ThemeData theme, String label, String value, {String? displayValue}) {
+    if (value.isEmpty || value == 'Unknown') {
+      if (displayValue == null || displayValue.isEmpty || displayValue == 'Unknown') {
+          // just let it show 'Unknown' or hide it, actually wait, the original code doesn't hide "Unknown"
+      }
+    }
+    if (value.isEmpty) return const SizedBox.shrink();
+    return InkWell(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(label),
+            content: SingleChildScrollView(
+              child: SelectableText(value),
+            ),
+            actions: <Widget>[
+              Center(
+                child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  style: OutlinedButton.styleFrom(
+                    elevation: 0.0,
+                    side: BorderSide(color: theme.colorScheme.primary, width: 2.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(11),
+                    ),
+                  ),
+                  child: Text(
+                    'Close',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: theme.colorScheme.tertiary,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Flexible(
+              child: Text(
+                displayValue ?? value,
+                textAlign: TextAlign.right,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w400,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

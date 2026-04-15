@@ -43,6 +43,33 @@ class _QRBarReaderState extends State<QRBarReader> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        forceMaterialTransparency: true,
+        actions: [
+          Container(
+            margin: EdgeInsets.fromLTRB(0,5,5,0),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface.withValues(alpha: .4),
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              style: ButtonStyle(
+                iconSize: const WidgetStatePropertyAll(24),
+                iconColor: WidgetStatePropertyAll(
+                  theme.colorScheme.inverseSurface,
+                ),
+              ),
+              icon: const Icon(Icons.arrow_back_ios_new),
+              onPressed: () {
+                controller?.pauseCamera();
+                Navigator.of(context).pop();
+              },
+            ),
+          ),
+        ],
+      ),
       body: Column(
         children: <Widget>[
           Expanded(flex: 4, child: _buildQrView(context)),
@@ -56,6 +83,7 @@ class _QRBarReaderState extends State<QRBarReader> {
           color: theme.colorScheme.surface.withValues(alpha: .4),
         ),
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Container(
@@ -67,7 +95,7 @@ class _QRBarReaderState extends State<QRBarReader> {
                     theme.colorScheme.inverseSurface,
                   ),
                 ),
-                icon: const Icon(Icons.cameraswitch),
+                icon: const Icon(Icons.cameraswitch, size: 30,),
                 onPressed: () async {
                   await controller?.flipCamera();
                   if (mounted) setState(() {});
@@ -83,7 +111,7 @@ class _QRBarReaderState extends State<QRBarReader> {
                     theme.colorScheme.inverseSurface,
                   ),
                 ),
-                icon: const Icon(Icons.flash_on),
+                icon: const Icon(Icons.flash_on, size: 30,),
                 onPressed: () async {
                   await controller?.toggleFlash();
                   if (mounted) setState(() {});
@@ -99,24 +127,8 @@ class _QRBarReaderState extends State<QRBarReader> {
                     theme.colorScheme.inverseSurface,
                   ),
                 ),
-                icon: const Icon(Icons.photo),
+                icon: const Icon(Icons.photo, size: 30,),
                 onPressed: _pickImage,
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.all(10),
-              child: IconButton(
-                style: ButtonStyle(
-                  iconSize: const WidgetStatePropertyAll(30),
-                  iconColor: WidgetStatePropertyAll(
-                    theme.colorScheme.inverseSurface,
-                  ),
-                ),
-                icon: const Icon(Icons.arrow_back_ios_new),
-                onPressed: () {
-                  controller?.pauseCamera();
-                  Navigator.of(context).pop();
-                },
               ),
             ),
           ],

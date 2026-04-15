@@ -310,24 +310,26 @@ class _EditCardFormState extends State<EditCardForm> {
           TakePictureButton(
             picturePath: widget.card.frontImagePath,
             label: Text(
-              'Front face picture',
+              'Front face picture\nHold to delete',
               style: theme.textTheme.bodyLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 fontSize: 15,
                 color: theme.colorScheme.inverseSurface,
               ),
+              textAlign: TextAlign.center,
             ),
           ),
           const SizedBox(height: 15),
           TakePictureButton(
             picturePath: widget.card.backImagePath,
             label: Text(
-              'Back face picture',
+              'Back face picture\nHold to delete',
               style: theme.textTheme.bodyLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 fontSize: 15,
                 color: theme.colorScheme.inverseSurface,
               ),
+              textAlign: TextAlign.center,
             ),
           ),
           const SizedBox(height: 15),

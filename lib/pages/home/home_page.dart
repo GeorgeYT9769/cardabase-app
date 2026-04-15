@@ -85,6 +85,10 @@ class _HomePageState extends State<Homepage> {
           tagFilter: tagFilter,
           sortingStyle: editableSettings.cardListViewOptions.sortingStyle,
           numberOfColumns: editableSettings.cardListViewOptions.numberOfColumns,
+          sortNameCaseInsensitive:
+              editableSettings.cardListViewOptions.sortNameCaseInsensitive,
+          sortNameIgnoreAccents:
+              editableSettings.cardListViewOptions.sortNameIgnoreAccents,
         ),
       );
       await _settingsBox.save(editableSettings.seal());

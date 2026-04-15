@@ -21,7 +21,7 @@ class NumberOfColumnsSlider extends StatelessWidget {
         max: 5,
         divisions: 4,
         onChanged: (double newValue) {
-          GetIt.I<VibrationProvider>().vibrateSuccess();
+          GetIt.I<VibrationProvider>().vibrateSelection();
           controller.value = newValue.round();
         },
       ),

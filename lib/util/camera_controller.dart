@@ -41,7 +41,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
       TransformationController();
   final ScreenshotController _screenshotController = ScreenshotController();
   bool hideCutoutBorder = false;
-  bool _isSaving = false; // Added for loading indicator
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -93,7 +93,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
       final XFile file = await _cameraController!.takePicture();
       setState(() {
         _capturedImageFile = file;
-        _transformationController.value = Matrix4.diagonal3Values(1.0, .93, 1.0); // Start zoomed in, allow zooming out
+        _transformationController.value = Matrix4.identity(); // Start zoomed in, allow zooming out
       });
     } catch (e) {
       // Handle error
@@ -106,7 +106,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     if (image != null) {
       setState(() {
         _capturedImageFile = image;
-        _transformationController.value = Matrix4.diagonal3Values(1, .93, 1); // Start zoomed in, allow zooming out
+        _transformationController.value = Matrix4.identity(); // Start zoomed in, allow zooming out
       });
     }
   }
@@ -117,19 +117,9 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
       hideCutoutBorder = true;
     });
     await Future.delayed(const Duration(milliseconds: 50));
-    final RenderBox box = context.findRenderObject()! as RenderBox;
-    final Size screenSize = box.size;
-    final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
-    final double cutoutWidth = screenSize.width * widget.cutoutWidthPercentage;
-    final double cutoutHeight = cutoutWidth / widget.cardAspectRatio;
-    final double cutoutYOffset = (screenSize.height - cutoutHeight) / 2 - 70;
-    final Offset cutoutOffset = Offset(
-      (screenSize.width - cutoutWidth) / 2,
-      cutoutYOffset,
-    );
     final typed_data.Uint8List? imageBytes =
         await _screenshotController.capture(
-      pixelRatio: devicePixelRatio,
+      pixelRatio: MediaQuery.of(context).devicePixelRatio,
     );
     setState(() {
       hideCutoutBorder = false;
@@ -137,10 +127,22 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     if (imageBytes == null) return _capturedImageFile!.path;
     final fullImage = img.decodeImage(imageBytes);
     if (fullImage == null) return _capturedImageFile!.path;
-    final int cropX = (cutoutOffset.dx * devicePixelRatio).round();
-    final int cropY = (cutoutOffset.dy * devicePixelRatio).round();
-    final int cropWidth = (cutoutWidth * devicePixelRatio).round();
-    final int cropHeight = (cutoutHeight * devicePixelRatio).round();
+
+    // Derive crop region directly from the captured image's own pixel dimensions.
+    // This mirrors the painter's percentage-based logic in pixel space, so X and Y
+    // are always aligned with the cutout overlay — no RenderBox/devicePixelRatio drift.
+    final int imgW = fullImage.width;
+    final int imgH = fullImage.height;
+    int cropWidth = (imgW * widget.cutoutWidthPercentage).round();
+    int cropHeight = (cropWidth / widget.cardAspectRatio).round();
+    // Apply the same clamping as the painter
+    if (cropHeight > (imgH * 0.7).round()) {
+      cropHeight = (imgH * 0.7).round();
+      cropWidth = (cropHeight * widget.cardAspectRatio).round();
+    }
+    final int cropX = ((imgW - cropWidth) / 2).round();
+    final int cropY = ((imgH - cropHeight) / 2).round();
+
     final img.Image cropped = img.copyCrop(
       fullImage,
       x: cropX,
@@ -189,10 +191,39 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Stack(
       children: [
         Scaffold(
-          appBar: AppBar(title: const Text('Photo')),
+          extendBodyBehindAppBar: true,
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            forceMaterialTransparency: true,
+            actions: [
+              Container(
+                margin: EdgeInsets.fromLTRB(0,5,5,0),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface.withValues(alpha: .4),
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  style: ButtonStyle(
+                    iconSize: const WidgetStatePropertyAll(24),
+                    iconColor: WidgetStatePropertyAll(
+                      theme.colorScheme.inverseSurface,
+                    ),
+                  ),
+                  icon: const Icon(Icons.arrow_back_ios_new),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+            ],
+            centerTitle: true,
+            elevation: 0.0,
+            backgroundColor: theme.colorScheme.surface,
+          ),
           body: FutureBuilder<void>(
             future: _initializeControllerFuture,
             builder: (context, snapshot) {
@@ -220,7 +251,9 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                 } else {
                   return Screenshot(
                     controller: _screenshotController,
-                    child: Stack(
+                    child: ColoredBox(
+                      color: Colors.black,
+                      child: Stack(
                       children: [
                         Positioned.fill(
                           child: InteractiveViewer(
@@ -235,9 +268,11 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                 0, 0, 1, 0, _brightness * 255,
                                 0, 0, 0, 1, 0,
                               ]),
-                              child: Image.file(
-                                File(_capturedImageFile!.path),
-                                fit: BoxFit.contain,
+                              child: SizedBox.expand(
+                                child: Image.file(
+                                  File(_capturedImageFile!.path),
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
                           ),
@@ -251,12 +286,13 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                 cardAspectRatio: widget.cardAspectRatio,
                                 shouldDrawDarkOverlay: false,
                                 hideBorder: hideCutoutBorder,
-                                cutoutYOffset: -24,
+                                cutoutYOffset: 0,
                               ),
                             ),
                           ),
                         ),
                       ],
+                    ),
                     ),
                   );
                 }
@@ -284,12 +320,13 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
           ),
           floatingActionButton: _capturedImageFile == null
               ? Container(
-                margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                margin: const EdgeInsets.symmetric(vertical: 10), // Only vertical margin
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   color: Theme.of(context).colorScheme.surface.withValues(alpha: .4),
                 ),
                 child: Row(
+                    mainAxisSize: MainAxisSize.min, // Make row as slim as possible
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       FloatingActionButton(
@@ -299,7 +336,13 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                         },
                         backgroundColor: Colors.transparent,
                         elevation: 0,
-                        child: const Icon(Icons.photo_library),
+                        child: const Icon(
+                          Icons.photo_library,
+                          size: 30,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 20,
                       ),
                       FloatingActionButton(
                         heroTag: 'takePhoto',
@@ -313,7 +356,10 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                         },
                         backgroundColor: Colors.transparent,
                         elevation: 0,
-                        child: const Icon(Icons.camera_alt),
+                        child: const Icon(
+                          Icons.camera_alt,
+                          size: 30,
+                        ),
                       ),
                     ],
                   ),
@@ -360,21 +406,25 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          FloatingActionButton.extended(
+                          FloatingActionButton(
                             heroTag: 'retakePhoto',
                             onPressed: _retakePicture,
-                            label: const Text('Retake'),
-                            icon: const Icon(Icons.refresh),
                             backgroundColor: Colors.transparent,
                             elevation: 0,
+                            child: const Icon(
+                              Icons.refresh,
+                              size: 30,
+                            ),
                           ),
-                          FloatingActionButton.extended(
+                          FloatingActionButton(
                             heroTag: 'usePhoto',
                             onPressed: _confirmAndSavePicture,
-                            label: const Text('Use Photo'),
-                            icon: const Icon(Icons.check),
                             backgroundColor: Colors.transparent,
                             elevation: 0,
+                            child: const Icon(
+                              Icons.check,
+                              size: 30,
+                            ),
                           ),
                         ],
                       ),
