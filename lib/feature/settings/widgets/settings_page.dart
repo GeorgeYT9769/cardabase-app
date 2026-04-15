@@ -64,8 +64,10 @@ class _SettingsPageState extends State<SettingsPage> {
     if (isEnabled) {
       final cards = GetIt.I<LoyaltyCardsBox>().values;
       try {
-        await exportCardsAsFile(cards,
-            directoryPath: _settingsBox.value.customExportPath);
+        await exportCardsAsFile(
+          cards,
+          directoryPath: _settingsBox.value.customExportPath,
+        );
         _settings.autoBackups.lastUpdate.value = DateTime.now().toUtc();
       } on NoPermissionToExternalStorageException catch (_) {
         GetIt.I<VibrationProvider>().vibrateError();
@@ -88,6 +90,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> resetCardabase(ThemeData theme) async {
     await GetIt.I<LoyaltyCardsBox>().clear();
+    if (!mounted) {
+      return;
+    }
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(buildCustomSnackBar('Cardabase was reset!', true));
@@ -168,7 +173,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 _subtitle(
                   theme,
                   'App Settings',
-                   theme.colorScheme.inverseSurface,
+                  theme.colorScheme.inverseSurface,
                 ),
                 _themeSetting(theme),
                 _extraDarkSetting(theme),
