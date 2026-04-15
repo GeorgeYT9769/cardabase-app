@@ -200,10 +200,7 @@ class LoyaltyCard {
           id: generateUniqueId() + idPadding,
           barcode: Barcode(
             data: cardMap['cardId'] ?? '',
-            type: BarcodeType.values.firstWhere(
-              (value) => value.name == strType,
-              orElse: () => throw Exception('unknown barcodeType: $strType'),
-            ),
+            type: parseBarcodeTypeStringFromDb(strType),
           ),
           name: cardMap['cardName'] ?? '',
           color: Color.fromARGB(255, red, green, blue),

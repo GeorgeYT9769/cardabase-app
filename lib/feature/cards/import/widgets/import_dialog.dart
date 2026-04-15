@@ -1,10 +1,8 @@
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
+import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-
-import '../../../../util/vibration_provider.dart';
-
 Future<bool> showImportCardsDialog(BuildContext context) {
   return showDialog(
     context: context,

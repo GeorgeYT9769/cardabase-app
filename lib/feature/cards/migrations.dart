@@ -23,10 +23,10 @@ Future<void> migrateCardsBoxTo202603(Box oldBox, LoyaltyCardsBox newBox) async {
 }
 
 LoyaltyCard? _mapDynamicToCard(dynamic value) {
-  final map = value as Map?;
-  if (map == null) {
+  if (value == null || value is! Map) {
     return null;
   }
+  final map = value;
 
   int? r;
   int? g;

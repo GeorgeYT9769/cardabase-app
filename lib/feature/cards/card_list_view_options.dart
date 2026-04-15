@@ -77,10 +77,10 @@ class CardListViewOptions {
     late int Function(Comparable a, Comparable b) comparer;
     switch (sortingStyle) {
       case SortingStyle.oldest:
-        cards.sort((a, b) => b.lastModifiedAt.compareTo(a.lastModifiedAt));
+        cards.sort((a, b) => a.lastModifiedAt.compareTo(b.lastModifiedAt));
         return;
       case SortingStyle.latest:
-        cards.sort((a, b) => a.lastModifiedAt.compareTo(b.lastModifiedAt));
+        cards.sort((a, b) => b.lastModifiedAt.compareTo(a.lastModifiedAt));
         return;
       case SortingStyle.nameAz:
         comparer = (a, b) => a.compareTo(b);

@@ -12,7 +12,7 @@ extension GetItExtensions on GetIt {
         final oldCardsBox = await hive.openBox('mybox');
         final newCardsBox = await Hive.openBox<LoyaltyCard>('cards202603');
 
-        migrateCardsBoxTo202603(oldCardsBox, newCardsBox);
+        await migrateCardsBoxTo202603(oldCardsBox, newCardsBox);
         await oldCardsBox.close();
 
         return newCardsBox;
