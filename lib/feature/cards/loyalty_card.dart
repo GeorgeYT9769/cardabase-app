@@ -4,6 +4,7 @@ import 'package:barcode_widget/barcode_widget.dart';
 import 'package:cardabase/data/hive.dart';
 import 'package:cardabase/data/unique_id.dart';
 import 'package:cardabase/feature/cards/edit/editable_loyalty_card.dart';
+import 'package:cardabase/util/barcode_type_extensions.dart';
 import 'package:cardabase/util/map_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -127,10 +128,7 @@ class LoyaltyCard {
       name: rawList[0],
       barcode: Barcode(
         data: rawList[1],
-        type: BarcodeType.values.firstWhere(
-          (value) => value.name == rawList[5],
-          orElse: () => throw Exception('unknown barcodeType: ${rawList[5]}'),
-        ),
+        type: parseBarcodeTypeStringFromDb(rawList[5]),
       ),
       color: Color.fromARGB(255, red, green, blue),
       requiresAuth: rawList[6] == 'true',
@@ -169,6 +167,7 @@ class LoyaltyCard {
     );
   }
 
+  @Deprecated('this method is only here for backwards compatibility.')
   factory LoyaltyCard.fromLegacyExport(String value, String idPadding) {
     final trimmed = value.trim();
 
@@ -257,6 +256,25 @@ class LoyaltyCard {
     throw Exception('failed to parse card');
   }
 
+  factory LoyaltyCard.fromExport(Map<String, dynamic> map, String idPadding) {
+    return LoyaltyCard(
+      id: map.getString('id') ?? (generateUniqueId() + idPadding),
+      barcode: map.getObject('barcode', Barcode.fromJsonMap) ??
+          (throw Exception('barcode is missing')),
+      name: map.getString('name') ?? (throw Exception('name is missing')),
+      color: map.getColor('color'),
+      tags: map.getList('tags')?.whereType<String>().toSet() ?? {},
+      notes: map.getString('notes'),
+      frontImagePath: null,
+      backImagePath: null,
+      useFrontImageOverlay: false,
+      points: map.getInt('points') ?? 0,
+      requiresAuth: map.getBool('requiresAuth') ?? false,
+      hideName: map.getBool('hideName') ?? false,
+      lastModifiedAt: DateTime.now().toUtc(),
+    );
+  }
+
   Map<String, dynamic> _toSharableJsonMap() {
     return {
       'id': id,
@@ -341,7 +359,7 @@ class Barcode {
   Map<String, dynamic> _toJsonMap() {
     return {
       'data': data,
-      'type': type.toString(),
+      'type': type.name,
     };
   }
 

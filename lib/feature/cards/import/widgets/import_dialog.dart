@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:cardabase/feature/cards/loyalty_card.dart';
-import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:cardabase/util/vibration_provider.dart';
+import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+
 Future<bool> showImportCardsDialog(BuildContext context) {
   return showDialog(
     context: context,
@@ -32,10 +35,29 @@ class _ImportDialogState extends State<ImportDialog> {
     }
 
     int count = 0;
-    final cards = input
-        .split('\n')
-        .map((line) => LoyaltyCard.fromLegacyExport(line, (count++).toString()))
-        .toList(growable: false);
+    List<LoyaltyCard>? cards;
+    try {
+      final jsonList = jsonDecode(input);
+      if (jsonList is List) {
+        cards = jsonList
+            .whereType<Map<String, dynamic>>()
+            .map((map) => LoyaltyCard.fromExport(map, (count++).toString()))
+            .toList(growable: false);
+      }
+    } catch (e) {
+      // IGNORE
+    }
+
+    // if new parse did not work, try the legacy one
+    if (cards == null) {
+      count = 0;
+      cards = input
+          .split('\n')
+          .map(
+            (line) => LoyaltyCard.fromLegacyExport(line, (count++).toString()),
+          )
+          .toList(growable: false);
+    }
 
     if (cards.isNotEmpty) {
       await cardsBox.clear();

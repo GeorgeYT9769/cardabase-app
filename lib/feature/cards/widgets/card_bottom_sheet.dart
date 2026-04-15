@@ -84,7 +84,6 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
   Future<void> _duplicateCard() async {
     Navigator.of(context).pop();
     final settings = settingsBox.value.editable();
-    final order = settings.cardListViewOptions.customOrder;
     final newCard = widget.loyaltyCard.clone();
     final customOrder = settings.cardListViewOptions.customOrder;
 
@@ -93,7 +92,7 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
       customOrder.insert(orderIndex + 1, newCard.id);
     }
 
-    settings.cardListViewOptions.customOrder.value = order;
+    settings.cardListViewOptions.customOrder.value = customOrder;
 
     await cardsBox.add(newCard);
     await settingsBox.save(settings.seal());

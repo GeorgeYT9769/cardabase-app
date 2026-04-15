@@ -221,7 +221,7 @@ class ListNotifier<T> extends ChangeNotifier
     final oldIndex = indexOf(element);
     switch (oldIndex) {
       case < 0:
-        // if the card does no tyet exist in the order, add it at the last place
+        // if the card does not yet exist in the order, add it at the last place
         add(element);
         return;
       case 0:
@@ -240,7 +240,7 @@ class ListNotifier<T> extends ChangeNotifier
       add(element);
       return;
     }
-    if (oldIndex >= _value.length - 2) {
+    if (oldIndex >= _value.length - 1) {
       // nothing to do since the element is already at the bottom
       return;
     }

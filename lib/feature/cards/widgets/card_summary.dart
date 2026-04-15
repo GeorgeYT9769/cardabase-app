@@ -47,7 +47,7 @@ class _CardSummaryState extends State<CardSummary> {
   }
 
   Future<void> setFrontImage() async {
-    if (widget.loyaltyCard.useFrontImageOverlay) {
+    if (!widget.loyaltyCard.useFrontImageOverlay) {
       return;
     }
 

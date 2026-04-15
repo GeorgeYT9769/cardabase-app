@@ -46,7 +46,6 @@ class _ExportDialogState extends State<ExportDialog> {
   }
 
   Future<void> exportToFile() async {
-    Navigator.of(context).pop();
     final dir = exportDirectoryPath.text.trim();
     try {
       await exportCardsAsFile(
@@ -70,11 +69,10 @@ class _ExportDialogState extends State<ExportDialog> {
         buildCustomSnackBar('No permission!', false),
       );
     }
+    Navigator.of(context).pop();
   }
 
   Future<void> exportToClipboard() async {
-    Navigator.of(context).pop();
-
     await exportCardsToClipboard(cardsBox.values);
     if (!mounted) {
       return;
@@ -83,6 +81,7 @@ class _ExportDialogState extends State<ExportDialog> {
     ScaffoldMessenger.of(context).showSnackBar(
       buildCustomSnackBar('Copied to Clipboard!', true),
     );
+    Navigator.of(context).pop();
   }
 
   @override

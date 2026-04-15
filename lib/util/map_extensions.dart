@@ -9,8 +9,16 @@ extension MapExtensions on Map<String, dynamic> {
 
   List? getList(String key) => this[key] as List?;
 
+  T? getObject<T>(String key, T Function(Map<String, dynamic> map) fromJson) {
+    final map = this[key] as Map<String, dynamic>?;
+    if (map == null) {
+      return null;
+    }
+    return fromJson(map);
+  }
+
   Color? getColor(String key) {
-    final strColor = getString('color');
+    final strColor = getString(key);
     if (strColor == null) {
       return null;
     }
