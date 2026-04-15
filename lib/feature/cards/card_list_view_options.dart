@@ -1,6 +1,8 @@
 import 'package:cardabase/data/hive.dart';
 import 'package:cardabase/feature/cards/edit/editable_card_list_view_options.dart';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
+import 'package:cardabase/util/list_extensions.dart';
+import 'package:cardabase/util/string_extensions.dart';
 import 'package:hive_ce/hive.dart';
 
 part 'card_list_view_options.g.dart';
@@ -47,8 +49,13 @@ class CardListViewOptions {
   @HiveField(1)
   final SortingStyle sortingStyle;
 
+  /// [sortNameCaseInsensitive] indicates whether the casing should matter when
+  /// sorting the cards.
   @HiveField(2, defaultValue: false)
   final bool sortNameCaseInsensitive;
+
+  /// [sortNameIgnoreAccents] indicates whether accents and other symbols should
+  /// be ignored when sorting the cards.
   @HiveField(3, defaultValue: false)
   final bool sortNameIgnoreAccents;
 
@@ -63,6 +70,11 @@ class CardListViewOptions {
   }
 
   void sortCards(List<LoyaltyCard> cards) {
+    if (cards.length <= 1) {
+      return;
+    }
+    late Comparable Function(LoyaltyCard card) selector;
+    late int Function(Comparable a, Comparable b) comparer;
     switch (sortingStyle) {
       case SortingStyle.oldest:
         cards.sort((a, b) => b.lastModifiedAt.compareTo(a.lastModifiedAt));
@@ -71,44 +83,39 @@ class CardListViewOptions {
         cards.sort((a, b) => a.lastModifiedAt.compareTo(b.lastModifiedAt));
         return;
       case SortingStyle.nameAz:
-        cards.sort((a, b) => a.name.compareTo(b.name));
-        return;
+        comparer = (a, b) => a.compareTo(b);
+        if (sortNameCaseInsensitive && sortNameIgnoreAccents) {
+          selector = (c) => c.name.removeDiacritics().toLowerCase();
+        } else if (sortNameCaseInsensitive) {
+          selector = (c) => c.name.toLowerCase();
+        } else if (sortNameIgnoreAccents) {
+          selector = (c) => c.name.removeDiacritics();
+        } else {
+          cards.sort((a, b) => a.name.compareTo(b.name));
+          return;
+        }
       case SortingStyle.nameZa:
-        cards.sort((a, b) => b.name.compareTo(a.name));
+        comparer = (a, b) => b.compareTo(a);
+        if (sortNameCaseInsensitive && sortNameIgnoreAccents) {
+          selector = (c) => c.name.removeDiacritics().toLowerCase();
+        } else if (sortNameCaseInsensitive) {
+          selector = (c) => c.name.toLowerCase();
+        } else if (sortNameIgnoreAccents) {
+          selector = (c) => c.name.removeDiacritics();
+        } else {
+          cards.sort((a, b) => b.name.compareTo(a.name));
+          return;
+        }
         return;
       case SortingStyle.custom:
         if (customOrder.isEmpty) {
           return;
         }
+        comparer = (a, b) => b.compareTo(a);
+        selector = (c) => customOrder.indexOf(c.id);
     }
 
-    // We iterate over the custom order and order the cards according to that.
-    // By removing the processed elements from the buffer, we can append all
-    // other elements at the end.
-    var cardIndex = 0;
-    final buffer = cards.cast<LoyaltyCard?>().toList(growable: false);
-    for (var i = 0; i < customOrder.length; i++) {
-      final buffIndex =
-          buffer.indexWhere((c) => c != null && c.id == customOrder[i]);
-      if (buffIndex < 0) {
-        continue;
-      }
-
-      cards[cardIndex] = buffer[buffIndex]!;
-      cardIndex++;
-
-      // by setting the value at a given index to null, we do not need to
-      // recompute the size of the list.
-      buffer[buffIndex] = null;
-    }
-
-    // append all cards left in the buffer to the end
-    for (final card in buffer) {
-      if (card == null) {
-        continue;
-      }
-      cards[cardIndex] = card;
-      cardIndex++;
-    }
+    cards.sortMapped(selector, comparer);
+    return;
   }
 }
