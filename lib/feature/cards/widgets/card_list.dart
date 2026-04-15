@@ -36,9 +36,13 @@ class _CardListState extends State<CardList> {
   void initState() {
     super.initState();
     _cardsSubscription = cardsBox.watch().listen((_) {
-      setState(() => cardsToDisplay = listCardsToDisplay());
+      cardsToDisplay = listCardsToDisplay();
+      setState(() {});
     });
-    _settingsSubscription = settingsBox.watch().listen((_) => setState(() {}));
+    _settingsSubscription = settingsBox.watch().listen((_) {
+      cardsToDisplay = listCardsToDisplay();
+      setState(() {});
+    });
     cardsToDisplay = listCardsToDisplay();
   }
 

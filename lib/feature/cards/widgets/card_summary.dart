@@ -93,7 +93,7 @@ class _CardSummaryState extends State<CardSummary> {
     final frontImageFile = this.frontImageFile;
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        backgroundColor: widget.loyaltyCard.color,
+        backgroundColor: widget.loyaltyCard.color ?? LoyaltyCard.defaultColor,
         foregroundColor: widget.loyaltyCard.color?.contrastingTextColor,
         elevation: 0.0,
         padding: EdgeInsets.zero,
