@@ -24,10 +24,16 @@ class _ImportDialogState extends State<ImportDialog> {
   final cardsBox = GetIt.I<LoyaltyCardsBox>();
   final textController = TextEditingController();
 
+  @override
+  void dispose() {
+    textController.dispose();
+    super.dispose();
+  }
+
   Future<void> onImportClicked() async {
     final input = textController.text.trim();
     if (input.isEmpty) {
-      GetIt.I<VibrationProvider>().vibrateSuccess();
+      GetIt.I<VibrationProvider>().vibrateError();
       ScaffoldMessenger.of(context).showSnackBar(
         buildCustomSnackBar('No data!', false),
       );

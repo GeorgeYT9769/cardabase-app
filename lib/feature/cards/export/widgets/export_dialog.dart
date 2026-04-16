@@ -59,7 +59,7 @@ class _ExportDialogState extends State<ExportDialog> {
         buildCustomSnackBar(
           dir == Settings.defaultCardExportDirectoryPath
               ? 'Exported to Downloads'
-              : 'ExportedexportDirectoryPathController to Custom Path',
+              : 'Exported to Custom Path',
           true,
         ),
       );
