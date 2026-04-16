@@ -106,7 +106,6 @@ class CardListViewOptions {
           cards.sort((a, b) => b.name.compareTo(a.name));
           return;
         }
-        return;
       case SortingStyle.custom:
         if (customOrder.isEmpty) {
           return;
@@ -116,6 +115,5 @@ class CardListViewOptions {
     }
 
     cards.sortMapped(selector, comparer);
-    return;
   }
 }
