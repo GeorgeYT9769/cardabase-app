@@ -236,7 +236,7 @@ class ListNotifier<T> extends ChangeNotifier
   void moveDown(T element) {
     final oldIndex = indexOf(element);
     if (oldIndex < 0) {
-      // if the card does no tyet exist in the order, add it at the last place
+      // if the card does not yet exist in the order, add it at the last place
       add(element);
       return;
     }
