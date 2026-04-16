@@ -56,13 +56,22 @@ class _ImportDialogState extends State<ImportDialog> {
 
     // if new parse did not work, try the legacy one
     if (cards == null) {
-      count = 0;
-      cards = input
-          .split('\n')
-          .map(
-            (line) => LoyaltyCard.fromLegacyExport(line, (count++).toString()),
-          )
-          .toList(growable: false);
+      try {
+        count = 0;
+        cards = input
+            .split('\n')
+            .map(
+              (line) =>
+                  LoyaltyCard.fromLegacyExport(line, (count++).toString()),
+            )
+            .toList(growable: false);
+      } catch (e) {
+        GetIt.I<VibrationProvider>().vibrateError();
+        ScaffoldMessenger.of(context).showSnackBar(
+          buildCustomSnackBar('Failed to parse data!', false),
+        );
+        return;
+      }
     }
 
     if (cards.isNotEmpty) {

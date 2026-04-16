@@ -110,8 +110,13 @@ class CardListViewOptions {
         if (customOrder.isEmpty) {
           return;
         }
+        // create dictionary to avoid having to iterate over the custom order
+        // many times
+        final customOrderIndex = <String, int>{
+          for (var i = 0; i < customOrder.length; i++) customOrder[i]: i,
+        };
         comparer = (a, b) => b.compareTo(a);
-        selector = (c) => customOrder.indexOf(c.id);
+        selector = (c) => customOrderIndex[c.id] ?? -1;
     }
 
     cards.sortMapped(selector, comparer);
