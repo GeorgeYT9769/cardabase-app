@@ -41,8 +41,7 @@ Future<void> exportCardsAsFile(
   final strTimestamp =
       '${now.year}${now.month}${now.day}_${now.hour}${now.minute}${now.second}';
 
-  final filePath =
-      '${directory.path}/Cardabase/Cardabase_backup_$strTimestamp.txt';
+  final filePath = '${directory.path}/Cardabase_backup_$strTimestamp.txt';
   final file = File(filePath);
   await file.writeAsString(serializedCards);
 }
