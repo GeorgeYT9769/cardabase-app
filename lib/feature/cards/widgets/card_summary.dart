@@ -91,10 +91,12 @@ class _CardSummaryState extends State<CardSummary> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final frontImageFile = this.frontImageFile;
+    final backgroundColor = widget.loyaltyCard.nonNullColor;
+    final foregroundColor = backgroundColor.contrastingTextColor;
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        backgroundColor: widget.loyaltyCard.color ?? LoyaltyCard.defaultColor,
-        foregroundColor: widget.loyaltyCard.color?.contrastingTextColor,
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
         elevation: 0.0,
         padding: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
@@ -124,7 +126,7 @@ class _CardSummaryState extends State<CardSummary> {
                     style: theme.textTheme.bodyLarge?.copyWith(
                       fontSize: widget.fontSize,
                       fontWeight: FontWeight.bold,
-                      color: widget.loyaltyCard.color?.contrastingTextColor,
+                      color: foregroundColor,
                     ),
                     textAlign: TextAlign.center,
                     maxLines: 2,

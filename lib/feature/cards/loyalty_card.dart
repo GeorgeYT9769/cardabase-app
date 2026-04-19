@@ -101,6 +101,8 @@ class LoyaltyCard {
   @HiveField(13)
   final DateTime lastModifiedAt;
 
+  Color get nonNullColor => color ?? defaultColor;
+
   EditableLoyaltyCard editable() => EditableLoyaltyCard.fromValue(this);
 
   String toJson() {
