@@ -102,6 +102,7 @@ LoyaltyCard? _mapDynamicToCard(dynamic value) {
     points: pointsAmount ?? 0,
     requiresAuth: hasPassword ?? false,
     hideName: hideTitle ?? false,
+    createdAt: DateTime.now().toUtc(),
     lastModifiedAt: DateTime.now().toUtc(),
   );
 }

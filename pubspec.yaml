@@ -57,6 +57,7 @@ dependencies:
   screen_brightness: ^2.1.2
   screenshot: ^3.0.0
   url_launcher: ^6.3.0
+  uuid: ">=4.0.0 <5.0.0"
   zxing2: ^0.2.4
 
 dev_dependencies:

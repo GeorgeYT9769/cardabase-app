@@ -1,7 +1,7 @@
 import 'package:cardabase/feature/authentication/widgets/require_password_dialog.dart';
-import 'package:cardabase/feature/cards/export/export_cards.dart';
-import 'package:cardabase/feature/cards/export/widgets/export_dialog.dart';
-import 'package:cardabase/feature/cards/import/widgets/import_dialog.dart';
+import 'package:cardabase/feature/cards/import_export/export_cards.dart';
+import 'package:cardabase/feature/cards/import_export/widgets/export_dialog.dart';
+import 'package:cardabase/feature/cards/import_export/widgets/import_dialog.dart';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';

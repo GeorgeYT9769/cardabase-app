@@ -129,7 +129,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
         onPressed: () => showDialog(
           context: context,
           builder: (context) => ShareCardDialog(
-            data: widget.loyaltyCard.serializeForSharing(),
+            data: widget.loyaltyCard.toJson(),
           ),
         ),
       ),

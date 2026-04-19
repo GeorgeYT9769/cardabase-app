@@ -103,7 +103,7 @@ class _EditCardPageState extends State<EditCardPage> {
     if (serialized.startsWith('[')) {
       card.loadValue(LoyaltyCard.fromLegacySharing(serialized));
     } else {
-      card.loadValue(LoyaltyCard.fromSerializedForSharing(serialized));
+      card.loadValue(LoyaltyCard.fromJson(serialized));
     }
   }
 

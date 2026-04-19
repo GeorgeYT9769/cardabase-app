@@ -40,14 +40,13 @@ class _ImportDialogState extends State<ImportDialog> {
       return;
     }
 
-    int count = 0;
     List<LoyaltyCard>? cards;
     try {
       final jsonList = jsonDecode(input);
       if (jsonList is List) {
         cards = jsonList
             .whereType<Map<String, dynamic>>()
-            .map((map) => LoyaltyCard.fromExport(map, (count++).toString()))
+            .map(LoyaltyCard.fromJsonMap)
             .toList(growable: false);
       }
     } catch (e) {
@@ -57,13 +56,9 @@ class _ImportDialogState extends State<ImportDialog> {
     // if new parse did not work, try the legacy one
     if (cards == null) {
       try {
-        count = 0;
         cards = input
             .split('\n')
-            .map(
-              (line) =>
-                  LoyaltyCard.fromLegacyExport(line, (count++).toString()),
-            )
+            .map(LoyaltyCard.fromLegacyExport)
             .toList(growable: false);
       } catch (e) {
         GetIt.I<VibrationProvider>().vibrateError();
@@ -86,7 +81,7 @@ class _ImportDialogState extends State<ImportDialog> {
 
     Navigator.of(context).pop(true);
     ScaffoldMessenger.of(context).showSnackBar(
-      buildCustomSnackBar('Imported $count cards!', true),
+      buildCustomSnackBar('Imported cards!', true),
     );
   }
 

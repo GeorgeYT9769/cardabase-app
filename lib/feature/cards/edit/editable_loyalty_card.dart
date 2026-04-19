@@ -18,6 +18,7 @@ class EditableLoyaltyCard {
     required this.points,
     required this.requiresAuth,
     required this.hideName,
+    required this.createdAt,
   });
 
   EditableLoyaltyCard.createNew()
@@ -34,6 +35,7 @@ class EditableLoyaltyCard {
           points: ValueNotifier(0),
           requiresAuth: ValueNotifier(false),
           hideName: ValueNotifier(false),
+          createdAt: ValueNotifier(DateTime.now().toUtc()),
         );
 
   factory EditableLoyaltyCard.fromValue(LoyaltyCard value) {
@@ -50,8 +52,12 @@ class EditableLoyaltyCard {
       points: ValueNotifier(value.points),
       requiresAuth: ValueNotifier(value.requiresAuth),
       hideName: ValueNotifier(value.hideName),
+      createdAt: ValueNotifier(value.createdAt),
     );
   }
+
+  // Some fields feel like they should be readonly instead of `ValueNotifier`.
+  // This is done to enable the `loadValue` method.
 
   final ValueNotifier<String> id;
   final EditableBarcode barcode;
@@ -65,6 +71,7 @@ class EditableLoyaltyCard {
   final ValueNotifier<int> points;
   final ValueNotifier<bool> requiresAuth;
   final ValueNotifier<bool> hideName;
+  final ValueNotifier<DateTime> createdAt;
 
   void loadValue(LoyaltyCard value) {
     id.value = value.id;
@@ -95,6 +102,7 @@ class EditableLoyaltyCard {
       points: points.value,
       requiresAuth: requiresAuth.value,
       hideName: hideName.value,
+      createdAt: createdAt.value,
       lastModifiedAt: DateTime.now().toUtc(),
     );
   }

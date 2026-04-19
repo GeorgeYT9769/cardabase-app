@@ -36,7 +36,7 @@ Future<void> exportCardsAsFile(
     await directory.create(recursive: true);
   }
 
-  final serializedCards = cards.serializeForExport();
+  final serializedCards = cards.serializeToJson();
   final now = DateTime.now();
   final strTimestamp =
       '${now.year}${now.month}${now.day}_${now.hour}${now.minute}${now.second}';
@@ -47,7 +47,7 @@ Future<void> exportCardsAsFile(
 }
 
 Future<void> exportCardsToClipboard(Iterable<LoyaltyCard> cards) async {
-  final serializedCards = cards.serializeForExport();
+  final serializedCards = cards.serializeToJson();
   await Clipboard.setData(ClipboardData(text: serializedCards));
 }
 

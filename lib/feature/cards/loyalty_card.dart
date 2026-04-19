@@ -31,6 +31,7 @@ class LoyaltyCard {
     required this.points,
     required this.requiresAuth,
     required this.hideName,
+    required this.createdAt,
     required this.lastModifiedAt,
   });
 
@@ -91,15 +92,19 @@ class LoyaltyCard {
   @HiveField(11)
   final bool hideName;
 
+  /// [createdAt] is the timestamp (UTC) at which the card was created.
+  @HiveField(12)
+  final DateTime createdAt;
+
   /// [lastModifiedAt] is the timestamp (UTC) at which the card was last modified.
   /// This is used by default for sorting.
-  @HiveField(12)
+  @HiveField(13)
   final DateTime lastModifiedAt;
 
   EditableLoyaltyCard editable() => EditableLoyaltyCard.fromValue(this);
 
-  String serializeForSharing() {
-    return jsonEncode(_toSharableJsonMap());
+  String toJson() {
+    return jsonEncode(toJsonMap());
   }
 
   @Deprecated('this method is only here for backwards compatibility.')
@@ -123,6 +128,7 @@ class LoyaltyCard {
     final green = int.parse(rawList[3]);
     final blue = int.parse(rawList[4]);
 
+    final now = DateTime.now().toUtc();
     return LoyaltyCard(
       id: generateUniqueId(),
       name: rawList[0],
@@ -139,37 +145,15 @@ class LoyaltyCard {
       useFrontImageOverlay: false,
       hideName: false,
       points: 0,
-      lastModifiedAt: DateTime.now().toUtc(),
-    );
-  }
-
-  factory LoyaltyCard.fromSerializedForSharing(String value) {
-    final jsonMap = jsonDecode(value) as Map<String, dynamic>?;
-    if (jsonMap == null) {
-      throw Exception('unknown data format from sharing');
-    }
-    return LoyaltyCard(
-      id: jsonMap.getString('id') ?? generateUniqueId(),
-      barcode: Barcode.fromJsonMap(
-        jsonMap['barcode'] as Map<String, dynamic>,
-      ),
-      name: jsonMap.getString('name') ?? (throw Exception('name is missing')),
-      color: jsonMap.getColor('color'),
-      tags: jsonMap.getList('tags')?.whereType<String>().toSet() ?? {},
-      notes: jsonMap.getString('notes'),
-      frontImagePath: null,
-      backImagePath: null,
-      useFrontImageOverlay: false,
-      points: jsonMap.getInt('points') ?? 0,
-      requiresAuth: jsonMap.getBool('requiresAuth') ?? false,
-      hideName: jsonMap.getBool('hideName') ?? false,
-      lastModifiedAt: DateTime.now().toUtc(),
+      createdAt: now,
+      lastModifiedAt: now,
     );
   }
 
   @Deprecated('this method is only here for backwards compatibility.')
-  factory LoyaltyCard.fromLegacyExport(String value, String idPadding) {
+  factory LoyaltyCard.fromLegacyExport(String value) {
     final trimmed = value.trim();
+    final now = DateTime.now().toUtc();
 
     if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
       final cleaned = trimmed.substring(1, trimmed.length - 1); // remove { }
@@ -196,7 +180,7 @@ class LoyaltyCard {
         final blue = int.tryParse(cardMap['blueValue']) ?? 0;
 
         return LoyaltyCard(
-          id: generateUniqueId() + idPadding,
+          id: generateUniqueId(),
           barcode: Barcode(
             data: cardMap['cardId'] ?? '',
             type: parseBarcodeTypeStringFromDb(strType),
@@ -212,7 +196,8 @@ class LoyaltyCard {
           requiresAuth:
               ((cardMap['hasPassword'] as String?)?.toLowerCase() == 'true'),
           hideName: false,
-          lastModifiedAt: DateTime.now().toUtc(),
+          createdAt: now,
+          lastModifiedAt: now,
         );
       }
     }
@@ -231,7 +216,7 @@ class LoyaltyCard {
       final blue = int.parse(rawList[4]);
 
       return LoyaltyCard(
-        id: generateUniqueId() + idPadding,
+        id: generateUniqueId(),
         name: rawList[0],
         barcode: Barcode(
           data: rawList[1],
@@ -249,55 +234,50 @@ class LoyaltyCard {
         useFrontImageOverlay: false,
         hideName: false,
         points: 0,
-        lastModifiedAt: DateTime.now().toUtc(),
+        createdAt: now,
+        lastModifiedAt: now,
       );
     }
 
     throw Exception('failed to parse card');
   }
 
-  factory LoyaltyCard.fromExport(Map<String, dynamic> map, String idPadding) {
+  factory LoyaltyCard.fromJson(String value) {
+    final jsonMap = jsonDecode(value) as Map<String, dynamic>?;
+    if (jsonMap == null) {
+      throw Exception('unknown data format from sharing');
+    }
+    return LoyaltyCard.fromJsonMap(jsonMap);
+  }
+
+  factory LoyaltyCard.fromJsonMap(Map<String, dynamic> jsonMap) {
+    final now = DateTime.now().toUtc();
     return LoyaltyCard(
-      id: map.getString('id') ?? (generateUniqueId() + idPadding),
-      barcode: map.getObject('barcode', Barcode.fromJsonMap) ??
+      id: jsonMap.getString('id') ?? generateUniqueId(),
+      barcode: jsonMap.getObject('barcode', Barcode.fromJsonMap) ??
           (throw Exception('barcode is missing')),
-      name: map.getString('name') ?? (throw Exception('name is missing')),
-      color: map.getColor('color'),
-      tags: map.getList('tags')?.whereType<String>().toSet() ?? {},
-      notes: map.getString('notes'),
+      name: jsonMap.getString('name') ?? (throw Exception('name is missing')),
+      color: jsonMap.getColor('color'),
+      tags: jsonMap.getList('tags')?.whereType<String>().toSet() ?? {},
+      notes: jsonMap.getString('notes'),
       frontImagePath: null,
       backImagePath: null,
       useFrontImageOverlay: false,
-      points: map.getInt('points') ?? 0,
-      requiresAuth: map.getBool('requiresAuth') ?? false,
-      hideName: map.getBool('hideName') ?? false,
-      lastModifiedAt: DateTime.now().toUtc(),
+      points: jsonMap.getInt('points') ?? 0,
+      requiresAuth: jsonMap.getBool('requiresAuth') ?? false,
+      hideName: jsonMap.getBool('hideName') ?? false,
+      createdAt: now,
+      lastModifiedAt: now,
     );
   }
 
-  Map<String, dynamic> _toSharableJsonMap() {
+  Map<String, dynamic> toJsonMap() {
     return {
       'id': id,
-      'barcode': barcode._toJsonMap(),
+      'barcode': barcode.toJsonMap(),
       'name': name,
-      if (color != null)
-        'color': color?.toHexString(
-          includeHashSign: true,
-          toUpperCase: true,
-        ),
-      if (tags.isNotEmpty) 'tags': tags.toList(growable: false),
-      if (notes != null) 'notes': notes,
-      if (points != 0) 'points': points,
-      if (requiresAuth != false) 'requiresAuth': requiresAuth,
-      if (hideName != false) 'hideName': hideName,
-    };
-  }
-
-  Map<String, dynamic> _toExportableJsonMap() {
-    return {
-      'id': id,
-      'barcode': barcode._toJsonMap(),
-      'name': name,
+      'createdAt': createdAt.toIso8601String(),
+      'lastModifiedAt': lastModifiedAt.toIso8601String(),
       if (color != null)
         'color': color?.toHexString(
           includeHashSign: true,
@@ -312,6 +292,7 @@ class LoyaltyCard {
   }
 
   LoyaltyCard clone() {
+    final now = DateTime.now().toUtc();
     return LoyaltyCard(
       id: generateUniqueId(),
       barcode: barcode.clone(),
@@ -325,7 +306,8 @@ class LoyaltyCard {
       points: points,
       requiresAuth: requiresAuth,
       hideName: hideName,
-      lastModifiedAt: lastModifiedAt,
+      createdAt: now,
+      lastModifiedAt: now,
     );
   }
 }
@@ -356,7 +338,7 @@ class Barcode {
     );
   }
 
-  Map<String, dynamic> _toJsonMap() {
+  Map<String, dynamic> toJsonMap() {
     return {
       'data': data,
       'type': type.name,
@@ -372,7 +354,7 @@ class Barcode {
 }
 
 extension LoyaltyCardListExtensions on Iterable<LoyaltyCard> {
-  String serializeForExport() {
-    return jsonEncode(map((card) => card._toExportableJsonMap()));
+  String serializeToJson() {
+    return jsonEncode(map((card) => card.toJsonMap()));
   }
 }
