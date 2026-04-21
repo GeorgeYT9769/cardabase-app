@@ -117,26 +117,26 @@ packages:
     dependency: "direct main"
     description:
       name: camera
-      sha256: "4142a19a38e388d3bab444227636610ba88982e36dff4552d5191a86f65dc437"
+      sha256: "034c38cb8014d29698dcae6d20276688a1bf74e6487dfeb274d70ea05d5f7777"
       url: "https://pub.dev"
     source: hosted
-    version: "0.11.4"
+    version: "0.12.0+1"
   camera_android_camerax:
     dependency: transitive
     description:
       name: camera_android_camerax
-      sha256: "8516fe308bc341a5067fb1a48edff0ddfa57c0d3cdcc9dbe7ceca3ba119e2577"
+      sha256: b5064cf25a2787d122d0bf12e77c7b1033a2b983d0730e3091f770ee376efde5
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.30"
+    version: "0.7.2"
   camera_avfoundation:
     dependency: transitive
     description:
       name: camera_avfoundation
-      sha256: "11b4aee2f5e5e038982e152b4a342c749b414aa27857899d20f4323e94cb5f0b"
+      sha256: "90e4cc3fde331581a3b2d35d83be41dbb7393af0ab857eb27b732174289cb96d"
       url: "https://pub.dev"
     source: hosted
-    version: "0.9.23+2"
+    version: "0.10.1"
   camera_platform_interface:
     dependency: transitive
     description:
@@ -460,10 +460,10 @@ packages:
     dependency: transitive
     description:
       name: hooks
-      sha256: e79ed1e8e1929bc6ecb6ec85f0cb519c887aa5b423705ded0d0f2d9226def388
+      sha256: "025f060e86d2d4c3c47b56e33caf7f93bf9283340f26d23424ebcfccf34f621e"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.2"
+    version: "1.0.3"
   http:
     dependency: "direct main"
     description:
@@ -936,6 +936,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
+  record_use:
+    dependency: transitive
+    description:
+      name: record_use
+      sha256: "2551bd8eecfe95d14ae75f6021ad0248be5c27f138c2ec12fcb52b500b3ba1ed"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.6.0"
   reorderable_grid_view:
     dependency: "direct main"
     description:

@@ -235,24 +235,27 @@ class _InfoScreenState extends State<InfoScreen> {
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 20),
-                          OutlinedButton.icon(
-                            onPressed: _fetchAppAndLatestVersion,
-                            icon: const Icon(Icons.refresh),
-                            label: const Text('Retry'),
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(
-                                color: theme.colorScheme.primary,
-                                width: 2,
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 40,
-                                vertical: 15,
-                              ),
-                              backgroundColor: Colors.transparent,
-                              elevation: 0.0,
-                              shape: const RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
+                          Bounceable(
+                            onTap: () {},
+                            child: OutlinedButton.icon(
+                              onPressed: _fetchAppAndLatestVersion,
+                              icon: const Icon(Icons.refresh),
+                              label: const Text('Retry'),
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(
+                                  color: theme.colorScheme.primary,
+                                  width: 2,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 40,
+                                  vertical: 15,
+                                ),
+                                backgroundColor: Colors.transparent,
+                                elevation: 0.0,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15)),
+                                ),
                               ),
                             ),
                           ),

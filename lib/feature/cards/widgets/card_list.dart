@@ -132,6 +132,7 @@ class _CardListState extends State<CardList> {
         loyaltyCard: card,
         cornerRadius: numberOfColumns == 1 ? 15 : 20 / numberOfColumns,
         fontSize: numberOfColumns == 1 ? 50 : 50 / numberOfColumns,
+        marginSize: numberOfColumns == 1 ? 10 : 5 / numberOfColumns,
       ),
     );
   }

@@ -10,6 +10,7 @@ import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/util/color_extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_ce_flutter/adapters.dart';
 
@@ -19,11 +20,13 @@ class CardSummary extends StatefulWidget {
     required this.loyaltyCard,
     required this.cornerRadius,
     required this.fontSize,
+    required this.marginSize,
   });
 
   final LoyaltyCard loyaltyCard;
   final double cornerRadius;
   final double fontSize;
+  final double marginSize;
 
   @override
   State<CardSummary> createState() => _CardSummaryState();
@@ -93,47 +96,53 @@ class _CardSummaryState extends State<CardSummary> {
     final frontImageFile = this.frontImageFile;
     final backgroundColor = widget.loyaltyCard.nonNullColor;
     final foregroundColor = backgroundColor.contrastingTextColor;
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor,
-        foregroundColor: foregroundColor,
-        elevation: 0.0,
-        padding: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(widget.cornerRadius),
-        ),
-      ),
-      onPressed: openCard,
-      child: ClipRRect(
-        borderRadius: BorderRadiusGeometry.circular(widget.cornerRadius),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            if (frontImageFile != null)
-              Image.file(
-                frontImageFile,
-                fit: BoxFit.cover,
-                width: double.infinity,
-                height: double.infinity,
-              ),
-            _effect(),
-            if (!widget.loyaltyCard.hideName)
-              Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: Center(
-                  child: Text(
-                    widget.loyaltyCard.name,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      fontSize: widget.fontSize,
-                      fontWeight: FontWeight.bold,
-                      color: foregroundColor,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
+    return Bounceable(
+      onTap: () {},
+      child: Container(
+        margin: EdgeInsets.all(widget.marginSize),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: backgroundColor,
+            foregroundColor: foregroundColor,
+            elevation: 0.0,
+            padding: EdgeInsets.zero,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(widget.cornerRadius),
+            ),
+          ),
+          onPressed: openCard,
+          child: ClipRRect(
+            borderRadius: BorderRadiusGeometry.circular(widget.cornerRadius),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                if (frontImageFile != null)
+                  Image.file(
+                    frontImageFile,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
                   ),
-                ),
-              ),
-          ],
+                _effect(),
+                if (!widget.loyaltyCard.hideName)
+                  Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Center(
+                      child: Text(
+                        widget.loyaltyCard.name,
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          fontSize: widget.fontSize,
+                          fontWeight: FontWeight.bold,
+                          color: foregroundColor,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ),
       ),
     );
