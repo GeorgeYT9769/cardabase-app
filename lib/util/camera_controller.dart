@@ -271,7 +271,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                               child: SizedBox.expand(
                                 child: Image.file(
                                   File(_capturedImageFile!.path),
-                                  fit: BoxFit.cover,
+                                  fit: BoxFit.contain,
                                 ),
                               ),
                             ),
