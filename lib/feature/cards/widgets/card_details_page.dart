@@ -157,7 +157,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
         initialPage: frontImagePath == null ? 0 : 1,
       ),
       children: [
-        if (frontImagePath != null)
+        if (frontImagePath != null && File(frontImagePath).existsSync() == true)
           CardFace.image(
             cardTileColor: widget.loyaltyCard.color,
             image: FileImage(File(frontImagePath)),
@@ -169,7 +169,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
           barcodeType: widget.loyaltyCard.barcode.type,
           showWhiteOutline: true,
         ),
-        if (backImagePath != null)
+        if (backImagePath != null && File(backImagePath).existsSync() == true)
           CardFace.image(
             cardTileColor: widget.loyaltyCard.color,
             image: FileImage(File(backImagePath)),

@@ -8,10 +8,13 @@ import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../../util/vibration_provider.dart';
+
 Future<void> showLoyaltyCardBottomSheets(
   BuildContext context,
   LoyaltyCard loyaltyCard,
 ) {
+  GetIt.I<VibrationProvider>().vibrateSelection();
   return showModalBottomSheet(
     context: context,
     elevation: 0.0,

@@ -115,8 +115,9 @@ class CardListViewOptions {
         final customOrderIndex = <String, int>{
           for (var i = 0; i < customOrder.length; i++) customOrder[i]: i,
         };
-        comparer = (a, b) => b.compareTo(a);
-        selector = (c) => customOrderIndex[c.id] ?? -1;
+        final missingCustomOrderIndex = customOrder.length;
+        comparer = (a, b) => a.compareTo(b);
+        selector = (c) => customOrderIndex[c.id] ?? missingCustomOrderIndex;
     }
 
     cards.sortMapped(selector, comparer);

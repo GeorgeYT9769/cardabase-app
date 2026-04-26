@@ -29,7 +29,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   barcode_widget: ^2.0.4
-  camera: ^0.11.3
+  camera: ^0.12.0+1
   cupertino_icons: ^1.0.2
   file_picker: ^11.0.2
   flutter:
