@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:cardabase/feature/cards/card_list_view_options.dart';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/cards/widgets/card_bottom_sheet.dart';
 import 'package:cardabase/feature/cards/widgets/card_summary.dart';
@@ -67,7 +68,12 @@ class _CardListState extends State<CardList> {
 
   void moveCard(int oldIndex, int newIndex) {
     final settings = settingsBox.value.editable();
+    if (settings.cardListViewOptions.customOrder.isEmpty) {
+      settings.cardListViewOptions.customOrder.value =
+          cardsBox.values.map((card) => card.id).toList();
+    }
     settings.cardListViewOptions.customOrder.move(oldIndex, newIndex);
+    settings.cardListViewOptions.sortingStyle.value = SortingStyle.custom;
     settingsBox.save(settings.seal());
   }
 
@@ -151,6 +157,7 @@ class _CardListState extends State<CardList> {
 
   Widget _card(ThemeData theme, LoyaltyCard card, int numberOfColumns) {
     return GestureDetector(
+      key: ValueKey(card.id),
       onLongPress: widget.isInReorderingMode
           ? null
           : () => showLoyaltyCardBottomSheets(context, card),
