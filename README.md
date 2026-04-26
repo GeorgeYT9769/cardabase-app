@@ -41,7 +41,7 @@
 - Does not need internet connection
 
 ## 🛡️ Security
-More info [here](https://www.virustotal.com/gui/file/16c68fd2161573f337b175c8c68a9be98f416b9bd91790286c44bb13466e6526/behavior)
+More info [here](https://www.virustotal.com/gui/file/16c68fd2161573f337b175c8c68a9be98f416b9bd91790286c44bb13466e6526)
 
 ## 📲 Installation
 
