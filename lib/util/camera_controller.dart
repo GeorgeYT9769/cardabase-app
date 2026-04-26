@@ -58,6 +58,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     _cameraController = CameraController(
       _cameras![0],
       ResolutionPreset.high,
+      enableAudio: false,
       imageFormatGroup: ImageFormatGroup.jpeg,
     );
     _initializeControllerFuture = _cameraController!.initialize();
