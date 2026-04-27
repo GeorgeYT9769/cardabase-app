@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:flutter/services.dart';
+
+bool get canCreateCardWidget => Platform.isAndroid || Platform.isIOS;
 
 Future<bool> createCardWidget(LoyaltyCard loyaltyCard) {
   const channel = MethodChannel('cardabase_widget');

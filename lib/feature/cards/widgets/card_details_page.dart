@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cardabase/feature/cards/loyalty_card.dart';
@@ -14,16 +15,21 @@ import 'package:screen_brightness/screen_brightness.dart';
 class CardDetailsPage extends StatefulWidget {
   const CardDetailsPage({
     super.key,
-    required this.loyaltyCard,
+    required this.cardId,
   });
 
-  final LoyaltyCard loyaltyCard;
+  final String cardId;
 
   @override
   State<CardDetailsPage> createState() => _CardDetailsPageState();
 }
 
 class _CardDetailsPageState extends State<CardDetailsPage> {
+  final cardsBox = GetIt.I<LoyaltyCardsBox>();
+
+  StreamSubscription? _cardSubscription;
+
+  LoyaltyCard? card;
   double? _previousBrightness;
   final settingsBox = GetIt.I.get<SettingsBox>();
 
@@ -33,6 +39,27 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
     if (settingsBox.value.useAutoBrightness == false) {
       _increaseBrightness();
     }
+    _cardSubscription = cardsBox
+        .watch(key: widget.cardId)
+        .map((event) => event.value as LoyaltyCard?)
+        .listen(onCardChanged);
+    card = cardsBox.get(widget.cardId);
+  }
+
+  @override
+  void didUpdateWidget(covariant CardDetailsPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.cardId != oldWidget.cardId) {
+      _cardSubscription?.cancel();
+      _cardSubscription = cardsBox
+          .watch(key: widget.cardId)
+          .map((event) => event.value as LoyaltyCard?)
+          .listen(onCardChanged);
+    }
+  }
+
+  Future<void> onCardChanged(LoyaltyCard? card) async {
+    setState(() => this.card = card);
   }
 
   Future<void> _increaseBrightness() async {
@@ -43,6 +70,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
   @override
   void dispose() {
     _resetBrightness();
+    _cardSubscription?.cancel();
     super.dispose();
   }
 
@@ -56,7 +84,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final textColor = widget.loyaltyCard.color?.contrastingTextColor;
+    final textColor = card?.color?.contrastingTextColor;
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: _appBar(theme),
@@ -70,12 +98,12 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
             margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
-              color: widget.loyaltyCard.color,
+              color: card?.color,
             ),
             child: Column(
               children: [
                 Text(
-                  widget.loyaltyCard.name,
+                  card?.name ?? '',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyLarge?.copyWith(
                     color: textColor,
@@ -83,7 +111,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                   ),
                 ),
                 Text(
-                  '${widget.loyaltyCard.points} points',
+                  '${card?.points} points',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: textColor,
@@ -102,7 +130,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
               ),
             ),
           ),
-          if (widget.loyaltyCard.notes != null)
+          if (card?.notes != null)
             Padding(
               padding: const EdgeInsets.only(
                 left: 20,
@@ -126,12 +154,14 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
           Icons.qr_code_2,
           color: theme.colorScheme.secondary,
         ),
-        onPressed: () => showDialog(
-          context: context,
-          builder: (context) => ShareCardDialog(
-            data: widget.loyaltyCard.toJson(),
-          ),
-        ),
+        onPressed: card == null
+            ? null
+            : () => showDialog(
+                  context: context,
+                  builder: (context) => ShareCardDialog(
+                    data: card?.toJson() ?? '',
+                  ),
+                ),
       ),
       actions: [
         IconButton(
@@ -150,8 +180,8 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
   }
 
   Widget _card(ThemeData theme) {
-    final frontImagePath = widget.loyaltyCard.frontImagePath;
-    final backImagePath = widget.loyaltyCard.backImagePath;
+    final frontImagePath = card?.frontImagePath;
+    final backImagePath = card?.backImagePath;
     return PageView(
       controller: PageController(
         initialPage: frontImagePath == null ? 0 : 1,
@@ -159,19 +189,20 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
       children: [
         if (frontImagePath != null && File(frontImagePath).existsSync() == true)
           CardFace.image(
-            cardTileColor: widget.loyaltyCard.color,
+            cardTileColor: card?.color,
             image: FileImage(File(frontImagePath)),
             showWhiteOutline: false,
           ),
-        CardFace.barcode(
-          cardTileColor: widget.loyaltyCard.color,
-          cardData: widget.loyaltyCard.barcode.data,
-          barcodeType: widget.loyaltyCard.barcode.type,
-          showWhiteOutline: true,
-        ),
+        if (card != null)
+          CardFace.barcode(
+            cardTileColor: card!.color,
+            cardData: card!.barcode.data,
+            barcodeType: card!.barcode.type,
+            showWhiteOutline: true,
+          ),
         if (backImagePath != null && File(backImagePath).existsSync() == true)
           CardFace.image(
-            cardTileColor: widget.loyaltyCard.color,
+            cardTileColor: card?.color,
             image: FileImage(File(backImagePath)),
             showWhiteOutline: false,
           ),
@@ -188,7 +219,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
           color: theme.colorScheme.inverseSurface,
           fontSize: 15,
         ),
-        hintText: widget.loyaltyCard.notes,
+        hintText: card?.notes,
         disabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: theme.colorScheme.primary),
           borderRadius: BorderRadius.circular(10),

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:barcode_widget/barcode_widget.dart';
+import 'package:cardabase/feature/cards/card_face_error_widget.dart';
 import 'package:cardabase/feature/cards/edit/editable_loyalty_card.dart';
 import 'package:cardabase/feature/cards/edit/widgets/barcode_type_selector_dialog.dart';
 import 'package:cardabase/feature/cards/edit/widgets/form_fields/barcode_type_selector_button.dart';
@@ -237,6 +238,10 @@ class _EditCardFormState extends State<EditCardForm> {
                     fit: BoxFit.cover,
                     width: double.infinity,
                     height: double.infinity,
+                    errorBuilder: (ctx, error, trace) => CardFaceErrorWidget(
+                      error: error,
+                      stackTrace: trace,
+                    ),
                   ),
                 ),
               if (!widget.card.hideName.value)

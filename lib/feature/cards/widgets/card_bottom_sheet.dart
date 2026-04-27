@@ -44,6 +44,9 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
   final settingsBox = GetIt.I<SettingsBox>();
 
   Future<void> _createCardWidget() async {
+    if (!canCreateCardWidget) {
+      return;
+    }
     if (widget.loyaltyCard.requiresAuth) {
       if (!await requirePassword(context)) {
         return;
@@ -130,14 +133,15 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
       padding: const EdgeInsets.all(16),
       child: Wrap(
         children: [
-          ListTile(
-            leading: Icon(Icons.widgets, color: theme.colorScheme.tertiary),
-            title: Text(
-              'Set as Widget',
-              style: theme.textTheme.bodyLarge?.copyWith(),
+          if (canCreateCardWidget)
+            ListTile(
+              leading: Icon(Icons.widgets, color: theme.colorScheme.tertiary),
+              title: Text(
+                'Set as Widget',
+                style: theme.textTheme.bodyLarge?.copyWith(),
+              ),
+              onTap: _createCardWidget,
             ),
-            onTap: _createCardWidget,
-          ),
           ListTile(
             leading: Icon(Icons.edit, color: theme.colorScheme.tertiary),
             title: Text('Edit', style: theme.textTheme.bodyLarge?.copyWith()),

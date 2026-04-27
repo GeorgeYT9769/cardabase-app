@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cardabase/data/unique_id.dart';
 import 'package:cardabase/feature/cards/edit/widgets/edit_card_page.dart';
@@ -145,37 +146,39 @@ class _MainState extends State<Main> {
   void initState() {
     super.initState();
 
-    quickActions.initialize((shortcutType) {
-      if (navigatorKey.currentState != null &&
-          navigatorKey.currentContext != null) {
-        if (shortcutType == 'add_card') {
-          navigatorKey.currentState!.push(
-            MaterialPageRoute(
-              builder: (context) => EditCardPage(cardId: generateUniqueId()),
-            ),
-          );
+    if (Platform.isAndroid || Platform.isIOS) {
+      quickActions.initialize((shortcutType) {
+        if (navigatorKey.currentState != null &&
+            navigatorKey.currentContext != null) {
+          if (shortcutType == 'add_card') {
+            navigatorKey.currentState!.push(
+              MaterialPageRoute(
+                builder: (context) => EditCardPage(cardId: generateUniqueId()),
+              ),
+            );
+          }
+          if (shortcutType == 'info') {
+            navigatorKey.currentState!.push(
+              MaterialPageRoute(builder: (context) => const SettingsPage()),
+            );
+          }
         }
-        if (shortcutType == 'info') {
-          navigatorKey.currentState!.push(
-            MaterialPageRoute(builder: (context) => const SettingsPage()),
-          );
-        }
-      }
-    });
+      });
 
-    quickActions.setShortcutItems(<ShortcutItem>[
-      const ShortcutItem(
-        type: 'add_card',
-        localizedTitle: 'Add card',
-        icon: 'ic_add_card',
-      ), // Added icon
-      const ShortcutItem(
-        type: 'info',
-        localizedTitle: 'Info',
-        localizedSubtitle: 'See info',
-        icon: 'ic_info',
-      ), // Added icon
-    ]);
+      quickActions.setShortcutItems(<ShortcutItem>[
+        const ShortcutItem(
+          type: 'add_card',
+          localizedTitle: 'Add card',
+          icon: 'ic_add_card',
+        ), // Added icon
+        const ShortcutItem(
+          type: 'info',
+          localizedTitle: 'Info',
+          localizedSubtitle: 'See info',
+          icon: 'ic_info',
+        ), // Added icon
+      ]);
+    }
   }
 
   @override

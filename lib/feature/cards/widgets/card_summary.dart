@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cardabase/feature/authentication/widgets/require_password_dialog.dart';
+import 'package:cardabase/feature/cards/card_face_error_widget.dart';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/cards/widgets/card_details_page.dart';
 import 'package:cardabase/feature/cards/widgets/card_effects/glitter.dart';
@@ -17,13 +19,13 @@ import 'package:hive_ce_flutter/adapters.dart';
 class CardSummary extends StatefulWidget {
   const CardSummary({
     super.key,
-    required this.loyaltyCard,
+    required this.cardId,
     required this.cornerRadius,
     required this.fontSize,
     required this.marginSize,
   });
 
-  final LoyaltyCard loyaltyCard;
+  final String cardId;
   final double cornerRadius;
   final double fontSize;
   final double marginSize;
@@ -33,46 +35,44 @@ class CardSummary extends StatefulWidget {
 }
 
 class _CardSummaryState extends State<CardSummary> {
-  File? frontImageFile;
+  final cardsBox = GetIt.I<LoyaltyCardsBox>();
+
+  StreamSubscription? _cardSubscription;
+
+  LoyaltyCard? card;
 
   @override
   void initState() {
     super.initState();
-    setFrontImage();
+    _cardSubscription = cardsBox
+        .watch(key: widget.cardId)
+        .map((event) => event.value as LoyaltyCard?)
+        .listen(onCardChanged);
+    card = cardsBox.get(widget.cardId);
   }
 
   @override
   void didUpdateWidget(covariant CardSummary oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.loyaltyCard != oldWidget.loyaltyCard) {
-      setFrontImage();
+    if (widget.cardId != oldWidget.cardId) {
+      _cardSubscription?.cancel();
+      _cardSubscription = cardsBox
+          .watch(key: widget.cardId)
+          .map((event) => event.value as LoyaltyCard?)
+          .listen(onCardChanged);
     }
   }
 
-  Future<void> setFrontImage() async {
-    if (!widget.loyaltyCard.useFrontImageOverlay) {
-      return;
-    }
-
-    final path = widget.loyaltyCard.frontImagePath;
-    if (path == null) {
-      return;
-    }
-
-    final file = File(path);
-    if (!await file.exists()) {
-      return;
-    }
-
-    if (!mounted) {
-      return;
-    }
-
-    setState(() => frontImageFile = file);
+  Future<void> onCardChanged(LoyaltyCard? card) async {
+    setState(() => this.card = card);
   }
 
   Future<void> openCard() async {
-    if (widget.loyaltyCard.requiresAuth) {
+    final card = this.card;
+    if (card == null) {
+      return;
+    }
+    if (card.requiresAuth) {
       if (!await requirePassword(context)) {
         return;
       }
@@ -83,19 +83,23 @@ class _CardSummaryState extends State<CardSummary> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CardDetailsPage(
-          loyaltyCard: widget.loyaltyCard,
-        ),
+        builder: (context) => CardDetailsPage(cardId: card.id),
       ),
     );
   }
 
   @override
+  void dispose() {
+    _cardSubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final frontImageFile = this.frontImageFile;
-    final backgroundColor = widget.loyaltyCard.nonNullColor;
-    final foregroundColor = backgroundColor.contrastingTextColor;
+    final frontImageFilePath = card?.frontImagePath;
+    final backgroundColor = card?.nonNullColor;
+    final foregroundColor = backgroundColor?.contrastingTextColor;
     return Bounceable(
       onTap: () {},
       child: Container(
@@ -110,26 +114,30 @@ class _CardSummaryState extends State<CardSummary> {
               borderRadius: BorderRadius.circular(widget.cornerRadius),
             ),
           ),
-          onPressed: openCard,
+          onPressed: card == null ? null : openCard,
           child: ClipRRect(
             borderRadius: BorderRadiusGeometry.circular(widget.cornerRadius),
             child: Stack(
               fit: StackFit.expand,
               children: [
-                if (frontImageFile != null)
+                if (frontImageFilePath != null)
                   Image.file(
-                    frontImageFile,
+                    File(frontImageFilePath),
                     fit: BoxFit.cover,
                     width: double.infinity,
                     height: double.infinity,
+                    errorBuilder: (ctx, error, trace) => CardFaceErrorWidget(
+                      error: error,
+                      stackTrace: trace,
+                    ),
                   ),
                 _effect(),
-                if (!widget.loyaltyCard.hideName)
+                if (card?.hideName == false)
                   Padding(
                     padding: const EdgeInsets.all(5.0),
                     child: Center(
                       child: Text(
-                        widget.loyaltyCard.name,
+                        card?.name ?? '',
                         style: theme.textTheme.bodyLarge?.copyWith(
                           fontSize: widget.fontSize,
                           fontWeight: FontWeight.bold,
