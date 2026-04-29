@@ -118,6 +118,9 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                     fontSize: 20,
                   ),
                 ),
+                SizedBox(
+                  height: 5,
+                ),
               ],
             ),
           ),
