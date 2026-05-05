@@ -68,10 +68,6 @@ class _CardListState extends State<CardList> {
 
   void moveCard(int oldIndex, int newIndex) {
     final settings = settingsBox.value.editable();
-    if (settings.cardListViewOptions.customOrder.isEmpty) {
-      settings.cardListViewOptions.customOrder.value =
-          cardsBox.values.map((card) => card.id).toList();
-    }
     settings.cardListViewOptions.customOrder.move(oldIndex, newIndex);
     settings.cardListViewOptions.sortingStyle.value = SortingStyle.custom;
     settingsBox.save(settings.seal());

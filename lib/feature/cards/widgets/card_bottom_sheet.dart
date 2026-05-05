@@ -100,8 +100,10 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
 
     settings.cardListViewOptions.customOrder.value = customOrder;
 
-    await cardsBox.add(newCard);
+    // Order of saving matters. Since the custom order is checked for new/old
+    // cards after the cardsBox changed, we need to update the settings first.
     await settingsBox.save(settings.seal());
+    await cardsBox.put(newCard.id, newCard);
   }
 
   Future<void> _moveCardUp() async {
@@ -120,10 +122,7 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
 
   Future<void> _deleteCard() async {
     Navigator.of(context).pop();
-    cardsBox.delete(widget.loyaltyCard.id);
-    final settings = settingsBox.value.editable();
-    settings.cardListViewOptions.customOrder.remove(widget.loyaltyCard.id);
-    await settingsBox.save(settings.seal());
+    await cardsBox.delete(widget.loyaltyCard.id);
   }
 
   @override
