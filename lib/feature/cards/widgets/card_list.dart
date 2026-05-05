@@ -1,82 +1,29 @@
-import 'dart:async';
 import 'dart:math';
 
-import 'package:cardabase/feature/cards/card_list_view_options.dart';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/cards/widgets/card_bottom_sheet.dart';
 import 'package:cardabase/feature/cards/widgets/card_summary.dart';
-import 'package:cardabase/feature/settings/get_it.dart';
-import 'package:cardabase/feature/settings/model.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 
-class CardList extends StatefulWidget {
+class CardList extends StatelessWidget {
   const CardList({
     super.key,
-    required this.tagFilter,
     required this.isInReorderingMode,
+    required this.numberOfColumns,
+    required this.cards,
+    required this.moveCard,
   });
 
-  final String? tagFilter;
   final bool isInReorderingMode;
-
-  @override
-  State<CardList> createState() => _CardListState();
-}
-
-class _CardListState extends State<CardList> {
-  final cardsBox = GetIt.I<LoyaltyCardsBox>();
-  final settingsBox = GetIt.I<SettingsBox>();
-
-  StreamSubscription? _cardsSubscription;
-  StreamSubscription? _settingsSubscription;
-
-  late List<LoyaltyCard> cardsToDisplay;
-
-  @override
-  void initState() {
-    super.initState();
-    _cardsSubscription = cardsBox.watch().listen((_) {
-      cardsToDisplay = listCardsToDisplay();
-      setState(() {});
-    });
-    _settingsSubscription = settingsBox.watch().listen((_) {
-      cardsToDisplay = listCardsToDisplay();
-      setState(() {});
-    });
-    cardsToDisplay = listCardsToDisplay();
-  }
-
-  @override
-  void dispose() {
-    _cardsSubscription?.cancel();
-    _settingsSubscription?.cancel();
-    super.dispose();
-  }
-
-  List<LoyaltyCard> listCardsToDisplay() {
-    final allCards = cardsBox.values.toList(growable: false);
-    settingsBox.value.cardListViewOptions.sortCards(allCards);
-    if (widget.tagFilter == null) {
-      return allCards;
-    }
-    return allCards
-        .where((card) => card.tags.contains(widget.tagFilter))
-        .toList(growable: false);
-  }
-
-  void moveCard(int oldIndex, int newIndex) {
-    final settings = settingsBox.value.editable();
-    settings.cardListViewOptions.customOrder.move(oldIndex, newIndex);
-    settings.cardListViewOptions.sortingStyle.value = SortingStyle.custom;
-    settingsBox.save(settings.seal());
-  }
+  final int numberOfColumns;
+  final List<LoyaltyCard> cards;
+  final void Function(int oldIndex, int newIndex) moveCard;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    if (cardsBox.isEmpty) {
+    if (cards.isEmpty) {
       return SliverFillRemaining(
         hasScrollBody: false,
         child: Stack(
@@ -117,14 +64,10 @@ class _CardListState extends State<CardList> {
     const childAspectRatio = 1.4;
     const gridPadding = 8.0;
 
-    final numberOfColumns =
-        settingsBox.value.cardListViewOptions.numberOfColumns;
+    final sliverChildren =
+        cards.map((card) => _card(context, theme, card)).toList();
 
-    final sliverChildren = cardsToDisplay
-        .map((card) => _card(theme, card, numberOfColumns))
-        .toList(growable: true);
-
-    if (widget.isInReorderingMode) {
+    if (isInReorderingMode) {
       return SliverPadding(
         padding: const EdgeInsets.all(gridPadding),
         sliver: ReorderableSliverGridView.count(
@@ -151,10 +94,10 @@ class _CardListState extends State<CardList> {
     }
   }
 
-  Widget _card(ThemeData theme, LoyaltyCard card, int numberOfColumns) {
+  Widget _card(BuildContext context, ThemeData theme, LoyaltyCard card) {
     return GestureDetector(
       key: ValueKey(card.id),
-      onLongPress: widget.isInReorderingMode
+      onLongPress: isInReorderingMode
           ? null
           : () => showLoyaltyCardBottomSheets(context, card),
       child: CardSummary(

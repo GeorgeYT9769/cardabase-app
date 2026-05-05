@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:cardabase/data/unique_id.dart';
+import 'package:cardabase/feature/cards/card_list_view_options.dart';
 import 'package:cardabase/feature/cards/edit/widgets/edit_card_page.dart';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/cards/widgets/card_list.dart';
@@ -8,6 +11,7 @@ import 'package:cardabase/feature/settings/widgets/settings_page.dart';
 import 'package:cardabase/pages/home/card_list_view_options_dialog.dart';
 import 'package:cardabase/pages/home/password_challenge_dialog.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
+import 'package:cardabase/util/widgets/multi_listenable_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get_it/get_it.dart';
@@ -21,17 +25,48 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomePageState extends State<Homepage> {
-  final _settingsBox = GetIt.I<SettingsBox>();
-
+  final settingsBox = GetIt.I<SettingsBox>();
   final cardsBox = GetIt.I<LoyaltyCardsBox>();
   final passwordBox = Hive.box('password');
 
-  bool isInReorderingMode = false;
-  String? tagFilter;
+  late final settings = settingsBox.value.editable();
+
+  final isInReorderingMode = ValueNotifier(false);
+  final tagFilter = ValueNotifier<String?>(null);
+
+  StreamSubscription? cardsSubscription;
+  StreamSubscription? settingsSubscription;
+
+  late List<LoyaltyCard> cardsToDisplay;
 
   @override
   void initState() {
     super.initState();
+    settingsSubscription = settingsBox.watch().listen((_) {
+      settings.loadValue(settingsBox.value);
+      setState(() {});
+    });
+    cardsSubscription = settingsBox.watch().listen((_) => setState(() {}));
+    cardsToDisplay = listCardsToDisplay();
+  }
+
+  @override
+  void dispose() {
+    cardsSubscription?.cancel();
+    settingsSubscription?.cancel();
+    super.dispose();
+  }
+
+  List<LoyaltyCard> listCardsToDisplay() {
+    final allCards = cardsBox.values.toList(growable: false);
+    settings.cardListViewOptions.seal().sortCards(allCards);
+    final tagFilter = this.tagFilter.value;
+    if (tagFilter == null || isInReorderingMode.value) {
+      return allCards;
+    }
+    return allCards
+        .where((card) => card.tags.contains(tagFilter))
+        .toList(growable: false);
   }
 
   Future<void> addCard() {
@@ -43,6 +78,12 @@ class _HomePageState extends State<Homepage> {
         ),
       ),
     );
+  }
+
+  Future<void> moveCard(int oldIndex, int newIndex) {
+    settings.cardListViewOptions.customOrder.move(oldIndex, newIndex);
+    settings.cardListViewOptions.sortingStyle.value = SortingStyle.custom;
+    return settingsBox.save(settings.seal());
   }
 
   Future<void> editCard(ThemeData theme, LoyaltyCard card) async {
@@ -71,36 +112,21 @@ class _HomePageState extends State<Homepage> {
   }
 
   Future<void> showCardListViewOptionsDialog() async {
-    final settings = _settingsBox.value;
-    final isInReorderingMode = ValueNotifier(this.isInReorderingMode);
-    final tagFilter = ValueNotifier(this.tagFilter);
-    final editableSettings = settings.editable();
-
-    try {
-      await showDialog(
-        context: context,
-        builder: (context) => CardListViewOptionsDialog(
-          allTags: settings.tags,
-          isInReorderingMode: isInReorderingMode,
-          tagFilter: tagFilter,
-          sortingStyle: editableSettings.cardListViewOptions.sortingStyle,
-          numberOfColumns: editableSettings.cardListViewOptions.numberOfColumns,
-          sortNameCaseInsensitive:
-              editableSettings.cardListViewOptions.sortNameCaseInsensitive,
-          sortNameIgnoreAccents:
-              editableSettings.cardListViewOptions.sortNameIgnoreAccents,
-        ),
-      );
-      await _settingsBox.save(editableSettings.seal());
-      setState(() {
-        this.isInReorderingMode = isInReorderingMode.value;
-        this.tagFilter = tagFilter.value;
-      });
-    } finally {
-      isInReorderingMode.dispose();
-      tagFilter.dispose();
-      editableSettings.dispose();
-    }
+    await showDialog(
+      context: context,
+      builder: (context) => CardListViewOptionsDialog(
+        allTags: settings.tags,
+        isInReorderingMode: isInReorderingMode,
+        tagFilter: tagFilter,
+        sortingStyle: settings.cardListViewOptions.sortingStyle,
+        numberOfColumns: settings.cardListViewOptions.numberOfColumns,
+        sortNameCaseInsensitive:
+            settings.cardListViewOptions.sortNameCaseInsensitive,
+        sortNameIgnoreAccents:
+            settings.cardListViewOptions.sortNameIgnoreAccents,
+      ),
+    );
+    await settingsBox.save(settings.seal());
   }
 
   Future<void> navigateToWelcomeScreen() {
@@ -128,54 +154,62 @@ class _HomePageState extends State<Homepage> {
       backgroundColor: theme.colorScheme.surface,
       floatingActionButton: _addCardButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      body: ValueListenableBuilder(
-        valueListenable: _settingsBox.listenable(),
-        builder: (context, settingsBox, _) {
-          final settings = settingsBox.value;
-          return CustomScrollView(
-            physics: const BouncingScrollPhysics(
-              decelerationRate: ScrollDecelerationRate.fast,
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(
+          decelerationRate: ScrollDecelerationRate.fast,
+        ),
+        slivers: [
+          SliverAppBar(
+            leading: IconButton(
+              icon: Icon(Icons.sort, color: theme.colorScheme.secondary),
+              onPressed: showCardListViewOptionsDialog,
             ),
-            slivers: [
-              SliverAppBar(
-                leading: IconButton(
-                  icon: Icon(Icons.sort, color: theme.colorScheme.secondary),
-                  onPressed: showCardListViewOptionsDialog,
-                ),
-                actions: [
-                  if (settings.developerOptions.isEnabled)
-                    IconButton(
-                      icon: Icon(
-                        Icons.web_stories,
-                        color: theme.colorScheme.secondary,
-                      ),
-                      onPressed: navigateToWelcomeScreen,
-                    ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.settings,
-                      color: theme.colorScheme.secondary,
-                    ),
-                    onPressed: navigateToSettingsScreen,
+            actions: [
+              if (settings.developerOptions.isEnabled.value)
+                IconButton(
+                  icon: Icon(
+                    Icons.web_stories,
+                    color: theme.colorScheme.secondary,
                   ),
-                ],
-                title: Text(
-                  'Cardabase',
-                  style: theme.textTheme.titleLarge?.copyWith(),
+                  onPressed: navigateToWelcomeScreen,
                 ),
-                centerTitle: true,
-                elevation: 0.0,
-                backgroundColor: theme.colorScheme.surface,
-                floating: true,
-                snap: true,
-              ),
-              CardList(
-                tagFilter: tagFilter,
-                isInReorderingMode: isInReorderingMode,
+              IconButton(
+                icon: Icon(
+                  Icons.settings,
+                  color: theme.colorScheme.secondary,
+                ),
+                onPressed: navigateToSettingsScreen,
               ),
             ],
-          );
-        },
+            title: Text(
+              'Cardabase',
+              style: theme.textTheme.titleLarge?.copyWith(),
+            ),
+            centerTitle: true,
+            elevation: 0.0,
+            backgroundColor: theme.colorScheme.surface,
+            floating: true,
+            snap: true,
+          ),
+          MultiListenableBuilder(
+            listenables: [
+              isInReorderingMode,
+              tagFilter,
+              settings.cardListViewOptions.sortNameIgnoreAccents,
+              settings.cardListViewOptions.sortingStyle,
+              settings.cardListViewOptions.sortNameCaseInsensitive,
+              settings.cardListViewOptions.numberOfColumns,
+              settings.cardListViewOptions.customOrder,
+            ],
+            builder: (context) => CardList(
+              isInReorderingMode: isInReorderingMode.value,
+              numberOfColumns:
+                  settings.cardListViewOptions.numberOfColumns.value,
+              cards: listCardsToDisplay(),
+              moveCard: moveCard,
+            ),
+          ),
+        ],
       ),
     );
   }
