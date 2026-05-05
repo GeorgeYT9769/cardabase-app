@@ -22,13 +22,11 @@ class CardSummary extends StatefulWidget {
     required this.cardId,
     required this.cornerRadius,
     required this.fontSize,
-    required this.marginSize,
   });
 
   final String cardId;
   final double cornerRadius;
   final double fontSize;
-  final double marginSize;
 
   @override
   State<CardSummary> createState() => _CardSummaryState();
@@ -102,54 +100,52 @@ class _CardSummaryState extends State<CardSummary> {
     final foregroundColor = backgroundColor?.contrastingTextColor;
     return Bounceable(
       onTap: () {},
-      child: Container(
-        margin: EdgeInsets.all(widget.marginSize),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: backgroundColor,
-            foregroundColor: foregroundColor,
-            elevation: 0.0,
-            padding: EdgeInsets.zero,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(widget.cornerRadius),
-            ),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor,
+          foregroundColor: foregroundColor,
+          elevation: 0.0,
+          padding: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(widget.cornerRadius),
           ),
-          onPressed: card == null ? null : openCard,
-          child: ClipRRect(
-            borderRadius: BorderRadiusGeometry.circular(widget.cornerRadius),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                if (frontImageFilePath != null && card?.useFrontImageOverlay == true)
-                  Image.file(
-                    File(frontImageFilePath),
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: double.infinity,
-                    errorBuilder: (ctx, error, trace) => CardFaceErrorWidget(
-                      error: error,
-                      stackTrace: trace,
-                    ),
+        ),
+        onPressed: card == null ? null : openCard,
+        child: ClipRRect(
+          borderRadius: BorderRadiusGeometry.circular(widget.cornerRadius),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              if (frontImageFilePath != null &&
+                  card?.useFrontImageOverlay == true)
+                Image.file(
+                  File(frontImageFilePath),
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                  errorBuilder: (ctx, error, trace) => CardFaceErrorWidget(
+                    error: error,
+                    stackTrace: trace,
                   ),
-                _effect(),
-                if (card?.hideName == false)
-                  Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: Center(
-                      child: Text(
-                        card?.name ?? '',
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          fontSize: widget.fontSize,
-                          fontWeight: FontWeight.bold,
-                          color: foregroundColor,
-                        ),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
+                ),
+              _effect(),
+              if (card?.hideName == false)
+                Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: Center(
+                    child: Text(
+                      card?.name ?? '',
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontSize: widget.fontSize,
+                        fontWeight: FontWeight.bold,
+                        color: foregroundColor,
                       ),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
                     ),
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
         ),
       ),

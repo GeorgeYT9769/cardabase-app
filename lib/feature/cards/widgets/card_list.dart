@@ -62,31 +62,30 @@ class CardList extends StatelessWidget {
     }
 
     const childAspectRatio = 1.4;
-    const gridPadding = 8.0;
+    const crossAxisPadding = 8.0;
+    const mainAxisPadding = 8.0;
 
     final sliverChildren =
         cards.map((card) => _card(context, theme, card)).toList();
 
     if (isInReorderingMode) {
-      return SliverPadding(
-        padding: const EdgeInsets.all(gridPadding),
-        sliver: ReorderableSliverGridView.count(
-          crossAxisCount: numberOfColumns,
-          childAspectRatio: childAspectRatio,
-          onReorder: moveCard,
-          children: sliverChildren,
-        ),
+      return ReorderableSliverGridView.count(
+        crossAxisSpacing: crossAxisPadding,
+        mainAxisSpacing: mainAxisPadding,
+        crossAxisCount: numberOfColumns,
+        childAspectRatio: childAspectRatio,
+        onReorder: moveCard,
+        children: sliverChildren,
       );
     } else {
       return SliverGrid(
         delegate: SliverChildBuilderDelegate(
-          (context, index) => Padding(
-            padding: const EdgeInsetsGeometry.all(gridPadding),
-            child: sliverChildren[index],
-          ),
+          (context, index) => sliverChildren[index],
           childCount: sliverChildren.length,
         ),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          mainAxisSpacing: mainAxisPadding,
+          crossAxisSpacing: crossAxisPadding,
           crossAxisCount: numberOfColumns,
           childAspectRatio: childAspectRatio,
         ),
@@ -100,11 +99,15 @@ class CardList extends StatelessWidget {
       onLongPress: isInReorderingMode
           ? null
           : () => showLoyaltyCardBottomSheets(context, card),
-      child: CardSummary(
-        cardId: card.id,
-        cornerRadius: numberOfColumns == 1 ? 15 : 20 / numberOfColumns,
-        fontSize: numberOfColumns == 1 ? 50 : 50 / numberOfColumns,
-        marginSize: numberOfColumns == 1 ? 10 : 5 / numberOfColumns,
+      child: Padding(
+        padding: numberOfColumns == 1
+            ? const EdgeInsets.all(10)
+            : EdgeInsets.all(5 / numberOfColumns),
+        child: CardSummary(
+          cardId: card.id,
+          cornerRadius: numberOfColumns == 1 ? 15 : 20 / numberOfColumns,
+          fontSize: numberOfColumns == 1 ? 50 : 50 / numberOfColumns,
+        ),
       ),
     );
   }
