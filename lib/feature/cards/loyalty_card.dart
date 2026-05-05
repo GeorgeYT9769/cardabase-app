@@ -264,7 +264,7 @@ class LoyaltyCard {
       notes: jsonMap.getString('notes'),
       frontImagePath: null,
       backImagePath: null,
-      useFrontImageOverlay: false,
+      useFrontImageOverlay: jsonMap.getBool('useFrontImageOverlay') ?? false,
       points: jsonMap.getInt('points') ?? 0,
       requiresAuth: jsonMap.getBool('requiresAuth') ?? false,
       hideName: jsonMap.getBool('hideName') ?? false,
@@ -290,6 +290,8 @@ class LoyaltyCard {
       if (points != 0) 'points': points,
       if (requiresAuth != false) 'requiresAuth': requiresAuth,
       if (hideName != false) 'hideName': hideName,
+      if (useFrontImageOverlay != false)
+        'useFrontImageOverlay': useFrontImageOverlay,
     };
   }
 

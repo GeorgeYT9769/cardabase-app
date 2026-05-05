@@ -120,7 +120,7 @@ class _CardSummaryState extends State<CardSummary> {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                if (frontImageFilePath != null)
+                if (frontImageFilePath != null && card?.useFrontImageOverlay == true)
                   Image.file(
                     File(frontImageFilePath),
                     fit: BoxFit.cover,
