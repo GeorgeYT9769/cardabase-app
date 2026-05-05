@@ -12,13 +12,13 @@
     <!-- <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a> https://discord.com/invite/fZNDfG2xv3 -->
     <br />
     <div align="center">
-      <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Stars">
-      <img alt="GitHub forks" src="https://img.shields.io/github/forks/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Forks">
-      <img alt="GitHub license" src="https://img.shields.io/github/license/GeorgeYT9769/cardabase-app?style=for-the-badge&label=License">
-      <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/GeorgeYT9769/cardabase-app/total?style=for-the-badge&label=Downloads">
-      <img alt="Downloads@latest" src="https://img.shields.io/github/downloads/GeorgeYT9769/cardabase-app/latest/total?style=for-the-badge">
-      <img alt="Commit Activity" src="https://img.shields.io/github/commit-activity/w/GeorgeYT9769/cardabase-app?style=for-the-badge">
-      <img alt="F-Droid" src="https://img.shields.io/f-droid/v/com.georgeyt9769.cardabase?style=for-the-badge&label=F-Droid">
+      <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Stars&color=001b3d">
+      <img alt="GitHub forks" src="https://img.shields.io/github/forks/GeorgeYT9769/cardabase-app?style=for-the-badge&label=Forks&color=001b3d">
+      <img alt="GitHub license" src="https://img.shields.io/github/license/GeorgeYT9769/cardabase-app?style=for-the-badge&label=License&color=001b3d">
+      <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/GeorgeYT9769/cardabase-app/total?style=for-the-badge&label=Downloads&color=001b3d">
+      <img alt="Downloads@latest" src="https://img.shields.io/github/downloads/GeorgeYT9769/cardabase-app/latest/total?style=for-the-badge&color=001b3d">
+      <img alt="Commit Activity" src="https://img.shields.io/github/commit-activity/w/GeorgeYT9769/cardabase-app?style=for-the-badge&color=001b3d">
+      <img alt="F-Droid" src="https://img.shields.io/f-droid/v/com.georgeyt9769.cardabase?style=for-the-badge&label=F-Droid&color=001b3d">
       <br />
       <a href="https://discord.com/invite/fZNDfG2xv3">
         <img alt="Discord" src="https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white">
@@ -41,7 +41,7 @@
 - Does not need internet connection
 
 ## 🛡️ Security
-More info [here](https://www.virustotal.com/gui/file/16c68fd2161573f337b175c8c68a9be98f416b9bd91790286c44bb13466e6526/behavior)
+More info [here](https://www.virustotal.com/gui/file/16c68fd2161573f337b175c8c68a9be98f416b9bd91790286c44bb13466e6526)
 
 ## 📲 Installation
 
@@ -51,7 +51,11 @@ height="80">](https://f-droid.org/packages/com.georgeyt9769.cardabase/)
 
 OR
 
-1. Download [latest official release](https://github.com/GeorgeYT9769/cardabase-app/releases/latest).
+[<img src="https://i.ibb.co/q0mdc4Z/get-it-on-github.png"
+alt="Get it on GitHub"
+height="80">](https://github.com/GeorgeYT9769/cardabase-app/releases/latest)
+
+1. ⬆️ Download [latest official release](https://github.com/GeorgeYT9769/cardabase-app/releases/latest) ⬆️.
 2. Locate the "cardabase-(version you got).apk" file (usually in the Internal storage/Downloads folder).
 3. Allow installing apps from unknown sources.
 4. Install it by clicking on the "Install" button.
