@@ -56,21 +56,24 @@ Future<void> _ensureCustomOrderContainsAllCards(
   LoyaltyCardsBox cardsBox,
   SettingsBox settingsBox,
 ) async {
-  final allCardIds =
-      cardsBox.values.map((card) => card.id).toList(growable: false);
+  final allCards = cardsBox.values.toList(growable: false);
 
   final settings = settingsBox.value;
+
+  // sort cards according to the users preference before adapting it in the
+  // custom order.
+  settings.cardListViewOptions.sortCards(allCards);
 
   final idsToAdd = <String>[];
   final idsToRemove = <String>[];
 
-  for (final cardId in allCardIds) {
-    if (!settings.cardListViewOptions.customOrder.contains(cardId)) {
-      idsToAdd.add(cardId);
+  for (final card in allCards) {
+    if (!settings.cardListViewOptions.customOrder.contains(card.id)) {
+      idsToAdd.add(card.id);
     }
   }
   for (final cardId in settings.cardListViewOptions.customOrder) {
-    if (!allCardIds.contains(cardId)) {
+    if (!allCards.any((card) => card.id == cardId)) {
       idsToRemove.add(cardId);
     }
   }
