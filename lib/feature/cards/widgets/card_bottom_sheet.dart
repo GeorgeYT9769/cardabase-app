@@ -122,7 +122,7 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
 
   Future<void> _deleteCard() async {
     Navigator.of(context).pop();
-    await cardsBox.delete(widget.loyaltyCard.id);
+    await cardsBox.delete(widget.loyaltyCard.id); //TODO: deleting a card produces empty ghost card, still clickable, opens empty space with null points
   }
 
   @override
