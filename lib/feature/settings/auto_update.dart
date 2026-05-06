@@ -1,12 +1,14 @@
+import 'package:cardabase/feature/cards/import_export/export_cards.dart';
+import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
-import 'package:cardabase/util/export_data.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_ce/hive.dart';
 
 Future<void> autoUpdateAfterInterval(
   BuildContext context,
   Box<Settings> settingsBox,
+  LoyaltyCardsBox cardsBox,
 ) async {
   final settings = settingsBox.value;
   final backupSettings = settings.autoBackups;
@@ -20,7 +22,10 @@ Future<void> autoUpdateAfterInterval(
     return;
   }
 
-  await exportCardList(context, toFile: true);
+  await exportCardsAsFile(
+    cardsBox.values,
+    directoryPath: settings.customExportPath,
+  );
 
   final editableSettings = settings.editable();
   editableSettings.autoBackups.lastUpdate.value = DateTime.now().toUtc();

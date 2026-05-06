@@ -25,7 +25,8 @@ class SettingsAdapter extends TypeAdapter<Settings> {
       vibrateOnDifferentActions: fields[5] as bool,
       tags: (fields[6] as List).cast<String>(),
       cardListViewOptions: fields[7] as CardListViewOptions,
-      customExportPath: fields[8] as String?,
+      customExportPath:
+          fields[8] == null ? 'Download/Cardabase' : fields[8] as String,
     );
   }
 
@@ -219,49 +220,6 @@ class DeveloperOptionsAdapter extends TypeAdapter<DeveloperOptions> {
           typeId == other.typeId;
 }
 
-class CardListViewOptionsAdapter extends TypeAdapter<CardListViewOptions> {
-  @override
-  final typeId = 7;
-
-  @override
-  CardListViewOptions read(BinaryReader reader) {
-    final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
-    };
-    return CardListViewOptions(
-      numberOfColumns: (fields[0] as num).toInt(),
-      sortingStyle: fields[1] as SortingStyle,
-      sortNameCaseInsensitive: fields[2] == null ? false : fields[2] as bool,
-      sortNameIgnoreAccents: fields[3] == null ? false : fields[3] as bool,
-    );
-  }
-
-  @override
-  void write(BinaryWriter writer, CardListViewOptions obj) {
-    writer
-      ..writeByte(4)
-      ..writeByte(0)
-      ..write(obj.numberOfColumns)
-      ..writeByte(1)
-      ..write(obj.sortingStyle)
-      ..writeByte(2)
-      ..write(obj.sortNameCaseInsensitive)
-      ..writeByte(3)
-      ..write(obj.sortNameIgnoreAccents);
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is CardListViewOptionsAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
 class LoyaltyCardEffectAdapter extends TypeAdapter<LoyaltyCardEffect> {
   @override
   final typeId = 4;
@@ -299,51 +257,6 @@ class LoyaltyCardEffectAdapter extends TypeAdapter<LoyaltyCardEffect> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is LoyaltyCardEffectAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
-}
-
-class SortingStyleAdapter extends TypeAdapter<SortingStyle> {
-  @override
-  final typeId = 6;
-
-  @override
-  SortingStyle read(BinaryReader reader) {
-    switch (reader.readByte()) {
-      case 0:
-        return SortingStyle.nameAz;
-      case 1:
-        return SortingStyle.nameZa;
-      case 2:
-        return SortingStyle.latest;
-      case 3:
-        return SortingStyle.oldest;
-      default:
-        return SortingStyle.nameAz;
-    }
-  }
-
-  @override
-  void write(BinaryWriter writer, SortingStyle obj) {
-    switch (obj) {
-      case SortingStyle.nameAz:
-        writer.writeByte(0);
-      case SortingStyle.nameZa:
-        writer.writeByte(1);
-      case SortingStyle.latest:
-        writer.writeByte(2);
-      case SortingStyle.oldest:
-        writer.writeByte(3);
-    }
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is SortingStyleAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

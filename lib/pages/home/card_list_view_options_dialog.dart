@@ -1,9 +1,9 @@
-import 'package:cardabase/feature/settings/model.dart';
+import 'package:cardabase/feature/cards/card_list_view_options.dart';
 import 'package:cardabase/pages/home/form_fields/number_of_columns_slider.dart';
 import 'package:cardabase/pages/home/form_fields/sorting_style_selector.dart';
-import 'package:cardabase/util/setting_tile.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get_it/get_it.dart';
 
 class CardListViewOptionsDialog extends StatelessWidget {
@@ -60,7 +60,8 @@ class CardListViewOptionsDialog extends StatelessWidget {
                         const SizedBox(height: 10),
                         ValueListenableBuilder<bool>(
                           valueListenable: sortNameCaseInsensitive,
-                          builder: (context, isCaseInsensitive, _) => SwitchListTile(
+                          builder: (context, isCaseInsensitive, _) =>
+                              SwitchListTile(
                             title: Text(
                               'Case Insensitive',
                               style: theme.textTheme.bodyLarge?.copyWith(
@@ -78,7 +79,8 @@ class CardListViewOptionsDialog extends StatelessWidget {
                         const SizedBox(height: 10),
                         ValueListenableBuilder<bool>(
                           valueListenable: sortNameIgnoreAccents,
-                          builder: (context, ignoreAccents, _) => SwitchListTile(
+                          builder: (context, ignoreAccents, _) =>
+                              SwitchListTile(
                             title: Text(
                               'Ignore Accents',
                               style: theme.textTheme.bodyLarge?.copyWith(
@@ -138,26 +140,29 @@ class CardListViewOptionsDialog extends StatelessWidget {
       ),
       actions: [
         Center(
-          child: OutlinedButton(
-            style: OutlinedButton.styleFrom(
-              elevation: 0.0,
-              side: BorderSide(
-                color: theme.colorScheme.primary,
-                width: 2.0,
+          child: Bounceable(
+            onTap: () {},
+            child: OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                elevation: 0.0,
+                side: BorderSide(
+                  color: theme.colorScheme.primary,
+                  width: 2.0,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(11),
+                ),
               ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(11),
-              ),
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text(
-              'SELECT',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-                color: theme.colorScheme.inverseSurface,
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'SELECT',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                  color: theme.colorScheme.inverseSurface,
+                ),
               ),
             ),
           ),

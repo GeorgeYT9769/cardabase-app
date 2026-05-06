@@ -214,7 +214,9 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                       theme.colorScheme.inverseSurface,
                     ),
                   ),
-                  icon: const Icon(Icons.arrow_back_ios_new),
+                  icon: const Icon(
+                    Icons.arrow_back_ios_new,
+                  ),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },

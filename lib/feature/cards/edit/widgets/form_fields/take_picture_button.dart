@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:cardabase/feature/cards/card_face_error_widget.dart';
 import 'package:cardabase/util/camera_controller.dart';
 import 'package:cardabase/util/dashed_rect.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 
@@ -25,10 +27,17 @@ class _TakePictureButtonState extends State<TakePictureButton> {
   }
 
   Future<void> _takePicture() async {
-    final picturePath = await Navigator.push<String>(
-      context,
-      MaterialPageRoute(builder: (context) => const CameraControllerScreen()),
-    );
+    late final String? picturePath;
+    if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+      final result = await FilePicker.pickFiles();
+      picturePath = result?.files.map((file) => file.path).firstOrNull;
+    } else {
+      picturePath = await Navigator.push<String>(
+        context,
+        MaterialPageRoute(builder: (context) => const CameraControllerScreen()),
+      );
+    }
+
     if (!mounted || picturePath == null) {
       return;
     }
@@ -71,15 +80,7 @@ class _TakePictureButtonState extends State<TakePictureButton> {
                 child: ValueListenableBuilder(
                   valueListenable: widget.picturePath,
                   builder: (context, path, _) => path != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
-                          child: Image.file(
-                            File(path),
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: double.infinity,
-                          ),
-                        )
+                      ? _imagePreview(context, path)
                       : Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -94,6 +95,22 @@ class _TakePictureButtonState extends State<TakePictureButton> {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _imagePreview(BuildContext context, String path) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(15),
+      child: Image.file(
+        File(path),
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        errorBuilder: (context, error, stackTrace) => CardFaceErrorWidget(
+          error: error,
+          stackTrace: stackTrace,
         ),
       ),
     );

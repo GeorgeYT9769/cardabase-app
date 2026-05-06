@@ -1,3 +1,4 @@
+import 'package:cardabase/feature/cards/edit/editable_card_list_view_options.dart';
 import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/util/list_notifier.dart';
 import 'package:flutter/foundation.dart';
@@ -41,7 +42,7 @@ class EditableSettings {
   final ValueNotifier<bool> vibrateOnDifferentActions;
   final ListNotifier<String> tags;
   final EditableCardListViewOptions cardListViewOptions;
-  final ValueNotifier<String?> customExportPath;
+  final ValueNotifier<String> customExportPath;
 
   void loadValue(Settings value) {
     lastSeenAppVersion.value = value.lastSeenAppVersion;
@@ -225,51 +226,5 @@ class EditableDeveloperOptions {
 
   void dispose() {
     isEnabled.dispose();
-  }
-}
-
-class EditableCardListViewOptions {
-  const EditableCardListViewOptions({
-    required this.numberOfColumns,
-    required this.sortingStyle,
-    required this.sortNameCaseInsensitive,
-    required this.sortNameIgnoreAccents,
-  });
-
-  factory EditableCardListViewOptions.fromValue(CardListViewOptions value) {
-    return EditableCardListViewOptions(
-      numberOfColumns: ValueNotifier(value.numberOfColumns),
-      sortingStyle: ValueNotifier(value.sortingStyle),
-      sortNameCaseInsensitive: ValueNotifier((value.sortNameCaseInsensitive as bool?) ?? false),
-      sortNameIgnoreAccents: ValueNotifier((value.sortNameIgnoreAccents as bool?) ?? false),
-    );
-  }
-
-  final ValueNotifier<int> numberOfColumns;
-  final ValueNotifier<SortingStyle> sortingStyle;
-  final ValueNotifier<bool> sortNameCaseInsensitive;
-  final ValueNotifier<bool> sortNameIgnoreAccents;
-
-  void loadValue(CardListViewOptions value) {
-    numberOfColumns.value = value.numberOfColumns;
-    sortingStyle.value = value.sortingStyle;
-    sortNameCaseInsensitive.value = (value.sortNameCaseInsensitive as bool?) ?? false;
-    sortNameIgnoreAccents.value = (value.sortNameIgnoreAccents as bool?) ?? false;
-  }
-
-  CardListViewOptions seal() {
-    return CardListViewOptions(
-      numberOfColumns: numberOfColumns.value,
-      sortingStyle: sortingStyle.value,
-      sortNameCaseInsensitive: sortNameCaseInsensitive.value,
-      sortNameIgnoreAccents: sortNameIgnoreAccents.value,
-    );
-  }
-
-  void dispose() {
-    numberOfColumns.dispose();
-    sortingStyle.dispose();
-    sortNameCaseInsensitive.dispose();
-    sortNameIgnoreAccents.dispose();
   }
 }

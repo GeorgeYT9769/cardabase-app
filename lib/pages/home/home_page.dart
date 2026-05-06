@@ -1,20 +1,21 @@
-import 'dart:math';
+import 'dart:async';
 
-import 'package:cardabase/data/cardabase_db.dart';
-import 'package:cardabase/data/loyalty_card.dart';
+import 'package:cardabase/data/unique_id.dart';
+import 'package:cardabase/feature/cards/card_list_view_options.dart';
+import 'package:cardabase/feature/cards/edit/widgets/edit_card_page.dart';
+import 'package:cardabase/feature/cards/loyalty_card.dart';
+import 'package:cardabase/feature/cards/widgets/card_list.dart';
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/feature/settings/widgets/settings_page.dart';
-import 'package:cardabase/pages/edit_card/edit_card.dart';
 import 'package:cardabase/pages/home/card_list_view_options_dialog.dart';
 import 'package:cardabase/pages/home/password_challenge_dialog.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
-import 'package:cardabase/util/card_tile.dart';
+import 'package:cardabase/util/widgets/multi_listenable_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
-import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -24,98 +25,65 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomePageState extends State<Homepage> {
-  final _settingsBox = GetIt.I<SettingsBox>();
-
-  final CardabaseDb cdb = CardabaseDb();
+  final settingsBox = GetIt.I<SettingsBox>();
+  final cardsBox = GetIt.I<LoyaltyCardsBox>();
   final passwordBox = Hive.box('password');
 
-  bool isInReorderingMode = false;
-  String? tagFilter;
+  late final settings = settingsBox.value.editable();
+
+  final isInReorderingMode = ValueNotifier(false);
+  final tagFilter = ValueNotifier<String?>(null);
+
+  StreamSubscription? cardsSubscription;
+  StreamSubscription? settingsSubscription;
+
+  late List<LoyaltyCard> cardsToDisplay;
 
   @override
   void initState() {
     super.initState();
-    cdb.loadData();
+    settingsSubscription = settingsBox.watch().listen((_) {
+      settings.loadValue(settingsBox.value);
+      setState(() {});
+    });
+    cardsSubscription = settingsBox.watch().listen((_) => setState(() {}));
+    cardsToDisplay = listCardsToDisplay();
   }
 
-  String removeDiacritics(String str) {
-    var withDia = 'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž';
-    var withoutDia = 'AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz';
+  @override
+  void dispose() {
+    cardsSubscription?.cancel();
+    settingsSubscription?.cancel();
+    super.dispose();
+  }
 
-    for (int i = 0; i < withDia.length; i++) {
-      str = str.replaceAll(withDia[i], withoutDia[i]);
+  List<LoyaltyCard> listCardsToDisplay() {
+    final allCards = cardsBox.values.toList(growable: false);
+    settings.cardListViewOptions.seal().sortCards(allCards);
+    final tagFilter = this.tagFilter.value;
+    if (tagFilter == null || isInReorderingMode.value) {
+      return allCards;
     }
-    return str;
+    return allCards
+        .where((card) => card.tags.contains(tagFilter))
+        .toList(growable: false);
   }
 
-  void saveAndApplySortingStyle() {
-    final sortOptions = _settingsBox.value.cardListViewOptions;
-    switch (sortOptions.sortingStyle) {
-      case SortingStyle.nameAz:
-      case SortingStyle.nameZa:
-        cdb.myShops.sort((a, b) {
-          String nameA = a['cardName'] as String;
-          String nameB = b['cardName'] as String;
-          if (sortOptions.sortNameIgnoreAccents) {
-            nameA = removeDiacritics(nameA);
-            nameB = removeDiacritics(nameB);
-          }
-          if (sortOptions.sortNameCaseInsensitive) {
-            nameA = nameA.toLowerCase();
-            nameB = nameB.toLowerCase();
-          }
-          return sortOptions.sortingStyle == SortingStyle.nameAz
-              ? nameA.compareTo(nameB)
-              : nameB.compareTo(nameA);
-        });
-      case SortingStyle.latest:
-        cdb.myShops.sort((a, b) {
-          return b['uniqueId'].compareTo(a['uniqueId']);
-        });
-      case SortingStyle.oldest:
-        cdb.myShops.sort((a, b) {
-          return a['uniqueId'].compareTo(b['uniqueId']);
-        });
-    }
-    cdb.updateDataBase();
-    setState(() {});
-  }
-
-  Future<void> deleteCard(ThemeData theme, LoyaltyCard card) async {
-    if (passwordBox.isNotEmpty && card.requiresAuth) {
-      final success = await showDialog<bool>(
-        context: context,
-        builder: (context) => PasswordChallengeDialog(
-          challengeButtonChild: Text(
-            'DELETE',
-            style: theme.textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
-            ),
-          ),
-        ),
-      ).then((value) => value ?? false);
-
-      if (!success || !mounted) {
-        return;
-      }
-    }
-
-    cdb.remove(card.uniqueId);
-    setState(() {});
-  }
-
-  Future<void> addCard() async {
-    await Navigator.push(
+  Future<void> addCard() {
+    return Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (builder) => EditCard(
-          card: LoyaltyCard.empty(),
+        builder: (builder) => EditCardPage(
+          cardId: generateUniqueId(),
         ),
       ),
     );
-    cdb.loadData();
-    setState(() {});
+  }
+
+  Future<void> moveCard(int oldIndex, int newIndex) {
+    settings.cardListViewOptions.customOrder.move(oldIndex, newIndex);
+    settings.cardListViewOptions.sortingStyle.value = SortingStyle.custom;
+    return settingsBox.save(settings.seal());
   }
 
   Future<void> editCard(ThemeData theme, LoyaltyCard card) async {
@@ -139,42 +107,26 @@ class _HomePageState extends State<Homepage> {
     }
     await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => EditCard(card: card)),
+      MaterialPageRoute(builder: (context) => EditCardPage(cardId: card.id)),
     );
-
-    setState(() => cdb.loadData());
   }
 
   Future<void> showCardListViewOptionsDialog() async {
-    final settings = _settingsBox.value;
-    final isInReorderingMode = ValueNotifier(this.isInReorderingMode);
-    final tagFilter = ValueNotifier(this.tagFilter);
-    final editableSettings = settings.editable();
-
-    try {
-      await showDialog(
-        context: context,
-        builder: (context) => CardListViewOptionsDialog(
-          allTags: settings.tags,
-          isInReorderingMode: isInReorderingMode,
-          tagFilter: tagFilter,
-          sortingStyle: editableSettings.cardListViewOptions.sortingStyle,
-          numberOfColumns: editableSettings.cardListViewOptions.numberOfColumns,
-          sortNameCaseInsensitive: editableSettings.cardListViewOptions.sortNameCaseInsensitive,
-          sortNameIgnoreAccents: editableSettings.cardListViewOptions.sortNameIgnoreAccents,
-        ),
-      );
-      await _settingsBox.save(editableSettings.seal());
-      setState(() {
-        this.isInReorderingMode = isInReorderingMode.value;
-        this.tagFilter = tagFilter.value;
-      });
-      saveAndApplySortingStyle();
-    } finally {
-      isInReorderingMode.dispose();
-      tagFilter.dispose();
-      editableSettings.dispose();
-    }
+    await showDialog(
+      context: context,
+      builder: (context) => CardListViewOptionsDialog(
+        allTags: settings.tags,
+        isInReorderingMode: isInReorderingMode,
+        tagFilter: tagFilter,
+        sortingStyle: settings.cardListViewOptions.sortingStyle,
+        numberOfColumns: settings.cardListViewOptions.numberOfColumns,
+        sortNameCaseInsensitive:
+            settings.cardListViewOptions.sortNameCaseInsensitive,
+        sortNameIgnoreAccents:
+            settings.cardListViewOptions.sortNameIgnoreAccents,
+      ),
+    );
+    await settingsBox.save(settings.seal());
   }
 
   Future<void> navigateToWelcomeScreen() {
@@ -188,20 +140,11 @@ class _HomePageState extends State<Homepage> {
     );
   }
 
-  Future<void> navigateToSettingsScreen() async {
-    final result = await Navigator.push<bool>(
+  Future<void> navigateToSettingsScreen() {
+    return Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const SettingsPage(),
-      ),
+      MaterialPageRoute(builder: (context) => const SettingsPage()),
     );
-    if (!mounted) {
-      return;
-    }
-    if (result == true) {
-      cdb.loadData();
-      setState(() {});
-    }
   }
 
   @override
@@ -211,173 +154,63 @@ class _HomePageState extends State<Homepage> {
       backgroundColor: theme.colorScheme.surface,
       floatingActionButton: _addCardButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      body: ValueListenableBuilder(
-        valueListenable: _settingsBox.listenable(),
-        builder: (context, settingsBox, _) {
-          final settings = settingsBox.value;
-          return CustomScrollView(
-            physics: const BouncingScrollPhysics(
-              decelerationRate: ScrollDecelerationRate.fast,
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(
+          decelerationRate: ScrollDecelerationRate.fast,
+        ),
+        slivers: [
+          SliverAppBar(
+            leading: IconButton(
+              icon: Icon(Icons.sort, color: theme.colorScheme.secondary),
+              onPressed: showCardListViewOptionsDialog,
             ),
-            slivers: [
-              SliverAppBar(
-                leading: IconButton(
-                  icon: Icon(Icons.sort, color: theme.colorScheme.secondary),
-                  onPressed: showCardListViewOptionsDialog,
-                ),
-                actions: [
-                  if (settings.developerOptions.isEnabled)
-                    IconButton(
-                      icon: Icon(
-                        Icons.web_stories,
-                        color: theme.colorScheme.secondary,
-                      ),
-                      onPressed: navigateToWelcomeScreen,
-                    ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.settings,
-                      color: theme.colorScheme.secondary,
-                    ),
-                    onPressed: navigateToSettingsScreen,
+            actions: [
+              if (settings.developerOptions.isEnabled.value)
+                IconButton(
+                  icon: Icon(
+                    Icons.web_stories,
+                    color: theme.colorScheme.secondary,
                   ),
-                ],
-                title: Text(
-                  'Cardabase',
-                  style: theme.textTheme.titleLarge?.copyWith(),
+                  onPressed: navigateToWelcomeScreen,
                 ),
-                centerTitle: true,
-                elevation: 0.0,
-                backgroundColor: theme.colorScheme.surface,
-                floating: true,
-                snap: true,
+              IconButton(
+                icon: Icon(
+                  Icons.settings,
+                  color: theme.colorScheme.secondary,
+                ),
+                onPressed: navigateToSettingsScreen,
               ),
-              _buildContentSliver(context, theme),
             ],
-          );
-        },
+            title: Text(
+              'Cardabase',
+              style: theme.textTheme.titleLarge?.copyWith(),
+            ),
+            centerTitle: true,
+            elevation: 0.0,
+            backgroundColor: theme.colorScheme.surface,
+            floating: true,
+            snap: true,
+          ),
+          MultiListenableBuilder(
+            listenables: [
+              isInReorderingMode,
+              tagFilter,
+              settings.cardListViewOptions.sortNameIgnoreAccents,
+              settings.cardListViewOptions.sortingStyle,
+              settings.cardListViewOptions.sortNameCaseInsensitive,
+              settings.cardListViewOptions.numberOfColumns,
+              settings.cardListViewOptions.customOrder,
+            ],
+            builder: (context) => CardList(
+              isInReorderingMode: isInReorderingMode.value,
+              numberOfColumns:
+                  settings.cardListViewOptions.numberOfColumns.value,
+              cards: listCardsToDisplay(),
+              moveCard: moveCard,
+            ),
+          ),
+        ],
       ),
-    );
-  }
-
-  Widget _buildContentSliver(BuildContext context, ThemeData theme) {
-    if (cdb.myShops.isEmpty) {
-      return SliverFillRemaining(
-        hasScrollBody: false,
-        child: Stack(
-          children: [
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(32.0),
-                child: Text(
-                  'There is nothing to see...',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyLarge
-                      ?.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 80,
-              right: 60,
-              child: CustomPaint(
-                size: const Size(200, 200),
-                painter: _CurvedArrowPainter(
-                  theme.colorScheme.primary,
-                  'Tap here!',
-                  theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                      fontStyle: FontStyle.italic,
-                      fontSize: 17,
-                    ) ??
-                    const TextStyle(),
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    const childAspectRatio = 1.4;
-    const gridPadding = 8.0;
-
-    final numberOfColumns =
-        _settingsBox.value.cardListViewOptions.numberOfColumns;
-
-    var cards = cdb.getAll();
-    if (tagFilter != null) {
-      cards = cards.where((card) => card.tags.contains(tagFilter));
-    }
-    final sliverChildren = cards
-        .map((card) => _card(theme, card, numberOfColumns))
-        .toList(growable: true);
-
-    if (isInReorderingMode) {
-      return SliverPadding(
-        padding: const EdgeInsets.all(gridPadding),
-        sliver: ReorderableSliverGridView.count(
-          crossAxisCount: numberOfColumns,
-          childAspectRatio: childAspectRatio,
-          children: sliverChildren,
-          onReorder: (oldIndex, newIndex) {
-            cdb.moveByIndex(oldIndex, newIndex);
-            setState(() {});
-          },
-        ),
-      );
-    } else {
-      return SliverPadding(
-        padding: const EdgeInsets.all(gridPadding),
-        sliver: SliverGrid(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) => sliverChildren[index],
-            childCount: sliverChildren.length,
-          ),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: numberOfColumns,
-            childAspectRatio: childAspectRatio,
-          ),
-        ),
-      );
-    }
-  }
-
-  Widget _card(ThemeData theme, LoyaltyCard card, int numberOfColumns) {
-    return CardTile(
-      key: ValueKey(card.uniqueId),
-      shopName: card.name,
-      deleteFunction: (context) => deleteCard(theme, card),
-      cardData: card.data,
-      cardTileColor: card.color ?? Colors.grey,
-      barcodeType: card.barcodeType,
-      hasPassword: card.requiresAuth,
-      editFunction: (context) => editCard(theme, card),
-      moveUpFunction: (context) {
-        cdb.move(card.uniqueId, (index) => index - 1);
-        setState(() {});
-      },
-      moveDownFunction: (context) {
-        cdb.move(card.uniqueId, (index) => index + 1);
-        setState(() {});
-      },
-      duplicateFunction: (context) {
-        cdb.duplicate(card.uniqueId);
-        setState(() {});
-      },
-      labelSize: numberOfColumns == 1 ? 50 : 50 / numberOfColumns,
-      borderSize: numberOfColumns == 1 ? 15 : 20 / numberOfColumns,
-      marginSize: numberOfColumns == 1 ? 10 : 20 / numberOfColumns,
-      tags: card.tags.toList(growable: false),
-      reorderMode: isInReorderingMode,
-      note: card.notes ?? 'Card notes are displayed here...',
-      uniqueId: card.uniqueId,
-      frontImagePath: card.frontImagePath ?? '',
-      backImagePath: card.backImagePath ?? '',
-      useFrontFaceOverlay: card.useFrontFaceOverlay,
-      hideTitle: card.hideTitle,
-      pointsAmount: card.points,
     );
   }
 
@@ -399,67 +232,4 @@ class _HomePageState extends State<Homepage> {
       ),
     );
   }
-}
-
-class _CurvedArrowPainter extends CustomPainter {
-  final Color color;
-  final String text;
-  final TextStyle textStyle;
-
-  _CurvedArrowPainter(this.color, this.text, this.textStyle);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 3
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    final textPainter = TextPainter(
-      text: TextSpan(text: text, style: textStyle),
-      textDirection: TextDirection.ltr,
-    )..layout();
-
-    textPainter.paint(canvas, Offset.zero);
-
-    // Tweak these points to move the arrow easily
-    final startPoint = Offset(textPainter.width / 2, textPainter.height + 10);
-    final endPoint = Offset(size.width / 1.4, size.height * 1.1);
-    final controlPoint = Offset(size.width * 0.1, size.height * 0.7);
-
-    final path = Path();
-    path.moveTo(startPoint.dx, startPoint.dy);
-    path.quadraticBezierTo(
-      controlPoint.dx,
-      controlPoint.dy,
-      endPoint.dx,
-      endPoint.dy,
-    );
-
-    canvas.drawPath(path, paint);
-
-    final dx = endPoint.dx - controlPoint.dx;
-    final dy = endPoint.dy - controlPoint.dy;
-    final angle = atan2(dy, dx);
-    const arrowSize = 25.0;
-    const arrowAngle = pi / 8; // Adjust for wider/narrower head
-
-    final headPath = Path();
-    headPath.moveTo(
-      endPoint.dx - arrowSize * cos(angle - arrowAngle),
-      endPoint.dy - arrowSize * sin(angle - arrowAngle),
-    );
-    headPath.lineTo(endPoint.dx, endPoint.dy);
-    headPath.lineTo(
-      endPoint.dx - arrowSize * cos(angle + arrowAngle),
-      endPoint.dy - arrowSize * sin(angle + arrowAngle),
-    );
-
-    canvas.drawPath(headPath, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant _CurvedArrowPainter oldDelegate) =>
-      oldDelegate.color != color || oldDelegate.text != text;
 }

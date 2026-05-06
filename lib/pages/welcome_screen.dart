@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get_it/get_it.dart';
-import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
 class WelcomeScreen extends StatefulWidget {
   final String currentAppVersion;
@@ -17,6 +16,7 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
+  final settingsBox = GetIt.I<SettingsBox>();
   String? changelog;
   bool expanded = false;
 
@@ -164,12 +164,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   height: MediaQuery.of(context).size.width / 4,
                   child: OutlinedButton(
                     onPressed: () async {
-                      final settingsBox = GetIt.I<SettingsBox>();
                       final editable = settingsBox.value.editable();
-                      editable.lastSeenAppVersion.value = widget.currentAppVersion;
+                      editable.lastSeenAppVersion.value =
+                          widget.currentAppVersion;
                       await settingsBox.save(editable.seal());
                       editable.dispose();
 
+                      if (!mounted) {
+                        return;
+                      }
                       if (context.mounted) {
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(
@@ -214,19 +217,20 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   height: MediaQuery.of(context).size.width / 7,
                   child: OutlinedButton(
                     onPressed: () async {
-                      final settingsBox = GetIt.I<SettingsBox>();
                       final editable = settingsBox.value.editable();
-                      editable.lastSeenAppVersion.value = widget.currentAppVersion;
+                      editable.lastSeenAppVersion.value =
+                          widget.currentAppVersion;
                       await settingsBox.save(editable.seal());
                       editable.dispose();
 
-                      if (context.mounted) {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (context) => const Homepage(),
-                          ),
-                        );
+                      if (!context.mounted) {
+                        return;
                       }
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => const Homepage(),
+                        ),
+                      );
                     },
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(

@@ -1,4 +1,5 @@
-import 'package:cardabase/data/hive_type_ids.dart';
+import 'package:cardabase/data/hive.dart';
+import 'package:cardabase/feature/cards/card_list_view_options.dart';
 import 'package:cardabase/feature/settings/editable_model.dart';
 import 'package:hive_ce/hive.dart';
 
@@ -17,7 +18,7 @@ class Settings {
     required this.vibrateOnDifferentActions,
     required this.tags,
     required this.cardListViewOptions,
-    this.customExportPath,
+    required this.customExportPath,
   });
 
   const Settings.defaultValue()
@@ -30,8 +31,10 @@ class Settings {
           vibrateOnDifferentActions: true,
           tags: const [],
           cardListViewOptions: const CardListViewOptions.defaultValue(),
-          customExportPath: '/storage/emulated/0/Download/Cardabase',
+          customExportPath: defaultCardExportDirectoryPath,
         );
+
+  static const defaultCardExportDirectoryPath = 'Download/Cardabase';
 
   @HiveField(0)
   final String? lastSeenAppVersion;
@@ -49,8 +52,8 @@ class Settings {
   final List<String> tags;
   @HiveField(7)
   final CardListViewOptions cardListViewOptions;
-  @HiveField(8)
-  final String? customExportPath;
+  @HiveField(8, defaultValue: defaultCardExportDirectoryPath)
+  final String customExportPath;
 
   EditableSettings editable() => EditableSettings.fromValue(this);
 }
@@ -152,48 +155,5 @@ class DeveloperOptions {
 
   EditableDeveloperOptions editable() {
     return EditableDeveloperOptions.fromValue(this);
-  }
-}
-
-@HiveType(typeId: HiveTypeIds.sortingStyle)
-enum SortingStyle {
-  @HiveField(0)
-  nameAz,
-  @HiveField(1)
-  nameZa,
-  @HiveField(2)
-  latest,
-  @HiveField(3)
-  oldest
-}
-
-@HiveType(typeId: HiveTypeIds.cardListViewOptions)
-class CardListViewOptions {
-  const CardListViewOptions({
-    required this.numberOfColumns,
-    required this.sortingStyle,
-    required this.sortNameCaseInsensitive,
-    required this.sortNameIgnoreAccents,
-  });
-
-  const CardListViewOptions.defaultValue()
-      : this(
-          numberOfColumns: 1,
-          sortingStyle: SortingStyle.latest,
-          sortNameCaseInsensitive: false,
-          sortNameIgnoreAccents: false,
-        );
-
-  @HiveField(0)
-  final int numberOfColumns;
-  @HiveField(1)
-  final SortingStyle sortingStyle;
-  @HiveField(2, defaultValue: false)
-  final bool sortNameCaseInsensitive;
-  @HiveField(3, defaultValue: false)
-  final bool sortNameIgnoreAccents;
-
-  EditableCardListViewOptions editable() {
-    return EditableCardListViewOptions.fromValue(this);
   }
 }
