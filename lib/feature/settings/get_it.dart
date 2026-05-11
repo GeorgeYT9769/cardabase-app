@@ -105,12 +105,21 @@ Future<void> onCardsChanged(BoxEvent event) async {
   }
 
   final settingsBox = GetIt.I<SettingsBox>();
-  final settings = settingsBox.value;
-  if (settings.cardListViewOptions.customOrder.contains(id)) {
-    return;
+  if (event.deleted) {
+    final settings = settingsBox.value;
+    if (!settings.cardListViewOptions.customOrder.contains(id)) {
+      return;
+    }
+    final editableSettings = settings.editable();
+    editableSettings.cardListViewOptions.customOrder.remove(id);
+    await settingsBox.save(editableSettings.seal());
+  } else {
+    final settings = settingsBox.value;
+    if (settings.cardListViewOptions.customOrder.contains(id)) {
+      return;
+    }
+    final editableSettings = settings.editable();
+    editableSettings.cardListViewOptions.customOrder.add(id);
+    await settingsBox.save(editableSettings.seal());
   }
-
-  final editableSettings = settings.editable();
-  editableSettings.cardListViewOptions.customOrder.add(id);
-  await settingsBox.save(editableSettings.seal());
 }
