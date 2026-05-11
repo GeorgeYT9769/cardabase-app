@@ -61,9 +61,9 @@ class CardList extends StatelessWidget {
       );
     }
 
-    const childAspectRatio = 1.4;
-    const crossAxisPadding = 8.0;
-    const mainAxisPadding = 8.0;
+    const childAspectRatio = 1.57;
+    const crossAxisPadding = 10.0;
+    const mainAxisPadding = 10.0;
 
     final sliverChildren =
         cards.map((card) => _card(context, theme, card)).toList();
