@@ -1,5 +1,5 @@
 import 'package:barcode_widget/barcode_widget.dart';
-import 'package:cardabase/pages/full_screen_card_face/full_screen_card_face_page.dart';
+import 'package:cardabase/feature/cards/widgets/full_screen_card_face_page.dart';
 import 'package:flutter/material.dart';
 
 class CardFace extends StatelessWidget {
@@ -12,7 +12,7 @@ class CardFace extends StatelessWidget {
   });
 
   factory CardFace.barcode({
-    required Color cardTileColor,
+    required Color? cardTileColor,
     required String cardData,
     required BarcodeType barcodeType,
     required bool showWhiteOutline,
@@ -45,7 +45,7 @@ class CardFace extends StatelessWidget {
   }
 
   factory CardFace.image({
-    required Color cardTileColor,
+    required Color? cardTileColor,
     required ImageProvider image,
     required bool showWhiteOutline,
   }) {
@@ -67,7 +67,7 @@ class CardFace extends StatelessWidget {
     );
   }
 
-  final Color cardTileColor;
+  final Color? cardTileColor;
   final WidgetBuilder fullScreenBuilder;
   final Widget child;
   final bool showWhiteOutline;
@@ -87,16 +87,16 @@ class CardFace extends StatelessWidget {
           borderRadius: BorderRadius.circular(15),
         ),
         child: showWhiteOutline
-          ? Container(
-            height: 120,
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10.0),
-              color: Colors.white,
-            ),
-            child: child,
-          )
-          : child,
+            ? Container(
+                height: 120,
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0),
+                  color: Colors.white,
+                ),
+                child: child,
+              )
+            : child,
       ),
     );
   }

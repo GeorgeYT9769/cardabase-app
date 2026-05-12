@@ -3,13 +3,17 @@
 // Check in to version control
 
 import 'package:hive_ce/hive_ce.dart';
+import 'package:cardabase/feature/cards/card_list_view_options.dart';
+import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/settings/model.dart';
 
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
     registerAdapter(AutoBackupSettingsAdapter());
+    registerAdapter(BarcodeAdapter());
     registerAdapter(CardListViewOptionsAdapter());
     registerAdapter(DeveloperOptionsAdapter());
+    registerAdapter(LoyaltyCardAdapter());
     registerAdapter(LoyaltyCardEffectAdapter());
     registerAdapter(LoyaltyCardEffectSettingsAdapter());
     registerAdapter(SettingsAdapter());
@@ -21,8 +25,10 @@ extension HiveRegistrar on HiveInterface {
 extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
     registerAdapter(AutoBackupSettingsAdapter());
+    registerAdapter(BarcodeAdapter());
     registerAdapter(CardListViewOptionsAdapter());
     registerAdapter(DeveloperOptionsAdapter());
+    registerAdapter(LoyaltyCardAdapter());
     registerAdapter(LoyaltyCardEffectAdapter());
     registerAdapter(LoyaltyCardEffectSettingsAdapter());
     registerAdapter(SettingsAdapter());

@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:cardabase/data/cardabase_db.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
@@ -141,9 +140,6 @@ class _CloudBackupState extends State<CloudBackup> {
 
         final Box myBox = Hive.box('mybox');
         myBox.put('CARDLIST', downloadedCards);
-
-        final CardabaseDb cdb = CardabaseDb();
-        cdb.loadData();
 
         GetIt.I<VibrationProvider>().vibrateSuccess();
         ScaffoldMessenger.of(context).showSnackBar(

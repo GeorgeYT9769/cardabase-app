@@ -1,9 +1,9 @@
-import 'package:cardabase/feature/settings/model.dart';
+import 'package:cardabase/feature/cards/card_list_view_options.dart';
 import 'package:cardabase/pages/home/form_fields/number_of_columns_slider.dart';
 import 'package:cardabase/pages/home/form_fields/sorting_style_selector.dart';
-import 'package:cardabase/util/setting_tile.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get_it/get_it.dart';
 
 class CardListViewOptionsDialog extends StatelessWidget {
@@ -58,67 +58,21 @@ class CardListViewOptionsDialog extends StatelessWidget {
                     return Column(
                       children: [
                         const SizedBox(height: 10),
-                        ValueListenableBuilder<bool>(
-                          valueListenable: sortNameCaseInsensitive,
-                          builder: (context, isCaseInsensitive, _) => SwitchListTile(
-                            title: Text(
-                              'Case Insensitive',
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                color: theme.colorScheme.inverseSurface,
-                              ),
-                            ),
-                            activeTrackColor: theme.colorScheme.primary,
-                            value: isCaseInsensitive,
-                            onChanged: (value) {
-                              GetIt.I<VibrationProvider>().vibrateSelection();
-                              sortNameCaseInsensitive.value = value;
-                            },
-                          ),
-                        ),
+                        _caseSensitiveSwitch(theme),
                         const SizedBox(height: 10),
-                        ValueListenableBuilder<bool>(
-                          valueListenable: sortNameIgnoreAccents,
-                          builder: (context, ignoreAccents, _) => SwitchListTile(
-                            title: Text(
-                              'Ignore Accents',
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                color: theme.colorScheme.inverseSurface,
-                              ),
-                            ),
-                            activeTrackColor: theme.colorScheme.primary,
-                            value: ignoreAccents,
-                            onChanged: (value) {
-                              GetIt.I<VibrationProvider>().vibrateSelection();
-                              sortNameIgnoreAccents.value = value;
-                            },
-                          ),
-                        ),
+                        _ignoreAccentsSwitch(theme),
+                      ],
+                    );
+                  } else if (value == SortingStyle.custom) {
+                    return Column(
+                      children: [
+                        const SizedBox(height: 10),
+                        _reorderingModeSwitch(theme),
                       ],
                     );
                   }
                   return const SizedBox.shrink();
                 },
-              ),
-              const SizedBox(height: 10),
-              _divider(theme),
-              const SizedBox(height: 10),
-              _optionTitle(theme, 'Reorder Mode:'),
-              ValueListenableBuilder(
-                valueListenable: isInReorderingMode,
-                builder: (context, value, _) => SwitchListTile(
-                  title: Text(
-                    isInReorderingMode.value ? 'On' : 'Off',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: theme.colorScheme.inverseSurface,
-                    ),
-                  ),
-                  activeTrackColor: theme.colorScheme.primary,
-                  value: value,
-                  onChanged: (newValue) {
-                    GetIt.I<VibrationProvider>().vibrateSelection();
-                    isInReorderingMode.value = newValue;
-                  },
-                ),
               ),
               const SizedBox(height: 10),
               _divider(theme),
@@ -138,29 +92,7 @@ class CardListViewOptionsDialog extends StatelessWidget {
       ),
       actions: [
         Center(
-          child: OutlinedButton(
-            style: OutlinedButton.styleFrom(
-              elevation: 0.0,
-              side: BorderSide(
-                color: theme.colorScheme.primary,
-                width: 2.0,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(11),
-              ),
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text(
-              'SELECT',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-                color: theme.colorScheme.inverseSurface,
-              ),
-            ),
-          ),
+          child: _selectButton(context, theme),
         ),
       ],
     );
@@ -239,6 +171,98 @@ class CardListViewOptionsDialog extends StatelessWidget {
               color: theme.colorScheme.onPrimary,
             )
           : null,
+    );
+  }
+
+  Widget _selectButton(BuildContext context, ThemeData theme) {
+    return Bounceable(
+      onTap: () {},
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          elevation: 0.0,
+          side: BorderSide(
+            color: theme.colorScheme.primary,
+            width: 2.0,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(11),
+          ),
+        ),
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'SELECT',
+          style: theme.textTheme.bodyLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+            color: theme.colorScheme.inverseSurface,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _caseSensitiveSwitch(ThemeData theme) {
+    return ValueListenableBuilder<bool>(
+      valueListenable: sortNameCaseInsensitive,
+      builder: (context, isCaseInsensitive, _) => SwitchListTile(
+        title: Text(
+          'Case Insensitive',
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: theme.colorScheme.inverseSurface,
+          ),
+        ),
+        activeTrackColor: theme.colorScheme.primary,
+        value: sortNameCaseInsensitive.value,
+        onChanged: (value) {
+          GetIt.I<VibrationProvider>().vibrateSelection();
+          sortNameCaseInsensitive.value = value;
+        },
+      ),
+    );
+  }
+
+  Widget _ignoreAccentsSwitch(ThemeData theme) {
+    return ValueListenableBuilder<bool>(
+      valueListenable: sortNameIgnoreAccents,
+      builder: (context, ignoreAccents, _) => SwitchListTile(
+        title: Text(
+          'Ignore Accents',
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: theme.colorScheme.inverseSurface,
+          ),
+        ),
+        activeTrackColor: theme.colorScheme.primary,
+        value: sortNameIgnoreAccents.value,
+        onChanged: (value) {
+          GetIt.I<VibrationProvider>().vibrateSelection();
+          sortNameIgnoreAccents.value = value;
+        },
+      ),
+    );
+  }
+
+  Widget _reorderingModeSwitch(ThemeData theme) {
+    return ValueListenableBuilder(
+      valueListenable: isInReorderingMode,
+      builder: (context, value, _) => SwitchListTile(
+        title: Text(
+          'Reorder mode',
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: theme.colorScheme.inverseSurface,
+          ),
+        ),
+        activeTrackColor: theme.colorScheme.primary,
+        value: value,
+        onChanged: (newValue) {
+          if (sortingStyle.value != SortingStyle.custom) {
+            return;
+          }
+          GetIt.I<VibrationProvider>().vibrateSelection();
+          isInReorderingMode.value = newValue;
+        },
+      ),
     );
   }
 }

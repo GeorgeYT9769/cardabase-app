@@ -27,7 +27,7 @@ class _BugReportDialogState extends State<BugReportDialog> {
       setState(() => isSending = true);
 
       final sent = await _sendToDiscordWebhook(text);
-      if (!context.mounted) {
+      if (!mounted) {
         return;
       }
       Navigator.pop(context);

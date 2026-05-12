@@ -217,6 +217,51 @@ class ListNotifier<T> extends ChangeNotifier
     notifyListeners();
   }
 
+  void moveUp(T element) {
+    final oldIndex = indexOf(element);
+    switch (oldIndex) {
+      case < 0:
+        // if the card does not yet exist in the order, add it at the last place
+        add(element);
+        return;
+      case 0:
+        // nothing to do since the element is already at the top
+        return;
+      case > 0:
+        swap(oldIndex, oldIndex - 1);
+        return;
+    }
+  }
+
+  void moveDown(T element) {
+    final oldIndex = indexOf(element);
+    if (oldIndex < 0) {
+      // if the card does not yet exist in the order, add it at the last place
+      add(element);
+      return;
+    }
+    if (oldIndex >= _value.length - 1) {
+      // nothing to do since the element is already at the bottom
+      return;
+    }
+
+    swap(oldIndex, oldIndex + 1);
+  }
+
+  void swap(int indexA, int indexB) {
+    final elementA = _value[indexA];
+    final elementB = _value[indexB];
+    _value[indexB] = elementA;
+    _value[indexA] = elementB;
+    notifyListeners();
+  }
+
+  void move(int oldIndex, int newIndex) {
+    final element = _value.removeAt(oldIndex);
+    _value.insert(newIndex, element);
+    notifyListeners();
+  }
+
   @override
   Iterable<T> get reversed => _value.reversed;
 

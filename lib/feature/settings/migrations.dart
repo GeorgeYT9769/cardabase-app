@@ -1,7 +1,12 @@
+import 'package:cardabase/feature/cards/card_list_view_options.dart';
 import 'package:cardabase/feature/settings/model.dart';
 import 'package:hive_ce/hive.dart';
 
-Future<void> migrateSettingsTo202603(Box oldBox, Box<Settings> newBox) {
+Future<void> migrateSettingsTo202603(
+  Box oldBox,
+  Box<Settings> newBox,
+  Box cardsBox,
+) {
   if (newBox.isNotEmpty) {
     return Future.value();
   }
@@ -58,7 +63,21 @@ Future<void> migrateSettingsTo202603(Box oldBox, Box<Settings> newBox) {
         sortingStyle: sortingStyle,
         sortNameCaseInsensitive: false,
         sortNameIgnoreAccents: false,
+        customOrder: _buildCustomOrder(cardsBox),
       ),
+      customExportPath: Settings.defaultCardExportDirectoryPath,
     ),
   );
+}
+
+/// [_buildCustomOrder] builds the [CardListViewOptions.customOrder] field from
+/// the OLD cards box. Since the settings migration is ran before the new
+/// cards-box is created, we cannot assume it exists yet.
+List<String> _buildCustomOrder(Box cardsBox) {
+  return (cardsBox.get('CARDLIST') as List?)
+          ?.cast<dynamic>()
+          .map((element) => element['uniqueId'] as String?)
+          .whereType<String>()
+          .toList(growable: false) ??
+      const [];
 }
