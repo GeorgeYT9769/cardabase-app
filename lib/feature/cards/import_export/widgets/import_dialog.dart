@@ -1,5 +1,4 @@
-import 'dart:convert';
-
+import 'package:cardabase/feature/cards/import_export/import_cards.dart';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
@@ -40,33 +39,15 @@ class _ImportDialogState extends State<ImportDialog> {
       return;
     }
 
-    List<LoyaltyCard>? cards;
+    final List<LoyaltyCard> cards;
     try {
-      final jsonList = jsonDecode(input);
-      if (jsonList is List) {
-        cards = jsonList
-            .whereType<Map<String, dynamic>>()
-            .map(LoyaltyCard.fromJsonMap)
-            .toList(growable: false);
-      }
+      cards = deserializeLoyaltyCards(input);
     } catch (e) {
-      // IGNORE
-    }
-
-    // if new parse did not work, try the legacy one
-    if (cards == null) {
-      try {
-        cards = input
-            .split('\n')
-            .map(LoyaltyCard.fromLegacyExport)
-            .toList(growable: false);
-      } catch (e) {
-        GetIt.I<VibrationProvider>().vibrateError();
-        ScaffoldMessenger.of(context).showSnackBar(
-          buildCustomSnackBar('Failed to parse data!', false),
-        );
-        return;
-      }
+      GetIt.I<VibrationProvider>().vibrateError();
+      ScaffoldMessenger.of(context).showSnackBar(
+        buildCustomSnackBar('Failed to parse data!', false),
+      );
+      return;
     }
 
     if (cards.isNotEmpty) {

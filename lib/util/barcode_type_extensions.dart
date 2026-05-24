@@ -1,7 +1,6 @@
 import 'package:barcode_widget/barcode_widget.dart';
 
 BarcodeType parseBarcodeTypeStringFromDb(String value) {
-  // TODO(wim): move this in a database wrapper
   return switch (value) {
     'CardType.itf' => BarcodeType.Itf,
     'CardType.itf16' => BarcodeType.CodeITF16,
@@ -54,7 +53,6 @@ extension BarcodeTypeExtensions on BarcodeType {
   }
 
   String getDbStringValue() {
-    // TODO(wim): move this to a database wrapper
     return switch (this) {
       BarcodeType.Itf => 'CardType.itf',
       BarcodeType.CodeITF16 => 'CardType.itf16',
