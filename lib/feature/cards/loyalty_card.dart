@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:hive_ce/hive.dart';
 
+export 'package:barcode_widget/barcode_widget.dart' show BarcodeType;
+
 part 'loyalty_card.g.dart';
 
 typedef LoyaltyCardsBox = Box<LoyaltyCard>;
@@ -177,9 +179,9 @@ class LoyaltyCard {
       if (cardMap.isNotEmpty) {
         final strType = cardMap['cardType'];
 
-        final red = int.tryParse(cardMap['redValue']) ?? 0;
-        final green = int.tryParse(cardMap['greenValue']) ?? 0;
-        final blue = int.tryParse(cardMap['blueValue']) ?? 0;
+        final red = cardMap.getInt('redValue');
+        final green = cardMap.getInt('greenValue');
+        final blue = cardMap.getInt('blueValue');
 
         return LoyaltyCard(
           id: generateUniqueId(),
@@ -188,15 +190,16 @@ class LoyaltyCard {
             type: parseBarcodeTypeStringFromDb(strType),
           ),
           name: cardMap['cardName'] ?? '',
-          color: Color.fromARGB(255, red, green, blue),
+          color: red == null || green == null || blue == null
+              ? null
+              : Color.fromARGB(255, red, green, blue),
           tags: {},
           notes: cardMap['note'],
           frontImagePath: null,
           backImagePath: null,
           useFrontImageOverlay: false,
-          points: int.tryParse(cardMap['pointsAmount']) ?? 0,
-          requiresAuth:
-              ((cardMap['hasPassword'] as String?)?.toLowerCase() == 'true'),
+          points: cardMap.getInt('pointsAmount') ?? 0,
+          requiresAuth: cardMap.getBool('hasPassword') ?? false,
           hideName: false,
           createdAt: now,
           lastModifiedAt: now,

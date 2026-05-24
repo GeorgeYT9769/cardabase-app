@@ -3,9 +3,29 @@ import 'package:flutter/painting.dart';
 extension MapExtensions on Map<String, dynamic> {
   String? getString(String key) => this[key] as String?;
 
-  int? getInt(String key) => this[key] as int?;
+  int? getInt(String key) {
+    final value = this[key];
+    switch (value) {
+      case int i:
+        return i;
+      case String s:
+        return int.tryParse(s);
+      default:
+        return null;
+    }
+  }
 
-  bool? getBool(String key) => this[key] as bool?;
+  bool? getBool(String key) {
+    final value = this[key];
+    switch (value) {
+      case bool b:
+        return b;
+      case String s:
+        return bool.tryParse(s);
+      default:
+        return null;
+    }
+  }
 
   List? getList(String key) => this[key] as List?;
 
