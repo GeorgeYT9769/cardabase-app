@@ -6,6 +6,7 @@ import 'package:cardabase/data/unique_id.dart';
 import 'package:cardabase/feature/cards/edit/editable_loyalty_card.dart';
 import 'package:cardabase/util/barcode_type_extensions.dart';
 import 'package:cardabase/util/map_extensions.dart';
+import 'package:cardabase/util/string_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:hive_ce/hive.dart';
@@ -143,7 +144,7 @@ class LoyaltyCard {
       color: Color.fromARGB(255, red, green, blue),
       requiresAuth: rawList[6] == 'true',
       tags: {},
-      notes: '',
+      notes: null,
       frontImagePath: null,
       backImagePath: null,
       useFrontImageOverlay: false,
@@ -194,7 +195,7 @@ class LoyaltyCard {
               ? null
               : Color.fromARGB(255, red, green, blue),
           tags: {},
-          notes: cardMap['note'],
+          notes: cardMap.getString('note')?.nullWhenEmpty,
           frontImagePath: null,
           backImagePath: null,
           useFrontImageOverlay: false,
