@@ -363,6 +363,6 @@ class Barcode {
 
 extension LoyaltyCardListExtensions on Iterable<LoyaltyCard> {
   String serializeToJson() {
-    return jsonEncode(map((card) => card.toJsonMap()));
+    return jsonEncode(map((card) => card.toJsonMap()).toList(growable: false));
   }
 }
