@@ -264,8 +264,10 @@ void main() {
             points: 0,
             requiresAuth: false,
             hideName: false,
-            createdAt: DateTime.fromMillisecondsSinceEpoch(1779824555324),
-            lastModifiedAt: DateTime.fromMillisecondsSinceEpoch(1779824555324),
+            createdAt:
+                DateTime.fromMillisecondsSinceEpoch(1779824555324).toUtc(),
+            lastModifiedAt:
+                DateTime.fromMillisecondsSinceEpoch(1779824555324).toUtc(),
           ),
           expected: {
             'id': 'c587625b-6892-428d-b902-f39e5b29edf1',
@@ -274,8 +276,8 @@ void main() {
               'data': 'this is a test value',
               'type': 'QrCode',
             },
-            'createdAt': '2026-05-26T21:42:35.324',
-            'lastModifiedAt': '2026-05-26T21:42:35.324',
+            'createdAt': '2026-05-26T19:42:35.324Z',
+            'lastModifiedAt': '2026-05-26T19:42:35.324Z',
           },
         ),
         InputOutputTestCase(
@@ -296,8 +298,10 @@ void main() {
             points: 42,
             requiresAuth: true,
             hideName: true,
-            createdAt: DateTime.fromMillisecondsSinceEpoch(1779824555324),
-            lastModifiedAt: DateTime.fromMillisecondsSinceEpoch(1779824555324),
+            createdAt:
+                DateTime.fromMillisecondsSinceEpoch(1779824555324).toUtc(),
+            lastModifiedAt:
+                DateTime.fromMillisecondsSinceEpoch(1779824555324).toUtc(),
           ),
           expected: {
             'id': '6fdfeb5a-04d9-4134-bade-7e5a53c3b268',
@@ -313,8 +317,8 @@ void main() {
             'points': 42,
             'requiresAuth': true,
             'hideName': true,
-            'createdAt': '2026-05-26T21:42:35.324',
-            'lastModifiedAt': '2026-05-26T21:42:35.324',
+            'createdAt': '2026-05-26T19:42:35.324Z',
+            'lastModifiedAt': '2026-05-26T19:42:35.324Z',
           },
         ),
       ];
