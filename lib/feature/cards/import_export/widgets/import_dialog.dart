@@ -52,7 +52,8 @@ class _ImportDialogState extends State<ImportDialog> {
 
     if (cards.isNotEmpty) {
       await cardsBox.clear();
-      await cardsBox.addAll(cards);
+      await cardsBox
+          .putAll(cards.asMap().map((_, value) => MapEntry(value.id, value)));
     }
     textController.text = '';
 
