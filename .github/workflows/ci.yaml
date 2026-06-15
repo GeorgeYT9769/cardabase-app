@@ -1,0 +1,33 @@
+name: Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  code_quality_check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+      
+      - name: Install flutter
+        uses: subosito/flutter-action@v2
+      - run: flutter doctor -v
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Verify formatting
+        if: false # TODO: enable once formatting is correct on all files
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyze project source
+        if: false # TODO: this currently fails because of the missing secrets file
+        run: dart analyze # TODO: --fatal-infos once all infos are solved
+
+      - name: Run tests
+        run: flutter test
+        

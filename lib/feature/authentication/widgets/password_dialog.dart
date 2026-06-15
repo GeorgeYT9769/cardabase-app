@@ -100,7 +100,7 @@ class _PasswordDialogState extends State<PasswordDialog> {
         ),
       ),
       child: Text(
-        'EXPORT',
+        'AUTHORIZE',
         style: theme.textTheme.bodyLarge?.copyWith(
           fontWeight: FontWeight.bold,
           fontSize: 15,
