@@ -3,34 +3,28 @@ import 'dart:convert';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 
 List<LoyaltyCard> deserializeLoyaltyCards(String input) {
-  final Object jsonException;
-  final Object legacyException;
-
   try {
     return _deserializeJsonExport(input);
-  } catch (e) {
-    jsonException = e;
+  } catch (_) {
+    // if new parse did not work, try the legacy one
   }
 
-  // if new parse did not work, try the legacy one
-  try {
-    return _deserializeLegacyExport(input);
-  } catch (e) {
-    legacyException = e;
-  }
-
-  throw LoyaltyCardDeserializationException(
-    jsonException: jsonException,
-    legacyException: legacyException,
-  );
+  return _deserializeLegacyExport(input);
 }
 
 List<LoyaltyCard> _deserializeLegacyExport(String input) {
-  return input
-      .split('\n')
-      .where((line) => line.startsWith('{') || line.startsWith('['))
-      .map(LoyaltyCard.fromLegacyExport)
-      .toList(growable: false);
+  final cards = <LoyaltyCard>[];
+  for (final line in input.split('\n')) {
+    if (line.startsWith('{') || line.startsWith('[')) {
+      try {
+        cards.add(LoyaltyCard.fromLegacyExport(line));
+      } catch (_) {
+        // Skip cards that fail to parse
+        continue;
+      }
+    }
+  }
+  return cards;
 }
 
 List<LoyaltyCard> _deserializeJsonExport(String input) {
@@ -38,10 +32,16 @@ List<LoyaltyCard> _deserializeJsonExport(String input) {
   if (jsonList is! List) {
     throw Exception('input is no a json list');
   } else {
-    return jsonList
-        .whereType<Map<String, dynamic>>()
-        .map(LoyaltyCard.fromJsonMap)
-        .toList(growable: false);
+    final cards = <LoyaltyCard>[];
+    for (final item in jsonList.whereType<Map<String, dynamic>>()) {
+      try {
+        cards.add(LoyaltyCard.fromJsonMap(item));
+      } catch (_) {
+        // Skip cards that fail to parse
+        continue;
+      }
+    }
+    return cards;
   }
 }
 

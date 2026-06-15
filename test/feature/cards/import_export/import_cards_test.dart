@@ -25,6 +25,16 @@ Timestamp: 20260524155619
             'Dollar store',
           ],
         ),
+        DeserializeLoyaltyCardsTestCase(
+          name: 'JSON export with non-Latin characters',
+          input: '[{"id":"test-id-1","barcode":{"data":"123","type":"Code128"},"name":"Δημοτική Βιβλιοθήκη","createdAt":"2026-06-15T12:00:00.000Z","lastModifiedAt":"2026-06-15T12:00:00.000Z","notes":"Greek library card"}]',
+          expectedShopNames: ['Δημοτική Βιβλιοθήκη'],
+        ),
+        DeserializeLoyaltyCardsTestCase(
+          name: 'JSON export with mixed valid and invalid cards (recovers valid cards)',
+          input: '[{"id":"test-id-1","barcode":{"data":"123","type":"Code128"},"name":"Valid Card","createdAt":"2026-06-15T12:00:00.000Z","lastModifiedAt":"2026-06-15T12:00:00.000Z"},{"id":"test-id-2","barcode":null,"name":"Invalid Card","createdAt":"2026-06-15T12:00:00.000Z","lastModifiedAt":"2026-06-15T12:00:00.000Z"},{"id":"test-id-3","barcode":{"data":"456","type":"CodeEAN13"},"name":"Another Valid","createdAt":"2026-06-15T12:00:00.000Z","lastModifiedAt":"2026-06-15T12:00:00.000Z"}]',
+          expectedShopNames: ['Valid Card', 'Another Valid'],
+        ),
       ];
 
       for (final tc in testCases) {
