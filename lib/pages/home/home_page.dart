@@ -191,22 +191,25 @@ class _HomePageState extends State<Homepage> {
             floating: true,
             snap: true,
           ),
-          MultiListenableBuilder(
-            listenables: [
-              isInReorderingMode,
-              tagFilter,
-              settings.cardListViewOptions.sortNameIgnoreAccents,
-              settings.cardListViewOptions.sortingStyle,
-              settings.cardListViewOptions.sortNameCaseInsensitive,
-              settings.cardListViewOptions.numberOfColumns,
-              settings.cardListViewOptions.customOrder,
-            ],
-            builder: (context) => CardList(
-              isInReorderingMode: isInReorderingMode.value,
-              numberOfColumns:
-                  settings.cardListViewOptions.numberOfColumns.value,
-              cards: listCardsToDisplay(),
-              moveCard: moveCard,
+          SliverPadding(
+            padding: const EdgeInsets.only(left: 10, right: 10, bottom: 100),
+            sliver: MultiListenableBuilder(
+              listenables: [
+                isInReorderingMode,
+                tagFilter,
+                settings.cardListViewOptions.sortNameIgnoreAccents,
+                settings.cardListViewOptions.sortingStyle,
+                settings.cardListViewOptions.sortNameCaseInsensitive,
+                settings.cardListViewOptions.numberOfColumns,
+                settings.cardListViewOptions.customOrder,
+              ],
+              builder: (context) => CardList(
+                isInReorderingMode: isInReorderingMode.value,
+                numberOfColumns:
+                    settings.cardListViewOptions.numberOfColumns.value,
+                cards: listCardsToDisplay(),
+                moveCard: moveCard,
+              ),
             ),
           ),
         ],

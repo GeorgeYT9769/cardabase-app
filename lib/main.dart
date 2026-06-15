@@ -10,6 +10,7 @@ import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/feature/settings/widgets/settings_page.dart';
 import 'package:cardabase/get_it.dart';
 import 'package:cardabase/pages/home/home_page.dart';
+import 'package:cardabase/pages/info.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
 import 'package:cardabase/theme/theme.dart';
 import 'package:flutter/material.dart';
@@ -159,7 +160,7 @@ class _MainState extends State<Main> {
           }
           if (shortcutType == 'info') {
             navigatorKey.currentState!.push(
-              MaterialPageRoute(builder: (context) => const SettingsPage()),
+              MaterialPageRoute(builder: (context) => const InfoScreen()),
             );
           }
         }
