@@ -1,5 +1,5 @@
 import 'package:cardabase/feature/cards/import_export/export_cards.dart';
-import 'package:cardabase/feature/cards/import_export/widgets/export_button.dart';
+import 'package:cardabase/feature/cards/import_export/widgets/io_dialog_button.dart';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
@@ -84,37 +84,78 @@ class _ExportDialogState extends State<ExportDialog> {
     Navigator.of(context).pop();
   }
 
+  Future<void> exportToZipFile() async {
+    final dir = exportDirectoryPath.text.trim();
+    try {
+      await exportDataAsZip(
+        cardsBox.values,
+        settings: settingsBox.value,
+        directoryPath: dir,
+      );
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        buildCustomSnackBar(
+          dir == Settings.defaultCardExportDirectoryPath
+              ? 'CDB exported to Downloads'
+              : 'CDB exported to Custom Path',
+          true,
+        ),
+      );
+    } on NoPermissionToExternalStorageException catch (_) {
+      GetIt.I<VibrationProvider>().vibrateError();
+      ScaffoldMessenger.of(context).showSnackBar(
+        buildCustomSnackBar('No permission!', false),
+      );
+    } catch (e) {
+      GetIt.I<VibrationProvider>().vibrateError();
+      ScaffoldMessenger.of(context).showSnackBar(
+        buildCustomSnackBar('Export failed: $e', false),
+      );
+    }
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return AlertDialog(
+      scrollable: true,
       title: Text(
-        'Export As:',
+        'Export:',
         style: theme.textTheme.bodyLarge?.copyWith(
           color: theme.colorScheme.inverseSurface,
           fontSize: 30,
         ),
       ),
-      content: SizedBox(
-        height: 210,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            ExportButton(
-              onPressed: exportToClipboard,
-              icon: const Icon(Icons.text_fields),
-              label: 'TEXT',
-            ),
-            const SizedBox(height: 40),
-            ExportButton(
-              onPressed: exportToFile,
-              icon: const Icon(Icons.file_copy),
-              label: 'FILE',
-            ),
-            const SizedBox(height: 5),
-            _customPathTextField(theme),
-          ],
-        ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          IODialogButton(
+            onPressed: exportToClipboard,
+            icon: const Icon(Icons.text_fields),
+            label: 'TEXT',
+            aboutText: 'Export cards as plain text into your clipboard',
+          ),
+          const SizedBox(height: 40),
+          IODialogButton(
+            onPressed: exportToFile,
+            icon: const Icon(Icons.file_copy),
+            label: 'FILE',
+            aboutText: 'Export cards as a single file',
+          ),
+          const SizedBox(height: 5),
+          IODialogButton(
+            onPressed: exportToZipFile,
+            icon: const Icon(Icons.folder_zip),
+            label: 'CDB FILE',
+            aboutText: 'Export cards and all other stuff as a CDB file',
+          ),
+          const SizedBox(height: 5),
+          _customPathTextField(theme),
+        ],
       ),
     );
   }

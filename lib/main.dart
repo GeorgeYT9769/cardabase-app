@@ -7,7 +7,6 @@ import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/settings/auto_update.dart';
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
-import 'package:cardabase/feature/settings/widgets/settings_page.dart';
 import 'package:cardabase/get_it.dart';
 import 'package:cardabase/pages/home/home_page.dart';
 import 'package:cardabase/pages/info.dart';
@@ -19,9 +18,12 @@ import 'package:get_it/get_it.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:quick_actions/quick_actions.dart';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'feature/cards/get_it.dart';
+import 'feature/cards/import_export/import_cards.dart';
+import 'util/widgets/custom_snack_bar.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -142,12 +144,26 @@ class Main extends StatefulWidget {
 class _MainState extends State<Main> {
   static const QuickActions quickActions = QuickActions();
   String shortcut = 'nothing set';
+  late StreamSubscription _intentDataStreamSubscription;
 
   @override
   void initState() {
     super.initState();
 
     if (Platform.isAndroid || Platform.isIOS) {
+      // For sharing images coming from outside the app while the app is in the memory
+      _intentDataStreamSubscription = ReceiveSharingIntent.instance.getMediaStream().listen((value) {
+        _handleSharedMedia(value);
+      }, onError: (err) {
+        print("getIntentDataStream error: $err");
+      });
+
+      // For sharing images coming from outside the app while the app is closed
+      ReceiveSharingIntent.instance.getInitialMedia().then((value) {
+        _handleSharedMedia(value);
+        ReceiveSharingIntent.instance.reset(); // reset intent
+      });
+
       quickActions.initialize((shortcutType) {
         if (navigatorKey.currentState != null &&
             navigatorKey.currentContext != null) {
@@ -182,8 +198,72 @@ class _MainState extends State<Main> {
     }
   }
 
+  void _handleSharedMedia(List<SharedMediaFile> media) async {
+    if (media.isEmpty) return;
+    final file = media.first;
+    if (file.path.toLowerCase().endsWith('.cdb')) {
+      final context = navigatorKey.currentContext;
+      if (context == null) return;
+
+      final loadBoxResult = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Import CDB File?'),
+          content: const Text('This will overwrite your current cards and settings.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Import'),
+            ),
+          ],
+        ),
+      );
+
+      if (loadBoxResult == true) {
+        try {
+          final importResult = await importDataFromFilePath(file.path);
+          final cardsBox = GetIt.I<LoyaltyCardsBox>();
+          final settingsBox = GetIt.I<SettingsBox>();
+
+          if (importResult.cards.isNotEmpty) {
+            await cardsBox.clear();
+            await cardsBox.putAll(
+              importResult.cards.asMap().map((_, value) => MapEntry(value.id, value)),
+            );
+          }
+
+          final settings = importResult.settings;
+          if (settingsBox.isEmpty) {
+            await settingsBox.add(settings);
+          } else {
+            await settingsBox.putAt(0, settings);
+          }
+
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              buildCustomSnackBar('Imported all data from CDB!', true),
+            );
+          }
+        } catch (e) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              buildCustomSnackBar('Failed to import CDB: $e', false),
+            );
+          }
+        }
+      }
+    }
+  }
+
   @override
   void dispose() {
+    if (Platform.isAndroid || Platform.isIOS) {
+      _intentDataStreamSubscription.cancel();
+    }
     super.dispose();
   }
 

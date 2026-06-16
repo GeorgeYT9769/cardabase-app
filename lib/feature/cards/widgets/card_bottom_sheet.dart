@@ -1,4 +1,5 @@
 import 'package:cardabase/feature/authentication/widgets/require_password_dialog.dart';
+import 'package:cardabase/feature/cards/card_list_view_options.dart';
 import 'package:cardabase/feature/cards/edit/widgets/edit_card_page.dart';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/cards/platform/set_widget_card.dart';
@@ -128,6 +129,8 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final sortingStyle = settingsBox.value.cardListViewOptions.sortingStyle;
+
     return Container(
       padding: const EdgeInsets.all(16),
       child: Wrap(
@@ -154,26 +157,29 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
             ),
             onTap: _duplicateCard,
           ),
-          ListTile(
-            leading:
-                Icon(Icons.arrow_upward, color: theme.colorScheme.tertiary),
-            title: Text(
-              'Move UP',
-              style: theme.textTheme.bodyLarge?.copyWith(),
-            ),
-            onTap: _moveCardUp,
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.arrow_downward,
-              color: theme.colorScheme.tertiary,
-            ),
-            title: Text(
-              'Move DOWN',
-              style: theme.textTheme.bodyLarge?.copyWith(),
-            ),
-            onTap: _moveCardDown,
-          ),
+          if (sortingStyle == SortingStyle.custom)
+            ...[
+              ListTile(
+                leading:
+                    Icon(Icons.arrow_upward, color: theme.colorScheme.tertiary),
+                title: Text(
+                  'Move UP',
+                  style: theme.textTheme.bodyLarge?.copyWith(),
+                ),
+                onTap: _moveCardUp,
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.arrow_downward,
+                  color: theme.colorScheme.tertiary,
+                ),
+                title: Text(
+                  'Move DOWN',
+                  style: theme.textTheme.bodyLarge?.copyWith(),
+                ),
+                onTap: _moveCardDown,
+              ),
+            ],
           ListTile(
             leading: const Icon(Icons.delete, color: Colors.red),
             title: Text(

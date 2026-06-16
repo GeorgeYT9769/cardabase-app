@@ -55,7 +55,43 @@ class Settings {
   @HiveField(8, defaultValue: defaultCardExportDirectoryPath)
   final String customExportPath;
 
+  Map<String, dynamic> toJsonMap() {
+    return {
+      if (lastSeenAppVersion != null) 'lastSeenAppVersion': lastSeenAppVersion,
+      'autoBackups': autoBackups.toJsonMap(),
+      'theme': theme.toJsonMap(),
+      'developerOptions': developerOptions.toJsonMap(),
+      'useAutoBrightness': useAutoBrightness,
+      'vibrateOnDifferentActions': vibrateOnDifferentActions,
+      'tags': tags,
+      'cardListViewOptions': cardListViewOptions.toJsonMap(),
+      'customExportPath': customExportPath,
+    };
+  }
+
   EditableSettings editable() => EditableSettings.fromValue(this);
+
+  factory Settings.fromJsonMap(Map<String, dynamic> map) {
+    return Settings(
+      lastSeenAppVersion: map['lastSeenAppVersion'] as String?,
+      autoBackups: map['autoBackups'] != null
+          ? AutoBackupSettings.fromJsonMap(map['autoBackups'] as Map<String, dynamic>)
+          : const AutoBackupSettings.defaultValue(),
+      theme: map['theme'] != null
+          ? ThemeSettings.fromJsonMap(map['theme'] as Map<String, dynamic>)
+          : const ThemeSettings.defaultValue(),
+      developerOptions: map['developerOptions'] != null
+          ? DeveloperOptions.fromJsonMap(map['developerOptions'] as Map<String, dynamic>)
+          : const DeveloperOptions.defaultValue(),
+      useAutoBrightness: map['useAutoBrightness'] as bool? ?? true,
+      vibrateOnDifferentActions: map['vibrateOnDifferentActions'] as bool? ?? true,
+      tags: (map['tags'] as List?)?.cast<String>() ?? const [],
+      cardListViewOptions: map['cardListViewOptions'] != null
+          ? CardListViewOptions.fromJsonMap(map['cardListViewOptions'] as Map<String, dynamic>)
+          : const CardListViewOptions.defaultValue(),
+      customExportPath: map['customExportPath'] as String? ?? defaultCardExportDirectoryPath,
+    );
+  }
 }
 
 @HiveType(typeId: HiveTypeIds.autoBackupSettings)
@@ -79,6 +115,22 @@ class AutoBackupSettings {
   final DateTime? lastUpdate;
   @HiveField(2)
   final Duration interval;
+
+  Map<String, dynamic> toJsonMap() {
+    return {
+      'isEnabled': isEnabled,
+      if (lastUpdate != null) 'lastUpdate': lastUpdate?.toIso8601String(),
+      'interval': interval.inMilliseconds,
+    };
+  }
+
+  factory AutoBackupSettings.fromJsonMap(Map<String, dynamic> map) {
+    return AutoBackupSettings(
+      isEnabled: map['isEnabled'] as bool? ?? false,
+      lastUpdate: map['lastUpdate'] != null ? DateTime.parse(map['lastUpdate'] as String) : null,
+      interval: Duration(milliseconds: map['interval'] as int? ?? const Duration(days: 7).inMilliseconds),
+    );
+  }
 
   EditableAutoBackupSettings editable() {
     return EditableAutoBackupSettings.fromValue(this);
@@ -111,6 +163,26 @@ class ThemeSettings {
   @HiveField(3)
   final LoyaltyCardEffectSettings loyaltyCardEffect;
 
+  Map<String, dynamic> toJsonMap() {
+    return {
+      'useDarkMode': useDarkMode,
+      'useExtraDark': useExtraDark,
+      'useSystemFont': useSystemFont,
+      'loyaltyCardEffect': loyaltyCardEffect.toJsonMap(),
+    };
+  }
+
+  factory ThemeSettings.fromJsonMap(Map<String, dynamic> map) {
+    return ThemeSettings(
+      useDarkMode: map['useDarkMode'] as bool? ?? false,
+      useExtraDark: map['useExtraDark'] as bool? ?? false,
+      useSystemFont: map['useSystemFont'] as bool? ?? false,
+      loyaltyCardEffect: map['loyaltyCardEffect'] != null
+          ? LoyaltyCardEffectSettings.fromJsonMap(map['loyaltyCardEffect'] as Map<String, dynamic>)
+          : const LoyaltyCardEffectSettings.defaultValue(),
+    );
+  }
+
   EditableThemeSettings editable() => EditableThemeSettings.fromValue(this);
 }
 
@@ -128,6 +200,23 @@ class LoyaltyCardEffectSettings {
   final bool isEnabled;
   @HiveField(1)
   final LoyaltyCardEffect effect;
+
+  Map<String, dynamic> toJsonMap() {
+    return {
+      'isEnabled': isEnabled,
+      'effect': effect.name,
+    };
+  }
+
+  factory LoyaltyCardEffectSettings.fromJsonMap(Map<String, dynamic> map) {
+    return LoyaltyCardEffectSettings(
+      isEnabled: map['isEnabled'] as bool? ?? false,
+      effect: LoyaltyCardEffect.values.firstWhere(
+        (e) => e.name == map['effect'],
+        orElse: () => LoyaltyCardEffect.grain,
+      ),
+    );
+  }
 
   EditableLoyaltyCardEffectSettings editable() {
     return EditableLoyaltyCardEffectSettings.fromValue(this);
@@ -152,6 +241,18 @@ class DeveloperOptions {
 
   @HiveField(0)
   final bool isEnabled;
+
+  Map<String, dynamic> toJsonMap() {
+    return {
+      'isEnabled': isEnabled,
+    };
+  }
+
+  factory DeveloperOptions.fromJsonMap(Map<String, dynamic> map) {
+    return DeveloperOptions(
+      isEnabled: map['isEnabled'] as bool? ?? false,
+    );
+  }
 
   EditableDeveloperOptions editable() {
     return EditableDeveloperOptions.fromValue(this);

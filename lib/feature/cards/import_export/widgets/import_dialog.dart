@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:cardabase/feature/cards/import_export/import_cards.dart';
+import 'package:cardabase/feature/cards/import_export/widgets/io_dialog_button.dart';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
+import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
@@ -21,6 +26,7 @@ class ImportDialog extends StatefulWidget {
 
 class _ImportDialogState extends State<ImportDialog> {
   final cardsBox = GetIt.I<LoyaltyCardsBox>();
+  final settingsBox = GetIt.I<SettingsBox>();
   final textController = TextEditingController();
 
   @override
@@ -67,19 +73,89 @@ class _ImportDialogState extends State<ImportDialog> {
     );
   }
 
+  Future<void> importFromZipFile() async {
+    final result = await FilePicker.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['cdb', 'zip'],
+    );
+
+    if (result == null || result.files.single.path == null) {
+      return;
+    }
+
+    final path = result.files.single.path!;
+    // Fallback: check extension manually if system picker is being difficult
+    if (!path.toLowerCase().endsWith('.cdb') && !path.toLowerCase().endsWith('.zip')) {
+      GetIt.I<VibrationProvider>().vibrateError();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          buildCustomSnackBar('Please select a CDB file!', false),
+        );
+      }
+      return;
+    }
+
+    try {
+      final bytes = await File(path).readAsBytes();
+      final importResult = await importDataFromZip(bytes);
+
+      if (importResult.cards.isNotEmpty) {
+        await cardsBox.clear();
+        await cardsBox.putAll(
+          importResult.cards
+              .asMap()
+              .map((_, value) => MapEntry(value.id, value)),
+        );
+      }
+
+      final settings = importResult.settings;
+      if (settingsBox.isEmpty) {
+        await settingsBox.add(settings);
+      } else {
+        await settingsBox.putAt(0, settings);
+      }
+
+      if (!mounted) {
+        return;
+      }
+
+      Navigator.of(context).pop(true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        buildCustomSnackBar('Imported all data from CDB!', true),
+      );
+    } catch (e) {
+      GetIt.I<VibrationProvider>().vibrateError();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          buildCustomSnackBar('Failed to import CDB: $e', false),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return AlertDialog(
+      scrollable: true,
       title: Text(
-        'Import Card Data',
+        'Import:',
         style: theme.textTheme.bodyLarge
             ?.copyWith(color: theme.colorScheme.inverseSurface, fontSize: 30),
       ),
-      content: SizedBox(
-        width: double.maxFinite,
-        child: _inputField(theme),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _inputField(theme),
+          SizedBox(height: 5),
+          IODialogButton(
+            onPressed: importFromZipFile,
+            icon: Icon(Icons.folder_zip),
+            label: 'Import CDB File',
+            aboutText: 'Import all your data from one CDB file',
+          ),
+        ],
       ),
       actions: [
         _cancelButton(theme),

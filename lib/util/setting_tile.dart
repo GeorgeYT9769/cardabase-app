@@ -45,7 +45,7 @@ class MySetting extends StatelessWidget {
                     Icon(
                       Icons.info,
                       size: 15,
-                      color: theme.colorScheme.inverseSurface,
+                      color: theme.colorScheme.surface,
                     ),
                     const SizedBox(width: 10),
                     Flexible(
@@ -53,7 +53,7 @@ class MySetting extends StatelessWidget {
                         aboutSettingHeader,
                         style: theme.textTheme.bodyLarge?.copyWith(
                           fontSize: 18,
-                          color: theme.colorScheme.inverseSurface,
+                          color: theme.colorScheme.surface,
                           fontWeight: FontWeight.bold,
                         ),
                         softWrap: true,
@@ -68,7 +68,8 @@ class MySetting extends StatelessWidget {
                 margin: const EdgeInsets.fromLTRB(20, 0, 20, 30),
                 behavior: SnackBarBehavior.floating,
                 dismissDirection: DismissDirection.vertical,
-                backgroundColor: theme.colorScheme.surface,
+                backgroundColor: theme.colorScheme.tertiary,
+                elevation: 0.0,
               ),
             );
           },

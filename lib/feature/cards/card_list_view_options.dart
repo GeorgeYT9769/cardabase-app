@@ -65,6 +65,29 @@ class CardListViewOptions {
   @HiveField(4, defaultValue: <String>[])
   final List<String> customOrder;
 
+  Map<String, dynamic> toJsonMap() {
+    return {
+      'numberOfColumns': numberOfColumns,
+      'sortingStyle': sortingStyle.name,
+      'sortNameCaseInsensitive': sortNameCaseInsensitive,
+      'sortNameIgnoreAccents': sortNameIgnoreAccents,
+      'customOrder': customOrder,
+    };
+  }
+
+  factory CardListViewOptions.fromJsonMap(Map<String, dynamic> map) {
+    return CardListViewOptions(
+      numberOfColumns: map['numberOfColumns'] as int? ?? 1,
+      sortingStyle: SortingStyle.values.firstWhere(
+        (e) => e.name == map['sortingStyle'],
+        orElse: () => SortingStyle.latest,
+      ),
+      sortNameCaseInsensitive: map['sortNameCaseInsensitive'] as bool? ?? false,
+      sortNameIgnoreAccents: map['sortNameIgnoreAccents'] as bool? ?? false,
+      customOrder: (map['customOrder'] as List?)?.cast<String>() ?? const [],
+    );
+  }
+
   EditableCardListViewOptions editable() {
     return EditableCardListViewOptions.fromValue(this);
   }

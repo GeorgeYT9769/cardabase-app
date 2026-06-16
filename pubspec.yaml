@@ -28,6 +28,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  archive: ^4.0.9
   barcode_widget: ^2.0.4
   camera: ^0.12.0+1
   cupertino_icons: ^1.0.2
@@ -53,6 +54,7 @@ dependencies:
   permission_handler: ^12.0.0+1
   qr_code_scanner_plus: ^2.1.1
   quick_actions: ^1.1.0
+  receive_sharing_intent: ^1.8.1
   reorderable_grid_view: ^2.2.8
   screen_brightness: ^2.1.2
   screenshot: ^3.0.0
