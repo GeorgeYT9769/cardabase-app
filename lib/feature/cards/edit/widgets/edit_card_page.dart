@@ -132,7 +132,7 @@ class _EditCardPageState extends State<EditCardPage> {
     return AppBar(
       leading: IconButton(
         icon: Icon(
-          Icons.qr_code_2,
+          Icons.qr_code_scanner,
           color: theme.colorScheme.secondary,
         ),
         onPressed: _scanSharedCode,

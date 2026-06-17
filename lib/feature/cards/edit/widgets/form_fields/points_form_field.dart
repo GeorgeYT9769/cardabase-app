@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:async';
 
 class PointsFormField extends StatefulWidget {
   const PointsFormField({
@@ -15,6 +16,8 @@ class PointsFormField extends StatefulWidget {
 
 class _PointsFormFieldState extends State<PointsFormField> {
   final _textController = TextEditingController();
+  Timer? _incrementTimer;
+  Timer? _decrementTimer;
 
   @override
   void initState() {
@@ -37,6 +40,8 @@ class _PointsFormFieldState extends State<PointsFormField> {
   void dispose() {
     widget.controller.removeListener(onWidgetControllerValueChanged);
     _textController.dispose();
+    _incrementTimer?.cancel();
+    _decrementTimer?.cancel();
     super.dispose();
   }
 
@@ -48,15 +53,68 @@ class _PointsFormFieldState extends State<PointsFormField> {
     _textController.text = strValue;
   }
 
+  void _incrementValue() {
+    if (widget.controller.value < 9999999999) {
+      widget.controller.value = widget.controller.value + 1;
+    }
+  }
+
+  void _decrementValue() {
+    if (widget.controller.value > 0) {
+      widget.controller.value = widget.controller.value - 1;
+    } else {
+      widget.controller.value = 0;
+    }
+  }
+
+  void _startIncrementTimer() {
+    _incrementTimer?.cancel();
+    _incrementValue(); // First increment immediately
+    _incrementTimer = Timer.periodic(Duration(milliseconds: 100), (_) {
+      _incrementValue();
+    });
+  }
+
+  void _stopIncrementTimer() {
+    _incrementTimer?.cancel();
+    _incrementTimer = null;
+  }
+
+  void _startDecrementTimer() {
+    _decrementTimer?.cancel();
+    _decrementValue(); // First decrement immediately
+    _decrementTimer = Timer.periodic(Duration(milliseconds: 100), (_) {
+      _decrementValue();
+    });
+  }
+
+  void _stopDecrementTimer() {
+    _decrementTimer?.cancel();
+    _decrementTimer = null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return TextFormField(
+      textAlign: TextAlign.center,
       controller: _textController,
       onChanged: (strValue) {
+        if (strValue.isEmpty) {
+          _textController.text = '0';
+          _textController.selection = const TextSelection.collapsed(offset: 1);
+          widget.controller.value = 0;
+          return;
+        }
+
         final intValue = int.tryParse(strValue);
         if (intValue != null) {
           widget.controller.value = intValue;
+          final cleanStr = intValue.toString();
+          if (strValue != cleanStr) {
+            _textController.text = cleanStr;
+            _textController.selection = TextSelection.collapsed(offset: cleanStr.length);
+          }
         }
       },
       inputFormatters: [
@@ -83,31 +141,25 @@ class _PointsFormFieldState extends State<PointsFormField> {
           fontWeight: FontWeight.bold,
           fontSize: 17,
         ),
-        prefixIcon: IconButton(
-          icon: Icon(
+        prefixIcon: GestureDetector(
+          onTap: _decrementValue,
+          onLongPressStart: (_) => _startDecrementTimer(),
+          onLongPressEnd: (_) => _stopDecrementTimer(),
+          child: Icon(
             Icons.remove,
             color: theme.colorScheme.secondary,
+            size: 30,
           ),
-          onPressed: () {
-            if (widget.controller.value > 0) {
-              widget.controller.value = (widget.controller.value) - 1;
-            } else {
-              widget.controller.value = 0;
-            }
-          },
         ),
-        suffixIcon: IconButton(
-          icon: Icon(
+        suffixIcon: GestureDetector(
+          onTap: _incrementValue,
+          onLongPressStart: (_) => _startIncrementTimer(),
+          onLongPressEnd: (_) => _stopIncrementTimer(),
+          child: Icon(
             Icons.add,
             color: theme.colorScheme.secondary,
+            size: 30,
           ),
-          onPressed: () {
-            if (widget.controller.value < 9999999999) {
-              widget.controller.value = (widget.controller.value) + 1;
-            } else {
-              widget.controller.value = 0;
-            }
-          },
         ),
       ),
       style: theme.textTheme.bodyLarge?.copyWith(

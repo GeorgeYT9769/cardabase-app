@@ -37,8 +37,22 @@ class EditCardForm extends StatefulWidget {
   State<EditCardForm> createState() => _EditCardFormState();
 }
 
-class _EditCardFormState extends State<EditCardForm> {
+class _EditCardFormState extends State<EditCardForm>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
   final passwordBox = Hive.box('password');
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   Color get textColor {
     final bg = widget.card.color.value;
@@ -181,30 +195,27 @@ class _EditCardFormState extends State<EditCardForm> {
             width: MediaQuery.of(context).size.width,
             child: _card(theme),
           ),
-          DefaultTabController(
-            length: 2,
-            child: Column(
-              children: [
-                TabBar(
-                  tabs: const [
-                    Tab(text: 'Card Details'),
-                    Tab(text: 'Others'),
-                  ],
-                  labelColor: theme.colorScheme.primary,
-                  unselectedLabelColor: theme.colorScheme.onSurface,
-                  splashFactory: NoSplash.splashFactory,
-                ),
-                SizedBox(
-                  height: 1000,
-                  child: TabBarView(
-                    children: [
-                      _cardDetails(theme),
-                      _other(theme),
-                    ],
-                  ),
-                ),
-              ],
+          TabBar(
+            controller: _tabController,
+            tabs: const [
+              Tab(text: 'Card Details'),
+              Tab(text: 'Others'),
+            ],
+            labelColor: theme.colorScheme.primary,
+            unselectedLabelColor: theme.colorScheme.onSurface,
+            splashFactory: NoSplash.splashFactory,
+            labelStyle: TextStyle().copyWith(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
             ),
+          ),
+          ListenableBuilder(
+            listenable: _tabController,
+            builder: (context, _) {
+              return _tabController.index == 0
+                  ? _cardDetails(theme)
+                  : _other(theme);
+            },
           ),
         ],
       ),
@@ -295,11 +306,18 @@ class _EditCardFormState extends State<EditCardForm> {
             ),
           ),
           const SizedBox(height: 15),
-          ColorPickerButton(onPressed: _showColorPickerDialog),
+          ValueListenableBuilder(
+            valueListenable: widget.card.color,
+            builder: (context, color, _) => ColorPickerButton(
+              onPressed: _showColorPickerDialog,
+              color: color ?? Colors.grey,
+            ),
+          ),
           const SizedBox(height: 15),
           PointsFormField(controller: widget.card.points),
           const SizedBox(height: 15),
           NotesFormField(controller: widget.card.notes),
+          const SizedBox(height: 100),
         ],
       ),
     );

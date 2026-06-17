@@ -14,6 +14,7 @@ import 'package:cardabase/pages/welcome_screen.dart';
 import 'package:cardabase/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -146,22 +147,19 @@ class _MainState extends State<Main> {
   String shortcut = 'nothing set';
   late StreamSubscription _intentDataStreamSubscription;
 
+
   @override
   void initState() {
     super.initState();
 
     if (Platform.isAndroid || Platform.isIOS) {
-      // For sharing images coming from outside the app while the app is in the memory
       _intentDataStreamSubscription = ReceiveSharingIntent.instance.getMediaStream().listen((value) {
         _handleSharedMedia(value);
-      }, onError: (err) {
-        print("getIntentDataStream error: $err");
       });
 
-      // For sharing images coming from outside the app while the app is closed
       ReceiveSharingIntent.instance.getInitialMedia().then((value) {
         _handleSharedMedia(value);
-        ReceiveSharingIntent.instance.reset(); // reset intent
+        ReceiveSharingIntent.instance.reset();
       });
 
       quickActions.initialize((shortcutType) {
@@ -198,6 +196,54 @@ class _MainState extends State<Main> {
     }
   }
 
+  Widget _cancelButton(BuildContext context, ThemeData theme) {
+    return Bounceable(
+      onTap: () {},
+      child: OutlinedButton(
+        onPressed: () => Navigator.pop(context, false),
+        style: OutlinedButton.styleFrom(
+          elevation: 0.0,
+          side: BorderSide(color: theme.colorScheme.primary, width: 2.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(11),
+          ),
+        ),
+        child: Text(
+          'Cancel',
+          style: theme.textTheme.bodyLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+            color: theme.colorScheme.tertiary,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _importButton(BuildContext context, ThemeData theme) {
+    return Bounceable(
+      onTap: () {},
+      child: OutlinedButton(
+        onPressed: () => Navigator.pop(context, true),
+        style: OutlinedButton.styleFrom(
+          elevation: 0.0,
+          side: BorderSide(color: theme.colorScheme.primary, width: 2.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(11),
+          ),
+        ),
+        child: Text(
+          'Import',
+          style: theme.textTheme.bodyLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+            color: theme.colorScheme.tertiary,
+          ),
+        ),
+      ),
+    );
+  }
+
   void _handleSharedMedia(List<SharedMediaFile> media) async {
     if (media.isEmpty) return;
     final file = media.first;
@@ -207,18 +253,12 @@ class _MainState extends State<Main> {
 
       final loadBoxResult = await showDialog<bool>(
         context: context,
-        builder: (context) => AlertDialog(
+        builder: (dialogContext) => AlertDialog(
           title: const Text('Import CDB File?'),
           content: const Text('This will overwrite your current cards and settings.'),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Import'),
-            ),
+            _cancelButton(dialogContext, Theme.of(dialogContext)),
+            _importButton(dialogContext, Theme.of(dialogContext)),
           ],
         ),
       );

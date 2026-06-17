@@ -3,15 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get_it/get_it.dart';
 
-class MySetting extends StatelessWidget {
+class SettingTile extends StatelessWidget {
   final String settingHeader;
   final String aboutSettingHeader;
   final IconData settingIcon;
   final void Function() settingAction;
   final Color iconColor;
   final Color borderColor;
+  final bool showMore;
 
-  const MySetting({
+  const SettingTile({
     super.key,
     required this.aboutSettingHeader,
     required this.settingAction,
@@ -19,6 +20,7 @@ class MySetting extends StatelessWidget {
     required this.settingIcon,
     required this.iconColor,
     required this.borderColor,
+    required this.showMore,
   });
 
   @override
@@ -98,18 +100,17 @@ class MySetting extends StatelessWidget {
                   settingHeader,
                   style: theme.textTheme.bodyLarge?.copyWith(
                     color: theme.colorScheme.inverseSurface,
-                    fontSize: 20,
+                    fontSize: 19,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                //Column(
-                //  crossAxisAlignment: CrossAxisAlignment.start,
-                //  children: [
-                //    Text(settingHeader, style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.inverseSurface, fontSize: 22, fontWeight: FontWeight.w600)),
-                //    const SizedBox(height: 5),
-                //    Text(aboutSettingHeader, style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.inverseSurface, fontSize: 12, fontWeight: FontWeight.w400)),
-                //  ],
-                //),
+                if (showMore) const Spacer(),
+                if (showMore)
+                  Icon(
+                    Icons.arrow_drop_down,
+                    color: theme.colorScheme.secondary,
+                    size: 30,
+                  ),
               ],
             ),
           ),

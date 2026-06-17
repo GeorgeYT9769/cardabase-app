@@ -84,7 +84,6 @@ class _ImportDialogState extends State<ImportDialog> {
     }
 
     final path = result.files.single.path!;
-    // Fallback: check extension manually if system picker is being difficult
     if (!path.toLowerCase().endsWith('.cdb') && !path.toLowerCase().endsWith('.zip')) {
       GetIt.I<VibrationProvider>().vibrateError();
       if (mounted) {

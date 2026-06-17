@@ -37,57 +37,53 @@ class CardListViewOptionsDialog extends StatelessWidget {
           fontSize: 30,
         ),
       ),
-      content: SizedBox(
-        height: 400,
-        width: double.maxFinite,
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(
-            decelerationRate: ScrollDecelerationRate.fast,
-          ),
-          child: Column(
-            children: <Widget>[
-              if (allTags.isNotEmpty) ..._tagFilter(theme),
-              _optionTitle(theme, 'Sort by:'),
-              const SizedBox(height: 10),
-              SortingStyleSelector(controller: sortingStyle),
-              ValueListenableBuilder<SortingStyle>(
-                valueListenable: sortingStyle,
-                builder: (context, value, _) {
-                  if (value == SortingStyle.nameAz ||
-                      value == SortingStyle.nameZa) {
-                    return Column(
-                      children: [
-                        const SizedBox(height: 10),
-                        _caseSensitiveSwitch(theme),
-                        const SizedBox(height: 10),
-                        _ignoreAccentsSwitch(theme),
-                      ],
-                    );
-                  } else if (value == SortingStyle.custom) {
-                    return Column(
-                      children: [
-                        const SizedBox(height: 10),
-                        _reorderingModeSwitch(theme),
-                      ],
-                    );
-                  }
-                  return const SizedBox.shrink();
-                },
+      content: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(
+          decelerationRate: ScrollDecelerationRate.fast,
+        ),
+        child: Column(
+          children: <Widget>[
+            if (allTags.isNotEmpty) ..._tagFilter(theme),
+            _optionTitle(theme, 'Sort by:'),
+            const SizedBox(height: 10),
+            SortingStyleSelector(controller: sortingStyle),
+            ValueListenableBuilder<SortingStyle>(
+              valueListenable: sortingStyle,
+              builder: (context, value, _) {
+                if (value == SortingStyle.nameAz ||
+                    value == SortingStyle.nameZa) {
+                  return Column(
+                    children: [
+                      const SizedBox(height: 10),
+                      _caseSensitiveSwitch(theme),
+                      const SizedBox(height: 10),
+                      _ignoreAccentsSwitch(theme),
+                    ],
+                  );
+                } else if (value == SortingStyle.custom) {
+                  return Column(
+                    children: [
+                      const SizedBox(height: 10),
+                      _reorderingModeSwitch(theme),
+                    ],
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+            const SizedBox(height: 10),
+            _divider(theme),
+            const SizedBox(height: 10),
+            ValueListenableBuilder(
+              valueListenable: numberOfColumns,
+              builder: (context, value, _) => _optionTitle(
+                theme,
+                'Columns: $value',
               ),
-              const SizedBox(height: 10),
-              _divider(theme),
-              const SizedBox(height: 10),
-              ValueListenableBuilder(
-                valueListenable: numberOfColumns,
-                builder: (context, value, _) => _optionTitle(
-                  theme,
-                  'Columns: $value',
-                ),
-              ),
-              const SizedBox(height: 10),
-              NumberOfColumnsSlider(controller: numberOfColumns),
-            ],
-          ),
+            ),
+            const SizedBox(height: 10),
+            NumberOfColumnsSlider(controller: numberOfColumns),
+          ],
         ),
       ),
       actions: [

@@ -185,7 +185,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 _tagsButton(theme),
                 _importCardsButton(theme),
                 _exportCardsButton(theme),
-                _cloudBackupSettingsButton(theme),
+                //_cloudBackupSettingsButton(theme),
                 _autoBackupSettingsButton(theme),
                 const SizedBox(height: 10),
                 _subtitle(
@@ -279,7 +279,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _themeSetting(ThemeData theme) {
     return ValueListenableBuilder(
       valueListenable: _settings.theme.useDarkMode,
-      builder: (context, useDarkMode, _) => MySetting(
+      builder: (context, useDarkMode, _) => SettingTile(
         aboutSettingHeader: 'Switch theme between blue and white',
         settingAction: () async {
           _settings.theme.useDarkMode.value = !useDarkMode;
@@ -289,6 +289,7 @@ class _SettingsPageState extends State<SettingsPage> {
         settingIcon: Icons.palette,
         iconColor: theme.colorScheme.tertiary,
         borderColor: theme.colorScheme.primary,
+        showMore: false,
       ),
     );
   }
@@ -296,7 +297,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _extraDarkSetting(ThemeData theme) {
     return ValueListenableBuilder(
       valueListenable: _settings.theme.useExtraDark,
-      builder: (context, useExtraDark, _) => MySetting(
+      builder: (context, useExtraDark, _) => SettingTile(
         aboutSettingHeader: 'Use true black color for dark mode background',
         settingAction: () async {
           _settings.theme.useExtraDark.value = !useExtraDark;
@@ -304,9 +305,10 @@ class _SettingsPageState extends State<SettingsPage> {
         },
         settingHeader: 'Extra Dark Mode',
         iconColor:
-            useExtraDark ? Colors.green : Colors.red, // Indicate active state
-        settingIcon: Icons.brightness_2, // Moon icon for dark mode
+            useExtraDark ? Colors.green : Colors.red,
+        settingIcon: Icons.brightness_2,
         borderColor: theme.colorScheme.primary,
+        showMore: false,
       ),
     );
   }
@@ -314,7 +316,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _autoBrightnessSettingsButton(ThemeData theme) {
     return ValueListenableBuilder(
       valueListenable: _settings.useAutoBrightness,
-      builder: (context, isEnabled, _) => MySetting(
+      builder: (context, isEnabled, _) => SettingTile(
         aboutSettingHeader: 'Automatic brightness in card details',
         settingAction: () async {
           _settings.useAutoBrightness.value = !isEnabled;
@@ -324,6 +326,7 @@ class _SettingsPageState extends State<SettingsPage> {
         iconColor: isEnabled ? Colors.red : Colors.green,
         settingIcon: isEnabled ? Icons.lightbulb_outline : Icons.lightbulb,
         borderColor: theme.colorScheme.primary,
+        showMore: false,
       ),
     );
   }
@@ -331,7 +334,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _vibrationSettingsButton(ThemeData theme) {
     return ValueListenableBuilder(
       valueListenable: _settings.vibrateOnDifferentActions,
-      builder: (context, isEnabled, _) => MySetting(
+      builder: (context, isEnabled, _) => SettingTile(
         aboutSettingHeader: 'Vibrate on different actions',
         settingAction: () async {
           _settings.vibrateOnDifferentActions.value = !isEnabled;
@@ -341,6 +344,7 @@ class _SettingsPageState extends State<SettingsPage> {
         iconColor: isEnabled ? Colors.green : Colors.red,
         settingIcon: isEnabled ? Icons.vibration : Icons.phone_android_sharp,
         borderColor: theme.colorScheme.primary,
+        showMore: false,
       ),
     );
   }
@@ -348,7 +352,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _fontSettingsButton(ThemeData theme) {
     return ValueListenableBuilder(
       valueListenable: _settings.theme.useSystemFont,
-      builder: (context, useSystemFont, _) => MySetting(
+      builder: (context, useSystemFont, _) => SettingTile(
         aboutSettingHeader: 'Use System font everywhere',
         settingAction: () async {
           _settings.theme.useSystemFont.value = !useSystemFont;
@@ -359,6 +363,7 @@ class _SettingsPageState extends State<SettingsPage> {
         settingIcon:
             useSystemFont ? Icons.font_download : Icons.font_download_outlined,
         borderColor: theme.colorScheme.primary,
+        showMore: false,
       ),
     );
   }
@@ -366,20 +371,21 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _effectsButton(ThemeData theme) {
     return ValueListenableBuilder(
       valueListenable: _settings.theme.loyaltyCardEffect.isEnabled,
-      builder: (context, useEffects, _) => MySetting(
+      builder: (context, useEffects, _) => SettingTile(
         aboutSettingHeader: 'Add special effects to Card Tile',
         settingAction: showCardEffectsDialog,
         settingHeader: 'Card Tile effects',
         iconColor: useEffects ? Colors.green : Colors.red,
         settingIcon: CupertinoIcons.sparkles,
         borderColor: theme.colorScheme.primary,
+        showMore: true,
       ),
     );
   }
 
   Widget _passwordButton(ThemeData theme) {
-    return MySetting(
-      aboutSettingHeader: 'Protect your cards by using password',
+    return SettingTile(
+      aboutSettingHeader: 'Protect your cards by using a password',
       settingAction: () => Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const PasswordScreen()),
@@ -388,11 +394,12 @@ class _SettingsPageState extends State<SettingsPage> {
       settingIcon: Icons.password,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,
+      showMore: false,
     );
   }
 
   Widget _tagsButton(ThemeData theme) {
-    return MySetting(
+    return SettingTile(
       aboutSettingHeader: 'Categorize your cards by using tags',
       settingAction: () => Navigator.push(
         context,
@@ -402,11 +409,12 @@ class _SettingsPageState extends State<SettingsPage> {
       settingIcon: Icons.label,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,
+      showMore: false,
     );
   }
 
   Widget _importCardsButton(ThemeData theme) {
-    return MySetting(
+    return SettingTile(
       aboutSettingHeader: 'Load all your cards from the export',
       settingAction: () async {
         final imported = await showImportCardsDialog(context);
@@ -420,11 +428,12 @@ class _SettingsPageState extends State<SettingsPage> {
       settingIcon: Icons.save_alt,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,
+      showMore: true,
     );
   }
 
   Widget _exportCardsButton(ThemeData theme) {
-    return MySetting(
+    return SettingTile(
       aboutSettingHeader: 'Backup all your cards into one file',
       settingAction: () async {
         final success = await requirePassword(context);
@@ -437,11 +446,12 @@ class _SettingsPageState extends State<SettingsPage> {
       settingIcon: Icons.upload,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,
+      showMore: true,
     );
   }
 
   Widget _cloudBackupSettingsButton(ThemeData theme) {
-    return MySetting(
+    return SettingTile(
       aboutSettingHeader: 'Backup your cards into self-hosted cloud storage',
       settingAction: () => Navigator.push(
         context,
@@ -451,36 +461,39 @@ class _SettingsPageState extends State<SettingsPage> {
       iconColor: Theme.of(context).colorScheme.tertiary,
       settingIcon: Icons.cloud,
       borderColor: Theme.of(context).colorScheme.primary,
+      showMore: false,
     );
   }
 
   Widget _autoBackupSettingsButton(ThemeData theme) {
     return ValueListenableBuilder(
       valueListenable: _settings.autoBackups.isEnabled,
-      builder: (context, isEnabled, _) => MySetting(
+      builder: (context, isEnabled, _) => SettingTile(
         aboutSettingHeader: 'Do backups automatically on app start',
         settingAction: showAutoUpdateDialog,
         settingHeader: 'AUTO Backups',
         iconColor: isEnabled ? Colors.green : Colors.red,
         settingIcon: Icons.upload,
         borderColor: theme.colorScheme.primary,
+        showMore: true,
       ),
     );
   }
 
   Widget _deleteDatabaseButton(ThemeData theme) {
-    return MySetting(
+    return SettingTile(
       aboutSettingHeader: 'Remove all cards from the app',
       settingAction: () => showClearCardsDialog(),
       settingHeader: 'Delete Cardabase',
       settingIcon: Icons.delete_outline,
       iconColor: Colors.red,
       borderColor: Colors.red,
+      showMore: false,
     );
   }
 
   Widget _aboutButton(ThemeData theme) {
-    return MySetting(
+    return SettingTile(
       aboutSettingHeader: 'About Cardabase',
       settingAction: () {
         Navigator.push(
@@ -494,11 +507,12 @@ class _SettingsPageState extends State<SettingsPage> {
       settingIcon: Icons.info,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,
+      showMore: false,
     );
   }
 
   Widget _discordLink(ThemeData theme) {
-    return MySetting(
+    return SettingTile(
       aboutSettingHeader: 'Join Cardabase Discord community',
       settingAction: () => _launchUrl(
         Uri.parse('https://discord.com/invite/fZNDfG2xv3'),
@@ -507,11 +521,12 @@ class _SettingsPageState extends State<SettingsPage> {
       settingIcon: Icons.discord,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,
+      showMore: false,
     );
   }
 
   Widget _bugReportButton(ThemeData theme) {
-    return MySetting(
+    return SettingTile(
       aboutSettingHeader: 'Report a bug anonymously',
       settingAction: () => showDialog(
         context: context,
@@ -521,11 +536,12 @@ class _SettingsPageState extends State<SettingsPage> {
       settingIcon: Icons.bug_report,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,
+      showMore: false,
     );
   }
 
   Widget _githubLink(ThemeData theme) {
-    return MySetting(
+    return SettingTile(
       aboutSettingHeader: 'Visit source code of this project',
       settingAction: () => _launchUrl(
         Uri.parse('https://github.com/GeorgeYT9769/cardabase-app'),
@@ -534,11 +550,12 @@ class _SettingsPageState extends State<SettingsPage> {
       settingIcon: Icons.code,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,
+      showMore: false,
     );
   }
 
   Widget _fdroidLink(ThemeData theme) {
-    return MySetting(
+    return SettingTile(
       aboutSettingHeader: 'Visit F-Droid page of this project',
       settingAction: () => _launchUrl(
         Uri.parse(
@@ -549,11 +566,12 @@ class _SettingsPageState extends State<SettingsPage> {
       settingIcon: Icons.store,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,
+      showMore: false,
     );
   }
 
   Widget _websiteLink(ThemeData theme) {
-    return MySetting(
+    return SettingTile(
       aboutSettingHeader: 'Check out the website for this project',
       settingAction: () => _launchUrl(
         Uri.parse('https://georgeyt9769.github.io/cardabase/'),
@@ -562,6 +580,7 @@ class _SettingsPageState extends State<SettingsPage> {
       settingIcon: Icons.web,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,
+      showMore: false,
     );
   }
 }
