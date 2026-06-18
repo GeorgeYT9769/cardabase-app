@@ -98,9 +98,6 @@ Future<void> _ensureCustomOrderContainsAllCards(
 Future<void> onCardsChanged(BoxEvent event) async {
   final id = event.key;
   if (id is! String) {
-    print(
-      'Id of card is no String. This should not happen. (Id: $id)',
-    );
     return;
   }
 

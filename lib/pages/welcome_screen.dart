@@ -1,10 +1,14 @@
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/pages/home/home_page.dart';
+import 'package:cardabase/pages/terms_of_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get_it/get_it.dart';
+import 'package:material_new_shapes/material_new_shapes.dart';
+
+import '../util/expressive_loading_indicator.dart';
 
 class WelcomeScreen extends StatefulWidget {
   final String currentAppVersion;
@@ -67,7 +71,22 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final changelogWidget = changelog == null
-        ? const CircularProgressIndicator()
+        ? ExpressiveLoadingIndicator(
+          color: Theme.of(context).colorScheme.tertiary,
+          constraints: const BoxConstraints(
+            minWidth: 64.0,
+            minHeight: 64.0,
+            maxWidth: 64.0,
+            maxHeight: 64.0,
+          ),
+          polygons: [
+            MaterialShapes.softBurst,
+            MaterialShapes.pentagon,
+            MaterialShapes.pill,
+          ],
+          semanticsLabel: 'Loading',
+          semanticsValue: 'In progress',
+        )
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -150,12 +169,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               ),
               const SizedBox(height: 30),
               changelogWidget,
-              Text(
-                'Important: New storage system -> ERRORS. To fix this, export and import all your cards to convert them.',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyLarge
-                    ?.copyWith(fontSize: 16, color: Colors.red),
-              ),
+              //Text(
+              //  'Important: New storage system -> ERRORS. To fix this, export and import all your cards to convert them.',
+              //  textAlign: TextAlign.center,
+              //  style: theme.textTheme.bodyLarge
+              //      ?.copyWith(fontSize: 16, color: Colors.red),
+              //),
               const SizedBox(height: 40),
               Bounceable(
                 onTap: () {},
@@ -256,6 +275,21 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       style: theme.textTheme.bodyLarge
                           ?.copyWith(color: theme.colorScheme.inverseSurface),
                     ),
+                  ),
+                ),
+              ),
+              TextButton(
+                child: Text(
+                  'By entering the app, you agree to the Terms of Service',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TermsOfServicePage(),
                   ),
                 ),
               ),

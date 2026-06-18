@@ -13,6 +13,7 @@ import 'package:cardabase/feature/settings/widgets/tags_page.dart';
 import 'package:cardabase/pages/cloud_backup.dart';
 import 'package:cardabase/pages/info.dart';
 import 'package:cardabase/pages/password.dart';
+import 'package:cardabase/pages/terms_of_service.dart';
 import 'package:cardabase/util/setting_tile.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
@@ -201,26 +202,20 @@ class _SettingsPageState extends State<SettingsPage> {
                   theme.colorScheme.inverseSurface,
                 ),
                 _aboutButton(theme),
+                _tosButton(theme),
                 _discordLink(theme),
                 _bugReportButton(theme),
                 _githubLink(theme),
                 _fdroidLink(theme),
                 _websiteLink(theme),
                 //uncomment this to enable dev options in the settings
-                // const SizedBox(height: 10),
-                // _subtitle(
-                //   theme,
-                //   'Other',
-                // ),
-                //MySetting(
-                //  aboutSettingHeader:
-                //  'Toggle developer options',
-                //  settingAction: toggleDeveloperOptions,
-                //  settingHeader: 'DEV Options',
-                //  settingIcon:Icons.developer_mode,
-                //  iconColor: devOptions ? Colors.green : Colors.red,
-                //  borderColor: theme.colorScheme.primary,
+                //const SizedBox(height: 10),
+                //_subtitle(
+                //  theme,
+                //  'Other',
+                //  theme.colorScheme.inverseSurface,
                 //),
+                //_debugButton(theme),
                 const SizedBox(height: 100),
               ]),
             ),
@@ -492,6 +487,24 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  Widget _debugButton(ThemeData theme) {
+    return ValueListenableBuilder(
+      valueListenable: _settings.developerOptions.isEnabled,
+      builder: (context, isEnabled, _) => SettingTile(
+        aboutSettingHeader: 'Debug some actions',
+        settingAction: () async {
+          _settings.developerOptions.isEnabled.value = !isEnabled;
+          await _settingsBox.save(_settings.seal());
+        },
+        settingHeader: 'Developer options',
+        iconColor: isEnabled ? Colors.green : Colors.red,
+        settingIcon: isEnabled ? Icons.phonelink_setup : Icons.phonelink_setup,
+        borderColor: theme.colorScheme.primary,
+        showMore: false,
+      ),
+    );
+  }
+
   Widget _aboutButton(ThemeData theme) {
     return SettingTile(
       aboutSettingHeader: 'About Cardabase',
@@ -505,6 +518,25 @@ class _SettingsPageState extends State<SettingsPage> {
       },
       settingHeader: 'App INFO',
       settingIcon: Icons.info,
+      iconColor: theme.colorScheme.tertiary,
+      borderColor: theme.colorScheme.primary,
+      showMore: false,
+    );
+  }
+
+  Widget _tosButton(ThemeData theme) {
+    return SettingTile(
+      aboutSettingHeader: 'Legal terms and conditions',
+      settingAction: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const TermsOfServicePage(),
+          ),
+        );
+      },
+      settingHeader: 'Terms of Service',
+      settingIcon: Icons.gavel,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,
       showMore: false,

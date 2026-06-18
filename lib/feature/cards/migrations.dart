@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:barcode_widget/barcode_widget.dart' show BarcodeType;
 import 'package:cardabase/data/unique_id.dart';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/util/barcode_type_extensions.dart';

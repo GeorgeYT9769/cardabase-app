@@ -117,7 +117,7 @@ class _CloudBackupState extends State<CloudBackup> {
       ScaffoldMessenger.of(context).showSnackBar(
         buildCustomSnackBar(
             'Uploaded $successCount cards. Failed on $failCount.',
-            failCount < 0),
+            failCount < 0,),
       );
     }
   }
@@ -144,7 +144,7 @@ class _CloudBackupState extends State<CloudBackup> {
         GetIt.I<VibrationProvider>().vibrateSuccess();
         ScaffoldMessenger.of(context).showSnackBar(
           buildCustomSnackBar(
-              'Successfully downloaded ${downloadedCards.length} cards', true),
+              'Successfully downloaded ${downloadedCards.length} cards', true,),
         );
       } else {
         GetIt.I<VibrationProvider>().vibrateSuccess();
@@ -247,7 +247,7 @@ class _CloudBackupState extends State<CloudBackup> {
       GetIt.I<VibrationProvider>().vibrateSuccess();
       ScaffoldMessenger.of(context).showSnackBar(
         buildCustomSnackBar(
-            'Permanently deleted $deletedCount cards from cloud', true),
+            'Permanently deleted $deletedCount cards from cloud', true,),
       );
     } catch (e) {
       debugPrint('Failed to delete cards: $e');
@@ -296,7 +296,7 @@ class _CloudBackupState extends State<CloudBackup> {
         GetIt.I<VibrationProvider>().vibrateSuccess();
         ScaffoldMessenger.of(context).showSnackBar(
           buildCustomSnackBar(
-              'Server returned status ${response.statusCode}', false),
+              'Server returned status ${response.statusCode}', false,),
         );
       }
       httpClient.close();

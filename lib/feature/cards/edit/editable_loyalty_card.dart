@@ -1,4 +1,3 @@
-import 'package:barcode_widget/barcode_widget.dart' hide Barcode;
 import 'package:cardabase/data/unique_id.dart';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/util/list_notifier.dart';

@@ -1,0 +1,44 @@
+TERMS OF SERVICE FOR CARDABASE
+
+Last Updated: June 18, 2026
+
+Please read these Terms of Service ("Terms") carefully before using the Cardabase mobile application (the "App") developed by GeorgeYT9769 ("we", "us", or "our").
+
+By downloading, installing, or using Cardabase, you agree to be bound by these Terms and the MIT License under which this software is distributed.
+
+-------------------------------------------------------
+
+1. DESCRIPTION OF SERVICE
+Cardabase is an open-source digital wallet application designed to help users store, manage, and display loyalty cards and barcodes locally on their devices.
+
+2. OPEN SOURCE LICENSE
+The App is licensed under the MIT License. This means you are free to use, copy, modify, and distribute the software, provided that the copyright notice and permission notice are included in all copies or substantial portions of the software.
+
+3. USER RESPONSIBILITY AND DATA PRIVACY
+- Offline Storage: Cardabase is an offline-first application. All card data, barcodes, and images are stored locally on your device. We do not have access to your data.
+- Security: While the App offers features like encrypted storage and password protection for cards, you are solely responsible for maintaining the security of your device and your App password.
+- Backups: You are responsible for using the "Export Cardabase" feature to back up your data. We are not responsible for any data loss resulting from app uninstallation, device damage, or software errors.
+
+4. REQUIRED PERMISSIONS
+To function correctly, the App may request access to:
+- Camera: For scanning barcodes and taking pictures of physical cards.
+- Storage (Read/Write): To save card data and images locally and to perform import/export functions.
+- Internet (Optional): Used solely for checking for app updates or fetching changelogs.
+- System Settings: To manage screen brightness for easier barcode scanning.
+
+5. PROHIBITED USE
+You agree not to use Cardabase for any illegal purposes, including but not limited to the storage or distribution of fraudulent digital assets or copyrighted material you do not have the right to possess.
+
+6. DISCLAIMER OF WARRANTIES
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+
+7. LIMITATION OF LIABILITY
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. This includes, but is not limited to, hardware damage, software bugs, or loss of data.
+
+8. CHANGES TO TERMS
+We reserve the right to update these Terms at any time. Changes will be effective immediately upon the release of a new version of the App. Your continued use of the App constitutes acceptance of the revised Terms.
+
+9. CONTACT
+If you have any questions about these Terms, please contact the developer via:
+- GitHub: https://github.com/GeorgeYT9769/cardabase-app
+- Discord: georgeyt9769
