@@ -5,7 +5,7 @@
 <h1 align="center">Cardabase</h1>
 
   <p align="center">
-    Cardabase is your digital wallet for loyalty cards. Save all your shop cards in one secure place and access them instantly.
+    Lightweight digital wallet to securely scan, store, and manage loyalty cards offline.
     <br />
     <div align="center">
       <img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/featureGraphic.png?raw=true" alt="Banner">
@@ -29,16 +29,14 @@
 
 <br />
 
-## 👌 Features
+## 👌 Key Features
 
-- Light/dark mode themes
-- Modern look with user-friendly layout
-- Light, fast and smooth experience
-- Encrypted storage
-- Support for modern barcode types
-- Password protected cards
-- Share cards easily with QR Codes
-- Does not need internet connection
+- 100% Offline & Private: No tracking, no data collection, and no internet connection required to manage your cards.
+- Fast Barcode Scanning: Easily scan physical cards using your device's camera or import them from images.
+- Encrypted Storage: Protect your sensitive cards and data with password-secured local encryption.
+- Screen Brightness Control: Automatically adjusts your screen brightness when displaying a card for seamless scanning at checkout counters.
+- Import & Export: Take full control of your data with easy backup and restore options.
+- Modern, Lightweight UI: Fast, clean design optimized for daily use without bloat.
 
 ## 🛡️ Security
 More info [here](https://www.virustotal.com/gui/file/16c68fd2161573f337b175c8c68a9be98f416b9bd91790286c44bb13466e6526)
@@ -63,72 +61,15 @@ height="80">](https://github.com/GeorgeYT9769/cardabase-app/releases/latest)
 > [!NOTE]
 > F-Droid releases might not be in sync with those from GitHub.
 
-## ❗ Acknowledgments
-
-By downloading the app you agree:
-
-- To accept the MIT license;
-- That the owner, creators, and contributors are not responsible for any hardware, software, emotional, or other damages made by bugs in the app. Download and use at your own risk;
-- To allow Cardabase to use local storage (camera, internet connection - optional).
-
 ## 🔜 Coming soon
 
-- add biometric identification for the password
 - add a counter to every card, so when card is clicked, it would add a point, then this could be used to sort by the most used cards
 - custom color theme, custom theme builder
-- anonymous bug reporting (to Discord issue tracker)
+- advanced front image editor
 - idk, let me know via issues ;)
 
-## 📦 Storage System
-
-From 1.5.0, Cardabase uses this storage system:
-
-`'ID': VALUE # EXAMPLE,`
-`'cardName': <Card Name>,`   
-`'cardId': <Card ID>,`  
-`'redValue': <R value>,`  
-`'greenValue': <G value>,`  
-`'blueValue': <B value>,`  
-`'cardType': <Card Type>,`  
-`'hasPassword': <Password>,`
-`'uniqueId': <Unique ID>,`
-`'tags': <Tags>,`
-
-- `<Card Name>` - Name of the card (String)
-- `<Card ID>` - ID of the card (String)
-- `<R value>` - Value of Red color, 0 - 255 (int)
-- `<G value>` - Value of Green color, 0 - 255 (int)
-- `<B value>` - Value of Blue color, 0 - 255 (int)
-- `<Card Type>` - Type of the card, they can be [THESE](https://github.com/GeorgeYT9769/cardabase-app/blob/2e86905c4fb4f861cd3008506a681aab96ea9b38/lib/pages/createcardnew.dart#L9-L27) or [THESE](https://github.com/GeorgeYT9769/cardabase-app/blob/2e86905c4fb4f861cd3008506a681aab96ea9b38/lib/pages/createcardnew.dart#L58-L89), (same types) (String)
-- `<Password>` - If the card has a password or not (bool)
-- `<Unique ID>` - ID of each card, YYYYMMDDHHMMSSX, X is a bonus number only applied when importing all cards at once (String)
-- `<Tags>` - List of tags to categorize the cards (List with Strings in it)
-
-## 📥 Import a card via QR Code
-
-From 1.3.0, you can easily import a card via QR Code.
-This is how the structure of the data in the QR Code looks like:
-`
-'cardName': controller.text,
-'cardId': controllercardid.text,
-'redValue': redValue,
-'greenValue': greenValue,
-'blueValue': blueValue,
-'cardType': cardTypeText,
-'hasPassword': hasPassword,
-'uniqueId': uniqueId,
-'tags': selectedTags.toList(),
-`
-- `<Card Name>` - Name of the card (String)
-- `<Card ID>` - ID of the card (String)
-- `<R value>` - Value of Red color, 0 - 255 (int)
-- `<G value>` - Value of Green color, 0 - 255 (int)
-- `<B value>` - Value of Blue color, 0 - 255 (int)
-- `<Card Type>` - Type of the card, they can be [THESE](https://github.com/GeorgeYT9769/cardabase-app/blob/2e86905c4fb4f861cd3008506a681aab96ea9b38/lib/pages/createcardnew.dart#L9-L27) or [THESE](https://github.com/GeorgeYT9769/cardabase-app/blob/2e86905c4fb4f861cd3008506a681aab96ea9b38/lib/pages/createcardnew.dart#L58-L89), (same types) (String)
-- `<Password>` - If the card has a password or not (bool)
-
 ## 📌 Permissions
-Currently, the app uses these permissions (+why are they needed) :
+Currently, the app uses these permissions (+ why are they needed) :
 - android.permission.WRITE_EXTERNAL_STORAGE - used by the storage system to save the app's data, mandatory
 - android.permission.READ_EXTERNAL_STORAGE - used by the storage system to save the app's data, mandatory
 - android.permission.MANAGE_EXTERNAL_STORAGE - used by the import and export system, optional
@@ -138,6 +79,7 @@ Currently, the app uses these permissions (+why are they needed) :
 - android.permission.CAMERA - used to read barcodes and take pictures of the cards, optional
 - android.permission.READ_MEDIA_IMAGES - used to select images for cards, optional
 - android.permission.READ_MEDIA_VISUAL_USER_SELECTED - used to select images for cards, optional
+- android.permission.USE_BIOMETRIC - for fingerprint verification if a card password is used, optional
 
 ## 🤝 Thanks to
 

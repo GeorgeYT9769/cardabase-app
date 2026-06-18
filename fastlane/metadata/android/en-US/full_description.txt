@@ -1,18 +1,13 @@
-Features:
-- Light/dark mode themes
-- Modern look with user-friendly layout
-- Light, fast and smooth experience
-- Encrypted storage
-- Support for modern barcode types
-- Password protected cards
-- Share cards easily with QR Codes
-- Does not need internet connection
+Ditch the plastic and declutter your wallet with Cardabase, a lightweight, secure, and open-source digital wallet for all your loyalty cards, tickets, and barcodes.
 
-Note:
-- Images might be different from the actual app design.
+Built with privacy and simplicity in mind, Cardabase is entirely offline-first. Your personal data, card numbers, and scanned images never leave your device.
 
-Acknowledgments:
-By downloading the app you agree:
-- To accept the MIT license;
-- That the owner, creators, and contributors are not responsible for any hardware, software, emotional, or other damages made by the app. Download and use on your own risk;
-- To allow Cardabase use local storage (internet and camera - optional).
+Key Features:
+• 100% Offline & Private: No tracking, no data collection, and no internet connection required to manage your cards.
+• Fast Barcode Scanning: Easily scan physical cards using your device's camera or import them from images.
+• Encrypted Storage: Protect your sensitive cards and data with password-secured local encryption.
+• Screen Brightness Control: Automatically adjusts your screen brightness when displaying a card for seamless scanning at checkout counters.
+• Import & Export: Take full control of your data with easy backup and restore options.
+• Modern, Lightweight UI: Fast, clean design optimized for daily use without bloat.
+
+Cardabase is fully open-source (MIT License). Code and contributions are welcome on GitHub.

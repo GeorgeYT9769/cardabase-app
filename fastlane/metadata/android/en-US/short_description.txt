@@ -1,1 +1,1 @@
-Cardabase is an open-source digital wallet application designed to help users store, manage, and display loyalty cards and barcodes locally on their devices.
+Lightweight digital wallet to securely scan, store, and manage loyalty cards offline.
