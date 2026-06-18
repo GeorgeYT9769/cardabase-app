@@ -4,9 +4,11 @@ class PasswordFormField extends StatelessWidget {
   const PasswordFormField({
     super.key,
     required this.controller,
+    this.suffixIcon,
   });
 
   final TextEditingController controller;
+  final Widget? suffixIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +36,7 @@ class PasswordFormField extends StatelessWidget {
           color: theme.colorScheme.secondary,
         ),
         labelText: 'Password',
+        suffixIcon: suffixIcon,
       ),
       style: theme.textTheme.bodyLarge?.copyWith(
         color: theme.colorScheme.tertiary,

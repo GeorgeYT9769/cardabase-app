@@ -371,6 +371,41 @@ class _PasswordScreenState extends State<PasswordScreen> {
                       ),
                     ),
                   ),
+                  SizedBox(height: 10,),
+                  Divider(
+                    color: theme.colorScheme.primary,
+                    thickness: 1.0,
+                  ),
+                  ValueListenableBuilder(
+                    valueListenable: passwordbox.listenable(keys: ['use_biometric']),
+                    builder: (context, box, _) {
+                      final useBiometric = box.get('use_biometric', defaultValue: false);
+                      return CheckboxListTile(
+                        title: Text(
+                          'Use biometric authentication',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: theme.colorScheme.inverseSurface,
+                          ),
+                        ),
+                        value: useBiometric,
+                        onChanged: (value) {
+                          passwordbox.put('use_biometric', value);
+                        },
+                        activeColor: theme.colorScheme.primary,
+                        checkColor: theme.colorScheme.onPrimary,
+                        controlAffinity: ListTileControlAffinity.leading,
+                        contentPadding: EdgeInsets.zero,
+                        side: BorderSide(
+                          color: theme.colorScheme.primary,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),

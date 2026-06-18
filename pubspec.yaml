@@ -46,6 +46,7 @@ dependencies:
   http: ^1.4.0
   image: ^4.9.1
   image_picker: ^1.2.2
+  local_auth: ^2.3.0
   material_new_shapes: ^1.0.0
   package_info_plus: ^10.1.0
   password_strength_checker: ^1.3.2

@@ -445,6 +445,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  //for later use
   Widget _cloudBackupSettingsButton(ThemeData theme) {
     return SettingTile(
       aboutSettingHeader: 'Backup your cards into self-hosted cloud storage',
@@ -487,6 +488,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  //for debug use
   Widget _debugButton(ThemeData theme) {
     return ValueListenableBuilder(
       valueListenable: _settings.developerOptions.isEnabled,
