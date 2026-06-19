@@ -1,5 +1,27 @@
 LATEST CHANGELOG:
 
+19.06.2026:
+1.8.0:
+- Overhauled and improved storage system (thanks Wim),
+- Custom sorting system has been improved (thanks Wim),
+- Sorting cards by name can now ignore accents and can be case insensitive,
+- Card layout on homescreen has been improved,
+- Added bottom padding for users with 3-button system navigation (overlapping issues),
+- You can now set Card effects for front page of the cards (can be heavy on performance),
+- If you have a password set up, you can now authenticate using fingerprint (only if you decide to enable this option),
+- Tags page got a little overhaul,
+- Exporting your Cardabase now means you can export a whole setup (cards, settings, images) in one .cdb file,
+- Importing your Cardabase now means you can import the whole setup from the .cdb file, also you can just click on the file and open it with Cardabase in any file Explorer,
+- Deleting your Cardabase now has it's own Danger Zone to make it more visible,
+- Added Terms of Service,
+- You can now anonymously report a bug, this will only gather text you write and sends it directly into Discord issues channel (please be kind and don't misuse this feature),
+- App Info page got overhauled, added app informations such as version, build number, signature and installation info,
+- Buttons for Card Type and Card Color were redesigned to match the design of other input fields,
+- You can now add points to different cards, either by manually entering, clicking or holding side buttons,
+- Taking pictures of you cards is now much easier and better, also with buttons redesign,
+- Redesigned app icon to match the app's font and texts in README and for F-Droid store,
+- Fixed some bugs.
+
 29.12.2025:
 1.7.0:
 - App now supports pictures of your cards - simply go to Others tab and add a picture, either by making one or picking one from your Gallery,
@@ -9,7 +31,7 @@ LATEST CHANGELOG:
 - App now supports full dark theme for OLED screens,
 - Setting tiles are now slimmer, the details are hidde and can be shown by holding on the setting tile,
 - You can now export your Cardabase into clipboard and paste/send/save it however you like,
-- App bar (the top bar of the page) at the Homepage and Settings hide when you scroll down and show up when you scroll up,
+- App bar (the top bar of the page) at the Homepage and Settings hides when you scroll downwards and shows up when you scroll upwards,
 - You can now duplicate your cards (was removed somehow, my fault),
 - App now supports app shortcuts, so when you hold the icon, a menu pops up with different options (if you have an idea what to put there, let me know),
 - Fixed a bug where auto updates could be turned on without entering a password (if one was set up).
@@ -28,7 +50,7 @@ LATEST CHANGELOG:
 - Small improvements and bug fixes.
 
 19.10.2025:
-1.6.0::
+1.6.0:
 - You can now add notes to your cards,
 - There are now auto backups meaning you can turn it on and set a duration how often you want the app to back up your cards automatically,
 - Small improvements and bug fixes.

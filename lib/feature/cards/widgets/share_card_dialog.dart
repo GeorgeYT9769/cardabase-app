@@ -1,5 +1,6 @@
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bounceable/flutter_bounceable.dart';
 
 class ShareCardDialog extends StatelessWidget {
   const ShareCardDialog({
@@ -36,24 +37,27 @@ class ShareCardDialog extends StatelessWidget {
       ),
       actions: [
         Center(
-          child: OutlinedButton(
-            style: OutlinedButton.styleFrom(
-              elevation: 0.0,
-              side: BorderSide(
-                color: theme.colorScheme.primary,
-                width: 2.0,
+          child: Bounceable(
+            onTap: () {},
+            child: OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                elevation: 0.0,
+                side: BorderSide(
+                  color: theme.colorScheme.primary,
+                  width: 2.0,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(11),
+                ),
               ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(11),
-              ),
-            ),
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              'DONE',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-                color: theme.colorScheme.tertiary,
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'DONE',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                  color: theme.colorScheme.tertiary,
+                ),
               ),
             ),
           ),
