@@ -1,5 +1,9 @@
 LATEST CHANGELOG:
 
+25.06.2026
+1.8.1:
+- Fixed a bug for F-Droid build and release (this is an optional update).
+
 19.06.2026:
 1.8.0:
 - Overhauled and improved storage system (thanks Wim),
