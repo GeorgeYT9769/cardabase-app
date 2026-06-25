@@ -6,7 +6,6 @@ import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/feature/settings/widgets/auto_update_settings_dialog.dart';
-import 'package:cardabase/feature/settings/widgets/bug_report_dialog.dart';
 import 'package:cardabase/feature/settings/widgets/card_effect_settings_dialog.dart';
 import 'package:cardabase/feature/settings/widgets/clear_cards_dialog.dart';
 import 'package:cardabase/feature/settings/widgets/tags_page.dart';
@@ -204,7 +203,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 _aboutButton(theme),
                 _tosButton(theme),
                 _discordLink(theme),
-                _bugReportButton(theme),
                 _githubLink(theme),
                 _fdroidLink(theme),
                 _websiteLink(theme),
@@ -553,21 +551,6 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       settingHeader: 'Discord',
       settingIcon: Icons.discord,
-      iconColor: theme.colorScheme.tertiary,
-      borderColor: theme.colorScheme.primary,
-      showMore: false,
-    );
-  }
-
-  Widget _bugReportButton(ThemeData theme) {
-    return SettingTile(
-      aboutSettingHeader: 'Report a bug anonymously',
-      settingAction: () => showDialog(
-        context: context,
-        builder: (context) => const BugReportDialog(),
-      ),
-      settingHeader: 'Bug report',
-      settingIcon: Icons.bug_report,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,
       showMore: false,
