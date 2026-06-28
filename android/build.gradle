@@ -1,3 +1,5 @@
+import com.android.build.gradle.LibraryExtension
+
 buildscript {
     ext.kotlin_version = '2.2.0'
     repositories {
@@ -55,5 +57,21 @@ tasks.register("clean", Delete) {
 tasks.whenTaskAdded { task ->
     if (task.name.contains("ArtProfile")) {
         task.enabled = false
+    }
+}
+
+subprojects {
+    plugins.withId("com.android.library") {
+        if (name == "jni") {
+            extensions.configure("android") { LibraryExtension ext ->
+                ext.defaultConfig {
+                    externalNativeBuild {
+                        cmake {
+                            arguments += "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,--build-id=none"
+                        }
+                    }
+                }
+            }
+        }
     }
 }

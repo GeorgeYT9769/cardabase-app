@@ -1,5 +1,9 @@
 LATEST CHANGELOG:
 
+28.06.2026
+1.8.2:
+- Fixed a bug (JNI Pub) for F-Droid reproducible builds system (this is an optional update).
+
 25.06.2026
 1.8.1:
 - Fixed a bug for F-Droid build and release (this is an optional update).
