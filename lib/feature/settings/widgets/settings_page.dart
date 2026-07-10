@@ -197,11 +197,12 @@ class _SettingsPageState extends State<SettingsPage> {
                 const SizedBox(height: 10),
                 _subtitle(
                   theme,
-                  'Social Networks',
+                  'About',
                   theme.colorScheme.inverseSurface,
                 ),
                 _aboutButton(theme),
                 _tosButton(theme),
+                _keepAndroidOpen(theme),
                 _discordLink(theme),
                 _githubLink(theme),
                 _fdroidLink(theme),
@@ -210,7 +211,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 //const SizedBox(height: 10),
                 //_subtitle(
                 //  theme,
-                //  'Other',
+                //  'Tools',
                 //  theme.colorScheme.inverseSurface,
                 //),
                 //_debugButton(theme),
@@ -282,7 +283,6 @@ class _SettingsPageState extends State<SettingsPage> {
         settingIcon: Icons.palette,
         iconColor: theme.colorScheme.tertiary,
         borderColor: theme.colorScheme.primary,
-        showMore: false,
       ),
     );
   }
@@ -301,7 +301,6 @@ class _SettingsPageState extends State<SettingsPage> {
             useExtraDark ? Colors.green : Colors.red,
         settingIcon: Icons.brightness_2,
         borderColor: theme.colorScheme.primary,
-        showMore: false,
       ),
     );
   }
@@ -319,7 +318,6 @@ class _SettingsPageState extends State<SettingsPage> {
         iconColor: isEnabled ? Colors.red : Colors.green,
         settingIcon: isEnabled ? Icons.lightbulb_outline : Icons.lightbulb,
         borderColor: theme.colorScheme.primary,
-        showMore: false,
       ),
     );
   }
@@ -337,7 +335,6 @@ class _SettingsPageState extends State<SettingsPage> {
         iconColor: isEnabled ? Colors.green : Colors.red,
         settingIcon: isEnabled ? Icons.vibration : Icons.phone_android_sharp,
         borderColor: theme.colorScheme.primary,
-        showMore: false,
       ),
     );
   }
@@ -356,7 +353,6 @@ class _SettingsPageState extends State<SettingsPage> {
         settingIcon:
             useSystemFont ? Icons.font_download : Icons.font_download_outlined,
         borderColor: theme.colorScheme.primary,
-        showMore: false,
       ),
     );
   }
@@ -387,7 +383,6 @@ class _SettingsPageState extends State<SettingsPage> {
       settingIcon: Icons.password,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,
-      showMore: false,
     );
   }
 
@@ -402,7 +397,6 @@ class _SettingsPageState extends State<SettingsPage> {
       settingIcon: Icons.label,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,
-      showMore: false,
     );
   }
 
@@ -455,7 +449,6 @@ class _SettingsPageState extends State<SettingsPage> {
       iconColor: Theme.of(context).colorScheme.tertiary,
       settingIcon: Icons.cloud,
       borderColor: Theme.of(context).colorScheme.primary,
-      showMore: false,
     );
   }
 
@@ -482,7 +475,7 @@ class _SettingsPageState extends State<SettingsPage> {
       settingIcon: Icons.delete_outline,
       iconColor: Colors.red,
       borderColor: Colors.red,
-      showMore: false,
+      textColor: Colors.red,
     );
   }
 
@@ -500,7 +493,6 @@ class _SettingsPageState extends State<SettingsPage> {
         iconColor: isEnabled ? Colors.green : Colors.red,
         settingIcon: isEnabled ? Icons.phonelink_setup : Icons.phonelink_setup,
         borderColor: theme.colorScheme.primary,
-        showMore: false,
       ),
     );
   }
@@ -520,7 +512,6 @@ class _SettingsPageState extends State<SettingsPage> {
       settingIcon: Icons.info,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,
-      showMore: false,
     );
   }
 
@@ -539,7 +530,19 @@ class _SettingsPageState extends State<SettingsPage> {
       settingIcon: Icons.gavel,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,
-      showMore: false,
+    );
+  }
+
+  Widget _keepAndroidOpen(ThemeData theme) {
+    return SettingTile(
+      aboutSettingHeader: 'Your phone is about to stop being yours.',
+      settingAction: () => _launchUrl(
+        Uri.parse('https://keepandroidopen.org/'),
+      ),
+      settingHeader: 'Keep Android Open',
+      settingIcon: Icons.android,
+      iconColor: theme.colorScheme.tertiary,
+      borderColor: theme.colorScheme.primary,
     );
   }
 
@@ -553,7 +556,6 @@ class _SettingsPageState extends State<SettingsPage> {
       settingIcon: Icons.discord,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,
-      showMore: false,
     );
   }
 
@@ -567,7 +569,6 @@ class _SettingsPageState extends State<SettingsPage> {
       settingIcon: Icons.code,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,
-      showMore: false,
     );
   }
 
@@ -583,7 +584,6 @@ class _SettingsPageState extends State<SettingsPage> {
       settingIcon: Icons.store,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,
-      showMore: false,
     );
   }
 
@@ -597,7 +597,6 @@ class _SettingsPageState extends State<SettingsPage> {
       settingIcon: Icons.web,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,
-      showMore: false,
     );
   }
 }

@@ -118,18 +118,29 @@ class _EditCardPageState extends State<EditCardPage> {
     final theme = Theme.of(context);
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
-      appBar: _appBar(theme),
-      body: EditCardForm(
-        formKey: _formKey,
-        card: card,
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(
+          decelerationRate: ScrollDecelerationRate.fast,
+        ),
+        slivers: [
+          _sliverAppBar(theme),
+          SliverToBoxAdapter(
+            child: EditCardForm(
+              formKey: _formKey,
+              card: card,
+            ),
+          ),
+        ],
       ),
       floatingActionButton: SaveButton(onPressed: _save),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
-  AppBar _appBar(ThemeData theme) {
-    return AppBar(
+  SliverAppBar _sliverAppBar(ThemeData theme) {
+    return SliverAppBar(
+      floating: true,
+      snap: true,
       leading: IconButton(
         icon: Icon(
           Icons.qr_code_scanner,

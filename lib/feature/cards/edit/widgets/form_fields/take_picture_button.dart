@@ -28,15 +28,10 @@ class _TakePictureButtonState extends State<TakePictureButton> {
 
   Future<void> _takePicture() async {
     late final String? picturePath;
-    if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-      final result = await FilePicker.pickFiles();
-      picturePath = result?.files.map((file) => file.path).firstOrNull;
-    } else {
-      picturePath = await Navigator.push<String>(
-        context,
-        MaterialPageRoute(builder: (context) => const CameraControllerScreen()),
-      );
-    }
+    picturePath = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (context) => const CameraControllerScreen()),
+    );
 
     if (!mounted || picturePath == null) {
       return;

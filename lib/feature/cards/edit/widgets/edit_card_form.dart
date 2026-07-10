@@ -183,10 +183,7 @@ class _EditCardFormState extends State<EditCardForm>
     final theme = Theme.of(context);
     return Form(
       key: widget.formKey,
-      child: ListView(
-        physics: const BouncingScrollPhysics(
-          decelerationRate: ScrollDecelerationRate.fast,
-        ),
+      child: Column(
         children: [
           SizedBox(
             // TODO(wim): migrate this to LayoutBuilder
@@ -203,7 +200,7 @@ class _EditCardFormState extends State<EditCardForm>
             labelColor: theme.colorScheme.primary,
             unselectedLabelColor: theme.colorScheme.onSurface,
             splashFactory: NoSplash.splashFactory,
-            labelStyle: TextStyle().copyWith(
+            labelStyle: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),

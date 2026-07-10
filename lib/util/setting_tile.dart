@@ -9,8 +9,9 @@ class SettingTile extends StatelessWidget {
   final IconData settingIcon;
   final void Function() settingAction;
   final Color iconColor;
-  final Color borderColor;
+  final Color? borderColor;
   final bool showMore;
+  final Color? textColor;
 
   const SettingTile({
     super.key,
@@ -19,8 +20,9 @@ class SettingTile extends StatelessWidget {
     required this.settingHeader,
     required this.settingIcon,
     required this.iconColor,
-    required this.borderColor,
-    required this.showMore,
+    this.borderColor,
+    this.showMore = false,
+    this.textColor,
   });
 
   @override
@@ -78,7 +80,7 @@ class SettingTile extends StatelessWidget {
           child: OutlinedButton(
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.all(15),
-              side: BorderSide(color: borderColor, width: 2),
+              side: BorderSide(color: borderColor ?? theme.colorScheme.primary, width: 2),
               backgroundColor: Colors.transparent,
               elevation: 0.0,
               shape: RoundedRectangleBorder(
@@ -99,7 +101,7 @@ class SettingTile extends StatelessWidget {
                 Text(
                   settingHeader,
                   style: theme.textTheme.bodyLarge?.copyWith(
-                    color: theme.colorScheme.inverseSurface,
+                    color: textColor ?? theme.colorScheme.inverseSurface,
                     fontSize: 19,
                     fontWeight: FontWeight.w600,
                   ),

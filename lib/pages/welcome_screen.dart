@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get_it/get_it.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:material_new_shapes/material_new_shapes.dart';
 
 import '../util/expressive_loading_indicator.dart';
@@ -28,6 +29,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   void initState() {
     super.initState();
     loadChangelog();
+  }
+
+  int calculateDaysUntilEndOfAndroid() {
+    int days;
+    DateTime end = DateTime(2026, 10, 1);
+    DateTime now = DateTime.now();
+    Duration difference = end.difference(now);
+    days = difference.inDays;
+    return days > 0 ? days : 0;
   }
 
   Future<void> loadChangelog() async {
@@ -156,146 +166,164 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         ),
         automaticallyImplyLeading: false,
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.auto_awesome,
-                size: 80,
-                color: theme.colorScheme.primary,
+      body: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(24.0),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.errorContainer,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              'Your phone is about to stop being yours.\nTime left: ${calculateDaysUntilEndOfAndroid()} days.\nFor more info visit keepandroidopen.org',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                fontSize: 20,
+                color: theme.colorScheme.error,
               ),
-              const SizedBox(height: 30),
-              changelogWidget,
-              //Text(
-              //  'Important: New storage system -> ERRORS. To fix this, export and import all your cards to convert them.',
-              //  textAlign: TextAlign.center,
-              //  style: theme.textTheme.bodyLarge
-              //      ?.copyWith(fontSize: 16, color: Colors.red),
-              //),
-              const SizedBox(height: 40),
-              Bounceable(
-                onTap: () {},
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.width / 4,
-                  child: OutlinedButton(
-                    onPressed: () async {
-                      final editable = settingsBox.value.editable();
-                      editable.lastSeenAppVersion.value =
-                          widget.currentAppVersion;
-                      await settingsBox.save(editable.seal());
-                      editable.dispose();
+            ),
+          ),
+          Spacer(),
+          Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.auto_awesome,
+                  size: 80,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(height: 30),
+                changelogWidget,
+                //Text(
+                //  'Important: New storage system -> ERRORS. To fix this, export and import all your cards to convert them.',
+                //  textAlign: TextAlign.center,
+                //  style: theme.textTheme.bodyLarge
+                //      ?.copyWith(fontSize: 16, color: Colors.red),
+                //),
+                const SizedBox(height: 40),
+                Bounceable(
+                  onTap: () {},
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.width / 4,
+                    child: OutlinedButton(
+                      onPressed: () async {
+                        final editable = settingsBox.value.editable();
+                        editable.lastSeenAppVersion.value =
+                            widget.currentAppVersion;
+                        await settingsBox.save(editable.seal());
+                        editable.dispose();
 
-                      if (!mounted) {
-                        return;
-                      }
-                      if (context.mounted) {
+                        if (!mounted) {
+                          return;
+                        }
+                        if (context.mounted) {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                              builder: (context) => const Homepage(),
+                            ),
+                          );
+                        }
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                          color: theme.colorScheme.primary,
+                          width: 2,
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 40,
+                          vertical: 15,
+                        ),
+                        backgroundColor: Colors.transparent,
+                        elevation: 0.0,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(15),
+                            topRight: Radius.circular(15),
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        'Continue',
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          fontSize: 22,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Bounceable(
+                  onTap: () {},
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.width / 7,
+                    child: OutlinedButton(
+                      onPressed: () async {
+                        final editable = settingsBox.value.editable();
+                        editable.lastSeenAppVersion.value =
+                            widget.currentAppVersion;
+                        await settingsBox.save(editable.seal());
+                        editable.dispose();
+
+                        if (!context.mounted) {
+                          return;
+                        }
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(
                             builder: (context) => const Homepage(),
                           ),
                         );
-                      }
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(
-                        color: theme.colorScheme.primary,
-                        width: 2,
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
-                        vertical: 15,
-                      ),
-                      backgroundColor: Colors.transparent,
-                      elevation: 0.0,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(15),
-                          topRight: Radius.circular(15),
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                          color: theme.colorScheme.inverseSurface,
+                          width: 2,
                         ),
-                      ),
-                    ),
-                    child: Text(
-                      'Continue',
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        fontSize: 22,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Bounceable(
-                onTap: () {},
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.width / 7,
-                  child: OutlinedButton(
-                    onPressed: () async {
-                      final editable = settingsBox.value.editable();
-                      editable.lastSeenAppVersion.value =
-                          widget.currentAppVersion;
-                      await settingsBox.save(editable.seal());
-                      editable.dispose();
-
-                      if (!context.mounted) {
-                        return;
-                      }
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (context) => const Homepage(),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 40,
+                          vertical: 15,
                         ),
-                      );
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(
-                        color: theme.colorScheme.inverseSurface,
-                        width: 2,
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
-                        vertical: 15,
-                      ),
-                      backgroundColor: Colors.transparent,
-                      elevation: 0.0,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(15),
-                          bottomRight: Radius.circular(15),
+                        backgroundColor: Colors.transparent,
+                        elevation: 0.0,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(15),
+                            bottomRight: Radius.circular(15),
+                          ),
                         ),
+                        minimumSize: const Size.square(40),
                       ),
-                      minimumSize: const Size.square(40),
+                      child: Text(
+                        'Skip for now',
+                        style: theme.textTheme.bodyLarge
+                            ?.copyWith(color: theme.colorScheme.inverseSurface),
+                      ),
                     ),
-                    child: Text(
-                      'Skip for now',
-                      style: theme.textTheme.bodyLarge
-                          ?.copyWith(color: theme.colorScheme.inverseSurface),
+                  ),
+                ),
+                TextButton(
+                  child: Text(
+                    'By entering the app, you agree to the Terms of Service',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.primary,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const TermsOfServicePage(),
                     ),
                   ),
                 ),
-              ),
-              TextButton(
-                child: Text(
-                  'By entering the app, you agree to the Terms of Service',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.primary,
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const TermsOfServicePage(),
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+          Spacer(),
+        ],
       ),
     );
   }

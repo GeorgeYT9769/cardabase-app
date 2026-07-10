@@ -152,48 +152,46 @@ class _MainState extends State<Main> {
   void initState() {
     super.initState();
 
-    if (Platform.isAndroid || Platform.isIOS) {
-      _intentDataStreamSubscription = ReceiveSharingIntent.instance.getMediaStream().listen((value) {
-        _handleSharedMedia(value);
-      });
+    _intentDataStreamSubscription = ReceiveSharingIntent.instance.getMediaStream().listen((value) {
+      _handleSharedMedia(value);
+    });
 
-      ReceiveSharingIntent.instance.getInitialMedia().then((value) {
-        _handleSharedMedia(value);
-        ReceiveSharingIntent.instance.reset();
-      });
+    ReceiveSharingIntent.instance.getInitialMedia().then((value) {
+      _handleSharedMedia(value);
+      ReceiveSharingIntent.instance.reset();
+    });
 
-      quickActions.initialize((shortcutType) {
-        if (navigatorKey.currentState != null &&
-            navigatorKey.currentContext != null) {
-          if (shortcutType == 'add_card') {
-            navigatorKey.currentState!.push(
-              MaterialPageRoute(
-                builder: (context) => EditCardPage(cardId: generateUniqueId()),
-              ),
-            );
-          }
-          if (shortcutType == 'info') {
-            navigatorKey.currentState!.push(
-              MaterialPageRoute(builder: (context) => const InfoScreen()),
-            );
-          }
+    quickActions.initialize((shortcutType) {
+      if (navigatorKey.currentState != null &&
+          navigatorKey.currentContext != null) {
+        if (shortcutType == 'add_card') {
+          navigatorKey.currentState!.push(
+            MaterialPageRoute(
+              builder: (context) => EditCardPage(cardId: generateUniqueId()),
+            ),
+          );
         }
-      });
+        if (shortcutType == 'info') {
+          navigatorKey.currentState!.push(
+            MaterialPageRoute(builder: (context) => const InfoScreen()),
+          );
+        }
+      }
+    });
 
-      quickActions.setShortcutItems(<ShortcutItem>[
-        const ShortcutItem(
-          type: 'add_card',
-          localizedTitle: 'Add card',
-          icon: 'ic_add_card',
-        ), // Added icon
-        const ShortcutItem(
-          type: 'info',
-          localizedTitle: 'Info',
-          localizedSubtitle: 'See info',
-          icon: 'ic_info',
-        ), // Added icon
-      ]);
-    }
+    quickActions.setShortcutItems(<ShortcutItem>[
+      const ShortcutItem(
+        type: 'add_card',
+        localizedTitle: 'Add card',
+        icon: 'ic_add_card',
+      ), // Added icon
+      const ShortcutItem(
+        type: 'info',
+        localizedTitle: 'Info',
+        localizedSubtitle: 'See info',
+        icon: 'ic_info',
+      ), // Added icon
+    ]);
   }
 
   Widget _cancelButton(BuildContext context, ThemeData theme) {
@@ -301,9 +299,7 @@ class _MainState extends State<Main> {
 
   @override
   void dispose() {
-    if (Platform.isAndroid || Platform.isIOS) {
-      _intentDataStreamSubscription.cancel();
-    }
+    _intentDataStreamSubscription.cancel();
     super.dispose();
   }
 
