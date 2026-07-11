@@ -21,12 +21,10 @@ class CardSummary extends StatefulWidget {
     super.key,
     required this.cardId,
     required this.cornerRadius,
-    required this.fontSize,
   });
 
   final String cardId;
   final double cornerRadius;
-  final double fontSize;
 
   @override
   State<CardSummary> createState() => _CardSummaryState();
@@ -131,17 +129,20 @@ class _CardSummaryState extends State<CardSummary> {
               _effect(),
               if (card?.hideName == false)
                 Padding(
-                  padding: const EdgeInsets.all(5.0),
+                  padding: const EdgeInsets.all(10.0),
                   child: Center(
-                    child: Text(
-                      card?.name ?? '',
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        fontSize: widget.fontSize,
-                        fontWeight: FontWeight.bold,
-                        color: foregroundColor,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        card?.name ?? '',
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          fontSize: 50,
+                          fontWeight: FontWeight.bold,
+                          color: foregroundColor,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
                       ),
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
                     ),
                   ),
                 ),

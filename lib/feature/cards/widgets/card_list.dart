@@ -6,7 +6,7 @@ import 'package:cardabase/feature/cards/widgets/card_summary.dart';
 import 'package:flutter/material.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 
-class CardList extends StatelessWidget {
+class CardList extends StatefulWidget {
   const CardList({
     super.key,
     required this.isInReorderingMode,
@@ -21,9 +21,91 @@ class CardList extends StatelessWidget {
   final void Function(int oldIndex, int newIndex) moveCard;
 
   @override
+  State<CardList> createState() => _CardListState();
+}
+
+class _CardListState extends State<CardList> {
+  final GlobalKey<SliverAnimatedGridState> _gridKey =
+      GlobalKey<SliverAnimatedGridState>();
+  List<LoyaltyCard> _items = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _items = List.from(widget.cards);
+  }
+
+  @override
+  void didUpdateWidget(CardList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    final oldList = _items;
+    final newList = widget.cards;
+
+    if (widget.isInReorderingMode) {
+      _items = List.from(newList);
+      return;
+    }
+
+    // Detect single removal
+    if (oldList.length == newList.length + 1) {
+      int? removedIndex;
+      for (int i = 0; i < newList.length; i++) {
+        if (oldList[i].id != newList[i].id) {
+          removedIndex = i;
+          break;
+        }
+      }
+      removedIndex ??= oldList.length - 1;
+
+      final removedItem = oldList[removedIndex];
+      _items.removeAt(removedIndex);
+      _gridKey.currentState?.removeItem(
+        removedIndex,
+        (context, animation) => _buildItem(removedItem, animation, isRemoving: true),
+        duration: const Duration(milliseconds: 400),
+      );
+    } 
+    // Detect single addition
+    else if (oldList.length == newList.length - 1) {
+      int? insertedIndex;
+      for (int i = 0; i < oldList.length; i++) {
+        if (oldList[i].id != newList[i].id) {
+          insertedIndex = i;
+          break;
+        }
+      }
+      insertedIndex ??= newList.length - 1;
+
+      _items.insert(insertedIndex, newList[insertedIndex]);
+      _gridKey.currentState?.insertItem(
+        insertedIndex,
+        duration: const Duration(milliseconds: 400),
+      );
+    }
+    // Fallback for complex changes (sorting, filters, multiple changes)
+    else {
+      _items = List.from(newList);
+    }
+  }
+
+  Widget _buildItem(LoyaltyCard card, Animation<double> animation, {bool isRemoving = false}) {
+    return ScaleTransition(
+      scale: CurvedAnimation(
+        parent: animation,
+        curve: isRemoving ? Curves.easeInBack : Curves.easeOutBack,
+      ),
+      child: FadeTransition(
+        opacity: animation,
+        child: _card(context, Theme.of(context), card),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    if (cards.isEmpty) {
+    if (widget.cards.isEmpty) {
       return SliverFillRemaining(
         hasScrollBody: false,
         child: Stack(
@@ -65,30 +147,30 @@ class CardList extends StatelessWidget {
     const crossAxisPadding = 10.0;
     const mainAxisPadding = 10.0;
 
-    final sliverChildren =
-        cards.map((card) => _card(context, theme, card)).toList();
-
-    if (isInReorderingMode) {
+    if (widget.isInReorderingMode) {
       return ReorderableSliverGridView.count(
         crossAxisSpacing: crossAxisPadding,
         mainAxisSpacing: mainAxisPadding,
-        crossAxisCount: numberOfColumns,
+        crossAxisCount: widget.numberOfColumns,
         childAspectRatio: childAspectRatio,
-        onReorder: moveCard,
-        children: sliverChildren,
+        onReorder: widget.moveCard,
+        children: widget.cards.map((card) => _card(context, theme, card)).toList(),
       );
     } else {
-      return SliverGrid(
-        delegate: SliverChildBuilderDelegate(
-          (context, index) => sliverChildren[index],
-          childCount: sliverChildren.length,
-        ),
+      return SliverAnimatedGrid(
+        key: _gridKey,
+        initialItemCount: _items.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           mainAxisSpacing: mainAxisPadding,
           crossAxisSpacing: crossAxisPadding,
-          crossAxisCount: numberOfColumns,
+          crossAxisCount: widget.numberOfColumns,
           childAspectRatio: childAspectRatio,
         ),
+        itemBuilder: (context, index, animation) {
+          // Safety check for async sync
+          if (index >= _items.length) return const SizedBox.shrink();
+          return _buildItem(_items[index], animation);
+        },
       );
     }
   }
@@ -96,17 +178,16 @@ class CardList extends StatelessWidget {
   Widget _card(BuildContext context, ThemeData theme, LoyaltyCard card) {
     return GestureDetector(
       key: ValueKey(card.id),
-      onLongPress: isInReorderingMode
+      onLongPress: widget.isInReorderingMode
           ? null
           : () => showLoyaltyCardBottomSheets(context, card),
       child: Padding(
-        padding: numberOfColumns == 1
+        padding: widget.numberOfColumns == 1
             ? const EdgeInsets.all(10)
-            : EdgeInsets.all(5 / numberOfColumns),
+            : EdgeInsets.all(5 / widget.numberOfColumns),
         child: CardSummary(
           cardId: card.id,
-          cornerRadius: numberOfColumns == 1 ? 15 : 20 / numberOfColumns,
-          fontSize: numberOfColumns == 1 ? 50 : 50 / numberOfColumns,
+          cornerRadius: widget.numberOfColumns == 1 ? 15 : 20 / widget.numberOfColumns,
         ),
       ),
     );

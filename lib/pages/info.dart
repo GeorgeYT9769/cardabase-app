@@ -1,10 +1,13 @@
 import 'dart:convert';
 
+import 'package:cardabase/feature/settings/get_it.dart';
+import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/pages/news.dart';
 import 'package:cardabase/util/expressive_loading_indicator.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:material_new_shapes/material_new_shapes.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -124,6 +127,26 @@ class _InfoScreenState extends State<InfoScreen> {
     }
   }
 
+  int _devTaps = 0;
+
+  Future<void> _handleVersionTap() async {
+    final settingsBox = GetIt.I<SettingsBox>();
+    if (settingsBox.value.developerOptions.isEnabled) return;
+
+    _devTaps++;
+    if (_devTaps >= 7) {
+      final settings = settingsBox.value.editable();
+      settings.developerOptions.isEnabled.value = true;
+      await settingsBox.save(settings.seal());
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          buildCustomSnackBar('Developer options enabled!', true),
+        );
+      }
+      _devTaps = 0;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -180,10 +203,13 @@ class _InfoScreenState extends State<InfoScreen> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 10),
-              Text(
-                'Version: $_appVersion',
-                style: theme.textTheme.bodyLarge,
-                textAlign: TextAlign.center,
+              GestureDetector(
+                onTap: _handleVersionTap,
+                child: Text(
+                  'Version: $_appVersion',
+                  style: theme.textTheme.bodyLarge,
+                  textAlign: TextAlign.center,
+                ),
               ),
               const SizedBox(height: 5),
               Text(

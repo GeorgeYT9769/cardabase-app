@@ -46,7 +46,7 @@ class _HomePageState extends State<Homepage> {
       settings.loadValue(settingsBox.value);
       setState(() {});
     });
-    cardsSubscription = settingsBox.watch().listen((_) => setState(() {}));
+    cardsSubscription = cardsBox.watch().listen((_) => setState(() {}));
     cardsToDisplay = listCardsToDisplay();
   }
 
@@ -165,14 +165,6 @@ class _HomePageState extends State<Homepage> {
               onPressed: showCardListViewOptionsDialog,
             ),
             actions: [
-              if (settings.developerOptions.isEnabled.value)
-                IconButton(
-                  icon: Icon(
-                    Icons.web_stories,
-                    color: theme.colorScheme.secondary,
-                  ),
-                  onPressed: navigateToWelcomeScreen,
-                ),
               IconButton(
                 icon: Icon(
                   Icons.settings,

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/pages/home/home_page.dart';
@@ -6,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get_it/get_it.dart';
-import 'package:hive_ce/hive.dart';
 import 'package:material_new_shapes/material_new_shapes.dart';
 
 import '../util/expressive_loading_indicator.dart';
@@ -75,6 +76,25 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       buffer.writeln(lines[i]);
     }
     return buffer.toString().trim();
+  }
+
+  void continueToApp() async {
+    final editable = settingsBox.value.editable();
+    editable.lastSeenAppVersion.value =
+        widget.currentAppVersion;
+    await settingsBox.save(editable.seal());
+    editable.dispose();
+
+    if (!mounted) {
+      return;
+    }
+    if (context.mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const Homepage(),
+        ),
+      );
+    }
   }
 
   @override
@@ -159,17 +179,41 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Welcome to Cardabase!',
-          style: theme.textTheme.bodyLarge?.copyWith(
-            fontSize: 25,
+          'Welcome',
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: theme.colorScheme.tertiary,
           ),
         ),
-        automaticallyImplyLeading: false,
+        centerTitle: true,
+        elevation: 0.0,
+        backgroundColor: theme.colorScheme.surface,
+        leading: Transform.rotate(
+          angle: math.pi,
+          child: IconButton(
+            icon: Icon(
+              Icons.exit_to_app,
+              color: theme.colorScheme.secondary,
+            ),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ),
+        actions: [
+          Transform.rotate(
+            angle: math.pi,
+            child: IconButton(
+              icon: Icon(
+                Icons.arrow_back_ios_new,
+                color: theme.colorScheme.secondary,
+              ), onPressed: continueToApp,
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(24.0),
+            margin: const EdgeInsets.fromLTRB(20, 5, 20, 10),
+            padding: const EdgeInsets.all(20.0),
             decoration: BoxDecoration(
               color: theme.colorScheme.errorContainer,
               borderRadius: BorderRadius.circular(10),
@@ -177,12 +221,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             child: Text(
               'Your phone is about to stop being yours.\nTime left: ${calculateDaysUntilEndOfAndroid()} days.\nFor more info visit keepandroidopen.org',
               style: theme.textTheme.bodyLarge?.copyWith(
-                fontSize: 20,
+                fontSize: 14,
                 color: theme.colorScheme.error,
               ),
             ),
           ),
-          Spacer(),
           Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(
@@ -208,24 +251,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.width / 4,
                     child: OutlinedButton(
-                      onPressed: () async {
-                        final editable = settingsBox.value.editable();
-                        editable.lastSeenAppVersion.value =
-                            widget.currentAppVersion;
-                        await settingsBox.save(editable.seal());
-                        editable.dispose();
-
-                        if (!mounted) {
-                          return;
-                        }
-                        if (context.mounted) {
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(
-                              builder: (context) => const Homepage(),
-                            ),
-                          );
-                        }
-                      },
+                      onPressed: continueToApp,
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(
                           color: theme.colorScheme.primary,
@@ -322,7 +348,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               ],
             ),
           ),
-          Spacer(),
         ],
       ),
     );

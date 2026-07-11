@@ -94,7 +94,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
         ),
         children: [
           Container(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
             margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
@@ -102,12 +102,17 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
             ),
             child: Column(
               children: [
-                Text(
-                  card?.name ?? '',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: textColor,
-                    fontSize: 50,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    card?.name ?? '',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: textColor,
+                      fontSize: 50,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
                   ),
                 ),
                 Text(

@@ -122,8 +122,68 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
   }
 
   Future<void> _deleteCard() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Card'),
+        content: Text('Are you sure you want to delete ${widget.loyaltyCard.name}?'),
+        actions: [
+          OutlinedButton(
+            onPressed: () {
+              Navigator.pop(context, false);
+            },
+            style: OutlinedButton.styleFrom(
+              elevation: 0.0,
+              side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(11),
+              ),
+            ),
+            child: Text(
+              'Cancel',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+                color: Theme.of(context).colorScheme.tertiary,
+              ),
+            ),
+          ),
+          OutlinedButton(
+            onPressed: () {
+              Navigator.pop(context, true);
+            },
+            style: OutlinedButton.styleFrom(
+              elevation: 0.0,
+              side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(11),
+              ),
+            ),
+            child: Text(
+              'DELETE',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+                color: Colors.red,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
     Navigator.of(context).pop();
-    await cardsBox.delete(widget.loyaltyCard.id); //TODO: deleting a card produces empty ghost card, still clickable, opens empty space with null points
+
+    final settings = settingsBox.value.editable();
+    settings.cardListViewOptions.customOrder.value = settings
+        .cardListViewOptions.customOrder.value
+        .where((id) => id != widget.loyaltyCard.id)
+        .toList();
+    await settingsBox.save(settings.seal());
+
+    await cardsBox.delete(widget.loyaltyCard.id);
   }
 
   @override
@@ -140,20 +200,26 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
               leading: Icon(Icons.widgets, color: theme.colorScheme.tertiary),
               title: Text(
                 'Set as Widget',
-                style: theme.textTheme.bodyLarge?.copyWith(),
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight(700),
+                ),
               ),
               onTap: _createCardWidget,
             ),
           ListTile(
             leading: Icon(Icons.edit, color: theme.colorScheme.tertiary),
-            title: Text('Edit', style: theme.textTheme.bodyLarge?.copyWith()),
+            title: Text('Edit', style: theme.textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight(700),
+            ),),
             onTap: _editCard,
           ),
           ListTile(
             leading: Icon(Icons.copy, color: theme.colorScheme.tertiary),
             title: Text(
               'Duplicate',
-              style: theme.textTheme.bodyLarge?.copyWith(),
+              style: theme.textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight(700),
+              ),
             ),
             onTap: _duplicateCard,
           ),
@@ -164,7 +230,9 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
                     Icon(Icons.arrow_upward, color: theme.colorScheme.tertiary),
                 title: Text(
                   'Move UP',
-                  style: theme.textTheme.bodyLarge?.copyWith(),
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight(700),
+                  ),
                 ),
                 onTap: _moveCardUp,
               ),
@@ -175,7 +243,9 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
                 ),
                 title: Text(
                   'Move DOWN',
-                  style: theme.textTheme.bodyLarge?.copyWith(),
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight(700),
+                  ),
                 ),
                 onTap: _moveCardDown,
               ),
@@ -184,7 +254,10 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
             leading: const Icon(Icons.delete, color: Colors.red),
             title: Text(
               'DELETE',
-              style: theme.textTheme.bodyLarge?.copyWith(),
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: Colors.red,
+                fontWeight: FontWeight(700),
+              ),
             ),
             onTap: _deleteCard,
           ),

@@ -10,6 +10,7 @@ import 'package:cardabase/feature/settings/widgets/card_effect_settings_dialog.d
 import 'package:cardabase/feature/settings/widgets/clear_cards_dialog.dart';
 import 'package:cardabase/feature/settings/widgets/tags_page.dart';
 import 'package:cardabase/pages/cloud_backup.dart';
+import 'package:cardabase/pages/dev_tools.dart';
 import 'package:cardabase/pages/info.dart';
 import 'package:cardabase/pages/password.dart';
 import 'package:cardabase/pages/terms_of_service.dart';
@@ -207,20 +208,46 @@ class _SettingsPageState extends State<SettingsPage> {
                 _githubLink(theme),
                 _fdroidLink(theme),
                 _websiteLink(theme),
-                //uncomment this to enable dev options in the settings
-                //const SizedBox(height: 10),
-                //_subtitle(
-                //  theme,
-                //  'Tools',
-                //  theme.colorScheme.inverseSurface,
-                //),
-                //_debugButton(theme),
+                ValueListenableBuilder(
+                  valueListenable: _settings.developerOptions.isEnabled,
+                  builder: (context, isEnabled, _) {
+                    if (!isEnabled) return const SizedBox.shrink();
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 10),
+                        _subtitle(
+                          theme,
+                          'Tools',
+                          theme.colorScheme.inverseSurface,
+                        ),
+                        _debugButton(theme),
+                        _devToolsButton(theme),
+                      ],
+                    );
+                  },
+                ),
                 const SizedBox(height: 100),
               ]),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _devToolsButton(ThemeData theme) {
+    return SettingTile(
+      aboutSettingHeader: 'App insights and developer utilities',
+      settingAction: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const DevToolsPage()),
+      ),
+      settingHeader: 'Developer Tools',
+      settingIcon: Icons.developer_mode,
+      iconColor: theme.colorScheme.tertiary,
+      borderColor: theme.colorScheme.primary,
+      showMore: true,
     );
   }
 

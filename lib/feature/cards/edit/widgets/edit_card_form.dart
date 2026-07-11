@@ -253,22 +253,21 @@ class _EditCardFormState extends State<EditCardForm>
                 ),
               if (!widget.card.hideName.value)
                 Center(
-                  child: Wrap(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                        child: Text(
-                          widget.card.name.text,
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            fontSize: 50,
-                            fontWeight: FontWeight.bold,
-                            color: textColor,
-                          ),
-                          maxLines: 2,
-                          textAlign: TextAlign.center,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        widget.card.name.text,
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          fontSize: 50,
+                          fontWeight: FontWeight.bold,
+                          color: textColor,
                         ),
+                        maxLines: 1,
+                        textAlign: TextAlign.center,
                       ),
-                    ],
+                    ),
                   ),
                 ),
             ],

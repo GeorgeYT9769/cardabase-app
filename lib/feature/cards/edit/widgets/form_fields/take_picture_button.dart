@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:cardabase/feature/cards/card_face_error_widget.dart';
 import 'package:cardabase/util/camera_controller.dart';
 import 'package:cardabase/util/dashed_rect.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 
