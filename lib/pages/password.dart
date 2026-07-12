@@ -35,20 +35,14 @@ class _PasswordScreenState extends State<PasswordScreen> {
           hideConfirmPassword = true;
         });
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          buildCustomSnackBar('Success!', true),
-        );
+        showCustomSnackBar(context, 'Success!', true);
       } else {
         GetIt.I<VibrationProvider>().vibrateError();
-        ScaffoldMessenger.of(context).showSnackBar(
-          buildCustomSnackBar('Passwords do not match!', false),
-        );
+        showCustomSnackBar(context, 'Passwords do not match!', false);
       }
     } else {
       GetIt.I<VibrationProvider>().vibrateError();
-      ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar('Password cannot be empty!', false),
-      );
+      showCustomSnackBar(context, 'Password cannot be empty!', false);
     }
   }
 
@@ -61,14 +55,10 @@ class _PasswordScreenState extends State<PasswordScreen> {
         resetPassword.text = '';
       });
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar('Success!', true),
-      );
+      showCustomSnackBar(context, 'Success!', true);
     } else {
       GetIt.I<VibrationProvider>().vibrateSuccess();
-      ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar('Incorrect password!', false),
-      );
+      showCustomSnackBar(context, 'Incorrect password!', false);
     }
   }
 

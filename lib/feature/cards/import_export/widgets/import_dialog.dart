@@ -39,9 +39,7 @@ class _ImportDialogState extends State<ImportDialog> {
     final input = textController.text.trim();
     if (input.isEmpty) {
       GetIt.I<VibrationProvider>().vibrateError();
-      ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar('No data!', false),
-      );
+      showCustomSnackBar(context, 'No data!', false);
       return;
     }
 
@@ -50,9 +48,7 @@ class _ImportDialogState extends State<ImportDialog> {
       cards = deserializeLoyaltyCards(input);
     } catch (e) {
       GetIt.I<VibrationProvider>().vibrateError();
-      ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar('Failed to parse data!', false),
-      );
+      showCustomSnackBar(context, 'Failed to parse data!', false);
       return;
     }
 
@@ -68,9 +64,7 @@ class _ImportDialogState extends State<ImportDialog> {
     }
 
     Navigator.of(context).pop(true);
-    ScaffoldMessenger.of(context).showSnackBar(
-      buildCustomSnackBar('Imported cards!', true),
-    );
+    showCustomSnackBar(context, 'Imported cards!', true);
   }
 
   Future<void> importFromZipFile() async {
@@ -87,9 +81,7 @@ class _ImportDialogState extends State<ImportDialog> {
     if (!path.toLowerCase().endsWith('.cdb') && !path.toLowerCase().endsWith('.zip')) {
       GetIt.I<VibrationProvider>().vibrateError();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          buildCustomSnackBar('Please select a CDB file!', false),
-        );
+        showCustomSnackBar(context, 'Please select a CDB file!', false);
       }
       return;
     }
@@ -119,15 +111,11 @@ class _ImportDialogState extends State<ImportDialog> {
       }
 
       Navigator.of(context).pop(true);
-      ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar('Imported all data from CDB!', true),
-      );
+      showCustomSnackBar(context, 'Imported all data from CDB!', true);
     } catch (e) {
       GetIt.I<VibrationProvider>().vibrateError();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          buildCustomSnackBar('Failed to import CDB: $e', false),
-        );
+        showCustomSnackBar(context, 'Failed to import CDB: $e', false);
       }
     }
   }
@@ -157,8 +145,15 @@ class _ImportDialogState extends State<ImportDialog> {
         ],
       ),
       actions: [
-        _cancelButton(theme),
-        _importButton(theme),
+        Center(
+          child: Row(
+            children: [
+              _cancelButton(theme),
+              Spacer(),
+              _importButton(theme),
+            ],
+          ),
+        ),
       ],
     );
   }

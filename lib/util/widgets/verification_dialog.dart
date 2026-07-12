@@ -63,9 +63,7 @@ Future<bool> showPasswordVerificationDialog(BuildContext context) async {
                   });
                 } else {
                   GetIt.I<VibrationProvider>().vibrateError();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    buildCustomSnackBar('Incorrect password!', false),
-                  );
+                  showCustomSnackBar(context, 'Incorrect password!', false);
                 }
               },
               style: OutlinedButton.styleFrom(

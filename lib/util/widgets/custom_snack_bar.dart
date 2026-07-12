@@ -48,3 +48,9 @@ SnackBar buildCustomSnackBar(String message, bool success) {
         : const Color.fromARGB(255, 237, 67, 55),
   );
 }
+
+void showCustomSnackBar(BuildContext context, String message, bool success) {
+  ScaffoldMessenger.of(context)
+    ..removeCurrentSnackBar()
+    ..showSnackBar(buildCustomSnackBar(message, success));
+}

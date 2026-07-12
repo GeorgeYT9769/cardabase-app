@@ -227,9 +227,7 @@ class _QRBarReaderState extends State<QRBarReader> {
       });
     } else {
       GetIt.I<VibrationProvider>().vibrateError();
-      ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar('Error', false),
-      );
+      showCustomSnackBar(context, 'Error', false);
     }
   }
 
@@ -240,9 +238,7 @@ class _QRBarReaderState extends State<QRBarReader> {
         controller?.pauseCamera();
         Navigator.of(context).pop();
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            buildCustomSnackBar('No camera permission!', false),
-          );
+          showCustomSnackBar(context, 'No camera permission!', false);
           setState(() {
             _permissionDeniedShown = true;
           });

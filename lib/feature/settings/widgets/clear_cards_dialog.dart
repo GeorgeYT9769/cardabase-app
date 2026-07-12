@@ -52,7 +52,7 @@ class _ClearCardsDialogState extends State<ClearCardsDialog> {
       style: OutlinedButton.styleFrom(
         elevation: 0.0,
         side: BorderSide(
-          color: theme.colorScheme.primary,
+          color: Colors.red,
           width: 2.0,
         ),
         shape: RoundedRectangleBorder(
@@ -64,7 +64,7 @@ class _ClearCardsDialogState extends State<ClearCardsDialog> {
         style: theme.textTheme.bodyLarge?.copyWith(
           fontWeight: FontWeight.bold,
           fontSize: 15,
-          color: theme.colorScheme.inverseSurface,
+          color: Colors.red,
         ),
       ),
     );

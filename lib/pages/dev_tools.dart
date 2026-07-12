@@ -90,18 +90,14 @@ class _DevToolsPageState extends State<DevToolsPage> {
     }
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar('Done!', true),
-      );
+      showCustomSnackBar(context, 'Done!', true);
     }
   }
 
   Future<void> _clearDatabase() async {
     await _cardsBox.clear();
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar('Cleared!', true),
-      );
+      showCustomSnackBar(context, 'Cleared!', true);
     }
   }
 

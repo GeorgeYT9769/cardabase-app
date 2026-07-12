@@ -42,9 +42,7 @@ class _TagsPageState extends State<TagsPage> {
     }
 
     if (_settings.tags.contains(newTag)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar('Tag already exists!', false),
-      );
+      showCustomSnackBar(context, 'Tag already exists!', false);
       return;
     }
 

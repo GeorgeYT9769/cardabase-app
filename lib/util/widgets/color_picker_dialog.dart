@@ -29,9 +29,9 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
     final theme = Theme.of(context);
     return AlertDialog(
       title: Text(
-        'Pick a color!',
+        'Card color',
         style: theme.textTheme.bodyLarge
-            ?.copyWith(color: theme.colorScheme.inverseSurface, fontSize: 30),
+          ?.copyWith(color: theme.colorScheme.inverseSurface, fontSize: 30),
       ),
       content: SingleChildScrollView(
         child: ColorPicker(

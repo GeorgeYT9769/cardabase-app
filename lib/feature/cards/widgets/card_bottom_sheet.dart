@@ -62,9 +62,7 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
       return;
     }
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar('Widget updated!', true),
-      );
+      showCustomSnackBar(context, 'Widget updated!', true);
     }
   }
 

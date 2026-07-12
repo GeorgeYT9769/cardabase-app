@@ -1,5 +1,4 @@
 import 'package:cardabase/feature/authentication/widgets/password_dialog.dart';
-import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_ce/hive.dart';
@@ -13,7 +12,7 @@ Future<bool> requirePassword(BuildContext context) async {
       storedPassword is String && storedPassword.isNotEmpty;
   if (!hasPassword) {
     // if no password is stored, don't ask to verify it.
-    GetIt.I<VibrationProvider>().vibrateSuccess();
+    //GetIt.I<VibrationProvider>().vibrateSuccess();
     return true;
   }
 

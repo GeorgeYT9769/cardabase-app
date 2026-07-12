@@ -55,19 +55,16 @@ class _ExportDialogState extends State<ExportDialog> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar(
-          dir == Settings.defaultCardExportDirectoryPath
-              ? 'Exported to Downloads'
-              : 'Exported to Custom Path',
-          true,
-        ),
+      showCustomSnackBar(
+        context,
+        dir == Settings.defaultCardExportDirectoryPath
+            ? 'Exported to Downloads'
+            : 'Exported to Custom Path',
+        true,
       );
     } on NoPermissionToExternalStorageException catch (_) {
       GetIt.I<VibrationProvider>().vibrateError();
-      ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar('No permission!', false),
-      );
+      showCustomSnackBar(context, 'No permission!', false);
     }
     Navigator.of(context).pop();
   }
@@ -78,9 +75,7 @@ class _ExportDialogState extends State<ExportDialog> {
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      buildCustomSnackBar('Copied to Clipboard!', true),
-    );
+    showCustomSnackBar(context, 'Copied to Clipboard!', true);
     Navigator.of(context).pop();
   }
 
@@ -95,24 +90,19 @@ class _ExportDialogState extends State<ExportDialog> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar(
-          dir == Settings.defaultCardExportDirectoryPath
-              ? 'CDB exported to Downloads'
-              : 'CDB exported to Custom Path',
-          true,
-        ),
+      showCustomSnackBar(
+        context,
+        dir == Settings.defaultCardExportDirectoryPath
+            ? 'CDB exported to Downloads'
+            : 'CDB exported to Custom Path',
+        true,
       );
     } on NoPermissionToExternalStorageException catch (_) {
       GetIt.I<VibrationProvider>().vibrateError();
-      ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar('No permission!', false),
-      );
+      showCustomSnackBar(context, 'No permission!', false);
     } catch (e) {
       GetIt.I<VibrationProvider>().vibrateError();
-      ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar('Export failed: $e', false),
-      );
+      showCustomSnackBar(context, 'Export failed: $e', false);
     }
     Navigator.of(context).pop();
   }
@@ -135,8 +125,8 @@ class _ExportDialogState extends State<ExportDialog> {
         children: [
           IODialogButton(
             onPressed: exportToClipboard,
-            icon: const Icon(Icons.text_fields),
-            label: 'TEXT',
+            icon: const Icon(Icons.copy),
+            label: 'CLIPBOARD',
             aboutText: 'Export cards as plain text into your clipboard',
           ),
           const SizedBox(height: 40),
@@ -157,6 +147,11 @@ class _ExportDialogState extends State<ExportDialog> {
           _customPathTextField(theme),
         ],
       ),
+      actions: [
+        Center(
+          child: _doneButton(context, theme),
+        ),
+      ],
     );
   }
 
@@ -210,6 +205,30 @@ class _ExportDialogState extends State<ExportDialog> {
                   );
                 },
               ),
+      ),
+    );
+  }
+
+  Widget _doneButton(BuildContext context, ThemeData theme) {
+    return OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        elevation: 0.0,
+        side: BorderSide(
+          color: theme.colorScheme.primary,
+          width: 2.0,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(11),
+        ),
+      ),
+      onPressed: () => Navigator.of(context).pop(),
+      child: Text(
+        'DONE',
+        style: theme.textTheme.bodyLarge?.copyWith(
+          fontWeight: FontWeight.bold,
+          fontSize: 15,
+          color: theme.colorScheme.inverseSurface,
+        ),
       ),
     );
   }

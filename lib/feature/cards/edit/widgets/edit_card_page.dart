@@ -66,22 +66,14 @@ class _EditCardPageState extends State<EditCardPage> {
     GetIt.I<VibrationProvider>().vibrateError();
 
     if (card.name.text.isEmpty == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar('Card Name cannot be empty!', false),
-      );
+      showCustomSnackBar(context, 'Card Name cannot be empty!', false);
     } else if (card.barcode.data.text.isEmpty == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar('Card ID cannot be empty!', false),
-      );
+      showCustomSnackBar(context, 'Card ID cannot be empty!', false);
     } else if (validBarcode(card.barcode.type.value)(card.barcode.data.text) !=
         null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar('Invalid Card ID!', false),
-      );
+      showCustomSnackBar(context, 'Invalid Card ID!', false);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar('Something went wrong!', false),
-      );
+      showCustomSnackBar(context, 'Something went wrong!', false);
     }
   }
 
@@ -118,29 +110,21 @@ class _EditCardPageState extends State<EditCardPage> {
     final theme = Theme.of(context);
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(
-          decelerationRate: ScrollDecelerationRate.fast,
-        ),
-        slivers: [
-          _sliverAppBar(theme),
-          SliverToBoxAdapter(
-            child: EditCardForm(
-              formKey: _formKey,
-              card: card,
-            ),
-          ),
-        ],
+      body: EditCardForm(
+        formKey: _formKey,
+        card: card,
+        appBar: _sliverAppBar(theme),
       ),
       floatingActionButton: SaveButton(onPressed: _save),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
-  SliverAppBar _sliverAppBar(ThemeData theme) {
+  Widget _sliverAppBar(ThemeData theme) {
     return SliverAppBar(
       floating: true,
       snap: true,
+      pinned: false,
       leading: IconButton(
         icon: Icon(
           Icons.qr_code_scanner,

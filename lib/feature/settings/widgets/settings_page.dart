@@ -75,9 +75,7 @@ class _SettingsPageState extends State<SettingsPage> {
         if (!mounted) {
           return;
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          buildCustomSnackBar('No permission!', false),
-        );
+        showCustomSnackBar(context, 'No permission!', false);
       }
     }
     await _settingsBox.save(_settings.seal());
@@ -94,9 +92,7 @@ class _SettingsPageState extends State<SettingsPage> {
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(buildCustomSnackBar('Cardabase was reset!', true));
+    showCustomSnackBar(context, 'Cardabase was reset!', true);
     Navigator.of(context).pop(true);
   }
 

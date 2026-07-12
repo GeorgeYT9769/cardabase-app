@@ -67,9 +67,7 @@ class _PasswordChallengeDialogState extends State<PasswordChallengeDialog> {
     final expectedPassword = passwordBox.get('PW');
     if (password.text != expectedPassword) {
       GetIt.I<VibrationProvider>().vibrateError();
-      ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar('Incorrect password!', false),
-      );
+      showCustomSnackBar(context, 'Incorrect password!', false);
       return;
     }
 

@@ -49,8 +49,8 @@ class _AutoUpdateSettingsDialogState extends State<AutoUpdateSettingsDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             _enableSwitch(theme),
-            const SizedBox(height: 10),
-            _intervalSlider(theme),
+            if (isEnabled) const SizedBox(height: 10),
+            if (isEnabled) _intervalSlider(theme),
           ],
         ),
       ),

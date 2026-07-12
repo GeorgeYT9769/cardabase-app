@@ -27,10 +27,12 @@ class EditCardForm extends StatefulWidget {
     super.key,
     required this.formKey,
     required this.card,
+    required this.appBar,
   });
 
   final Key formKey;
   final EditableLoyaltyCard card;
+  final Widget appBar;
 
   @override
   State<EditCardForm> createState() => _EditCardFormState();
@@ -103,22 +105,20 @@ class _EditCardFormState extends State<EditCardForm>
       try {
         sharedCard = LoyaltyCard.fromLegacySharing(code);
       } on FormatException {
-        ScaffoldMessenger.of(context).showSnackBar(
-          buildCustomSnackBar(
-            'Scanned code is not a valid Cardabase share code.',
-            false,
-          ),
+        showCustomSnackBar(
+          context,
+          'Scanned code is not a valid Cardabase share code.',
+          false,
         );
       }
     } else if (code.startsWith('{')) {
       try {
         sharedCard = LoyaltyCard.fromLegacySharing(code);
       } on FormatException {
-        ScaffoldMessenger.of(context).showSnackBar(
-          buildCustomSnackBar(
-            'Scanned code is not a valid Cardabase share code.',
-            false,
-          ),
+        showCustomSnackBar(
+          context,
+          'Scanned code is not a valid Cardabase share code.',
+          false,
         );
       }
     } else {
@@ -183,37 +183,45 @@ class _EditCardFormState extends State<EditCardForm>
     final theme = Theme.of(context);
     return Form(
       key: widget.formKey,
-      child: Column(
-        children: [
-          SizedBox(
-            // TODO(wim): migrate this to LayoutBuilder
-            height: MediaQuery.of(context).size.width / 1.586,
-            width: MediaQuery.of(context).size.width,
-            child: _card(theme),
-          ),
-          TabBar(
-            controller: _tabController,
-            tabs: const [
-              Tab(text: 'Card Details'),
-              Tab(text: 'Others'),
-            ],
-            labelColor: theme.colorScheme.primary,
-            unselectedLabelColor: theme.colorScheme.onSurface,
-            splashFactory: NoSplash.splashFactory,
-            labelStyle: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
+      child: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) => [
+          widget.appBar,
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: MediaQuery.of(context).size.width / 1.586,
+              width: MediaQuery.of(context).size.width,
+              child: _card(theme),
             ),
           ),
-          ListenableBuilder(
-            listenable: _tabController,
-            builder: (context, _) {
-              return _tabController.index == 0
-                  ? _cardDetails(theme)
-                  : _other(theme);
-            },
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: _SliverAppBarDelegate(
+              TabBar(
+                controller: _tabController,
+                tabs: const [
+                  Tab(text: 'Card Details'),
+                  Tab(text: 'Others'),
+                ],
+                labelColor: theme.colorScheme.primary,
+                unselectedLabelColor: theme.colorScheme.onSurface,
+                splashFactory: NoSplash.splashFactory,
+                labelStyle: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+                indicatorColor: theme.colorScheme.primary,
+              ),
+              backgroundColor: theme.colorScheme.surface,
+            ),
           ),
         ],
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            SingleChildScrollView(child: _cardDetails(theme)),
+            SingleChildScrollView(child: _other(theme)),
+          ],
+        ),
       ),
     );
   }
@@ -515,5 +523,34 @@ class _EditCardFormState extends State<EditCardForm>
         );
       },
     );
+  }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  _SliverAppBarDelegate(this._tabBar, {required this.backgroundColor});
+
+  final TabBar _tabBar;
+  final Color backgroundColor;
+
+  @override
+  double get minExtent => _tabBar.preferredSize.height;
+  @override
+  double get maxExtent => _tabBar.preferredSize.height;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(
+      color: backgroundColor,
+      child: _tabBar,
+    );
+  }
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+    return backgroundColor != oldDelegate.backgroundColor;
   }
 }

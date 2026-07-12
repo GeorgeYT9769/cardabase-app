@@ -121,9 +121,7 @@ class _InfoScreenState extends State<InfoScreen> {
 
   Future<void> _launchUrl(String url) async {
     if (!await launchUrl(Uri.parse(url))) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        buildCustomSnackBar('Could not launch $url', false),
-      );
+      showCustomSnackBar(context, 'Could not launch $url', false);
     }
   }
 
@@ -139,9 +137,7 @@ class _InfoScreenState extends State<InfoScreen> {
       settings.developerOptions.isEnabled.value = true;
       await settingsBox.save(settings.seal());
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          buildCustomSnackBar('Developer options enabled!', true),
-        );
+        showCustomSnackBar(context, 'Developer options enabled!', true);
       }
       _devTaps = 0;
     }

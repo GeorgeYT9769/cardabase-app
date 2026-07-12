@@ -280,15 +280,11 @@ class _MainState extends State<Main> {
           }
 
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              buildCustomSnackBar('Imported all data from CDB!', true),
-            );
+            showCustomSnackBar(context, 'Imported all data from CDB!', true);
           }
         } catch (e) {
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              buildCustomSnackBar('Failed to import CDB: $e', false),
-            );
+            showCustomSnackBar(context, 'Failed to import CDB: $e', false);
           }
         }
       }
