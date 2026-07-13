@@ -36,6 +36,7 @@ class LoyaltyCard {
     required this.hideName,
     required this.createdAt,
     required this.lastModifiedAt,
+    required this.usePoints,
   });
 
   /// [id] is the unique identifier of the card.
@@ -103,6 +104,10 @@ class LoyaltyCard {
   /// This is used by default for sorting.
   @HiveField(13)
   final DateTime lastModifiedAt;
+  
+  /// [usePoints] whether the card uses Points amount
+  @HiveField(14)
+  final bool usePoints;
 
   Color get nonNullColor => color ?? defaultColor;
 
@@ -152,6 +157,7 @@ class LoyaltyCard {
       points: 0,
       createdAt: now,
       lastModifiedAt: now,
+      usePoints: false,
     );
   }
 
@@ -204,6 +210,7 @@ class LoyaltyCard {
           hideName: false,
           createdAt: now,
           lastModifiedAt: now,
+          usePoints: false,
         );
       }
     }
@@ -242,6 +249,7 @@ class LoyaltyCard {
         points: 0,
         createdAt: now,
         lastModifiedAt: now,
+        usePoints: false,
       );
     }
 
@@ -274,6 +282,7 @@ class LoyaltyCard {
       hideName: jsonMap.getBool('hideName') ?? false,
       createdAt: now,
       lastModifiedAt: now,
+      usePoints: jsonMap.getBool('usePoints') ?? false,
     );
   }
 
@@ -296,6 +305,7 @@ class LoyaltyCard {
       if (hideName != false) 'hideName': hideName,
       if (useFrontImageOverlay != false)
         'useFrontImageOverlay': useFrontImageOverlay,
+      if (usePoints != false) 'usePoints': usePoints,
     };
   }
 
@@ -316,6 +326,7 @@ class LoyaltyCard {
       hideName: hideName,
       createdAt: now,
       lastModifiedAt: now,
+      usePoints: usePoints,
     );
   }
 }
@@ -330,7 +341,7 @@ class Barcode {
   @HiveField(0)
   final String data;
   @HiveField(1)
-  final BarcodeType type;
+  final BarcodeType? type;
 
   EditableBarcode editable() => EditableBarcode.fromValue(this);
 
@@ -339,17 +350,19 @@ class Barcode {
     return Barcode(
       data:
           map.getString('data') ?? (throw Exception('barcode data is missing')),
-      type: BarcodeType.values.firstWhere(
-        (value) => value.name == strType,
-        orElse: () => throw Exception('unknown barcodeType: $strType'),
-      ),
+      type: strType == null
+          ? null
+          : BarcodeType.values.firstWhere(
+              (value) => value.name == strType,
+              orElse: () => throw Exception('unknown barcodeType: $strType'),
+            ),
     );
   }
 
   Map<String, dynamic> toJsonMap() {
     return {
       'data': data,
-      'type': type.name,
+      if (type != null) 'type': type!.name,
     };
   }
 

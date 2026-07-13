@@ -18,6 +18,7 @@ class EditableLoyaltyCard {
     required this.requiresAuth,
     required this.hideName,
     required this.createdAt,
+    required this.usePoints,
   });
 
   EditableLoyaltyCard.createNew()
@@ -35,6 +36,7 @@ class EditableLoyaltyCard {
           requiresAuth: ValueNotifier(false),
           hideName: ValueNotifier(false),
           createdAt: ValueNotifier(DateTime.now().toUtc()),
+          usePoints: ValueNotifier(false),
         );
 
   factory EditableLoyaltyCard.fromValue(LoyaltyCard value) {
@@ -52,6 +54,7 @@ class EditableLoyaltyCard {
       requiresAuth: ValueNotifier(value.requiresAuth),
       hideName: ValueNotifier(value.hideName),
       createdAt: ValueNotifier(value.createdAt),
+      usePoints: ValueNotifier(value.usePoints),
     );
   }
 
@@ -71,6 +74,7 @@ class EditableLoyaltyCard {
   final ValueNotifier<bool> requiresAuth;
   final ValueNotifier<bool> hideName;
   final ValueNotifier<DateTime> createdAt;
+  final ValueNotifier<bool> usePoints;
 
   void loadValue(LoyaltyCard value) {
     id.value = value.id;
@@ -85,6 +89,7 @@ class EditableLoyaltyCard {
     points.value = value.points;
     requiresAuth.value = value.requiresAuth;
     hideName.value = value.hideName;
+    usePoints.value = value.usePoints;
   }
 
   LoyaltyCard seal() {
@@ -103,6 +108,7 @@ class EditableLoyaltyCard {
       hideName: hideName.value,
       createdAt: createdAt.value,
       lastModifiedAt: DateTime.now().toUtc(),
+      usePoints: usePoints.value,
     );
   }
 
@@ -119,6 +125,7 @@ class EditableLoyaltyCard {
     points.dispose();
     requiresAuth.dispose();
     hideName.dispose();
+    usePoints.dispose();
   }
 }
 
@@ -131,7 +138,7 @@ class EditableBarcode {
   EditableBarcode.createNew()
       : this(
           data: TextEditingController(),
-          type: ValueNotifier(BarcodeType.CodeEAN13),
+          type: ValueNotifier(null),
         );
 
   factory EditableBarcode.fromValue(Barcode value) {
@@ -142,7 +149,7 @@ class EditableBarcode {
   }
 
   final TextEditingController data;
-  final ValueNotifier<BarcodeType> type;
+  final ValueNotifier<BarcodeType?> type;
 
   void loadValue(Barcode value) {
     data.text = value.data;

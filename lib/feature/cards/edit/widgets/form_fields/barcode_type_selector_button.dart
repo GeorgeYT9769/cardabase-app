@@ -11,7 +11,7 @@ class BarcodeTypeSelectorButton extends StatelessWidget {
     required this.onPressed,
   });
 
-  final BarcodeType barcodeType;
+  final BarcodeType? barcodeType;
   final VoidCallback onPressed;
 
   @override
@@ -42,7 +42,9 @@ class BarcodeTypeSelectorButton extends StatelessWidget {
           child: Row(
             children: [
               Icon(
-                isSquareCode ? Icons.qr_code_2 : CupertinoIcons.barcode,
+                barcodeType == null
+                    ? Icons.not_interested
+                    : (isSquareCode ? Icons.qr_code_2 : CupertinoIcons.barcode),
                 color: theme.colorScheme.secondary,
               ),
               const SizedBox(width: 15),
@@ -56,7 +58,7 @@ class BarcodeTypeSelectorButton extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                barcodeType.getLabel(),
+                barcodeType?.getLabel() ?? 'None',
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: theme.colorScheme.tertiary,
                   fontWeight: FontWeight.bold,

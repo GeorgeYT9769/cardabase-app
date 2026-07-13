@@ -1,7 +1,8 @@
 import 'package:barcode_widget/barcode_widget.dart';
 
-BarcodeType parseBarcodeTypeStringFromDb(String value) {
+BarcodeType? parseBarcodeTypeStringFromDb(String value) {
   return switch (value) {
+    'CardType.none' => null,
     'CardType.itf' => BarcodeType.Itf,
     'CardType.itf16' => BarcodeType.CodeITF16,
     'CardType.itf14' => BarcodeType.CodeITF14,

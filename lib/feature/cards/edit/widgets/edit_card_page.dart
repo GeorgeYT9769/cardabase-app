@@ -67,10 +67,11 @@ class _EditCardPageState extends State<EditCardPage> {
 
     if (card.name.text.isEmpty == true) {
       showCustomSnackBar(context, 'Card Name cannot be empty!', false);
-    } else if (card.barcode.data.text.isEmpty == true) {
+    } else if (card.barcode.type.value != null &&
+        card.barcode.data.text.isEmpty == true) {
       showCustomSnackBar(context, 'Card ID cannot be empty!', false);
-    } else if (validBarcode(card.barcode.type.value)(card.barcode.data.text) !=
-        null) {
+    } else if (card.barcode.type.value != null &&
+        validBarcode(card.barcode.type.value)(card.barcode.data.text) != null) {
       showCustomSnackBar(context, 'Invalid Card ID!', false);
     } else {
       showCustomSnackBar(context, 'Something went wrong!', false);

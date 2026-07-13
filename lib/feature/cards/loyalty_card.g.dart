@@ -31,13 +31,14 @@ class LoyaltyCardAdapter extends TypeAdapter<LoyaltyCard> {
       hideName: fields[11] as bool,
       createdAt: fields[12] as DateTime,
       lastModifiedAt: fields[13] as DateTime,
+      usePoints: fields[14] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, LoyaltyCard obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(15)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -65,7 +66,9 @@ class LoyaltyCardAdapter extends TypeAdapter<LoyaltyCard> {
       ..writeByte(12)
       ..write(obj.createdAt)
       ..writeByte(13)
-      ..write(obj.lastModifiedAt);
+      ..write(obj.lastModifiedAt)
+      ..writeByte(14)
+      ..write(obj.usePoints);
   }
 
   @override
@@ -91,7 +94,7 @@ class BarcodeAdapter extends TypeAdapter<Barcode> {
     };
     return Barcode(
       data: fields[0] as String,
-      type: fields[1] as BarcodeType,
+      type: fields[1] as BarcodeType?,
     );
   }
 

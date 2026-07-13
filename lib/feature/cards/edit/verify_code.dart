@@ -2,7 +2,10 @@ import 'package:barcode_widget/barcode_widget.dart';
 import 'package:cardabase/util/form_validation.dart';
 import 'package:flutter/widgets.dart';
 
-FormFieldValidator<String> validBarcode(BarcodeType type) {
+FormFieldValidator<String> validBarcode(BarcodeType? type) {
+  if (type == null) {
+    return (_) => null;
+  }
   return switch (type) {
     BarcodeType.Itf => isDigits(),
     BarcodeType.CodeITF16 =>

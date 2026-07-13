@@ -8,12 +8,13 @@ class BarcodeTypeSelectorDialog extends StatelessWidget {
     this.allowedTypes,
   });
 
-  final List<BarcodeType>? allowedTypes;
+  final List<BarcodeType?>? allowedTypes;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final allowedTypes = this.allowedTypes ?? BarcodeType.values;
+    final List<BarcodeType?> allowedTypes =
+        this.allowedTypes ?? [null, ...BarcodeType.values];
     return AlertDialog(
       title: Text(
         'Barcode Type',
@@ -31,12 +32,17 @@ class BarcodeTypeSelectorDialog extends StatelessWidget {
           itemBuilder: (context, index) {
             final type = allowedTypes[index];
             return ListTile(
-              title: Text(type.getLabel()),
-              onTap: () => Navigator.of(context).pop(type),
+              title: Text(type?.getLabel() ?? 'None'),
+              onTap: () => Navigator.of(context).pop(SelectedBarcodeType(type)),
             );
           },
         ),
       ),
     );
   }
+}
+
+class SelectedBarcodeType {
+  final BarcodeType? type;
+  SelectedBarcodeType(this.type);
 }

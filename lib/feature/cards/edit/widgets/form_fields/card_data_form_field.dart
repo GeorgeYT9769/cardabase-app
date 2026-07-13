@@ -13,7 +13,7 @@ class CardDataFormField extends StatelessWidget {
   });
 
   final TextEditingController controller;
-  final BarcodeType barcodeType;
+  final BarcodeType? barcodeType;
   final VoidCallback onScanButtonPressed;
 
   @override
@@ -21,8 +21,8 @@ class CardDataFormField extends StatelessWidget {
     final theme = Theme.of(context);
     return TextFormField(
       controller: controller,
-      validator: isNotEmpty<String>().and(validBarcode(barcodeType)),
-      inputFormatters: barcodeType == BarcodeType.QrCode
+      validator: barcodeType == null ? null : isNotEmpty<String>().and(validBarcode(barcodeType)),
+      inputFormatters: barcodeType == BarcodeType.QrCode || barcodeType == null
           ? null
           : [
               FilteringTextInputFormatter.deny(

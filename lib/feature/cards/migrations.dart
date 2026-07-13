@@ -103,5 +103,6 @@ LoyaltyCard? _mapDynamicToCard(dynamic value) {
     hideName: hideTitle ?? false,
     createdAt: DateTime.now().toUtc(),
     lastModifiedAt: DateTime.now().toUtc(),
+    usePoints: false,
   );
 }

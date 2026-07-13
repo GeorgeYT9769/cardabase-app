@@ -87,67 +87,67 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
     final textColor = card?.color?.contrastingTextColor;
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
-      appBar: _appBar(theme),
-      body: ListView(
+      body: CustomScrollView(
         physics: const BouncingScrollPhysics(
           decelerationRate: ScrollDecelerationRate.fast,
         ),
-        children: [
-          Container(
-            padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-            margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              color: card?.color,
-            ),
+        slivers: [
+          _appBar(theme),
+          SliverToBoxAdapter(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    card?.name ?? '',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: textColor,
-                      fontSize: 50,
-                      fontWeight: FontWeight.bold,
+                Container(
+                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                  margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: card?.color,
+                  ),
+                  child: Column(
+                    children: [
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          card?.name ?? '',
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: textColor,
+                            fontSize: 50,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                        ),
+                      ),
+                      if (card?.usePoints == true)
+                        Text(
+                          '${card?.points} points',
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: textColor,
+                            fontSize: 20,
+                          ),
+                        ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                    ],
+                  ),
+                ),
+                _cardPreview(theme),
+                if (card?.notes != null)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 20,
+                      top: 20,
+                      right: 20,
+                      bottom: 120,
                     ),
-                    maxLines: 1,
+                    child: _note(theme),
                   ),
-                ),
-                Text(
-                  '${card?.points} points',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: textColor,
-                    fontSize: 20,
-                  ),
-                ),
-                SizedBox(
-                  height: 5,
-                ),
               ],
             ),
           ),
-          SizedBox(
-            child: LayoutBuilder(
-              builder: (context, constraints) => SizedBox(
-                height: constraints.maxWidth / 1.586,
-                width: constraints.maxWidth,
-                child: _card(theme),
-              ),
-            ),
-          ),
-          if (card?.notes != null)
-            Padding(
-              padding: const EdgeInsets.only(
-                left: 20,
-                top: 20,
-                right: 20,
-                bottom: 120,
-              ),
-              child: _note(theme),
-            ),
         ],
       ),
       floatingActionButton: _saveButton(theme),
@@ -155,8 +155,10 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
     );
   }
 
-  AppBar _appBar(ThemeData theme) {
-    return AppBar(
+  Widget _appBar(ThemeData theme) {
+    return SliverAppBar(
+      floating: true,
+      snap: true,
       leading: IconButton(
         icon: Icon(
           Icons.qr_code_2,
@@ -187,34 +189,64 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
     );
   }
 
-  Widget _card(ThemeData theme) {
+  Widget _cardPreview(ThemeData theme) {
     final frontImagePath = card?.frontImagePath;
     final backImagePath = card?.backImagePath;
+    final hasFront =
+        frontImagePath != null && File(frontImagePath).existsSync() == true;
+    final hasBarcode = card != null && card!.barcode.type != null;
+    final hasBack =
+        backImagePath != null && File(backImagePath).existsSync() == true;
+
+    if (!hasFront && !hasBarcode && !hasBack) {
+      return const SizedBox.shrink();
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) => SizedBox(
+        height: constraints.maxWidth / 1.586,
+        width: constraints.maxWidth,
+        child: _card(theme, hasFront, hasBarcode, hasBack),
+      ),
+    );
+  }
+
+  Widget _card(ThemeData theme, bool hasFront, bool hasBarcode, bool hasBack) {
+    final frontImagePath = card?.frontImagePath;
+    final backImagePath = card?.backImagePath;
+
+    final children = [
+      if (hasFront)
+        CardFace.image(
+          cardTileColor: card?.color,
+          image: FileImage(File(frontImagePath!)),
+          showWhiteOutline: false,
+        ),
+      if (hasBarcode)
+        CardFace.barcode(
+          cardTileColor: card!.color,
+          cardData: card!.barcode.data,
+          barcodeType: card!.barcode.type!,
+          showWhiteOutline: true,
+        ),
+      if (hasBack)
+        CardFace.image(
+          cardTileColor: card?.color,
+          image: FileImage(File(backImagePath!)),
+          showWhiteOutline: false,
+        ),
+    ];
+
+    int initialPage = 0;
+    if (hasFront && hasBarcode) {
+      initialPage = 1;
+    }
+
     return PageView(
       controller: PageController(
-        initialPage: frontImagePath == null ? 0 : 1,
+        initialPage: initialPage,
       ),
-      children: [
-        if (frontImagePath != null && File(frontImagePath).existsSync() == true)
-          CardFace.image(
-            cardTileColor: card?.color,
-            image: FileImage(File(frontImagePath)),
-            showWhiteOutline: false,
-          ),
-        if (card != null)
-          CardFace.barcode(
-            cardTileColor: card!.color,
-            cardData: card!.barcode.data,
-            barcodeType: card!.barcode.type,
-            showWhiteOutline: true,
-          ),
-        if (backImagePath != null && File(backImagePath).existsSync() == true)
-          CardFace.image(
-            cardTileColor: card?.color,
-            image: FileImage(File(backImagePath)),
-            showWhiteOutline: false,
-          ),
-      ],
+      children: children,
     );
   }
 

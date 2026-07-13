@@ -31,6 +31,7 @@ void main() {
             hideName: false,
             createdAt: DateTime.now().toUtc(),
             lastModifiedAt: DateTime.now().toUtc(),
+            usePoints: false,
           ),
         ),
       ];
@@ -89,6 +90,7 @@ void main() {
             hideName: false,
             createdAt: DateTime.now().toUtc(),
             lastModifiedAt: DateTime.now().toUtc(),
+            usePoints: false,
           ),
         ),
         InputOutputTestCase(
@@ -113,6 +115,7 @@ void main() {
             hideName: false,
             createdAt: DateTime.now().toUtc(),
             lastModifiedAt: DateTime.now().toUtc(),
+            usePoints: false,
           ),
         ),
       ];
@@ -176,6 +179,7 @@ void main() {
             hideName: false,
             createdAt: DateTime.now().toUtc(),
             lastModifiedAt: DateTime.now().toUtc(),
+            usePoints: false,
           ),
         ),
         InputOutputTestCase(
@@ -196,6 +200,7 @@ void main() {
             'hideName': true,
             'createdAt': DateTime.now().toUtc().toIso8601String(),
             'updatedAt': DateTime.now().toUtc().toIso8601String(),
+            'usePoints': false,
           },
           expected: LoyaltyCard(
             id: '6fdfeb5a-04d9-4134-bade-7e5a53c3b268',
@@ -215,6 +220,7 @@ void main() {
             hideName: true,
             createdAt: DateTime.now().toUtc(),
             lastModifiedAt: DateTime.now().toUtc(),
+            usePoints: false,
           ),
         ),
       ];
@@ -268,6 +274,7 @@ void main() {
                 DateTime.fromMillisecondsSinceEpoch(1779824555324).toUtc(),
             lastModifiedAt:
                 DateTime.fromMillisecondsSinceEpoch(1779824555324).toUtc(),
+            usePoints: false,
           ),
           expected: {
             'id': 'c587625b-6892-428d-b902-f39e5b29edf1',
@@ -278,6 +285,7 @@ void main() {
             },
             'createdAt': '2026-05-26T19:42:35.324Z',
             'lastModifiedAt': '2026-05-26T19:42:35.324Z',
+            'usePoints': false,
           },
         ),
         InputOutputTestCase(
@@ -302,6 +310,7 @@ void main() {
                 DateTime.fromMillisecondsSinceEpoch(1779824555324).toUtc(),
             lastModifiedAt:
                 DateTime.fromMillisecondsSinceEpoch(1779824555324).toUtc(),
+            usePoints: false,
           ),
           expected: {
             'id': '6fdfeb5a-04d9-4134-bade-7e5a53c3b268',
@@ -319,6 +328,7 @@ void main() {
             'hideName': true,
             'createdAt': '2026-05-26T19:42:35.324Z',
             'lastModifiedAt': '2026-05-26T19:42:35.324Z',
+            'usePoints': false,
           },
         ),
       ];

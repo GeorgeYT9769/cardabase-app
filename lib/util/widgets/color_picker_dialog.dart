@@ -29,7 +29,7 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
     final theme = Theme.of(context);
     return AlertDialog(
       title: Text(
-        'Card color',
+        'Card Color',
         style: theme.textTheme.bodyLarge
           ?.copyWith(color: theme.colorScheme.inverseSurface, fontSize: 30),
       ),

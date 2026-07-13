@@ -135,10 +135,11 @@ class _EditCardFormState extends State<EditCardForm>
   }
 
   Future<void> _showBarcodeSelectorDialog() async {
-    final BarcodeType? result = await showDialog<BarcodeType>(
+    final result = await showDialog<SelectedBarcodeType>(
       context: context,
       builder: (context) => BarcodeTypeSelectorDialog(
         allowedTypes: [
+          null,
           BarcodeType.Code39,
           BarcodeType.Code93,
           BarcodeType.Code128,
@@ -163,7 +164,7 @@ class _EditCardFormState extends State<EditCardForm>
       return;
     }
 
-    widget.card.barcode.type.value = result;
+    widget.card.barcode.type.value = result.type;
   }
 
   Future<void> _showColorPickerDialog() async {
@@ -234,6 +235,7 @@ class _EditCardFormState extends State<EditCardForm>
         widget.card.name,
         widget.card.color,
         widget.card.hideName,
+        widget.card.usePoints,
       ],
       builder: (context) {
         final path = widget.card.frontImagePath.value;
@@ -405,6 +407,31 @@ class _EditCardFormState extends State<EditCardForm>
               ),
               onChanged: (checked) {
                 widget.card.hideName.value = checked ?? false;
+              },
+            ),
+          ),
+          ValueListenableBuilder(
+            valueListenable: widget.card.usePoints,
+            builder: (context, value, _) => CheckboxListTile(
+              value: value,
+              title: Text(
+                'Use Points amount',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  //cardTypeText
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                  color: theme.colorScheme.inverseSurface,
+                ),
+              ),
+              controlAffinity: ListTileControlAffinity.leading,
+              side: BorderSide(
+                color: theme.colorScheme.primary,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5),
+              ),
+              onChanged: (checked) {
+                widget.card.usePoints.value = checked ?? false;
               },
             ),
           ),

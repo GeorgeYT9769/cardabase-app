@@ -118,6 +118,7 @@ Future<ZipImportResult> importDataFromZip(List<int> bytes) async {
         hideName: card.hideName,
         createdAt: card.createdAt,
         lastModifiedAt: card.lastModifiedAt,
+        usePoints: card.usePoints,
       ),
     );
   }
