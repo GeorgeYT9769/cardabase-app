@@ -25,6 +25,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   final settingsBox = GetIt.I<SettingsBox>();
   String? changelog;
   bool expanded = false;
+  late int days = calculateDaysUntilEndOfAndroid();
 
   @override
   void initState() {
@@ -100,23 +101,29 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    final isErrorOrEmpty = changelog == 'No changelog found for this version.' ||
+        changelog == 'Failed to load changelog.';
+    final hasEnoughLines = (changelog?.split('\n').length ?? 0) > 3;
+    final showExpandButton = !isErrorOrEmpty && hasEnoughLines;
+
     final changelogWidget = changelog == null
         ? ExpressiveLoadingIndicator(
-          color: Theme.of(context).colorScheme.tertiary,
-          constraints: const BoxConstraints(
-            minWidth: 64.0,
-            minHeight: 64.0,
-            maxWidth: 64.0,
-            maxHeight: 64.0,
-          ),
-          polygons: [
-            MaterialShapes.softBurst,
-            MaterialShapes.pentagon,
-            MaterialShapes.pill,
-          ],
-          semanticsLabel: 'Loading',
-          semanticsValue: 'In progress',
-        )
+            color: Theme.of(context).colorScheme.tertiary,
+            constraints: const BoxConstraints(
+              minWidth: 64.0,
+              minHeight: 64.0,
+              maxWidth: 64.0,
+              maxHeight: 64.0,
+            ),
+            polygons: [
+              MaterialShapes.softBurst,
+              MaterialShapes.pentagon,
+              MaterialShapes.pill,
+            ],
+            semanticsLabel: 'Loading',
+            semanticsValue: 'In progress',
+          )
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -128,51 +135,59 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-              AnimatedCrossFade(
-                crossFadeState: expanded
-                    ? CrossFadeState.showSecond
-                    : CrossFadeState.showFirst,
-                duration: const Duration(milliseconds: 250),
-                firstChild: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _getFirstLines(changelog!, 3),
-                      style: theme.textTheme.bodyLarge?.copyWith(fontSize: 16),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Center(
-                      child: IconButton(
-                        icon: const Icon(Icons.keyboard_arrow_down),
-                        onPressed: () => setState(() => expanded = true),
-                      ),
-                    ),
-                  ],
-                ),
-                secondChild: SizedBox(
-                  height: 180,
-                  child: Column(
+              if (!showExpandButton)
+                Text(
+                  changelog!,
+                  style: theme.textTheme.bodyLarge?.copyWith(fontSize: 16),
+                )
+              else
+                AnimatedCrossFade(
+                  crossFadeState: expanded
+                      ? CrossFadeState.showSecond
+                      : CrossFadeState.showFirst,
+                  duration: const Duration(milliseconds: 250),
+                  firstChild: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: Text(
-                            changelog!,
-                            style: theme.textTheme.bodyLarge
-                                ?.copyWith(fontSize: 16),
-                          ),
-                        ),
+                      Text(
+                        _getFirstLines(changelog!, 3),
+                        style:
+                            theme.textTheme.bodyLarge?.copyWith(fontSize: 16),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       Center(
                         child: IconButton(
-                          icon: const Icon(Icons.keyboard_arrow_up),
-                          onPressed: () => setState(() => expanded = false),
+                          icon: const Icon(Icons.keyboard_arrow_down),
+                          onPressed: () => setState(() => expanded = true),
                         ),
                       ),
                     ],
                   ),
+                  secondChild: SizedBox(
+                    height: 180,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Text(
+                              changelog!,
+                              style: theme.textTheme.bodyLarge
+                                  ?.copyWith(fontSize: 16),
+                            ),
+                          ),
+                        ),
+                        Center(
+                          child: IconButton(
+                            icon: const Icon(Icons.keyboard_arrow_up),
+                            onPressed: () => setState(() => expanded = false),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
             ],
           );
 
@@ -211,40 +226,46 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       ),
       body: Column(
         children: [
-          Container(
-            margin: const EdgeInsets.fromLTRB(20, 5, 20, 10),
-            padding: const EdgeInsets.all(20.0),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.errorContainer,
-              borderRadius: BorderRadius.circular(10),
+          if (days > 0)
+            Container(
+              margin: const EdgeInsets.fromLTRB(20, 5, 20, 10),
+              padding: const EdgeInsets.all(20.0),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.errorContainer,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                'Your phone is about to stop being yours.\nTime left: $days days.\nFor more info visit keepandroidopen.org',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontSize: 14,
+                  color: theme.colorScheme.error,
+                ),
+              ),
             ),
-            child: Text(
-              'Your phone is about to stop being yours.\nTime left: ${calculateDaysUntilEndOfAndroid()} days.\nFor more info visit keepandroidopen.org',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                fontSize: 14,
-                color: theme.colorScheme.error,
+          const SizedBox(height: 10),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.auto_awesome,
+                      size: 80,
+                      color: theme.colorScheme.primary,
+                    ),
+                    const SizedBox(height: 30),
+                    changelogWidget,
+                  ],
+                ),
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.auto_awesome,
-                  size: 80,
-                  color: theme.colorScheme.primary,
-                ),
-                const SizedBox(height: 30),
-                changelogWidget,
-                //Text(
-                //  'Important: New storage system -> ERRORS. To fix this, export and import all your cards to convert them.',
-                //  textAlign: TextAlign.center,
-                //  style: theme.textTheme.bodyLarge
-                //      ?.copyWith(fontSize: 16, color: Colors.red),
-                //),
-                const SizedBox(height: 40),
                 Bounceable(
                   onTap: () {},
                   child: SizedBox(
@@ -324,8 +345,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       ),
                       child: Text(
                         'Skip for now',
-                        style: theme.textTheme.bodyLarge
-                            ?.copyWith(color: theme.colorScheme.inverseSurface),
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.inverseSurface),
                       ),
                     ),
                   ),

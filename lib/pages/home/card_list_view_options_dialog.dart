@@ -37,53 +37,62 @@ class CardListViewOptionsDialog extends StatelessWidget {
           fontSize: 30,
         ),
       ),
-      content: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(
-          decelerationRate: ScrollDecelerationRate.fast,
-        ),
-        child: Column(
-          children: <Widget>[
-            if (allTags.isNotEmpty) ..._tagFilter(theme),
-            _optionTitle(theme, 'Sort by:'),
-            const SizedBox(height: 10),
-            SortingStyleSelector(controller: sortingStyle),
-            ValueListenableBuilder<SortingStyle>(
-              valueListenable: sortingStyle,
-              builder: (context, value, _) {
-                if (value == SortingStyle.nameAz ||
-                    value == SortingStyle.nameZa) {
-                  return Column(
-                    children: [
-                      const SizedBox(height: 10),
-                      _caseSensitiveSwitch(theme),
-                      const SizedBox(height: 10),
-                      _ignoreAccentsSwitch(theme),
-                    ],
-                  );
-                } else if (value == SortingStyle.custom) {
-                  return Column(
-                    children: [
-                      const SizedBox(height: 10),
-                      _reorderingModeSwitch(theme),
-                    ],
-                  );
-                }
-                return const SizedBox.shrink();
-              },
+      content: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.45,
+          ),
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(
+              decelerationRate: ScrollDecelerationRate.fast,
             ),
-            const SizedBox(height: 10),
-            _divider(theme),
-            const SizedBox(height: 10),
-            ValueListenableBuilder(
-              valueListenable: numberOfColumns,
-              builder: (context, value, _) => _optionTitle(
-                theme,
-                'Columns: $value',
-              ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                if (allTags.isNotEmpty) ..._tagFilter(theme),
+                _optionTitle(theme, 'Sort by:'),
+                const SizedBox(height: 10),
+                SortingStyleSelector(controller: sortingStyle),
+                ValueListenableBuilder<SortingStyle>(
+                  valueListenable: sortingStyle,
+                  builder: (context, value, _) {
+                    if (value == SortingStyle.nameAz ||
+                        value == SortingStyle.nameZa) {
+                      return Column(
+                        children: [
+                          const SizedBox(height: 10),
+                          _caseSensitiveSwitch(theme),
+                          const SizedBox(height: 10),
+                          _ignoreAccentsSwitch(theme),
+                        ],
+                      );
+                    } else if (value == SortingStyle.custom) {
+                      return Column(
+                        children: [
+                          const SizedBox(height: 10),
+                          _reorderingModeSwitch(theme),
+                        ],
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+                const SizedBox(height: 10),
+                _divider(theme),
+                const SizedBox(height: 10),
+                ValueListenableBuilder(
+                  valueListenable: numberOfColumns,
+                  builder: (context, value, _) => _optionTitle(
+                    theme,
+                    'Columns: $value',
+                  ),
+                ),
+                const SizedBox(height: 10),
+                NumberOfColumnsSlider(controller: numberOfColumns),
+              ],
             ),
-            const SizedBox(height: 10),
-            NumberOfColumnsSlider(controller: numberOfColumns),
-          ],
+          ),
         ),
       ),
       actions: [
@@ -116,23 +125,16 @@ class CardListViewOptionsDialog extends StatelessWidget {
     return [
       _optionTitle(theme, 'Tags:'),
       const SizedBox(height: 10),
-      SingleChildScrollView(
-        physics: const BouncingScrollPhysics(
-          decelerationRate: ScrollDecelerationRate.fast,
-        ),
-        scrollDirection: Axis.horizontal,
-        child: ValueListenableBuilder(
-          valueListenable: tagFilter,
-          builder: (context, tagFilter, _) => Row(
-            children: allTags
-                .map(
-                  (tag) => Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                    child: _tag(theme, tag, tagFilter == tag),
-                  ),
-                )
-                .toList(growable: false),
-          ),
+      ValueListenableBuilder(
+        valueListenable: tagFilter,
+        builder: (context, tagFilter, _) => Wrap(
+          spacing: 8,
+          runSpacing: 0,
+          children: allTags
+              .map(
+                (tag) => _tag(theme, tag, tagFilter == tag),
+              )
+              .toList(growable: false),
         ),
       ),
       const SizedBox(height: 5),
@@ -160,13 +162,13 @@ class CardListViewOptionsDialog extends StatelessWidget {
             : theme.colorScheme.primary.withValues(alpha: 0.3),
         width: isSelected ? 2 : 1,
       ),
-      avatar: isSelected
-          ? Icon(
-              Icons.check,
-              size: 18,
-              color: theme.colorScheme.onPrimary,
-            )
-          : null,
+      //avatar: isSelected
+      //    ? Icon(
+      //        Icons.check,
+      //        size: 18,
+      //        color: theme.colorScheme.onPrimary,
+      //      )
+      //    : null,
     );
   }
 

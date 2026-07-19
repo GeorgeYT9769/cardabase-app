@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class AddTagDialog extends StatefulWidget {
-  const AddTagDialog({super.key});
+  final List<String> existingTags;
+
+  const AddTagDialog({super.key, this.existingTags = const []});
 
   @override
   State<AddTagDialog> createState() => _AddTagDialogState();
@@ -9,11 +11,26 @@ class AddTagDialog extends StatefulWidget {
 
 class _AddTagDialogState extends State<AddTagDialog> {
   final _controller = TextEditingController();
+  String? _errorText;
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  void _validate(String value) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      setState(() => _errorText = null);
+      return;
+    }
+
+    if (widget.existingTags.contains(trimmed)) {
+      setState(() => _errorText = 'Tag already exists');
+    } else {
+      setState(() => _errorText = null);
+    }
   }
 
   @override
@@ -32,7 +49,9 @@ class _AddTagDialogState extends State<AddTagDialog> {
         children: [
           TextFormField(
             controller: _controller,
+            onChanged: _validate,
             decoration: InputDecoration(
+              errorText: _errorText,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: const BorderSide(width: 2.0),
@@ -59,37 +78,37 @@ class _AddTagDialogState extends State<AddTagDialog> {
             ),
           ),
           const SizedBox(height: 20),
-          Center(
-            child: OutlinedButton(
-              onPressed: () {
-                final trimmed = _controller.text.trim();
-                if (trimmed.isEmpty) {
-                  return;
-                }
-                Navigator.of(context).pop(
-                  _controller.text.trim(),
-                );
-              },
-              style: OutlinedButton.styleFrom(
-                elevation: 0.0,
-                side: BorderSide(
-                  color: theme.colorScheme.primary,
-                  width: 2.0,
+          if (_errorText != 'Tag already exists')
+            Center(
+              child: OutlinedButton(
+                onPressed: () {
+                  final trimmed = _controller.text.trim();
+                  if (trimmed.isEmpty) {
+                    setState(() => _errorText = 'Tag cannot be empty');
+                    return;
+                  }
+                  Navigator.of(context).pop(trimmed);
+                },
+                style: OutlinedButton.styleFrom(
+                  elevation: 0.0,
+                  side: BorderSide(
+                    color: theme.colorScheme.primary,
+                    width: 2.0,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(11),
+                  ),
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(11),
-                ),
-              ),
-              child: Text(
-                'ADD',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                  color: theme.colorScheme.tertiary,
+                child: Text(
+                  'ADD',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: theme.colorScheme.tertiary,
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );

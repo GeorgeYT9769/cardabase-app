@@ -60,6 +60,7 @@ void main() {
           expect(output.points, tc.expected.points);
           expect(output.requiresAuth, tc.expected.requiresAuth);
           expect(output.hideName, tc.expected.hideName);
+          expect(output.usePoints, tc.expected.usePoints);
         });
       }
     });
@@ -115,7 +116,7 @@ void main() {
             hideName: false,
             createdAt: DateTime.now().toUtc(),
             lastModifiedAt: DateTime.now().toUtc(),
-            usePoints: false,
+            usePoints: true,
           ),
         ),
       ];
@@ -144,6 +145,7 @@ void main() {
           expect(output.points, tc.expected.points);
           expect(output.requiresAuth, tc.expected.requiresAuth);
           expect(output.hideName, tc.expected.hideName);
+          expect(output.usePoints, tc.expected.usePoints);
         });
       }
     });
@@ -223,6 +225,37 @@ void main() {
             usePoints: false,
           ),
         ),
+        InputOutputTestCase(
+          name: 'missing usePoints but has pointsAmount',
+          input: {
+            'name': 'Legacy Card',
+            'barcode': {
+              'data': '987654321',
+              'type': 'Code128',
+            },
+            'pointsAmount': 100,
+          },
+          expected: LoyaltyCard(
+            id: '',
+            barcode: const Barcode(
+              data: '987654321',
+              type: BarcodeType.Code128,
+            ),
+            name: 'Legacy Card',
+            color: null,
+            tags: const {},
+            notes: null,
+            frontImagePath: null,
+            backImagePath: null,
+            useFrontImageOverlay: false,
+            points: 100,
+            requiresAuth: false,
+            hideName: false,
+            createdAt: DateTime.now().toUtc(),
+            lastModifiedAt: DateTime.now().toUtc(),
+            usePoints: true,
+          ),
+        ),
       ];
 
       for (final tc in testCases) {
@@ -244,6 +277,7 @@ void main() {
           expect(output.points, tc.expected.points);
           expect(output.requiresAuth, tc.expected.requiresAuth);
           expect(output.hideName, tc.expected.hideName);
+          expect(output.usePoints, tc.expected.usePoints);
         });
       }
     });
@@ -285,7 +319,6 @@ void main() {
             },
             'createdAt': '2026-05-26T19:42:35.324Z',
             'lastModifiedAt': '2026-05-26T19:42:35.324Z',
-            'usePoints': false,
           },
         ),
         InputOutputTestCase(
@@ -328,7 +361,43 @@ void main() {
             'hideName': true,
             'createdAt': '2026-05-26T19:42:35.324Z',
             'lastModifiedAt': '2026-05-26T19:42:35.324Z',
-            'usePoints': false,
+          },
+        ),
+        InputOutputTestCase(
+          name: 'usePoints is true',
+          input: LoyaltyCard(
+            id: 'test-id',
+            barcode: const Barcode(
+              data: '123',
+              type: BarcodeType.QrCode,
+            ),
+            name: 'Shop 3',
+            color: null,
+            tags: const {},
+            notes: null,
+            frontImagePath: null,
+            backImagePath: null,
+            useFrontImageOverlay: false,
+            points: 10,
+            requiresAuth: false,
+            hideName: false,
+            createdAt:
+                DateTime.fromMillisecondsSinceEpoch(1779824555324).toUtc(),
+            lastModifiedAt:
+                DateTime.fromMillisecondsSinceEpoch(1779824555324).toUtc(),
+            usePoints: true,
+          ),
+          expected: {
+            'id': 'test-id',
+            'name': 'Shop 3',
+            'barcode': {
+              'data': '123',
+              'type': 'QrCode',
+            },
+            'createdAt': '2026-05-26T19:42:35.324Z',
+            'lastModifiedAt': '2026-05-26T19:42:35.324Z',
+            'points': 10,
+            'usePoints': true,
           },
         ),
       ];

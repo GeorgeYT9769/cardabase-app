@@ -16,11 +16,23 @@ extension GetItExtensions on GetIt {
         await oldCardsBox.close();
 
         await _fixDuplicationBugData(newCardsBox);
+        await _fixUsePointsData(newCardsBox);
 
         return newCardsBox;
       },
       dispose: (box) => box.close(),
     );
+  }
+}
+
+Future<void> _fixUsePointsData(LoyaltyCardsBox box) async {
+  for (final card in box.values) {
+    // If a card has points but usePoints is false, it's likely an old card
+    // that was created before the usePoints toggle was added.
+    if (card.points != 0 && !card.usePoints) {
+      final updatedCard = card.copyWith(usePoints: true);
+      await box.put(updatedCard.id, updatedCard);
+    }
   }
 }
 

@@ -3,6 +3,7 @@ import 'package:cardabase/pages/welcome_screen.dart';
 import 'package:cardabase/util/setting_tile.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -33,6 +34,8 @@ class _DevToolsPageState extends State<DevToolsPage> {
   }
 
   Future<void> _seedDatabase() async {
+    await _cardsBox.clear();
+
     final now = DateTime.now().toUtc();
     final dummyCards = [
       LoyaltyCard(
@@ -86,6 +89,40 @@ class _DevToolsPageState extends State<DevToolsPage> {
         lastModifiedAt: now,
         usePoints: false,
       ),
+      LoyaltyCard(
+        id: 'dummy-4',
+        name: 'Cinema Plus',
+        barcode: const Barcode(data: 'CINEMA-123', type: BarcodeType.Code39),
+        color: Colors.purple,
+        tags: {'Entertainment'},
+        notes: 'Discount on popcorn',
+        frontImagePath: null,
+        backImagePath: null,
+        useFrontImageOverlay: false,
+        points: 50,
+        requiresAuth: false,
+        hideName: false,
+        createdAt: now,
+        lastModifiedAt: now,
+        usePoints: true,
+      ),
+      LoyaltyCard(
+        id: 'dummy-5',
+        name: 'Pharmacy',
+        barcode: const Barcode(data: 'PHARMA-987', type: BarcodeType.Itf),
+        color: Colors.green,
+        tags: {'Health'},
+        notes: 'Prescription pickup card',
+        frontImagePath: null,
+        backImagePath: null,
+        useFrontImageOverlay: false,
+        points: 200,
+        requiresAuth: false,
+        hideName: false,
+        createdAt: now,
+        lastModifiedAt: now,
+        usePoints: true,
+      ),
     ];
 
     for (final card in dummyCards) {
@@ -93,15 +130,25 @@ class _DevToolsPageState extends State<DevToolsPage> {
     }
 
     if (mounted) {
-      showCustomSnackBar(context, 'Done!', true);
+      setState(() {});
+      showCustomSnackBar(context, 'Database wiped & seeded!', true);
     }
   }
 
   Future<void> _clearDatabase() async {
     await _cardsBox.clear();
     if (mounted) {
-      showCustomSnackBar(context, 'Cleared!', true);
+      setState(() {});
+      showCustomSnackBar(context, 'Database cleared!', true);
     }
+  }
+
+  Future<void> _copyToClipboard() async {
+    Clipboard.setData(
+      ClipboardData(
+        text: '[{"id":"202606191546400","barcode":{"data":"978020137964","type":"CodeEAN13"},"name":"CopyCard","createdAt":"2026-06-21T08:42:17.429Z","lastModifiedAt":"2026-06-21T08:42:17.429Z","color":"FFD5DA27","notes":"", "points": 10}]',
+      ),
+    );
   }
 
   @override
@@ -174,6 +221,13 @@ class _DevToolsPageState extends State<DevToolsPage> {
                 iconColor: Colors.red,
                 borderColor: Colors.red,
                 textColor: Colors.red,
+              ),
+              SettingTile(
+                settingHeader: 'Copy fake card',
+                aboutSettingHeader: 'Copy fake card to clipboard',
+                settingIcon: Icons.copy,
+                settingAction: _copyToClipboard,
+                iconColor: theme.colorScheme.tertiary,
               ),
               const SizedBox(height: 100),
             ]),

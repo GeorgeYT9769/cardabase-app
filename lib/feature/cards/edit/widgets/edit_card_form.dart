@@ -476,7 +476,8 @@ class _EditCardFormState extends State<EditCardForm>
         if (allTags.isEmpty) {
           return const SizedBox.shrink();
         }
-        return Row(
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Tags:',
@@ -486,65 +487,52 @@ class _EditCardFormState extends State<EditCardForm>
                 fontSize: 16,
               ),
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: SizedBox(
-                height: 40,
-                child: ListView.builder(
-                  physics: const BouncingScrollPhysics(
-                    decelerationRate: ScrollDecelerationRate.fast,
-                  ),
-                  scrollDirection: Axis.horizontal,
-                  itemCount: allTags.length,
-                  itemBuilder: (context, chipIndex) {
-                    final tag = allTags[chipIndex];
-                    final isSelected = widget.card.tags.value.contains(tag);
-                    return Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-                      child: ActionChip(
-                        label: Text(tag),
-                        onPressed: () {
-                          setState(() {
-                            if (isSelected) {
-                              widget.card.tags.value = widget.card.tags.value
-                                  .where((t) => t != tag)
-                                  .toList(growable: false);
-                            } else {
-                              widget.card.tags.value = [
-                                ...widget.card.tags.value,
-                                tag,
-                              ];
-                            }
-                          });
-                        },
-                        labelStyle: theme.textTheme.bodyLarge?.copyWith(
-                          color: isSelected
-                              ? theme.colorScheme.onPrimary
-                              : theme.colorScheme.inverseSurface,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        backgroundColor: isSelected
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.surface,
-                        side: BorderSide(
-                          color: isSelected
-                              ? theme.colorScheme.primary
-                              : theme.colorScheme.primary
-                                  .withValues(alpha: 0.3),
-                          width: isSelected ? 2 : 1,
-                        ),
-                        avatar: isSelected
-                            ? Icon(
-                                Icons.check,
-                                size: 18,
-                                color: theme.colorScheme.onPrimary,
-                              )
-                            : null,
-                      ),
-                    );
+            const SizedBox(height: 5),
+            Wrap(
+              spacing: 8,
+              runSpacing: 0,
+              children: allTags.map((tag) {
+                final isSelected = widget.card.tags.value.contains(tag);
+                return ActionChip(
+                  label: Text(tag),
+                  onPressed: () {
+                    setState(() {
+                      if (isSelected) {
+                        widget.card.tags.value = widget.card.tags.value
+                            .where((t) => t != tag)
+                            .toList(growable: false);
+                      } else {
+                        widget.card.tags.value = [
+                          ...widget.card.tags.value,
+                          tag,
+                        ];
+                      }
+                    });
                   },
-                ),
-              ),
+                  labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                    color: isSelected
+                        ? theme.colorScheme.onPrimary
+                        : theme.colorScheme.inverseSurface,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  backgroundColor: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.surface,
+                  side: BorderSide(
+                    color: isSelected
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.primary.withValues(alpha: 0.3),
+                    width: isSelected ? 2 : 1,
+                  ),
+                  //avatar: isSelected
+                  //    ? Icon(
+                  //        Icons.check,
+                  //        size: 18,
+                  //        color: theme.colorScheme.onPrimary,
+                  //      )
+                  //    : null,
+                );
+              }).toList(),
             ),
           ],
         );

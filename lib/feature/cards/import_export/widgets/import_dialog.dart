@@ -145,15 +145,8 @@ class _ImportDialogState extends State<ImportDialog> {
         ],
       ),
       actions: [
-        Center(
-          child: Row(
-            children: [
-              _cancelButton(theme),
-              Spacer(),
-              _importButton(theme),
-            ],
-          ),
-        ),
+         _cancelButton(theme),
+         _importButton(theme),
       ],
     );
   }

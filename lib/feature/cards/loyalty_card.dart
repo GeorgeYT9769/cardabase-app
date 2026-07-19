@@ -190,6 +190,8 @@ class LoyaltyCard {
         final green = cardMap.getInt('greenValue');
         final blue = cardMap.getInt('blueValue');
 
+        final points = cardMap.getInt('pointsAmount') ?? 0;
+
         return LoyaltyCard(
           id: generateUniqueId(),
           barcode: Barcode(
@@ -205,12 +207,12 @@ class LoyaltyCard {
           frontImagePath: null,
           backImagePath: null,
           useFrontImageOverlay: false,
-          points: cardMap.getInt('pointsAmount') ?? 0,
+          points: points,
           requiresAuth: cardMap.getBool('hasPassword') ?? false,
           hideName: false,
           createdAt: now,
           lastModifiedAt: now,
-          usePoints: false,
+          usePoints: cardMap.containsKey('pointsAmount'),
         );
       }
     }
@@ -266,6 +268,8 @@ class LoyaltyCard {
 
   factory LoyaltyCard.fromJsonMap(Map<String, dynamic> jsonMap) {
     final now = DateTime.now().toUtc();
+    final points =
+        jsonMap.getInt('points') ?? jsonMap.getInt('pointsAmount') ?? 0;
     return LoyaltyCard(
       id: jsonMap.getString('id') ?? generateUniqueId(),
       barcode: jsonMap.getObject('barcode', Barcode.fromJsonMap) ??
@@ -277,12 +281,13 @@ class LoyaltyCard {
       frontImagePath: null,
       backImagePath: null,
       useFrontImageOverlay: jsonMap.getBool('useFrontImageOverlay') ?? false,
-      points: jsonMap.getInt('points') ?? 0,
+      points: points,
       requiresAuth: jsonMap.getBool('requiresAuth') ?? false,
       hideName: jsonMap.getBool('hideName') ?? false,
       createdAt: now,
       lastModifiedAt: now,
-      usePoints: jsonMap.getBool('usePoints') ?? false,
+      usePoints: jsonMap.getBool('usePoints') ??
+          (jsonMap.containsKey('points') || jsonMap.containsKey('pointsAmount')),
     );
   }
 
@@ -307,6 +312,42 @@ class LoyaltyCard {
         'useFrontImageOverlay': useFrontImageOverlay,
       if (usePoints != false) 'usePoints': usePoints,
     };
+  }
+
+  LoyaltyCard copyWith({
+    String? id,
+    Barcode? barcode,
+    String? name,
+    Color? color,
+    Set<String>? tags,
+    String? notes,
+    String? frontImagePath,
+    String? backImagePath,
+    bool? useFrontImageOverlay,
+    int? points,
+    bool? requiresAuth,
+    bool? hideName,
+    DateTime? createdAt,
+    DateTime? lastModifiedAt,
+    bool? usePoints,
+  }) {
+    return LoyaltyCard(
+      id: id ?? this.id,
+      barcode: barcode ?? this.barcode,
+      name: name ?? this.name,
+      color: color ?? this.color,
+      tags: tags ?? this.tags,
+      notes: notes ?? this.notes,
+      frontImagePath: frontImagePath ?? this.frontImagePath,
+      backImagePath: backImagePath ?? this.backImagePath,
+      useFrontImageOverlay: useFrontImageOverlay ?? this.useFrontImageOverlay,
+      points: points ?? this.points,
+      requiresAuth: requiresAuth ?? this.requiresAuth,
+      hideName: hideName ?? this.hideName,
+      createdAt: createdAt ?? this.createdAt,
+      lastModifiedAt: lastModifiedAt ?? this.lastModifiedAt,
+      usePoints: usePoints ?? this.usePoints,
+    );
   }
 
   LoyaltyCard clone() {

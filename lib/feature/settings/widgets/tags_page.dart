@@ -1,3 +1,4 @@
+import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/settings/editable_model.dart';
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
@@ -18,6 +19,7 @@ class TagsPage extends StatefulWidget {
 
 class _TagsPageState extends State<TagsPage> {
   final _settingsBox = GetIt.I<SettingsBox>();
+  final _cardsBox = GetIt.I<LoyaltyCardsBox>();
   final _settings = EditableSettings.fromValue(const Settings.defaultValue());
 
   @override
@@ -35,19 +37,25 @@ class _TagsPageState extends State<TagsPage> {
   Future<void> showAddDialog(BuildContext context) async {
     final newTag = await showDialog<String>(
       context: context,
-      builder: (context) => AddTagDialog(),
+      builder: (context) => AddTagDialog(
+        existingTags: _settings.tags.value,
+      ),
     );
     if (!mounted || newTag == null) {
       return;
     }
 
-    if (_settings.tags.contains(newTag)) {
+    _addTag(newTag);
+  }
+
+  void _addTag(String tag) {
+    if (_settings.tags.contains(tag)) {
       showCustomSnackBar(context, 'Tag already exists!', false);
       return;
     }
 
-    _settings.tags.add(newTag);
-    return _settingsBox.save(_settings.seal());
+    _settings.tags.add(tag);
+    _settingsBox.save(_settings.seal());
   }
 
   @override
@@ -80,23 +88,76 @@ class _TagsPageState extends State<TagsPage> {
       body: ValueListenableBuilder(
         valueListenable: _settings.tags,
         builder: (context, tags, _) {
-          if (tags.isEmpty) {
-            return Center(
-              child: Text(
-                'No tags added',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            );
-          }
-          return ListView.builder(
+          final tagsFromCards = _cardsBox.values
+              .expand((card) => card.tags)
+              .toSet()
+              .difference(tags.toSet());
+
+          return CustomScrollView(
             physics: const BouncingScrollPhysics(
               decelerationRate: ScrollDecelerationRate.fast,
             ),
-            itemCount: tags.length,
-            itemBuilder: (context, index) => _tag(theme, index),
+            slivers: [
+              if (tagsFromCards.isNotEmpty) ...[
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 5),
+                    child: Text(
+                      'Tags from Cards:',
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: theme.colorScheme.inverseSurface,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 0,
+                      children: tagsFromCards.map((tag) {
+                        return OutlinedButton(
+                          onPressed: () => _addTag(tag),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                              color: theme.colorScheme.primary,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(tag),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 10)),
+              ],
+              if (tags.isEmpty)
+                const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: Text(
+                      'No tags added',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                )
+              else
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => _tag(theme, index),
+                    childCount: tags.length,
+                  ),
+                ),
+            ],
           );
         },
       ),

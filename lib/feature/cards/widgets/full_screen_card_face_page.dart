@@ -1,12 +1,11 @@
-import 'dart:math' show pi;
-
-import 'package:barcode_widget/barcode_widget.dart'; // Import the barcode library
+import 'package:barcode_widget/barcode_widget.dart';
 import 'package:flutter/material.dart';
 
 class FullScreenCardFacePage extends StatelessWidget {
   const FullScreenCardFacePage({
     super.key,
     required this.child,
+    this.backgroundColor,
   });
 
   factory FullScreenCardFacePage.barcode({
@@ -14,6 +13,7 @@ class FullScreenCardFacePage extends StatelessWidget {
     required BarcodeType barcodeType,
   }) {
     return FullScreenCardFacePage(
+      backgroundColor: Colors.white,
       child: _buildBarcodeWidget(cardData, barcodeType),
     );
   }
@@ -23,36 +23,51 @@ class FullScreenCardFacePage extends StatelessWidget {
   }) {
     return FullScreenCardFacePage(
       child: SizedBox.expand(
-        child: Transform.rotate(
-          angle: pi / 2,
-          child: Image(
-            image: image,
-            fit: BoxFit.contain,
-          ),
+        child: Image(
+          image: image,
+          fit: BoxFit.contain,
         ),
       ),
     );
   }
 
   final Widget child;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final effectiveBackgroundColor = backgroundColor ?? theme.colorScheme.surface;
+
     return Scaffold(
-      backgroundColor: Colors.white, // White background for better visibility
+      backgroundColor: effectiveBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.black), // Black back icon
+        backgroundColor: effectiveBackgroundColor,
+        iconTheme: IconThemeData(
+          color: effectiveBackgroundColor == Colors.white
+              ? Colors.black
+              : theme.colorScheme.onSurface,
+        ),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: effectiveBackgroundColor == Colors.white
+                  ? Colors.black
+                  : theme.colorScheme.onSurface,
+            ),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],
       ),
       body: Center(
-        child: child,
+        child: InteractiveViewer(
+          panEnabled: true,
+          minScale: 0.5,
+          maxScale: 4.0,
+          child: child,
+        ),
       ),
     );
   }
@@ -62,33 +77,27 @@ class FullScreenCardFacePage extends StatelessWidget {
     double? height;
 
     switch (type) {
-      // 2D barcodes
       case BarcodeType.QrCode || BarcodeType.DataMatrix || BarcodeType.Aztec:
-        width = 300; // Slightly larger for better full-screen display
+        width = 300;
         height = 300;
       default:
-        // Assume other types are 1D barcodes
-        width = 400; // Wider for 1D barcodes to fill more space
+        width = 400;
         height = 200;
     }
 
-    return Transform.rotate(
-      angle: pi / 2,
+    return RotatedBox(
+      quarterTurns: 1,
       child: SizedBox(
-        // Wrap in SizedBox to give explicit size to the barcode
         width: width,
         height: height,
         child: BarcodeWidget(
           barcode: Barcode.fromType(type),
-          // Use the determined barcode object
           data: data,
           backgroundColor: Colors.white,
-          // Background color
           style: const TextStyle(
             color: Colors.black,
             fontSize: 16,
           ),
-          // Style for human-readable text
           errorBuilder: (context, error) => Center(
             child: Text(
               'Error rendering barcode: $error\nData: $data',
