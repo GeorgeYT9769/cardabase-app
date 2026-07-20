@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cardabase</string>
+    <string name="shortcut_add_card_short">Новая карта</string>
+    <string name="shortcut_add_card_long">Добавить новую карту</string>
+    <string name="widget_description">Отображать штрих-код карты лояльности на главном экране</string>
+</resources>
+

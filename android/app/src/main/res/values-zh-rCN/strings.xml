@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cardabase</string>
+    <string name="shortcut_add_card_short">新卡</string>
+    <string name="shortcut_add_card_long">添加新卡</string>
+    <string name="widget_description">在您的主屏幕上显示忠诚卡条形码</string>
+</resources>
+

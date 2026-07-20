@@ -1,33 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/widget_bg_border"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#2196F3"
-    android:padding="6dp"
+    android:padding="8dp"
     android:orientation="horizontal">
 
     <LinearLayout
-        android:id="@+id/widget_bg_inner"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#FFFFFF"
-        android:paddingTop="16dp"
-        android:paddingBottom="12dp"
-        android:paddingLeft="12dp"
-        android:paddingRight="12dp"
+        android:padding="12dp"
         android:gravity="center"
         android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/widget_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Set a card from the Cardabase app"
-            android:textColor="#000000"
-            android:textSize="14sp"
-            android:gravity="center"
-            android:visibility="gone" />
 
         <ImageView
             android:id="@+id/widget_barcode"
@@ -36,20 +21,17 @@
             android:layout_weight="1"
             android:layout_gravity="center"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_barcode_preview"
-            android:visibility="visible" />
+            android:src="@drawable/ic_barcode_preview" />
 
         <TextView
-            android:id="@+id/widget_data_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="1 234567 890128"
+            android:text="1234 5678 9012"
             android:textColor="#000000"
-            android:textSize="14sp"
-            android:fontFamily="monospace"
+            android:textSize="12sp"
             android:gravity="center"
             android:layout_marginTop="6dp"
-            android:visibility="visible" />
+            android:fontFamily="monospace" />
 
     </LinearLayout>
 </LinearLayout>

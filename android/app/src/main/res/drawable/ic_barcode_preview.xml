@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="120dp"
+    android:viewportWidth="200"
+    android:viewportHeight="120">
+    <!-- Sparse barcode bars so the preview reads as bars instead of a solid block -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M22,14h3v92h-3zM32,14h1v92h-1zM42,14h6v92h-6zM54,14h2v92h-2zM66,14h4v92h-4zM79,14h1v92h-1zM90,14h5v92h-5zM103,14h2v92h-2zM115,14h7v92h-7zM130,14h1v92h-1zM141,14h4v92h-4zM154,14h2v92h-2zM166,14h6v92h-6zM180,14h3v92h-3z" />
+</vector>

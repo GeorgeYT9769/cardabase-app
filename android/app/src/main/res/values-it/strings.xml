@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cardabase</string>
+    <string name="shortcut_add_card_short">Nuova carta</string>
+    <string name="shortcut_add_card_long">Aggiungi una nuova carta</string>
+    <string name="widget_description">Visualizza il codice a barre della carta fedeltà sulla schermata principale</string>
+</resources>
+

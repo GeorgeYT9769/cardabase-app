@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cardabase</string>
+    <string name="shortcut_add_card_short">Nová karta</string>
+    <string name="shortcut_add_card_long">Pridať novú kartu</string>
+    <string name="widget_description">Zobrazte čiarový kód vernostnej karty na domovskej obrazovke</string>
+</resources>

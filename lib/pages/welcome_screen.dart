@@ -3,11 +3,13 @@ import 'dart:math' as math;
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/pages/home/home_page.dart';
+ import 'package:cardabase/pages/lock_screen.dart';
 import 'package:cardabase/pages/terms_of_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get_it/get_it.dart';
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:material_new_shapes/material_new_shapes.dart';
 
 import '../util/expressive_loading_indicator.dart';
@@ -89,13 +91,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     if (!mounted) {
       return;
     }
-    if (context.mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const Homepage(),
-        ),
-      );
-    }
+    final passwordBox = GetIt.I<Box>(instanceName: 'passwordBox');
+    final storedPassword = passwordBox.get('PW');
+    final hasPassword = storedPassword is String && storedPassword.isNotEmpty;
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) =>
+            hasPassword ? const LockScreen() : const Homepage(),
+      ),
+    );
   }
 
   @override
@@ -318,9 +322,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         if (!context.mounted) {
                           return;
                         }
+                        final passwordBox = GetIt.I<Box>(instanceName: 'passwordBox');
+                        final storedPassword = passwordBox.get('PW');
+                        final hasPassword = storedPassword is String && storedPassword.isNotEmpty;
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(
-                            builder: (context) => const Homepage(),
+                            builder: (context) =>
+                                hasPassword ? const LockScreen() : const Homepage(),
                           ),
                         );
                       },

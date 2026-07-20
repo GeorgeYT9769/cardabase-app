@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cardabase</string>
+    <string name="shortcut_add_card_short">Neue Karte</string>
+    <string name="shortcut_add_card_long">Neue Karte hinzufügen</string>
+    <string name="widget_description">Treueprogramm-Barcode auf deinem Startbildschirm anzeigen</string>
+</resources>
+

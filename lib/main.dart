@@ -8,6 +8,7 @@ import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/get_it.dart';
 import 'package:cardabase/pages/home/home_page.dart';
 import 'package:cardabase/pages/info.dart';
+import 'package:cardabase/pages/lock_screen.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
 import 'package:cardabase/theme/theme.dart';
 import 'package:flutter/material.dart';
@@ -110,13 +111,17 @@ void main() async {
   final packageInfo = await GetIt.I.getAsync<PackageInfo>();
   final settingsBox = await GetIt.I.getAsync<SettingsBox>();
   final cardsBox = await GetIt.I.getAsync<LoyaltyCardsBox>();
-  await GetIt.I.getAsync<Box>(instanceName: 'passwordBox');
+  final passwordBox = await GetIt.I.getAsync<Box>(instanceName: 'passwordBox');
   final currentAppVersion = packageInfo.version;
 
   Widget initialScreen;
+  final storedPassword = passwordBox.get('PW');
+  final hasPassword = storedPassword is String && storedPassword.isNotEmpty;
 
   if (settingsBox.value.lastSeenAppVersion != currentAppVersion) {
     initialScreen = WelcomeScreen(currentAppVersion: currentAppVersion);
+  } else if (hasPassword) {
+    initialScreen = const LockScreen();
   } else {
     initialScreen = const Homepage();
   }

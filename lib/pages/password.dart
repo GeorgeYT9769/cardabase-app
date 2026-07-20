@@ -396,6 +396,37 @@ class _PasswordScreenState extends State<PasswordScreen> {
                       );
                     },
                   ),
+                  //const SizedBox(height: 20),
+                  ValueListenableBuilder(
+                    valueListenable: passwordbox.listenable(keys: ['lock_app']),
+                    builder: (context, box, _) {
+                      final lock_app = box.get('lock_app', defaultValue: false);
+                      return CheckboxListTile(
+                        title: Text(
+                          'Lock app',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: theme.colorScheme.inverseSurface,
+                          ),
+                        ),
+                        value: lock_app,
+                        onChanged: (value) {
+                          passwordbox.put('lock_app', value);
+                        },
+                        activeColor: theme.colorScheme.primary,
+                        checkColor: theme.colorScheme.onPrimary,
+                        controlAffinity: ListTileControlAffinity.leading,
+                        contentPadding: EdgeInsets.zero,
+                        side: BorderSide(
+                          color: theme.colorScheme.primary,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),

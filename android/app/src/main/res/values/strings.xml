@@ -3,4 +3,5 @@
     <string name="app_name">Cardabase</string>
     <string name="shortcut_add_card_short">New Card</string>
     <string name="shortcut_add_card_long">Add a new card</string>
+    <string name="widget_description">Display a loyalty card barcode on your home screen</string>
 </resources>

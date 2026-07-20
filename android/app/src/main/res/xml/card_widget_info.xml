@@ -6,5 +6,8 @@
     android:targetCellHeight="2"
     android:updatePeriodMillis="0"
     android:initialLayout="@layout/card_widget"
+    android:previewLayout="@layout/card_widget_preview"
+    android:previewImage="@drawable/widget_preview"
     android:resizeMode="horizontal|vertical"
-    android:widgetCategory="home_screen" />
+    android:widgetCategory="home_screen"
+    android:description="@string/widget_description" />

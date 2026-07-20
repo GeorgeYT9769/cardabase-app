@@ -1,4 +1,5 @@
 import 'package:cardabase/feature/cards/loyalty_card.dart';
+import 'package:cardabase/pages/lock_screen.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
 import 'package:cardabase/util/setting_tile.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
@@ -196,6 +197,22 @@ class _DevToolsPageState extends State<DevToolsPage> {
                       builder: (context) => const WelcomeScreen(
                         currentAppVersion: 'DevMode',
                       ),
+                    ),
+                  );
+                },
+                iconColor: theme.colorScheme.tertiary,
+                borderColor: theme.colorScheme.primary,
+                showMore: true,
+              ),
+              SettingTile(
+                settingHeader: 'Lock Screen',
+                aboutSettingHeader: 'Open the password lock screen',
+                settingIcon: Icons.lock,
+                settingAction: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LockScreen(),
                     ),
                   );
                 },
