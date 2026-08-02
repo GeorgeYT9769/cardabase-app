@@ -8,6 +8,7 @@ import 'package:cardabase/feature/cards/widgets/share_card_dialog.dart';
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/util/color_extensions.dart';
+import 'package:cardabase/util/widgets/cdb_app_bar_sliver.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -159,9 +160,9 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
   }
 
   Widget _appBar(ThemeData theme) {
-    return SliverAppBar(
-      floating: true,
-      snap: true,
+    return CdbAppBarSliver(
+      title: 'Details',
+      onBackPressed: () => Navigator.pop(context),
       leading: IconButton(
         icon: Icon(
           Icons.qr_code_2,
@@ -170,11 +171,11 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
         onPressed: card == null
             ? null
             : () => showDialog(
-                  context: context,
-                  builder: (context) => ShareCardDialog(
-                    data: card?.toJson() ?? '',
-                  ),
-                ),
+          context: context,
+          builder: (context) => ShareCardDialog(
+            data: card?.toJson() ?? '',
+          ),
+        ),
       ),
       actions: [
         if (settingsBox.value.developerOptions.isEnabled)
@@ -214,54 +215,55 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                             },
                             style: OutlinedButton.styleFrom(
                               elevation: 0.0,
-                              side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0),
+                              side: BorderSide(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 2.0),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(11),
                               ),
                             ),
                             child: Text(
                               'Copy',
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                                color: Theme.of(context).colorScheme.tertiary,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                    color:
+                                        Theme.of(context).colorScheme.tertiary,
+                                  ),
                             ),
                           ),
                           OutlinedButton(
                             onPressed: () => Navigator.pop(context),
                             style: OutlinedButton.styleFrom(
                               elevation: 0.0,
-                              side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0),
+                              side: BorderSide(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 2.0),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(11),
                               ),
                             ),
                             child: Text(
                               'Cancel',
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                                color: Theme.of(context).colorScheme.tertiary,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                    color:
+                                        Theme.of(context).colorScheme.tertiary,
+                                  ),
                             ),
                           ),
                         ],
                       ),
                     ),
           ),
-        IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: theme.colorScheme.secondary,
-          ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
       ],
-      title: Text('Details', style: theme.textTheme.titleLarge?.copyWith()),
-      centerTitle: true,
-      elevation: 0.0,
-      backgroundColor: theme.colorScheme.surface,
     );
   }
 

@@ -21,8 +21,8 @@ class SettingsAdapter extends TypeAdapter<Settings> {
       autoBackups: fields[1] as AutoBackupSettings,
       theme: fields[2] as ThemeSettings,
       developerOptions: fields[3] as DeveloperOptions,
-      useAutoBrightness: fields[4] as bool,
-      vibrateOnDifferentActions: fields[5] as bool,
+      useAutoBrightness: fields[4] == null ? true : fields[4] as bool,
+      vibrateOnDifferentActions: fields[5] == null ? true : fields[5] as bool,
       tags: (fields[6] as List).cast<String>(),
       cardListViewOptions: fields[7] as CardListViewOptions,
       customExportPath:
@@ -76,9 +76,10 @@ class AutoBackupSettingsAdapter extends TypeAdapter<AutoBackupSettings> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return AutoBackupSettings(
-      isEnabled: fields[0] as bool,
+      isEnabled: fields[0] == null ? false : fields[0] as bool,
       lastUpdate: fields[1] as DateTime?,
-      interval: fields[2] as Duration,
+      interval:
+          fields[2] == null ? const Duration(days: 7) : fields[2] as Duration,
     );
   }
 
@@ -120,13 +121,14 @@ class ThemeSettingsAdapter extends TypeAdapter<ThemeSettings> {
       useExtraDark: fields[1] as bool,
       useSystemFont: fields[2] as bool,
       loyaltyCardEffect: fields[3] as LoyaltyCardEffectSettings,
+      rightBackButton: fields[4] == null ? false : fields[4] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, ThemeSettings obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.useDarkMode)
       ..writeByte(1)
@@ -134,7 +136,9 @@ class ThemeSettingsAdapter extends TypeAdapter<ThemeSettings> {
       ..writeByte(2)
       ..write(obj.useSystemFont)
       ..writeByte(3)
-      ..write(obj.loyaltyCardEffect);
+      ..write(obj.loyaltyCardEffect)
+      ..writeByte(4)
+      ..write(obj.rightBackButton);
   }
 
   @override
@@ -160,8 +164,10 @@ class LoyaltyCardEffectSettingsAdapter
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return LoyaltyCardEffectSettings(
-      isEnabled: fields[0] as bool,
-      effect: fields[1] as LoyaltyCardEffect,
+      isEnabled: fields[0] == null ? false : fields[0] as bool,
+      effect: fields[1] == null
+          ? LoyaltyCardEffect.grain
+          : fields[1] as LoyaltyCardEffect,
     );
   }
 
@@ -197,7 +203,7 @@ class DeveloperOptionsAdapter extends TypeAdapter<DeveloperOptions> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return DeveloperOptions(
-      isEnabled: fields[0] as bool,
+      isEnabled: fields[0] == null ? false : fields[0] as bool,
     );
   }
 

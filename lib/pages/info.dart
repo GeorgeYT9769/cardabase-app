@@ -4,6 +4,7 @@ import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/pages/news.dart';
 import 'package:cardabase/util/expressive_loading_indicator.dart';
+import 'package:cardabase/util/widgets/cdb_app_bar_sliver.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
@@ -150,33 +151,9 @@ class _InfoScreenState extends State<InfoScreen> {
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          SliverAppBar(
-            title: Text(
-              'App Info',
-              style: theme.textTheme.titleLarge?.copyWith(
-                    color: theme.colorScheme.tertiary,
-                  ) ??
-                  const TextStyle(
-                    color: Colors.black,
-                  ),
-            ),
-            automaticallyImplyLeading: false,
-            actions: [
-              IconButton(
-                icon: Icon(
-                  Icons.arrow_back_ios_new,
-                  color: theme.colorScheme.secondary,
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-            centerTitle: true,
-            elevation: 0.0,
-            backgroundColor: theme.colorScheme.surface,
-            floating: true,
-            pinned: false,
+          CdbAppBarSliver(
+            title: 'App Info',
+            onBackPressed: () => Navigator.pop(context),
           ),
           SliverToBoxAdapter(
             child: Padding(

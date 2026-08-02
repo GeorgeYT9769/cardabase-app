@@ -5,6 +5,7 @@ import 'package:cardabase/feature/cards/edit/widgets/form_fields/save_button.dar
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/util/read_barcode.dart';
 import 'package:cardabase/util/vibration_provider.dart';
+import 'package:cardabase/util/widgets/cdb_app_bar_sliver.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -122,10 +123,9 @@ class _EditCardPageState extends State<EditCardPage> {
   }
 
   Widget _sliverAppBar(ThemeData theme) {
-    return SliverAppBar(
-      floating: true,
-      snap: true,
-      pinned: false,
+    return CdbAppBarSliver(
+      title: cardsBox.containsKey(widget.cardId) ? 'Edit card' : 'New card',
+      onBackPressed: () => Navigator.pop(context),
       leading: IconButton(
         icon: Icon(
           Icons.qr_code_scanner,
@@ -133,22 +133,6 @@ class _EditCardPageState extends State<EditCardPage> {
         ),
         onPressed: _scanSharedCode,
       ),
-      actions: [
-        IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: theme.colorScheme.secondary,
-          ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ],
-      title: Text(
-        cardsBox.containsKey(widget.cardId) ? 'Edit card' : 'New card',
-        style: theme.textTheme.titleLarge?.copyWith(),
-      ),
-      centerTitle: true,
-      elevation: 0.0,
-      backgroundColor: theme.colorScheme.surface,
     );
   }
 }

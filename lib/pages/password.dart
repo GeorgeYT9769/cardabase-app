@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:password_strength_checker/password_strength_checker.dart';
 
+import '../util/widgets/cdb_app_bar.dart';
 import '../util/widgets/custom_snack_bar.dart';
 
 class PasswordScreen extends StatefulWidget {
@@ -93,33 +94,10 @@ class _PasswordScreenState extends State<PasswordScreen> {
 
     return Scaffold(
       backgroundColor:
-          theme.colorScheme.surface, // - BACKGROUND COLOR (DEFAULT)
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios_new,
-              color: theme.colorScheme.secondary,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ],
-        title: Text(
-          'Password',
-          style: theme.textTheme.bodyLarge?.copyWith(
-            fontSize: 17,
-            fontWeight: FontWeight.w900,
-            fontFamily: 'xirod',
-            letterSpacing: 5,
-            color: theme.colorScheme.tertiary,
-          ),
-        ),
-        centerTitle: true,
-        elevation: 0.0,
-        backgroundColor: theme.colorScheme.surface,
+          theme.colorScheme.surface,
+      appBar: CdbAppBar(
+        title: 'Password',
+        onBackPressed: () => Navigator.pop(context),
       ),
       body: passwordbox.isEmpty == true
           // NO PWD

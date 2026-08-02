@@ -16,6 +16,7 @@ import 'package:cardabase/pages/password.dart';
 import 'package:cardabase/pages/terms_of_service.dart';
 import 'package:cardabase/util/setting_tile.dart';
 import 'package:cardabase/util/vibration_provider.dart';
+import 'package:cardabase/util/widgets/cdb_app_bar_sliver.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -127,8 +128,6 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  //TODO: add fingerprint verification
-
   Future<void> showClearCardsDialog() async {
     final success = await requirePassword(context);
     if (!mounted || !success) {
@@ -164,7 +163,11 @@ class _SettingsPageState extends State<SettingsPage> {
             decelerationRate: ScrollDecelerationRate.fast,
           ),
           slivers: [
-            _appBar(theme),
+            CdbAppBarSliver(
+              title: 'Settings',
+              onBackPressed: () =>
+                  Navigator.of(context).pop(didImport || didReset),
+            ),
             SliverList(
               delegate: SliverChildListDelegate([
                 _subtitle(
@@ -174,6 +177,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 _themeSetting(theme),
                 _extraDarkSetting(theme),
+                _backButtonSwitch(theme),
                 _autoBrightnessSettingsButton(theme),
                 _vibrationSettingsButton(theme),
                 _fontSettingsButton(theme),
@@ -267,32 +271,6 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _appBar(ThemeData theme) {
-    return SliverAppBar(
-      automaticallyImplyLeading: false,
-      actions: [
-        IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: theme.colorScheme.secondary,
-          ),
-          onPressed: () => Navigator.of(context).pop(didImport || didReset),
-        ),
-      ],
-      title: Text(
-        'Settings',
-        style: theme.textTheme.titleLarge?.copyWith(
-          color: theme.colorScheme.tertiary,
-        ),
-      ),
-      centerTitle: true,
-      elevation: 0.0,
-      backgroundColor: theme.colorScheme.surface,
-      floating: true,
-      snap: true,
-    );
-  }
-
   Widget _themeSetting(ThemeData theme) {
     return ValueListenableBuilder(
       valueListenable: _settings.theme.useDarkMode,
@@ -323,6 +301,23 @@ class _SettingsPageState extends State<SettingsPage> {
         iconColor:
             useExtraDark ? Colors.green : Colors.red,
         settingIcon: Icons.brightness_2,
+        borderColor: theme.colorScheme.primary,
+      ),
+    );
+  }
+
+  Widget _backButtonSwitch(ThemeData theme) {
+    return ValueListenableBuilder(
+      valueListenable: _settings.theme.rightBackButton,
+      builder: (context, rightBackButton, _) => SettingTile(
+        aboutSettingHeader: 'Switch back button on the right side',
+        settingAction: () async {
+          _settings.theme.rightBackButton.value = !rightBackButton;
+          await _settingsBox.save(_settings.seal());
+        },
+        settingHeader: 'Right Back Button',
+        settingIcon: Icons.arrow_back_ios_new,
+        iconColor: rightBackButton ? Colors.green : Colors.red,
         borderColor: theme.colorScheme.primary,
       ),
     );
@@ -564,7 +559,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       settingHeader: 'Keep Android Open',
       settingIcon: Icons.android,
-      iconColor: theme.colorScheme.tertiary,
+      iconColor: Color.fromARGB(255, 58, 221, 133),
       borderColor: theme.colorScheme.primary,
     );
   }

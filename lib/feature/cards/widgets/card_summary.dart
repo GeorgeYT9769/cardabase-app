@@ -21,10 +21,12 @@ class CardSummary extends StatefulWidget {
     super.key,
     required this.cardId,
     required this.cornerRadius,
+    this.onTap,
   });
 
   final String cardId;
   final double cornerRadius;
+  final VoidCallback? onTap;
 
   @override
   State<CardSummary> createState() => _CardSummaryState();
@@ -68,6 +70,7 @@ class _CardSummaryState extends State<CardSummary> {
     if (card == null) {
       return;
     }
+    widget.onTap?.call();
     if (card.requiresAuth) {
       if (!await requirePassword(context)) {
         return;

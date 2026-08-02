@@ -13,19 +13,23 @@ class CardList extends StatefulWidget {
     required this.numberOfColumns,
     required this.cards,
     required this.moveCard,
+    this.totalCardsCount = 0,
+    this.onCardTap,
   });
 
   final bool isInReorderingMode;
   final int numberOfColumns;
   final List<LoyaltyCard> cards;
   final void Function(int oldIndex, int newIndex) moveCard;
+  final int totalCardsCount;
+  final VoidCallback? onCardTap;
 
   @override
   State<CardList> createState() => _CardListState();
 }
 
 class _CardListState extends State<CardList> {
-  final GlobalKey<SliverAnimatedGridState> _gridKey =
+  GlobalKey<SliverAnimatedGridState> _gridKey =
       GlobalKey<SliverAnimatedGridState>();
   List<LoyaltyCard> _items = [];
 
@@ -47,8 +51,17 @@ class _CardListState extends State<CardList> {
       return;
     }
 
-    // Detect single removal
-    if (oldList.length == newList.length + 1) {
+    if (oldList.isEmpty || newList.isEmpty) {
+      _items = List.from(newList);
+      _gridKey = GlobalKey<SliverAnimatedGridState>();
+      return;
+    }
+
+    final totalCountChanged =
+        oldWidget.totalCardsCount != widget.totalCardsCount;
+
+    // Detect single removal (only animate if it's a real deletion from DB)
+    if (totalCountChanged && oldList.length == newList.length + 1) {
       int? removedIndex;
       for (int i = 0; i < newList.length; i++) {
         if (oldList[i].id != newList[i].id) {
@@ -62,12 +75,13 @@ class _CardListState extends State<CardList> {
       _items.removeAt(removedIndex);
       _gridKey.currentState?.removeItem(
         removedIndex,
-        (context, animation) => _buildItem(removedItem, animation, isRemoving: true),
+        (context, animation) =>
+            _buildItem(removedItem, animation, isRemoving: true),
         duration: const Duration(milliseconds: 400),
       );
-    } 
-    // Detect single addition
-    else if (oldList.length == newList.length - 1) {
+    }
+    // Detect single addition (only animate if it's a real addition to DB)
+    else if (totalCountChanged && oldList.length == newList.length - 1) {
       int? insertedIndex;
       for (int i = 0; i < oldList.length; i++) {
         if (oldList[i].id != newList[i].id) {
@@ -84,9 +98,20 @@ class _CardListState extends State<CardList> {
       );
     }
     // Fallback for complex changes (sorting, filters, multiple changes)
-    else {
+    else if (!_areListsEqual(oldList, newList)) {
       _items = List.from(newList);
+      // Force SliverAnimatedGrid to re-initialize with the new item count
+      // to avoid animations during search/filtering
+      _gridKey = GlobalKey<SliverAnimatedGridState>();
     }
+  }
+
+  bool _areListsEqual(List<LoyaltyCard> a, List<LoyaltyCard> b) {
+    if (a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i].id != b[i].id) return false;
+    }
+    return true;
   }
 
   Widget _buildItem(LoyaltyCard card, Animation<double> animation, {bool isRemoving = false}) {
@@ -106,6 +131,7 @@ class _CardListState extends State<CardList> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     if (widget.cards.isEmpty) {
+      final isFiltered = widget.totalCardsCount > 0;
       return SliverFillRemaining(
         hasScrollBody: false,
         child: Stack(
@@ -114,30 +140,33 @@ class _CardListState extends State<CardList> {
               child: Padding(
                 padding: const EdgeInsets.all(32.0),
                 child: Text(
-                  'There is nothing to see...',
+                  isFiltered
+                      ? 'No cards match your search...'
+                      : 'There is nothing to see...',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyLarge
                       ?.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
-            Positioned(
-              bottom: 80,
-              right: 60,
-              child: CustomPaint(
-                size: const Size(200, 200),
-                painter: _CurvedArrowPainter(
-                  theme.colorScheme.primary,
-                  'Tap here!',
-                  theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                    fontStyle: FontStyle.italic,
-                    fontSize: 17,
+            if (!isFiltered)
+              Positioned(
+                bottom: 80,
+                right: 60,
+                child: CustomPaint(
+                  size: const Size(200, 200),
+                  painter: _CurvedArrowPainter(
+                    theme.colorScheme.primary,
+                    'Tap here!',
+                    theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                      fontStyle: FontStyle.italic,
+                      fontSize: 17,
+                    ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
       );
@@ -187,7 +216,9 @@ class _CardListState extends State<CardList> {
             : EdgeInsets.all(5 / widget.numberOfColumns),
         child: CardSummary(
           cardId: card.id,
-          cornerRadius: widget.numberOfColumns == 1 ? 15 : 20 / widget.numberOfColumns,
+          cornerRadius:
+              widget.numberOfColumns == 1 ? 15 : 20 / widget.numberOfColumns,
+          onTap: widget.onCardTap,
         ),
       ),
     );

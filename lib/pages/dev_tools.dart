@@ -2,6 +2,7 @@ import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/pages/lock_screen.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
 import 'package:cardabase/util/setting_tile.dart';
+import 'package:cardabase/util/widgets/cdb_app_bar_sliver.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -162,7 +163,10 @@ class _DevToolsPageState extends State<DevToolsPage> {
           decelerationRate: ScrollDecelerationRate.fast,
         ),
         slivers: [
-          _appBar(theme),
+          CdbAppBarSliver(
+            title: 'Dev Tools',
+            onBackPressed: () => Navigator.of(context).pop(),
+          ),
           SliverList(
             delegate: SliverChildListDelegate([
               _subtitle(theme, 'Insights'),

@@ -46,11 +46,12 @@ Future<void> migrateSettingsTo202603(
         useExtraDark: oldBox.get('useExtraDark') as bool? ?? false,
         useSystemFont: oldBox.get('useSystemFont') as bool? ?? false,
         loyaltyCardEffect: loyaltyCardEffect == null
-            ? const LoyaltyCardEffectSettings.defaultValue()
-            : LoyaltyCardEffectSettings(
-                isEnabled: oldBox.get('effect') as bool? ?? false,
-                effect: loyaltyCardEffect,
-              ),
+          ? const LoyaltyCardEffectSettings.defaultValue()
+          : LoyaltyCardEffectSettings(
+              isEnabled: oldBox.get('effect') as bool? ?? false,
+              effect: loyaltyCardEffect,
+            ),
+        rightBackButton: oldBox.get('rightBackButton') as bool? ?? false,
       ),
       developerOptions: DeveloperOptions(
         isEnabled: oldBox.get('developerOptions') as bool? ?? false,

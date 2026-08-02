@@ -1,3 +1,4 @@
+import 'package:cardabase/util/widgets/cdb_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -70,23 +71,9 @@ class _NewsPageState extends State<NewsPage>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Changelog', style: theme.textTheme.titleLarge?.copyWith()),
-        centerTitle: true,
-        elevation: 0.0,
-        backgroundColor: theme.colorScheme.surface,
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios_new,
-              color: theme.colorScheme.secondary,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ],
+      appBar: CdbAppBar(
+        title: 'Changelog',
+        onBackPressed: () => Navigator.of(context).pop(),
         bottom: TabBar(
           physics: const BouncingScrollPhysics(
             decelerationRate: ScrollDecelerationRate.fast,

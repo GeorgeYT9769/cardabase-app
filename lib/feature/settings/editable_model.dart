@@ -44,6 +44,7 @@ class EditableSettings {
   final EditableCardListViewOptions cardListViewOptions;
   final ValueNotifier<String> customExportPath;
 
+
   void loadValue(Settings value) {
     lastSeenAppVersion.value = value.lastSeenAppVersion;
     autoBackups.loadValue(value.autoBackups);
@@ -129,6 +130,7 @@ class EditableThemeSettings {
     required this.useExtraDark,
     required this.useSystemFont,
     required this.loyaltyCardEffect,
+    required this.rightBackButton,
   });
 
   factory EditableThemeSettings.fromValue(ThemeSettings value) {
@@ -139,6 +141,7 @@ class EditableThemeSettings {
       loyaltyCardEffect: EditableLoyaltyCardEffectSettings.fromValue(
         value.loyaltyCardEffect,
       ),
+      rightBackButton: ValueNotifier(value.rightBackButton),
     );
   }
 
@@ -146,12 +149,15 @@ class EditableThemeSettings {
   final ValueNotifier<bool> useExtraDark;
   final ValueNotifier<bool> useSystemFont;
   final EditableLoyaltyCardEffectSettings loyaltyCardEffect;
+  final ValueNotifier<bool> rightBackButton;
+
 
   void loadValue(ThemeSettings value) {
     useDarkMode.value = value.useDarkMode;
     useExtraDark.value = value.useExtraDark;
     useSystemFont.value = value.useSystemFont;
     loyaltyCardEffect.loadValue(value.loyaltyCardEffect);
+    rightBackButton.value = value.rightBackButton;
   }
 
   ThemeSettings seal() {
@@ -160,6 +166,7 @@ class EditableThemeSettings {
       useExtraDark: useExtraDark.value,
       useSystemFont: useSystemFont.value,
       loyaltyCardEffect: loyaltyCardEffect.seal(),
+      rightBackButton: rightBackButton.value,
     );
   }
 
@@ -168,6 +175,7 @@ class EditableThemeSettings {
     useExtraDark.dispose();
     useSystemFont.dispose();
     loyaltyCardEffect.dispose();
+    rightBackButton.dispose();
   }
 }
 

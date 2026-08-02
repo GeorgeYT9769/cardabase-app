@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:material_new_shapes/material_new_shapes.dart';
 
 import '../util/expressive_loading_indicator.dart';
+import '../util/widgets/cdb_app_bar_sliver.dart';
 
 class TermsOfServicePage extends StatelessWidget {
   const TermsOfServicePage({super.key});
@@ -20,26 +21,9 @@ class TermsOfServicePage extends StatelessWidget {
               decelerationRate: ScrollDecelerationRate.fast,
             ),
             slivers: [
-              SliverAppBar(
-                title: Text(
-                  'TOS',
-                  style: theme.textTheme.titleLarge,
-                ),
-                centerTitle: true,
-                elevation: 0,
-                backgroundColor: theme.colorScheme.surface,
-                automaticallyImplyLeading: false,
-                actions: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.arrow_back_ios_new,
-                      color: theme.colorScheme.secondary,
-                    ),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-                floating: true,
-                snap: true,
+              CdbAppBarSliver(
+                title: 'TOS',
+                onBackPressed: () => Navigator.pop(context),
               ),
               if (snapshot.hasData)
                 SliverPadding(
@@ -61,7 +45,8 @@ class TermsOfServicePage extends StatelessWidget {
                   child: Center(
                     child: Text(
                       'Error loading Terms of Service',
-                      style: theme.textTheme.bodyLarge?.copyWith(color: Colors.red),
+                      style: theme.textTheme.bodyLarge
+                          ?.copyWith(color: Colors.red),
                     ),
                   ),
                 )

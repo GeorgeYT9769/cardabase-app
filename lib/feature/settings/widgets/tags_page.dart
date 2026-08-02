@@ -8,6 +8,7 @@ import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../../util/widgets/cdb_app_bar.dart';
 import '../../../util/widgets/custom_snack_bar.dart';
 
 class TagsPage extends StatefulWidget {
@@ -62,28 +63,9 @@ class _TagsPageState extends State<TagsPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Tags',
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: theme.colorScheme.tertiary,
-          ),
-        ),
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios_new,
-              color: theme.colorScheme.secondary,
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-        centerTitle: true,
-        elevation: 0.0,
-        backgroundColor: theme.colorScheme.surface,
+      appBar: CdbAppBar(
+        title: 'Tags',
+        onBackPressed: () => Navigator.pop(context),
       ),
       body: ValueListenableBuilder(
         valueListenable: _settings.tags,

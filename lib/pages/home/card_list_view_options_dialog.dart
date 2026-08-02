@@ -123,21 +123,39 @@ class CardListViewOptionsDialog extends StatelessWidget {
 
   List<Widget> _tagFilter(ThemeData theme) {
     return [
-      _optionTitle(theme, 'Tags:'),
-      const SizedBox(height: 10),
-      ValueListenableBuilder(
-        valueListenable: tagFilter,
-        builder: (context, tagFilter, _) => Wrap(
-          spacing: 8,
-          runSpacing: 0,
-          children: allTags
-              .map(
-                (tag) => _tag(theme, tag, tagFilter == tag),
-              )
-              .toList(growable: false),
+      Theme(
+        data: theme.copyWith(dividerColor: Colors.transparent),
+        child: ValueListenableBuilder<String?>(
+          valueListenable: tagFilter,
+          builder: (context, selectedTag, _) {
+            return ExpansionTile(
+              tilePadding: EdgeInsets.zero,
+              title: _optionTitle(theme, 'Tags:'),
+              subtitle: Text(
+                selectedTag ?? 'None',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              iconColor: theme.colorScheme.primary,
+              collapsedIconColor: theme.colorScheme.primary,
+              children: [
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 0,
+                  children: allTags
+                      .map(
+                        (tag) => _tag(theme, tag, selectedTag == tag),
+                      )
+                      .toList(growable: false),
+                ),
+                const SizedBox(height: 10),
+              ],
+            );
+          },
         ),
       ),
-      const SizedBox(height: 5),
       _divider(theme),
       const SizedBox(height: 10),
     ];

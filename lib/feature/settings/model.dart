@@ -44,9 +44,9 @@ class Settings {
   final ThemeSettings theme;
   @HiveField(3)
   final DeveloperOptions developerOptions;
-  @HiveField(4)
+  @HiveField(4, defaultValue: true)
   final bool useAutoBrightness;
-  @HiveField(5)
+  @HiveField(5, defaultValue: true)
   final bool vibrateOnDifferentActions;
   @HiveField(6)
   final List<String> tags;
@@ -109,11 +109,11 @@ class AutoBackupSettings {
           interval: const Duration(days: 7),
         );
 
-  @HiveField(0)
+  @HiveField(0, defaultValue: false)
   final bool isEnabled;
   @HiveField(1)
   final DateTime? lastUpdate;
-  @HiveField(2)
+  @HiveField(2, defaultValue: Duration(days: 7))
   final Duration interval;
 
   Map<String, dynamic> toJsonMap() {
@@ -144,6 +144,7 @@ class ThemeSettings {
     required this.useExtraDark,
     required this.useSystemFont,
     required this.loyaltyCardEffect,
+    required this.rightBackButton,
   });
 
   const ThemeSettings.defaultValue()
@@ -152,6 +153,7 @@ class ThemeSettings {
           useExtraDark: false,
           useSystemFont: false,
           loyaltyCardEffect: const LoyaltyCardEffectSettings.defaultValue(),
+          rightBackButton: false,
         );
 
   @HiveField(0)
@@ -162,6 +164,9 @@ class ThemeSettings {
   final bool useSystemFont;
   @HiveField(3)
   final LoyaltyCardEffectSettings loyaltyCardEffect;
+  @HiveField(4, defaultValue: false)
+  final bool rightBackButton;
+
 
   Map<String, dynamic> toJsonMap() {
     return {
@@ -169,6 +174,7 @@ class ThemeSettings {
       'useExtraDark': useExtraDark,
       'useSystemFont': useSystemFont,
       'loyaltyCardEffect': loyaltyCardEffect.toJsonMap(),
+      'rightBackButton': rightBackButton,
     };
   }
 
@@ -180,6 +186,7 @@ class ThemeSettings {
       loyaltyCardEffect: map['loyaltyCardEffect'] != null
           ? LoyaltyCardEffectSettings.fromJsonMap(map['loyaltyCardEffect'] as Map<String, dynamic>)
           : const LoyaltyCardEffectSettings.defaultValue(),
+      rightBackButton: map['rightBackButton'] as bool? ?? false,
     );
   }
 
@@ -196,9 +203,9 @@ class LoyaltyCardEffectSettings {
   const LoyaltyCardEffectSettings.defaultValue()
       : this(isEnabled: false, effect: LoyaltyCardEffect.grain);
 
-  @HiveField(0)
+  @HiveField(0, defaultValue: false)
   final bool isEnabled;
-  @HiveField(1)
+  @HiveField(1, defaultValue: LoyaltyCardEffect.grain)
   final LoyaltyCardEffect effect;
 
   Map<String, dynamic> toJsonMap() {
@@ -239,7 +246,7 @@ class DeveloperOptions {
 
   const DeveloperOptions.defaultValue() : this(isEnabled: false);
 
-  @HiveField(0)
+  @HiveField(0, defaultValue: false)
   final bool isEnabled;
 
   Map<String, dynamic> toJsonMap() {
