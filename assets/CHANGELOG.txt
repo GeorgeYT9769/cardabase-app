@@ -1,0 +1,175 @@
+LATEST CHANGELOG:
+
+28.06.2026
+1.8.2:
+- Fixed a bug (JNI Pub) for F-Droid reproducible builds system (this is an optional update).
+
+25.06.2026
+1.8.1:
+- Fixed a bug for F-Droid build and release (this is an optional update).
+
+19.06.2026:
+1.8.0:
+- Overhauled and improved storage system (thanks Wim),
+- Custom sorting system has been improved (thanks Wim),
+- Sorting cards by name can now ignore accents and can be case insensitive,
+- Card layout on homescreen has been improved,
+- Added bottom padding for users with 3-button system navigation (overlapping issues),
+- You can now set Card effects for front page of the cards (can be heavy on performance),
+- If you have a password set up, you can now authenticate using fingerprint (only if you decide to enable this option),
+- Tags page got a little overhaul,
+- Exporting your Cardabase now means you can export a whole setup (cards, settings, images) in one .cdb file,
+- Importing your Cardabase now means you can import the whole setup from the .cdb file, also you can just click on the file and open it with Cardabase in any file Explorer,
+- Deleting your Cardabase now has it's own Danger Zone to make it more visible,
+- Added Terms of Service,
+- You can now anonymously report a bug, this will only gather text you write and sends it directly into Discord issues channel (please be kind and don't misuse this feature),
+- App Info page got overhauled, added app informations such as version, build number, signature and installation info,
+- Buttons for Card Type and Card Color were redesigned to match the design of other input fields,
+- You can now add points to different cards, either by manually entering, clicking or holding side buttons,
+- Taking pictures of you cards is now much easier and better, also with buttons redesign,
+- Redesigned app icon to match the app's font and texts in README and for F-Droid store,
+- Fixed some bugs.
+
+29.12.2025:
+1.7.0:
+- App now supports pictures of your cards - simply go to Others tab and add a picture, either by making one or picking one from your Gallery,
+- You can now hide the title of the card to make the picture stand out,
+- Card pictures are available for you by the sides of the card, so when looking at the barcode of the card, just swipe left for back picture and right for front picture,
+- Photos and barcodes have preview screen, so you can see what they look like better (mainly for barcodes if the reader has troubles),
+- App now supports full dark theme for OLED screens,
+- Setting tiles are now slimmer, the details are hidde and can be shown by holding on the setting tile,
+- You can now export your Cardabase into clipboard and paste/send/save it however you like,
+- App bar (the top bar of the page) at the Homepage and Settings hides when you scroll downwards and shows up when you scroll upwards,
+- You can now duplicate your cards (was removed somehow, my fault),
+- App now supports app shortcuts, so when you hold the icon, a menu pops up with different options (if you have an idea what to put there, let me know),
+- Fixed a bug where auto updates could be turned on without entering a password (if one was set up).
+
+16.11.2025:
+1.6.3:
+- Fixed exporting legacy cards.
+
+05.11.2025:
+1.6.2:
+- Disable baseline profiles (for F-Droid build, completely optional update).
+
+02.11.2025:
+1.6.1:
+- Fixed a bug where the name of the card would not be visible due to card's colour being too light,
+- Small improvements and bug fixes.
+
+19.10.2025:
+1.6.0:
+- You can now add notes to your cards,
+- There are now auto backups meaning you can turn it on and set a duration how often you want the app to back up your cards automatically,
+- Small improvements and bug fixes.
+
+11.09.2025:
+1.5.4:
+- Fixed a bug where not granting permission would vibrate and crash the app,
+- Welcome screen now shows changes accordingly to the last version of the app from CHANGELOG.txt,
+- Small improvements
+
+06.09.2025
+1.5.3:
+- Set minifyEnabled and shrinkResources to true in the build.gradle (optional update)
+
+05.09.2025:
+1.5.2:
+- Fixed some bugs and F-Droid build issue (optional update)
+
+28.08.2025:
+1.5.1:
+- Fix for F-Droid build (optional update)
+
+27.08.2025:
+1.5.0:
+- Reworked the storage system; now it uses maps with keys instead of lists - this change means better system in card management, cards now have tags and unique IDs. But this means that your old cards will cause errors, but that is normal, it is using a new system on storage with old system. What to do? Settings->Export Cardabase->Import Cardabase. This will export all your cards (since they are still there, only displaying them causes errors) and import them back while converting them into new system,
+- Cards can now be dragged to reorder them,
+- Cards can now be sorted by name and date,
+- Introducing tags: Tags are Strings that categorize your cards however you like,
+- Welcome back screen with a quick summary what was changed,
+- Info page with information about app; this also serves a update check,
+- You can now switch into using system font of your phone instead of Cardabase font pack (xirod + Roboto),
+- When creating a card, you can now select an image to automatically apply its data and barcode type,
+- New page transitions,
+- News page moved into Info page,
+- More actions with vibrations,
+- New app icon that also be tinted (Material You),
+- New featureGraphic.png image,
+- New app screenshots,
+- Small changes, under-the-hood improvements and bug fixes,
+- Please join the Discord server so we can discuss new ideas and bugs...
+
+25.06.2025:
+1.4.1:
+- Swapped news screen with sort screen, so now it makes more sense,
+- Fixed online news not being loaded due to missing permission,
+- Code optimization,
+- Please join the Discord server so we can discuss new ideas and bugs...
+
+12.06.2025:
+1.4.0:
+- Added bouncy effect on homescreen,
+- New page: News, where you can find changelog and latest news (this allows "direct" messages to the users),
+- Cards can now be moved and they can change position,
+- You can now select the amount of columns you want to have on the homescreen (better for larger displays/higher DPIs) - press on the "CARDABASE" title to trigger the menu,
+- Vibrations were added, they are triggered on some occasions, like hold or event error,
+- You can now export your cards, they will be exported into your Internal Storage>Downloads folder,
+- You can now also import the cards, just copy everything under the "====" line and paste it into the window (this also rewrites existing cards!),
+- Delete all your cards with one button,
+- Back buttons and setting button were moved to the left side for easier reach and ergonomics,
+- Added support for Predictive Back Gesture (at least Android 13, must be turned on in the Developer Options, might not work for everyone - still testing it out),
+- Bug fixes and code improvements,
+- Please join the Discord server so we can discuss new ideas and bugs...
+
+08.05.2025:
+1.3.1:
+- Added ITF, ITF-14 and ITF-16 card types (thanks to EveX1),
+- Added an exception to QR Codes for entering special characters (you can now enter them into ID text field if QR Code is selected as a card type),
+- Please join the Discord server so we can discuss new ideas and bugs...
+
+04.04.2025:
+1.3.0:
+- Card details page now has a QR code, that can be shared for a quick scan,
+- When creating a new card, you can scan this QR code to quickly fill in all the details,
+- When reading a barcode/QR Code, it's type is now applied automatically,
+- Brightness now automatically raises on card details page, but this is turned off by default so you have to turn it on in the settings,
+- You can now edit cards and it's details,
+- Now holding the card a menu raises from the bottom, there you have three options (at least for now): Edit, Duplicate, Remove (the names are self-explanatory)
+- Made Alert Dialog windows similar to each other,
+- Small bug fixes.
+- Please join the Discord server so we can discuss new ideas and bugs...
+
+08.01.2025:
+1.2.0:
+- You can now save any of barcode type, not just EAN 13 (any of those that are available),
+- When creating a new card, the CANCEL button was removed and SAVE button was moved to the center, it's wider and sits on top (you can scroll and it will stay on the bottom),
+- Switching theme is now smooth and does not require app restart,
+- Now you can secure your cards with a password - set up one, check the box when creating a password and you are done (if you no longer want to reset the password, you can do that),
+- NOTE: If you forget the password, there is no possibility of removing it. You will have to reset the data of the entire app.
+- App icon was changed,
+- App screenshots were updated,
+- App featureGraphic.png was added (that big image at the top of readme),
+- Small bug fixes.
+
+06.11.2024/05.11.2024/03.11.2024:
+1.1.2/1.1.1/1.1.0:
+- Cards can now have longer names,
+- The card page with the EAN-13 code has been redesigned,
+- Settings are now sorted and more clear,
+- Added F-Droid store button,
+- Floating Action Button on the homepage got bigger,
+- Buttons on the 'Add a card' page are now more rounded,
+- The camera scanning page now has a back button,
+- Bug fixes.
+
+14.08.2024:
+1.0.0:
+Cardabase Release is finally here! You can now download a release and enjoy Cardabase.
+Features:
+- Beautiful themes
+- Secure Data Storage
+- Beautiful and smooth UI
+- Completely offline
+- Completely free
+- Small size
