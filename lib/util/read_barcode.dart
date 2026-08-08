@@ -5,10 +5,14 @@ import 'package:cardabase/util/vibration_provider.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 import 'package:zxing2/qrcode.dart';
+
+import '../feature/settings/get_it.dart';
+import '../feature/settings/model.dart';
 
 class QRBarReader extends StatefulWidget {
   const QRBarReader({super.key});
@@ -42,98 +46,117 @@ class _QRBarReaderState extends State<QRBarReader> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        forceMaterialTransparency: true,
-        actions: [
-          Container(
-            margin: EdgeInsets.fromLTRB(0,5,5,0),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface.withValues(alpha: .4),
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              style: ButtonStyle(
-                iconSize: const WidgetStatePropertyAll(24),
-                iconColor: WidgetStatePropertyAll(
-                  theme.colorScheme.inverseSurface,
-                ),
+    return ValueListenableBuilder(
+      valueListenable: GetIt.I<SettingsBox>().listenable(),
+      builder: (context, box, _) {
+        final settings = box.value;
+        final rightBackButton = settings.theme.rightBackButton;
+        final backButton = Container(
+          margin: const EdgeInsets.fromLTRB(5, 5, 5, 0),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface.withValues(alpha: .4),
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            style: ButtonStyle(
+              iconSize: const WidgetStatePropertyAll(24),
+              iconColor: WidgetStatePropertyAll(
+                theme.colorScheme.inverseSurface,
               ),
-              icon: const Icon(Icons.arrow_back_ios_new),
-              onPressed: () {
-                controller?.pauseCamera();
-                Navigator.of(context).pop();
-              },
+            ),
+            icon: const Icon(Icons.arrow_back_ios_new),
+            onPressed: () {
+              controller?.pauseCamera();
+              Navigator.of(context).pop();
+            },
+          ),
+        );
+
+        return Scaffold(
+          extendBodyBehindAppBar: true,
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            forceMaterialTransparency: true,
+            leading: !rightBackButton ? backButton : null,
+            actions: [
+              if (rightBackButton) backButton,
+            ],
+          ),
+          body: Column(
+            children: <Widget>[
+              Expanded(flex: 4, child: _buildQrView(context)),
+            ],
+          ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          floatingActionButton: Container(
+            margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: theme.colorScheme.surface.withValues(alpha: .4),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Container(
+                  margin: const EdgeInsets.all(10),
+                  child: IconButton(
+                    style: ButtonStyle(
+                      iconSize: const WidgetStatePropertyAll(30),
+                      iconColor: WidgetStatePropertyAll(
+                        theme.colorScheme.inverseSurface,
+                      ),
+                    ),
+                    icon: const Icon(
+                      Icons.cameraswitch,
+                      size: 30,
+                    ),
+                    onPressed: () async {
+                      await controller?.flipCamera();
+                      if (mounted) setState(() {});
+                    },
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.all(10),
+                  child: IconButton(
+                    style: ButtonStyle(
+                      iconSize: const WidgetStatePropertyAll(30),
+                      iconColor: WidgetStatePropertyAll(
+                        theme.colorScheme.inverseSurface,
+                      ),
+                    ),
+                    icon: const Icon(
+                      Icons.flash_on,
+                      size: 30,
+                    ),
+                    onPressed: () async {
+                      await controller?.toggleFlash();
+                      if (mounted) setState(() {});
+                    },
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.all(10),
+                  child: IconButton(
+                    style: ButtonStyle(
+                      iconSize: const WidgetStatePropertyAll(30),
+                      iconColor: WidgetStatePropertyAll(
+                        theme.colorScheme.inverseSurface,
+                      ),
+                    ),
+                    icon: const Icon(
+                      Icons.photo,
+                      size: 30,
+                    ),
+                    onPressed: _pickImage,
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
-      body: Column(
-        children: <Widget>[
-          Expanded(flex: 4, child: _buildQrView(context)),
-        ],
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Container(
-        margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: theme.colorScheme.surface.withValues(alpha: .4),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Container(
-              margin: const EdgeInsets.all(10),
-              child: IconButton(
-                style: ButtonStyle(
-                  iconSize: const WidgetStatePropertyAll(30),
-                  iconColor: WidgetStatePropertyAll(
-                    theme.colorScheme.inverseSurface,
-                  ),
-                ),
-                icon: const Icon(Icons.cameraswitch, size: 30,),
-                onPressed: () async {
-                  await controller?.flipCamera();
-                  if (mounted) setState(() {});
-                },
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.all(10),
-              child: IconButton(
-                style: ButtonStyle(
-                  iconSize: const WidgetStatePropertyAll(30),
-                  iconColor: WidgetStatePropertyAll(
-                    theme.colorScheme.inverseSurface,
-                  ),
-                ),
-                icon: const Icon(Icons.flash_on, size: 30,),
-                onPressed: () async {
-                  await controller?.toggleFlash();
-                  if (mounted) setState(() {});
-                },
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.all(10),
-              child: IconButton(
-                style: ButtonStyle(
-                  iconSize: const WidgetStatePropertyAll(30),
-                  iconColor: WidgetStatePropertyAll(
-                    theme.colorScheme.inverseSurface,
-                  ),
-                ),
-                icon: const Icon(Icons.photo, size: 30,),
-                onPressed: _pickImage,
-              ),
-            ),
-          ],
-        ),
-      ),
+        );
+      },
     );
   }
 

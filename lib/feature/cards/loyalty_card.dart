@@ -305,12 +305,12 @@ class LoyaltyCard {
         ),
       if (tags.isNotEmpty) 'tags': tags.toList(growable: false),
       if (notes != null) 'notes': notes,
-      if (points != 0) 'points': points,
+      'points': points,
       if (requiresAuth != false) 'requiresAuth': requiresAuth,
       if (hideName != false) 'hideName': hideName,
       if (useFrontImageOverlay != false)
         'useFrontImageOverlay': useFrontImageOverlay,
-      if (usePoints != false) 'usePoints': usePoints,
+      'usePoints': usePoints,
     };
   }
 

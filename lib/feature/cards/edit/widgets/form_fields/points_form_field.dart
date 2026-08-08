@@ -32,7 +32,14 @@ class _PointsFormFieldState extends State<PointsFormField> {
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.removeListener(onWidgetControllerValueChanged);
       widget.controller.addListener(onWidgetControllerValueChanged);
-      _textController.text = widget.controller.value.toString();
+      final newText = widget.controller.value.toString();
+      if (_textController.text != newText) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _textController.text = newText;
+          }
+        });
+      }
     }
   }
 
@@ -50,7 +57,11 @@ class _PointsFormFieldState extends State<PointsFormField> {
     if (strValue == _textController.text) {
       return;
     }
-    _textController.text = strValue;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _textController.text = strValue;
+      }
+    });
   }
 
   void _incrementValue() {

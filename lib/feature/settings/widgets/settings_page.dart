@@ -205,6 +205,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 _tosButton(theme),
                 _keepAndroidOpen(theme),
                 _discordLink(theme),
+                _supportLink(theme),
                 _githubLink(theme),
                 _fdroidLink(theme),
                 _websiteLink(theme),
@@ -572,6 +573,19 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       settingHeader: 'Discord',
       settingIcon: Icons.discord,
+      iconColor: theme.colorScheme.tertiary,
+      borderColor: theme.colorScheme.primary,
+    );
+  }
+
+  Widget _supportLink(ThemeData theme) {
+    return SettingTile(
+      aboutSettingHeader: 'Support Cardabase development using ko-fi.com',
+      settingAction: () => _launchUrl(
+        Uri.parse('https://ko-fi.com/georgeyt9769'),
+      ),
+      settingHeader: 'Support Cardabase',
+      settingIcon: Icons.monetization_on,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,
     );

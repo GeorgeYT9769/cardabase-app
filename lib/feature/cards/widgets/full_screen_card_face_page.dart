@@ -1,5 +1,10 @@
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
+
+import '../../settings/get_it.dart';
+import '../../settings/model.dart';
 
 class FullScreenCardFacePage extends StatelessWidget {
   const FullScreenCardFacePage({
@@ -37,38 +42,44 @@ class FullScreenCardFacePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final effectiveBackgroundColor = backgroundColor ?? theme.colorScheme.surface;
+    final effectiveBackgroundColor =
+        backgroundColor ?? theme.colorScheme.surface;
 
-    return Scaffold(
-      backgroundColor: effectiveBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: effectiveBackgroundColor,
-        iconTheme: IconThemeData(
-          color: effectiveBackgroundColor == Colors.white
-              ? Colors.black
-              : theme.colorScheme.onSurface,
-        ),
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios,
-              color: effectiveBackgroundColor == Colors.white
-                  ? Colors.black
-                  : theme.colorScheme.onSurface,
-            ),
-            onPressed: () => Navigator.of(context).pop(),
+    return ValueListenableBuilder(
+      valueListenable: GetIt.I<SettingsBox>().listenable(),
+      builder: (context, box, _) {
+        final settings = box.value;
+        final rightBackButton = settings.theme.rightBackButton;
+        final backButton = IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: effectiveBackgroundColor == Colors.white
+                ? Colors.black
+                : theme.colorScheme.onSurface,
           ),
-        ],
-      ),
-      body: Center(
-        child: InteractiveViewer(
-          panEnabled: true,
-          minScale: 0.5,
-          maxScale: 4.0,
-          child: child,
-        ),
-      ),
+          onPressed: () => Navigator.of(context).pop(),
+        );
+
+        return Scaffold(
+          backgroundColor: effectiveBackgroundColor,
+          appBar: AppBar(
+            backgroundColor: effectiveBackgroundColor,
+            automaticallyImplyLeading: false,
+            leading: !rightBackButton ? backButton : null,
+            actions: [
+              if (rightBackButton) backButton,
+            ],
+          ),
+          body: Center(
+            child: InteractiveViewer(
+              panEnabled: true,
+              minScale: 0.5,
+              maxScale: 4.0,
+              child: child,
+            ),
+          ),
+        );
+      },
     );
   }
 

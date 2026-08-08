@@ -6,7 +6,7 @@ import 'package:cardabase/pages/home/home_page.dart';
  import 'package:cardabase/pages/lock_screen.dart';
 import 'package:cardabase/pages/terms_of_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/services.dart' show rootBundle, SystemNavigator;
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
@@ -94,10 +94,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     final passwordBox = GetIt.I<Box>(instanceName: 'passwordBox');
     final storedPassword = passwordBox.get('PW');
     final hasPassword = storedPassword is String && storedPassword.isNotEmpty;
+    final lockApp = passwordBox.get('lock_app', defaultValue: false);
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (context) =>
-            hasPassword ? const LockScreen() : const Homepage(),
+            (hasPassword && lockApp) ? const LockScreen() : const Homepage(),
       ),
     );
   }
@@ -213,7 +214,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               Icons.exit_to_app,
               color: theme.colorScheme.secondary,
             ),
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => SystemNavigator.pop(),
           ),
         ),
         actions: [
@@ -325,10 +326,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         final passwordBox = GetIt.I<Box>(instanceName: 'passwordBox');
                         final storedPassword = passwordBox.get('PW');
                         final hasPassword = storedPassword is String && storedPassword.isNotEmpty;
+                        final lockApp = passwordBox.get('lock_app', defaultValue: false);
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(
                             builder: (context) =>
-                                hasPassword ? const LockScreen() : const Homepage(),
+                                (hasPassword && lockApp) ? const LockScreen() : const Homepage(),
                           ),
                         );
                       },

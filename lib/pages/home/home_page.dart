@@ -49,7 +49,14 @@ class _HomePageState extends State<Homepage> {
       settings.loadValue(settingsBox.value);
       setState(() {});
     });
-    cardsSubscription = cardsBox.watch().listen((_) => setState(() {}));
+    cardsSubscription = cardsBox.watch().listen((_) {
+      if (cardsBox.isEmpty) {
+        isSearchVisible.value = false;
+        searchQuery.value = '';
+        searchController.clear();
+      }
+      setState(() {});
+    });
     cardsToDisplay = listCardsToDisplay();
   }
 
@@ -199,13 +206,15 @@ class _HomePageState extends State<Homepage> {
               title: TapRegion(
                 groupId: 'search_bar',
                 child: TextButton(
-                  onPressed: () {
-                    isSearchVisible.value = !isSearchVisible.value;
-                    if (!isSearchVisible.value) {
-                      searchQuery.value = '';
-                      searchController.clear();
-                    }
-                  },
+                  onPressed: cardsBox.isEmpty
+                      ? null
+                      : () {
+                          isSearchVisible.value = !isSearchVisible.value;
+                          if (!isSearchVisible.value) {
+                            searchQuery.value = '';
+                            searchController.clear();
+                          }
+                        },
                   child: Text(
                     'Cardabase',
                     style: theme.textTheme.titleLarge?.copyWith(),
@@ -231,7 +240,7 @@ class _HomePageState extends State<Homepage> {
                     ),
                   );
                 },
-                child: isSearchVisible.value
+                child: isSearchVisible.value && cardsBox.isNotEmpty
                     ? TapRegion(
                         key: const ValueKey('searchBar'),
                         groupId: 'search_bar',
@@ -272,10 +281,11 @@ class _HomePageState extends State<Homepage> {
                                 color: theme.colorScheme.tertiary,
                               ),
                               prefixIcon: Icon(Icons.search,
-                                  color: theme.colorScheme.primary),
+                                  color: theme.colorScheme.primary,
+                              ),
                               suffixIcon: searchQuery.value.isNotEmpty
                                   ? IconButton(
-                                      icon: const Icon(Icons.clear),
+                                      icon: Icon(Icons.clear, color: theme.colorScheme.primary,),
                                       onPressed: () {
                                         searchController.clear();
                                         searchQuery.value = '';

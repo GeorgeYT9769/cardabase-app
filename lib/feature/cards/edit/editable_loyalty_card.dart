@@ -26,7 +26,7 @@ class EditableLoyaltyCard {
           id: ValueNotifier(generateUniqueId()),
           barcode: EditableBarcode.createNew(),
           name: TextEditingController(),
-          color: ValueNotifier(null),
+          color: ValueNotifier(LoyaltyCard.defaultColor),
           tags: ListNotifier(const []),
           notes: TextEditingController(),
           frontImagePath: ValueNotifier(null),

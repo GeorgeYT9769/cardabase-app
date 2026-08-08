@@ -3,6 +3,8 @@ import 'dart:typed_data' as typed_data;
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:material_new_shapes/material_new_shapes.dart';
@@ -10,6 +12,8 @@ import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 
+import '../feature/settings/get_it.dart';
+import '../feature/settings/model.dart';
 import 'expressive_loading_indicator.dart';
 
 class CameraControllerScreen extends StatefulWidget {
@@ -113,7 +117,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
   }
 
   Future<String> _cropAndSaveAdjustedImage() async {
-    if (_capturedImageFile == null) return _capturedImageFile!.path;
+    if (_capturedImageFile == null) return '';
     setState(() {
       hideCutoutBorder = true;
     });
@@ -125,9 +129,9 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     setState(() {
       hideCutoutBorder = false;
     });
-    if (imageBytes == null) return _capturedImageFile!.path;
+    if (imageBytes == null) return _capturedImageFile?.path ?? '';
     final fullImage = img.decodeImage(imageBytes);
-    if (fullImage == null) return _capturedImageFile!.path;
+    if (fullImage == null) return _capturedImageFile?.path ?? '';
 
     // Derive crop region directly from the captured image's own pixel dimensions.
     // This mirrors the painter's percentage-based logic in pixel space, so X and Y
@@ -193,274 +197,293 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Stack(
-      children: [
-        Scaffold(
-          extendBodyBehindAppBar: true,
-          appBar: AppBar(
-            automaticallyImplyLeading: false,
-            forceMaterialTransparency: true,
-            actions: [
-              Container(
-                margin: EdgeInsets.fromLTRB(0,5,5,0),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surface.withValues(alpha: .4),
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  style: ButtonStyle(
-                    iconSize: const WidgetStatePropertyAll(24),
-                    iconColor: WidgetStatePropertyAll(
-                      theme.colorScheme.inverseSurface,
-                    ),
-                  ),
-                  icon: const Icon(
-                    Icons.arrow_back_ios_new,
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ),
-            ],
-            centerTitle: true,
-            elevation: 0.0,
-            backgroundColor: theme.colorScheme.surface,
+    return ValueListenableBuilder(
+      valueListenable: GetIt.I<SettingsBox>().listenable(),
+      builder: (context, box, _) {
+        final settings = box.value;
+        final rightBackButton = settings.theme.rightBackButton;
+        final backButton = Container(
+          margin: const EdgeInsets.fromLTRB(5, 5, 5, 0),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface.withValues(alpha: .4),
+            shape: BoxShape.circle,
           ),
-          body: FutureBuilder<void>(
-            future: _initializeControllerFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                if (_capturedImageFile == null) {
-                  return Stack(
-                    children: [
-                      Positioned.fill(
-                        child: AspectRatio(
-                          aspectRatio: widget.cardAspectRatio,
-                          child: CameraPreview(_cameraController!),
-                        ),
-                      ),
-                      Positioned.fill(
-                        child: CustomPaint(
-                          painter: _CutoutPainter(
-                            cutoutColor: widget.cutoutColor,
-                            cutoutWidthPercentage: widget.cutoutWidthPercentage,
-                            cardAspectRatio: widget.cardAspectRatio,
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                } else {
-                  return Screenshot(
-                    controller: _screenshotController,
-                    child: ColoredBox(
-                      color: Colors.black,
-                      child: Stack(
-                      children: [
-                        Positioned.fill(
-                          child: InteractiveViewer(
-                            transformationController: _transformationController,
-                            minScale: 0.1,
-                            maxScale: 5.0,
-                            boundaryMargin: const EdgeInsets.all(double.infinity),
-                            child: ColorFiltered(
-                              colorFilter: ColorFilter.matrix([
-                                1, 0, 0, 0, _brightness * 255,
-                                0, 1, 0, 0, _brightness * 255,
-                                0, 0, 1, 0, _brightness * 255,
-                                0, 0, 0, 1, 0,
-                              ]),
-                              child: SizedBox.expand(
-                                child: Image.file(
-                                  File(_capturedImageFile!.path),
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
+          child: IconButton(
+            style: ButtonStyle(
+              iconSize: const WidgetStatePropertyAll(24),
+              iconColor: WidgetStatePropertyAll(
+                theme.colorScheme.inverseSurface,
+              ),
+            ),
+            icon: const Icon(
+              Icons.arrow_back_ios_new,
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        );
+
+        return Stack(
+          children: [
+            Scaffold(
+              extendBodyBehindAppBar: true,
+              appBar: AppBar(
+                automaticallyImplyLeading: false,
+                forceMaterialTransparency: true,
+                leading: !rightBackButton ? backButton : null,
+                actions: [
+                  if (rightBackButton) backButton,
+                ],
+                centerTitle: true,
+                elevation: 0.0,
+                backgroundColor: theme.colorScheme.surface,
+              ),
+              body: FutureBuilder<void>(
+                future: _initializeControllerFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (_capturedImageFile == null) {
+                      return Stack(
+                        children: [
+                          Positioned.fill(
+                            child: AspectRatio(
+                              aspectRatio: widget.cardAspectRatio,
+                              child: CameraPreview(_cameraController!),
                             ),
                           ),
-                        ),
-                        Positioned.fill(
-                          child: IgnorePointer(
+                          Positioned.fill(
                             child: CustomPaint(
                               painter: _CutoutPainter(
                                 cutoutColor: widget.cutoutColor,
-                                cutoutWidthPercentage: widget.cutoutWidthPercentage,
+                                cutoutWidthPercentage:
+                                    widget.cutoutWidthPercentage,
                                 cardAspectRatio: widget.cardAspectRatio,
-                                shouldDrawDarkOverlay: false,
-                                hideBorder: hideCutoutBorder,
-                                cutoutYOffset: 0,
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    ),
-                  );
-                }
-              } else {
-                return Center(
-                  child: ExpressiveLoadingIndicator(
-                    color: Theme.of(context).colorScheme.tertiary,
-                    constraints: const BoxConstraints(
-                      minWidth: 64.0,
-                      minHeight: 64.0,
-                      maxWidth: 64.0,
-                      maxHeight: 64.0,
-                    ),
-                    polygons: [
-                      MaterialShapes.softBurst,
-                      MaterialShapes.pentagon,
-                      MaterialShapes.pill,
-                    ],
-                    semanticsLabel: 'Loading',
-                    semanticsValue: 'In progress',
-                  ),
-                );
-              }
-            },
-          ),
-          floatingActionButton: _capturedImageFile == null
-              ? Container(
-                margin: const EdgeInsets.symmetric(vertical: 10), // Only vertical margin
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: Theme.of(context).colorScheme.surface.withValues(alpha: .4),
-                ),
-                child: Row(
-                    mainAxisSize: MainAxisSize.min, // Make row as slim as possible
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      FloatingActionButton(
-                        heroTag: 'selectFromGallery',
-                        onPressed: () async {
-                          await _pickImageFromGallery();
-                        },
-                        backgroundColor: Colors.transparent,
-                        elevation: 0,
-                        child: const Icon(
-                          Icons.photo_library,
-                          size: 30,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      FloatingActionButton(
-                        heroTag: 'takePhoto',
-                        onPressed: () async {
-                          try {
-                            await _initializeControllerFuture;
-                            await _takePicture();
-                          } catch (e) {
-                            Navigator.pop(context);
-                          }
-                        },
-                        backgroundColor: Colors.transparent,
-                        elevation: 0,
-                        child: const Icon(
-                          Icons.camera_alt,
-                          size: 30,
-                        ),
-                      ),
-                    ],
-                  ),
-              )
-              : Container(
-                margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: Theme.of(context).colorScheme.surface.withValues(alpha: .4),
-                ),
-                child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Brightness: ${_brightness.toStringAsFixed(1)}',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w900,
-                          color: Theme.of(context).colorScheme.inverseSurface,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.brightness_6_rounded),
-                            Expanded(
-                              child: Slider(
-                                value: _brightness,
-                                year2023: false,
-                                min: -1.0,
-                                max: 1.0,
-                                //activeColor: widget.cutoutColor,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _brightness = value;
-                                  });
-                                },
+                        ],
+                      );
+                    } else {
+                      return Screenshot(
+                        controller: _screenshotController,
+                        child: ColoredBox(
+                          color: Colors.black,
+                          child: Stack(
+                            children: [
+                              Positioned.fill(
+                                child: InteractiveViewer(
+                                  transformationController:
+                                      _transformationController,
+                                  minScale: 0.1,
+                                  maxScale: 5.0,
+                                  boundaryMargin:
+                                      const EdgeInsets.all(double.infinity),
+                                  child: ColorFiltered(
+                                    colorFilter: ColorFilter.matrix([
+                                      1, 0, 0, 0, _brightness * 255,
+                                      0, 1, 0, 0, _brightness * 255,
+                                      0, 0, 1, 0, _brightness * 255,
+                                      0, 0, 0, 1, 0,
+                                    ]),
+                                    child: SizedBox.expand(
+                                      child: Image.file(
+                                        File(_capturedImageFile!.path),
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ],
+                              Positioned.fill(
+                                child: IgnorePointer(
+                                  child: CustomPaint(
+                                    painter: _CutoutPainter(
+                                      cutoutColor: widget.cutoutColor,
+                                      cutoutWidthPercentage:
+                                          widget.cutoutWidthPercentage,
+                                      cardAspectRatio: widget.cardAspectRatio,
+                                      shouldDrawDarkOverlay: false,
+                                      hideBorder: hideCutoutBorder,
+                                      cutoutYOffset: 0,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                      );
+                    }
+                  } else {
+                    return Center(
+                      child: ExpressiveLoadingIndicator(
+                        color: Theme.of(context).colorScheme.tertiary,
+                        constraints: const BoxConstraints(
+                          minWidth: 64.0,
+                          minHeight: 64.0,
+                          maxWidth: 64.0,
+                          maxHeight: 64.0,
+                        ),
+                        polygons: [
+                          MaterialShapes.softBurst,
+                          MaterialShapes.pentagon,
+                          MaterialShapes.pill,
+                        ],
+                        semanticsLabel: 'Loading',
+                        semanticsValue: 'In progress',
                       ),
-                      Row(
+                    );
+                  }
+                },
+              ),
+              floatingActionButton: _capturedImageFile == null
+                  ? Container(
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 10), // Only vertical margin
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: theme.colorScheme.surface.withValues(alpha: .4),
+                      ),
+                      child: Row(
+                        mainAxisSize:
+                            MainAxisSize.min, // Make row as slim as possible
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           FloatingActionButton(
-                            heroTag: 'retakePhoto',
-                            onPressed: _retakePicture,
+                            heroTag: 'selectFromGallery',
+                            onPressed: () async {
+                              await _pickImageFromGallery();
+                            },
                             backgroundColor: Colors.transparent,
                             elevation: 0,
                             child: const Icon(
-                              Icons.refresh,
+                              Icons.photo_library,
                               size: 30,
                             ),
                           ),
+                          const SizedBox(
+                            width: 20,
+                          ),
                           FloatingActionButton(
-                            heroTag: 'usePhoto',
-                            onPressed: _confirmAndSavePicture,
+                            heroTag: 'takePhoto',
+                            onPressed: () async {
+                              try {
+                                await _initializeControllerFuture;
+                                await _takePicture();
+                              } catch (e) {
+                                Navigator.pop(context);
+                              }
+                            },
                             backgroundColor: Colors.transparent,
                             elevation: 0,
                             child: const Icon(
-                              Icons.check,
+                              Icons.camera_alt,
                               size: 30,
                             ),
                           ),
                         ],
                       ),
-                    ],
+                    )
+                  : Container(
+                      margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: theme.colorScheme.surface.withValues(alpha: .4),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Brightness: ${_brightness.toStringAsFixed(1)}',
+                            style:
+                                theme.textTheme.bodyLarge?.copyWith(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w900,
+                              color: theme.colorScheme.inverseSurface,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24.0, vertical: 8.0,),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.brightness_6_rounded),
+                                Expanded(
+                                  child: Slider(
+                                    year2023: false,
+                                    value: _brightness,
+                                    min: -1.0,
+                                    max: 1.0,
+                                    //activeColor: widget.cutoutColor,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _brightness = value;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              FloatingActionButton(
+                                heroTag: 'retakePhoto',
+                                onPressed: _retakePicture,
+                                backgroundColor: Colors.transparent,
+                                elevation: 0,
+                                child: const Icon(
+                                  Icons.refresh,
+                                  size: 30,
+                                ),
+                              ),
+                              FloatingActionButton(
+                                heroTag: 'usePhoto',
+                                onPressed: _confirmAndSavePicture,
+                                backgroundColor: Colors.transparent,
+                                elevation: 0,
+                                child: const Icon(
+                                  Icons.check,
+                                  size: 30,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.centerFloat,
+            ),
+            if (_isSaving)
+              Positioned.fill(
+                child: Container(
+                  color: Colors.black.withValues(alpha: 0.4),
+                  child: Center(
+                    child: ExpressiveLoadingIndicator(
+                      color: theme.colorScheme.tertiary,
+                      constraints: const BoxConstraints(
+                        minWidth: 64.0,
+                        minHeight: 64.0,
+                        maxWidth: 64.0,
+                        maxHeight: 64.0,
+                      ),
+                      polygons: [
+                        MaterialShapes.softBurst,
+                        MaterialShapes.pentagon,
+                        MaterialShapes.pill,
+                      ],
+                      semanticsLabel: 'Saving',
+                      semanticsValue: 'Saving image',
+                    ),
                   ),
-              ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        ),
-        if (_isSaving)
-          Positioned.fill(
-            child: Container(
-              color: Colors.black.withValues(alpha: 0.4),
-              child: Center(
-                child: ExpressiveLoadingIndicator(
-                  color: Theme.of(context).colorScheme.tertiary,
-                  constraints: const BoxConstraints(
-                    minWidth: 64.0,
-                    minHeight: 64.0,
-                    maxWidth: 64.0,
-                    maxHeight: 64.0,
-                  ),
-                  polygons: [
-                    MaterialShapes.softBurst,
-                    MaterialShapes.pentagon,
-                    MaterialShapes.pill,
-                  ],
-                  semanticsLabel: 'Saving',
-                  semanticsValue: 'Saving image',
                 ),
               ),
-            ),
-          ),
-      ],
+          ],
+        );
+      },
     );
   }
 }

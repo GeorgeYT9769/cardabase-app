@@ -117,10 +117,11 @@ void main() async {
   Widget initialScreen;
   final storedPassword = passwordBox.get('PW');
   final hasPassword = storedPassword is String && storedPassword.isNotEmpty;
+  final lockApp = passwordBox.get('lock_app', defaultValue: false);
 
   if (settingsBox.value.lastSeenAppVersion != currentAppVersion) {
     initialScreen = WelcomeScreen(currentAppVersion: currentAppVersion);
-  } else if (hasPassword) {
+  } else if (hasPassword && lockApp) {
     initialScreen = const LockScreen();
   } else {
     initialScreen = const Homepage();
