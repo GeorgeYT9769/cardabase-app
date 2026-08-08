@@ -1,6 +1,6 @@
 LATEST CHANGELOG:
 
-08.08.2026
+09.08.2026
 1.9.0:
 - You can now set a password for the app,
 - Sorting by tags is now prettier,

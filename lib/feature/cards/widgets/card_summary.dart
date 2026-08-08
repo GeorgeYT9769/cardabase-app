@@ -21,11 +21,13 @@ class CardSummary extends StatefulWidget {
     super.key,
     required this.cardId,
     required this.cornerRadius,
+    this.numberOfColumns = 1,
     this.onTap,
   });
 
   final String cardId;
   final double cornerRadius;
+  final int numberOfColumns;
   final VoidCallback? onTap;
 
   @override
@@ -139,7 +141,13 @@ class _CardSummaryState extends State<CardSummary> {
                       child: Text(
                         card?.name ?? '',
                         style: theme.textTheme.bodyLarge?.copyWith(
-                          fontSize: 50,
+                          fontSize: switch (widget.numberOfColumns) {
+                            1 => 50,
+                            2 => 32,
+                            3 => 24,
+                            4 => 18,
+                            _ => 15,
+                          }.toDouble(),
                           fontWeight: FontWeight.bold,
                           color: foregroundColor,
                         ),

@@ -218,6 +218,7 @@ class _CardListState extends State<CardList> {
           cardId: card.id,
           cornerRadius:
               widget.numberOfColumns == 1 ? 15 : 20 / widget.numberOfColumns,
+          numberOfColumns: widget.numberOfColumns,
           onTap: widget.onCardTap,
         ),
       ),
