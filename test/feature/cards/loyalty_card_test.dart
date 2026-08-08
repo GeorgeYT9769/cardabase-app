@@ -319,6 +319,8 @@ void main() {
             },
             'createdAt': '2026-05-26T19:42:35.324Z',
             'lastModifiedAt': '2026-05-26T19:42:35.324Z',
+            'points': 0,
+            'usePoints': false,
           },
         ),
         InputOutputTestCase(
@@ -361,6 +363,7 @@ void main() {
             'hideName': true,
             'createdAt': '2026-05-26T19:42:35.324Z',
             'lastModifiedAt': '2026-05-26T19:42:35.324Z',
+            'usePoints': false,
           },
         ),
         InputOutputTestCase(

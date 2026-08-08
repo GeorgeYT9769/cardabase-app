@@ -101,40 +101,132 @@ void main() async {
     );
   };
 
-  GetIt.I
-    ..registerPackageInfo()
-    ..registerHaptics()
-    ..registerHive()
-    ..registerSettings()
-    ..registerCards();
+  try {
+    GetIt.I
+      ..registerPackageInfo()
+      ..registerHaptics()
+      ..registerHive()
+      ..registerSettings()
+      ..registerCards();
 
-  final packageInfo = await GetIt.I.getAsync<PackageInfo>();
-  final settingsBox = await GetIt.I.getAsync<SettingsBox>();
-  final cardsBox = await GetIt.I.getAsync<LoyaltyCardsBox>();
-  final passwordBox = await GetIt.I.getAsync<Box>(instanceName: 'passwordBox');
-  final currentAppVersion = packageInfo.version;
+    // ignore: avoid_print
+    print('main: awaiting packageInfo');
+    final packageInfo = await GetIt.I.getAsync<PackageInfo>();
+    // ignore: avoid_print
+    print('main: got packageInfo ${packageInfo.version}');
 
-  Widget initialScreen;
-  final storedPassword = passwordBox.get('PW');
-  final hasPassword = storedPassword is String && storedPassword.isNotEmpty;
-  final lockApp = passwordBox.get('lock_app', defaultValue: false);
+    // ignore: avoid_print
+    print('main: awaiting settingsBox');
+    final settingsBox = await GetIt.I
+        .getAsync<SettingsBox>()
+        .timeout(
+          const Duration(seconds: 12),
+          onTimeout: () async {
+            // ignore: avoid_print
+            print('main: settingsBox timeout, opening settings202603 directly');
+            final hive = await GetIt.I.getAsync<HiveInterface>();
+            return hive.openBox<Settings>('settings202603');
+          },
+        );
+    // ignore: avoid_print
+    print('main: got settingsBox');
 
-  if (settingsBox.value.lastSeenAppVersion != currentAppVersion) {
-    initialScreen = WelcomeScreen(currentAppVersion: currentAppVersion);
-  } else if (hasPassword && lockApp) {
-    initialScreen = const LockScreen();
-  } else {
-    initialScreen = const Homepage();
-  }
+    // ignore: avoid_print
+    print('main: awaiting cardsBox');
+    final cardsBox = await GetIt.I
+        .getAsync<LoyaltyCardsBox>()
+        .timeout(
+          const Duration(seconds: 12),
+          onTimeout: () async {
+            // ignore: avoid_print
+            print('main: cardsBox timeout, opening cards202603 directly');
+            return Hive.openBox<LoyaltyCard>('cards202603');
+          },
+        );
+    // ignore: avoid_print
+    print('main: got cardsBox (length=${cardsBox.length})');
 
-  runApp(Main(initialScreen: initialScreen));
+    // ignore: avoid_print
+    print('main: awaiting passwordBox');
+    final passwordBox = await GetIt.I
+        .getAsync<Box>(instanceName: 'passwordBox')
+        .timeout(
+          const Duration(seconds: 12),
+          onTimeout: () async {
+            // ignore: avoid_print
+            print('main: passwordBox timeout, opening password directly');
+            final hive = await GetIt.I.getAsync<HiveInterface>();
+            return hive.openBox('password');
+          },
+        );
+    // ignore: avoid_print
+    print('main: got passwordBox');
 
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    final context = navigatorKey.currentContext;
-    if (context != null && context.mounted) {
-      autoUpdateAfterInterval(context, settingsBox, cardsBox);
+    final currentAppVersion = packageInfo.version;
+
+    Widget initialScreen;
+    final storedPassword = passwordBox.get('PW');
+    final hasPassword = storedPassword is String && storedPassword.isNotEmpty;
+    final lockApp = passwordBox.get('lock_app', defaultValue: false);
+
+    String? lastSeenVersion;
+    try {
+      lastSeenVersion = settingsBox.value.lastSeenAppVersion;
+    } catch (e, s) {
+      // ignore: avoid_print
+      print('main: failed reading settings value: $e\n$s');
+      lastSeenVersion = null;
     }
+
+    if (lastSeenVersion != currentAppVersion) {
+      initialScreen = WelcomeScreen(currentAppVersion: currentAppVersion);
+    } else if (hasPassword && lockApp) {
+      initialScreen = const LockScreen();
+    } else {
+      initialScreen = const Homepage();
+    }
+
+    runApp(Main(initialScreen: initialScreen));
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final context = navigatorKey.currentContext;
+      if (context != null && context.mounted) {
+        autoUpdateAfterInterval(context, settingsBox, cardsBox);
+      }
+    });
+  } catch (e, s) {
+    // As a last resort, show a visible startup error instead of a black screen.
+    // ignore: avoid_print
+    print('main: fatal startup error: $e\n$s');
+    runApp(StartupErrorApp(errorMessage: e.toString()));
+  }
+}
+
+class StartupErrorApp extends StatelessWidget {
+  final String errorMessage;
+
+  const StartupErrorApp({
+    super.key,
+    required this.errorMessage,
   });
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: Center(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Text(
+              'Cardabase failed to initialize local data.\n\nError:\n$errorMessage\n\nPlease restart the app. If this keeps happening, export your data from the old version and reinstall.',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class Main extends StatefulWidget {

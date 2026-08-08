@@ -106,7 +106,7 @@ class LoyaltyCard {
   final DateTime lastModifiedAt;
   
   /// [usePoints] whether the card uses Points amount
-  @HiveField(14)
+  @HiveField(14, defaultValue: false)
   final bool usePoints;
 
   Color get nonNullColor => color ?? defaultColor;

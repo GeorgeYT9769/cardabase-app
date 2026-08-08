@@ -12,24 +12,67 @@ extension SettingsGetItExtensions on GetIt {
   void registerSettings() {
     registerLazySingletonAsync<SettingsBox>(
       () async {
+        // Debug logging for settings registration. We return the new settings
+        // box immediately and defer heavy migration work to the background so
+        // the app can start and show UI faster.
+        // ignore: avoid_print
+        print('registerSettings: starting settings registration (deferred migration)');
         final hive = await getAsync<HiveInterface>();
 
-        final oldSettingsBox = await hive.openBox('settingsBox');
-        final newSettingsBox = await hive.openBox<Settings>('settings202603');
-        final oldCardsBox = await hive.openBox('mybox');
+        // open the new settings box and return it immediately
+        // ignore: avoid_print
+        print('registerSettings: opening new settings202603 box');
+        late SettingsBox newSettingsBox;
+        try {
+          newSettingsBox = await hive.openBox<Settings>('settings202603');
+        } catch (e, s) {
+          // Do not delete here. Deleting can silently drop settings.
+          // Surface the error so startup fallback can report it.
+          // ignore: avoid_print
+          print('registerSettings: failed opening settings202603: $e\n$s');
+          rethrow;
+        }
 
-        await migrateSettingsTo202603(
-          oldSettingsBox,
-          newSettingsBox,
-          oldCardsBox,
-        );
-        await oldSettingsBox.close();
-        await oldCardsBox.close();
+        if (newSettingsBox.isEmpty) {
+          // Run migration in the background
+          Future(() async {
+            try {
+              // ignore: avoid_print
+              print('registerSettings: background migration start');
+              final oldSettingsBox = await hive.openBox('settingsBox');
+              final oldCardsBox = await hive.openBox('mybox');
 
-        final cardsBox = await GetIt.I.getAsync<LoyaltyCardsBox>();
-        await _ensureCustomOrderContainsAllCards(cardsBox, newSettingsBox);
-        _cardsSubscription = cardsBox.watch().listen(onCardsChanged);
+              await migrateSettingsTo202603(
+                oldSettingsBox,
+                newSettingsBox,
+                oldCardsBox,
+              );
 
+              await oldSettingsBox.close();
+              await oldCardsBox.close();
+
+              // When the cards box becomes available, ensure custom order and
+              // start listening for card changes.
+              try {
+                final cardsBox = await GetIt.I.getAsync<LoyaltyCardsBox>();
+                await _ensureCustomOrderContainsAllCards(cardsBox, newSettingsBox);
+                _cardsSubscription = cardsBox.watch().listen(onCardsChanged);
+              } catch (e, s) {
+                // ignore: avoid_print
+                print('registerSettings: failed to ensure custom order: $e\n$s');
+              }
+
+              // ignore: avoid_print
+              print('registerSettings: background migration finished');
+            } catch (e, s) {
+              // ignore: avoid_print
+              print('registerSettings: background migration failed: $e\n$s');
+            }
+          });
+        }
+
+        // ignore: avoid_print
+        print('registerSettings: returning settings box');
         return newSettingsBox;
       },
       dispose: (box) {
@@ -41,14 +84,26 @@ extension SettingsGetItExtensions on GetIt {
 }
 
 extension SettingsBoxExtensions on Box<Settings> {
-  Settings get value => getAt(0) ?? Settings.defaultValue();
+  Settings get value {
+    // Hive getAt(0) can throw when the box is empty/corrupted; always fall
+    // back to default settings to avoid startup crashes.
+    if (isEmpty) {
+      return Settings.defaultValue();
+    }
+    try {
+      return getAt(0) ?? Settings.defaultValue();
+    } catch (_) {
+      return Settings.defaultValue();
+    }
+  }
 
   Future<void> save(Settings settings) {
     if (isEmpty) {
       return add(settings);
-    } else {
-      return putAt(0, settings);
     }
+
+    // If putAt fails due to a stale index state, fall back to add.
+    return putAt(0, settings).catchError((_) => add(settings));
   }
 }
 

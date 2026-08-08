@@ -31,7 +31,7 @@ class LoyaltyCardAdapter extends TypeAdapter<LoyaltyCard> {
       hideName: fields[11] as bool,
       createdAt: fields[12] as DateTime,
       lastModifiedAt: fields[13] as DateTime,
-      usePoints: fields[14] as bool,
+      usePoints: fields[14] == null ? false : fields[14] as bool,
     );
   }
 
