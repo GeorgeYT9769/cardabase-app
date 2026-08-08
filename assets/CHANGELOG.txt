@@ -1,5 +1,19 @@
 LATEST CHANGELOG:
 
+08.08.2026
+1.9.0:
+- You can now set a password for the app,
+- Sorting by tags is now prettier,
+- You can now search for cards by name, just click on the "Cardabase" title on home screen,
+- Fixed a bug with Predictive Back Gesture,
+- The back button is now on the left side by default with the ability to place it on the right side,
+- Tags can now be recommended from the cards you already have (if you have cards but not their tags),
+- Added a banner for Keep Android Open,
+- Added a support button in settings,
+- You now do not need a Card ID or it's type to save a card,
+- Points are now off by default and can be turned on (on for cards with non-zero points),
+- other bug fixes I forgot about.
+
 28.06.2026
 1.8.2:
 - Fixed a bug (JNI Pub) for F-Droid reproducible builds system (this is an optional update).
