@@ -11,7 +11,7 @@ LATEST CHANGELOG:
 - Added a banner for Keep Android Open,
 - Added a support button in settings,
 - You now do not need a Card ID or it's type to save a card,
-- Points are now off by default and can be turned on (on for cards with non-zero points),
+- Points are now off by default and can be turned on (just edit the card and tick the Use Points checkbox),
 - other bug fixes I forgot about.
 
 28.06.2026
