@@ -89,7 +89,9 @@ Currently, the app uses these permissions (+ why are they needed) :
 
 ## 🙌 Support
 
-For support, message me on Discord: "georgeyt9769".
+<a href="https://www.buymeacoffee.com/georgeyt9769" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+<br>
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/M5J124MU0N)
 
 ## 🤝 Contributing
 Contact me for more info :).
