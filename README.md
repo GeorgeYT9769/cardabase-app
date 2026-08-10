@@ -46,7 +46,7 @@ More info [here](https://www.virustotal.com/gui/file/16c68fd2161573f337b175c8c68
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
 alt="Get it on F-Droid"
 height="80">](https://f-droid.org/packages/com.georgeyt9769.cardabase/)
-[<img src="https://raw.githubusercontent.com/RookieEnough/Orion-Store/refs/heads/main/assets/orion-badge.png" alt="Get it on Orion Store" height="80">](https://rookieenough.github.io/Orion-Data/redirect.html?id=cardabase)
+[<img src="https://raw.githubusercontent.com/RookieEnough/Orion-Store/refs/heads/main/assets/orion-badge.png" alt="Get it on Orion Store" height="60">](https://rookieenough.github.io/Orion-Data/redirect.html?id=cardabase)
 
 OR
 
