@@ -104,7 +104,7 @@ class LoyaltyCard {
   /// This is used by default for sorting.
   @HiveField(13)
   final DateTime lastModifiedAt;
-  
+
   /// [usePoints] whether the card uses Points amount
   @HiveField(14, defaultValue: false)
   final bool usePoints;
@@ -184,7 +184,7 @@ class LoyaltyCard {
       }
 
       if (cardMap.isNotEmpty) {
-        final strType = cardMap['cardType'];
+        final strType = cardMap.getString('cardType')?.nullWhenEmpty;
 
         final red = cardMap.getInt('redValue');
         final green = cardMap.getInt('greenValue');
@@ -196,7 +196,8 @@ class LoyaltyCard {
           id: generateUniqueId(),
           barcode: Barcode(
             data: cardMap['cardId'] ?? '',
-            type: parseBarcodeTypeStringFromDb(strType),
+            type:
+                strType == null ? null : parseBarcodeTypeStringFromDb(strType),
           ),
           name: cardMap['cardName'] ?? '',
           color: red == null || green == null || blue == null
@@ -235,10 +236,7 @@ class LoyaltyCard {
         name: rawList[0],
         barcode: Barcode(
           data: rawList[1],
-          type: BarcodeType.values.firstWhere(
-            (value) => value.name == rawList[5],
-            orElse: () => throw Exception('unknown barcodeType: ${rawList[5]}'),
-          ),
+          type: parseBarcodeTypeStringFromDb(rawList[5]),
         ),
         color: Color.fromARGB(255, red, green, blue),
         requiresAuth: rawList[6] == 'true',
@@ -287,7 +285,8 @@ class LoyaltyCard {
       createdAt: now,
       lastModifiedAt: now,
       usePoints: jsonMap.getBool('usePoints') ??
-          (jsonMap.containsKey('points') || jsonMap.containsKey('pointsAmount')),
+          (jsonMap.containsKey('points') ||
+              jsonMap.containsKey('pointsAmount')),
     );
   }
 

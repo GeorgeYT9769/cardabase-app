@@ -1,5 +1,5 @@
-import 'dart:ui';
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:cardabase/data/unique_id.dart';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
@@ -57,10 +57,8 @@ List<dynamic> _extractLegacyCards(Box oldBox) {
 
   // Last-resort fallback: if individual entries look like cards, migrate them.
   final values = oldBox.values.toList(growable: false);
-  final hasCardLikeValues = values.any((value) =>
-      value is LoyaltyCard ||
-      value is Map ||
-      value is String);
+  final hasCardLikeValues = values
+      .any((value) => value is LoyaltyCard || value is Map || value is String);
   if (hasCardLikeValues) {
     return values;
   }
@@ -84,6 +82,18 @@ LoyaltyCard? _mapDynamicToCard(dynamic value) {
       if (decoded is Map<String, dynamic>) {
         return LoyaltyCard.fromJsonMap(decoded);
       }
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // the oldest versions stored a card as a list of loose values. The import
+  // of an export knows how to read those, so the migration goes through the
+  // same parser rather than dropping the card.
+  if (value is List) {
+    try {
+      // ignore: deprecated_member_use_from_same_package
+      return LoyaltyCard.fromLegacyExport('[${value.join(', ')}]');
     } catch (_) {
       return null;
     }
@@ -194,4 +204,3 @@ String? _asString(dynamic value) {
   if (value is String) return value;
   return null;
 }
-
