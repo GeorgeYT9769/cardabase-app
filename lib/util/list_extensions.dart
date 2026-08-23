@@ -11,6 +11,34 @@ extension ListExtensions<E> on List<E> {
       this[i] = sorted[i].a;
     }
   }
+
+  String? getStringAt(int index) {
+    final value = _elementAt(index);
+    return value is String ? value : null;
+  }
+
+  int? getIntAt(int index) {
+    return switch (_elementAt(index)) {
+      int i => i,
+      String s => int.tryParse(s),
+      _ => null,
+    };
+  }
+
+  bool? getBoolAt(int index) {
+    return switch (_elementAt(index)) {
+      bool b => b,
+      String s => bool.tryParse(s),
+      _ => null,
+    };
+  }
+
+  E? _elementAt(int index) {
+    if (index < 0 || index >= length) {
+      return null;
+    }
+    return this[index];
+  }
 }
 
 class _Tuple<A, B> {

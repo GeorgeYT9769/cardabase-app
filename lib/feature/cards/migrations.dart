@@ -93,7 +93,7 @@ LoyaltyCard? _mapDynamicToCard(dynamic value) {
   if (value is List) {
     try {
       // ignore: deprecated_member_use_from_same_package
-      return LoyaltyCard.fromLegacyExport('[${value.join(', ')}]');
+      return LoyaltyCard.fromLegacyValueList(value);
     } catch (_) {
       return null;
     }

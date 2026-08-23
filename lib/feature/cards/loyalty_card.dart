@@ -5,6 +5,7 @@ import 'package:cardabase/data/hive.dart';
 import 'package:cardabase/data/unique_id.dart';
 import 'package:cardabase/feature/cards/edit/editable_loyalty_card.dart';
 import 'package:cardabase/util/barcode_type_extensions.dart';
+import 'package:cardabase/util/list_extensions.dart';
 import 'package:cardabase/util/map_extensions.dart';
 import 'package:cardabase/util/string_extensions.dart';
 import 'package:flutter/material.dart';
@@ -164,7 +165,6 @@ class LoyaltyCard {
   @Deprecated('this method is only here for backwards compatibility.')
   factory LoyaltyCard.fromLegacyExport(String value) {
     final trimmed = value.trim();
-    final now = DateTime.now().toUtc();
 
     if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
       final cleaned = trimmed.substring(1, trimmed.length - 1); // remove { }
@@ -186,6 +186,7 @@ class LoyaltyCard {
       if (cardMap.isNotEmpty) {
         final strType = cardMap.getString('cardType')?.nullWhenEmpty;
 
+        final now = DateTime.now().toUtc();
         final red = cardMap.getInt('redValue');
         final green = cardMap.getInt('greenValue');
         final blue = cardMap.getInt('blueValue');
@@ -221,39 +222,48 @@ class LoyaltyCard {
     if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
       final cleaned = trimmed.substring(1, trimmed.length - 1);
       final rawList = cleaned.split(',').map((e) => e.trim()).toList();
-      if (rawList.length < 7) {
-        throw FormatException(
-          'Expected shared data to be in format of `[name, number, red, green, blue, cardType,hasPassword]`. But did not receive enough elements.',
-        );
-      }
-
-      final red = int.parse(rawList[2]);
-      final green = int.parse(rawList[3]);
-      final blue = int.parse(rawList[4]);
-
-      return LoyaltyCard(
-        id: generateUniqueId(),
-        name: rawList[0],
-        barcode: Barcode(
-          data: rawList[1],
-          type: parseBarcodeTypeStringFromDb(rawList[5]),
-        ),
-        color: Color.fromARGB(255, red, green, blue),
-        requiresAuth: rawList[6] == 'true',
-        tags: {},
-        notes: '',
-        frontImagePath: null,
-        backImagePath: null,
-        useFrontImageOverlay: false,
-        hideName: false,
-        points: 0,
-        createdAt: now,
-        lastModifiedAt: now,
-        usePoints: false,
-      );
+      return LoyaltyCard.fromLegacyValueList(rawList);
     }
 
     throw Exception('failed to parse card');
+  }
+
+  @Deprecated('this method is only here for backwards compatibility.')
+  factory LoyaltyCard.fromLegacyValueList(List rawList) {
+    if (rawList.length < 7) {
+      throw FormatException(
+        'Expected data to be in format of `[name, number, red, green, blue, cardType,hasPassword]`. But did not receive enough elements.',
+      );
+    }
+
+    final now = DateTime.now().toUtc();
+    final red = rawList.getIntAt(2);
+    final green = rawList.getIntAt(3);
+    final blue = rawList.getIntAt(4);
+    final strType = rawList.getStringAt(5);
+
+    return LoyaltyCard(
+      id: generateUniqueId(),
+      name: rawList.getStringAt(0) ?? '',
+      barcode: Barcode(
+        data: rawList.getStringAt(1) ?? '',
+        type: strType == null ? null : parseBarcodeTypeStringFromDb(strType),
+      ),
+      color: red == null || green == null || blue == null
+          ? null
+          : Color.fromARGB(255, red, green, blue),
+      requiresAuth: rawList.getBoolAt(6) ?? false,
+      tags: {},
+      notes: '',
+      frontImagePath: null,
+      backImagePath: null,
+      useFrontImageOverlay: false,
+      hideName: false,
+      points: 0,
+      createdAt: now,
+      lastModifiedAt: now,
+      usePoints: false,
+    );
   }
 
   factory LoyaltyCard.fromJson(String value) {
