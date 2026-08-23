@@ -53,6 +53,9 @@ Future<void> exportDataAsZip(
   Iterable<LoyaltyCard> cards, {
   required Settings settings,
   required String directoryPath,
+  bool includeCards = true,
+  bool includeSettings = true,
+  bool includeImages = true,
 }) async {
   if (!await _requestStoragePermission()) {
     throw NoPermissionToExternalStorageException();
@@ -74,40 +77,46 @@ Future<void> exportDataAsZip(
 
   final archive = Archive();
 
-  // Cards: one folder will contain one file with all cards named cards
-  final serializedCards = cards.serializeToJson();
-  final cardsBytes = utf8.encode(serializedCards);
-  archive.addFile(
-    ArchiveFile('cards/cards', cardsBytes.length, cardsBytes),
-  );
+  if (includeCards) {
+    // Cards: one folder will contain one file with all cards named cards
+    final serializedCards = cards.serializeToJson();
+    final cardsBytes = utf8.encode(serializedCards);
+    archive.addFile(
+      ArchiveFile('cards/cards', cardsBytes.length, cardsBytes),
+    );
+  }
 
-  // Settings: then settings named settings
-  final serializedSettings = jsonEncode(settings.toJsonMap());
-  final settingsBytes = utf8.encode(serializedSettings);
-  archive.addFile(
-    ArchiveFile('settings', settingsBytes.length, settingsBytes),
-  );
+  if (includeSettings) {
+    // Settings: then settings named settings
+    final serializedSettings = jsonEncode(settings.toJsonMap());
+    final settingsBytes = utf8.encode(serializedSettings);
+    archive.addFile(
+      ArchiveFile('settings', settingsBytes.length, settingsBytes),
+    );
+  }
 
-  // Images: then images with their names being the unique IDs...
-  for (final card in cards) {
-    if (card.frontImagePath != null) {
-      final file = File(card.frontImagePath!);
-      if (await file.exists()) {
-        final bytes = await file.readAsBytes();
-        final ext = p.extension(card.frontImagePath!);
-        archive.addFile(
-          ArchiveFile('images/${card.id}-f$ext', bytes.length, bytes),
-        );
+  if (includeImages) {
+    // Images: then images with their names being the unique IDs...
+    for (final card in cards) {
+      if (card.frontImagePath != null) {
+        final file = File(card.frontImagePath!);
+        if (await file.exists()) {
+          final bytes = await file.readAsBytes();
+          final ext = p.extension(card.frontImagePath!);
+          archive.addFile(
+            ArchiveFile('images/${card.id}-f$ext', bytes.length, bytes),
+          );
+        }
       }
-    }
-    if (card.backImagePath != null) {
-      final file = File(card.backImagePath!);
-      if (await file.exists()) {
-        final bytes = await file.readAsBytes();
-        final ext = p.extension(card.backImagePath!);
-        archive.addFile(
-          ArchiveFile('images/${card.id}-b$ext', bytes.length, bytes),
-        );
+      if (card.backImagePath != null) {
+        final file = File(card.backImagePath!);
+        if (await file.exists()) {
+          final bytes = await file.readAsBytes();
+          final ext = p.extension(card.backImagePath!);
+          archive.addFile(
+            ArchiveFile('images/${card.id}-b$ext', bytes.length, bytes),
+          );
+        }
       }
     }
   }

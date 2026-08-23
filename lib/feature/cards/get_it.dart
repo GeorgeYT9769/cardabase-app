@@ -47,6 +47,14 @@ extension GetItExtensions on GetIt {
               print('registerCards: background migration failed: $e\n$s');
             }
           });
+        } else {
+          // Even if not empty, we might need to fix data for users who
+          // already have the new box but are upgrading to a version with
+          // usePoints or other data fixes.
+          Future(() async {
+            await _fixDuplicationBugData(newCardsBox);
+            await _fixUsePointsData(newCardsBox);
+          });
         }
 
         return newCardsBox;
