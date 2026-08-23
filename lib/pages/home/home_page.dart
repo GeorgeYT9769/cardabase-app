@@ -190,9 +190,32 @@ class _HomePageState extends State<Homepage> {
             ),
           slivers: [
             SliverAppBar(
-              leading: IconButton(
-                icon: Icon(Icons.sort, color: theme.colorScheme.secondary),
-                onPressed: showCardListViewOptionsDialog,
+              leadingWidth: 100,
+              leading: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.sort, color: theme.colorScheme.secondary),
+                    onPressed: showCardListViewOptionsDialog,
+                  ),
+                  if (cardsBox.isNotEmpty)
+                    TapRegion(
+                      groupId: 'search_bar',
+                      child: IconButton(
+                        icon: Icon(
+                          isSearchVisible.value ? Icons.search_off : Icons.search,
+                          color: theme.colorScheme.secondary,
+                        ),
+                        onPressed: () {
+                          isSearchVisible.value = !isSearchVisible.value;
+                          if (!isSearchVisible.value) {
+                            searchQuery.value = '';
+                            searchController.clear();
+                          }
+                        },
+                      ),
+                    ),
+                ],
               ),
               actions: [
                 IconButton(
@@ -203,23 +226,9 @@ class _HomePageState extends State<Homepage> {
                   onPressed: navigateToSettingsScreen,
                 ),
               ],
-              title: TapRegion(
-                groupId: 'search_bar',
-                child: TextButton(
-                  onPressed: cardsBox.isEmpty
-                      ? null
-                      : () {
-                          isSearchVisible.value = !isSearchVisible.value;
-                          if (!isSearchVisible.value) {
-                            searchQuery.value = '';
-                            searchController.clear();
-                          }
-                        },
-                  child: Text(
-                    'Cardabase',
-                    style: theme.textTheme.titleLarge?.copyWith(),
-                  ),
-                ),
+              title: Text(
+                'Cardabase',
+                style: theme.textTheme.titleLarge?.copyWith(),
               ),
               centerTitle: true,
               elevation: 0.0,

@@ -214,7 +214,7 @@ class LoyaltyCard {
           hideName: false,
           createdAt: now,
           lastModifiedAt: now,
-          usePoints: cardMap.containsKey('pointsAmount'),
+          usePoints: points != 0 || cardMap.containsKey('pointsAmount'),
         );
       }
     }
@@ -295,7 +295,8 @@ class LoyaltyCard {
       createdAt: now,
       lastModifiedAt: now,
       usePoints: jsonMap.getBool('usePoints') ??
-          (jsonMap.containsKey('points') ||
+          (points != 0 ||
+              jsonMap.containsKey('points') ||
               jsonMap.containsKey('pointsAmount')),
     );
   }

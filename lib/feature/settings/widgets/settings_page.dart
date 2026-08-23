@@ -1,7 +1,5 @@
 import 'package:cardabase/feature/authentication/widgets/require_password_dialog.dart';
-import 'package:cardabase/feature/cards/import_export/export_cards.dart';
-import 'package:cardabase/feature/cards/import_export/widgets/export_dialog.dart';
-import 'package:cardabase/feature/cards/import_export/widgets/import_dialog.dart';
+import 'package:cardabase/feature/cards/import_export/import_export_page.dart';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
@@ -22,6 +20,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../cards/import_export/export_cards.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -184,10 +184,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 _effectsButton(theme),
                 _passwordButton(theme),
                 _tagsButton(theme),
-                _importCardsButton(theme),
-                _exportCardsButton(theme),
-                //_cloudBackupSettingsButton(theme),
-                _autoBackupSettingsButton(theme),
+                _backupRestoreButton(theme),
                 const SizedBox(height: 10),
                 _subtitle(
                   theme,
@@ -205,7 +202,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 _tosButton(theme),
                 _keepAndroidOpen(theme),
                 _discordLink(theme),
-                _supportLink(theme),
+                _kofiLink(theme),
+                _buymeacoffeeLink(theme),
                 _githubLink(theme),
                 _fdroidLink(theme),
                 _websiteLink(theme),
@@ -419,70 +417,30 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _importCardsButton(ThemeData theme) {
+  Widget _backupRestoreButton(ThemeData theme) {
     return SettingTile(
-      aboutSettingHeader: 'Load all your cards from the export',
-      settingAction: () async {
-        final imported = await showImportCardsDialog(context);
-        if (!mounted || imported != true) {
-          return;
-        }
-        setState(() => didImport = true);
-        Navigator.of(context).pop(true);
-      },
-      settingHeader: 'Import Cardabase',
-      settingIcon: Icons.save_alt,
-      iconColor: theme.colorScheme.tertiary,
-      borderColor: theme.colorScheme.primary,
-      showMore: true,
-    );
-  }
-
-  Widget _exportCardsButton(ThemeData theme) {
-    return SettingTile(
-      aboutSettingHeader: 'Backup all your cards into one file',
+      aboutSettingHeader: 'Import or Export your cards and settings',
       settingAction: () async {
         final success = await requirePassword(context);
         if (!mounted || !success) {
           return;
         }
-        await showExportCardsDialog(context);
+        final result = await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const ImportExportPage()),
+        );
+        if (result == true) {
+          setState(() => didImport = true);
+          if (mounted) {
+            Navigator.of(context).pop(true);
+          }
+        }
       },
-      settingHeader: 'Export Cardabase',
-      settingIcon: Icons.upload,
+      settingHeader: 'Import & Export',
+      settingIcon: Icons.import_export,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,
       showMore: true,
-    );
-  }
-
-  //for later use
-  Widget _cloudBackupSettingsButton(ThemeData theme) {
-    return SettingTile(
-      aboutSettingHeader: 'Backup your cards into self-hosted cloud storage',
-      settingAction: () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const CloudBackup()),
-      ),
-      settingHeader: 'Cloud Backup',
-      iconColor: Theme.of(context).colorScheme.tertiary,
-      settingIcon: Icons.cloud,
-      borderColor: Theme.of(context).colorScheme.primary,
-    );
-  }
-
-  Widget _autoBackupSettingsButton(ThemeData theme) {
-    return ValueListenableBuilder(
-      valueListenable: _settings.autoBackups.isEnabled,
-      builder: (context, isEnabled, _) => SettingTile(
-        aboutSettingHeader: 'Do backups automatically on app start',
-        settingAction: showAutoUpdateDialog,
-        settingHeader: 'AUTO Backups',
-        iconColor: isEnabled ? Colors.green : Colors.red,
-        settingIcon: Icons.upload,
-        borderColor: theme.colorScheme.primary,
-        showMore: true,
-      ),
     );
   }
 
@@ -578,16 +536,29 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _supportLink(ThemeData theme) {
+  Widget _kofiLink(ThemeData theme) {
     return SettingTile(
       aboutSettingHeader: 'Support Cardabase development using ko-fi.com',
       settingAction: () => _launchUrl(
         Uri.parse('https://ko-fi.com/georgeyt9769'),
       ),
-      settingHeader: 'Support Cardabase',
+      settingHeader: 'Ko-fi',
       settingIcon: Icons.monetization_on,
-      iconColor: theme.colorScheme.tertiary,
-      borderColor: theme.colorScheme.primary,
+      iconColor: Color(0xffe8c767),
+      borderColor: Color(0xffe8c767),
+    );
+  }
+
+  Widget _buymeacoffeeLink(ThemeData theme) {
+    return SettingTile(
+      aboutSettingHeader: 'Support Cardabase development using buymeacoffee.com',
+      settingAction: () => _launchUrl(
+        Uri.parse('https://www.buymeacoffee.com/georgeyt9769'),
+      ),
+      settingHeader: 'Buy Me a Coffee',
+      settingIcon: Icons.monetization_on,
+      iconColor: Color(0xffe8ca04),
+      borderColor: Color(0xffe8ca04),
     );
   }
 
