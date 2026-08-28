@@ -40,6 +40,7 @@ Future<void> migrateSettingsTo202603(
             ? null
             : DateTime.tryParse(lastAutoUpdate)?.toUtc(),
         interval: Duration(days: oldBox.get('autoBackupInterval') as int? ?? 7),
+        format: BackupFormat.json,
       ),
       theme: ThemeSettings(
         useDarkMode: oldBox.get('useDarkMode') as bool? ?? false,
@@ -67,6 +68,7 @@ Future<void> migrateSettingsTo202603(
         customOrder: _buildCustomOrder(cardsBox),
       ),
       customExportPath: Settings.defaultCardExportDirectoryPath,
+      format: BackupFormat.json,
     ),
   );
 }

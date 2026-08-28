@@ -43,13 +43,19 @@ class _ImportExportPageState extends State<ImportExportPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(_handleTabSelection);
     exportDirectoryPath.text = settingsBox.value.customExportPath;
     _autoBackupSettings =
         EditableAutoBackupSettings.fromValue(settingsBox.value.autoBackups);
   }
 
+  void _handleTabSelection() {
+    setState(() {});
+  }
+
   @override
   void dispose() {
+    _tabController.removeListener(_handleTabSelection);
     _tabController.dispose();
     importTextController.dispose();
     exportDirectoryPath.dispose();
@@ -204,15 +210,15 @@ class _ImportExportPageState extends State<ImportExportPage>
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             CdbAppBarSliver(
-              title: 'Import & Export',
+              title:  _tabController.index == 0 ? 'Backup' : 'Restore',
               onBackPressed: () => Navigator.of(context).pop(),
             ),
             SliverToBoxAdapter(
               child: TabBar(
                 controller: _tabController,
                 tabs: const [
-                  Tab(text: 'IMPORT', icon: Icon(Icons.download)),
-                  Tab(text: 'EXPORT', icon: Icon(Icons.upload)),
+                  Tab(icon: Icon(Icons.upload)),
+                  Tab(icon: Icon(Icons.download)),
                 ],
                 labelColor: theme.colorScheme.primary,
                 unselectedLabelColor: theme.colorScheme.tertiary,
@@ -224,8 +230,8 @@ class _ImportExportPageState extends State<ImportExportPage>
         body: TabBarView(
           controller: _tabController,
           children: [
-            _importTab(theme),
             _exportTab(theme),
+            _importTab(theme),
           ],
         ),
       ),
@@ -288,7 +294,7 @@ class _ImportExportPageState extends State<ImportExportPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _sectionTitle(theme, 'What to include:'),
+          _sectionTitle(theme, 'What to include in the CDB file:'),
           CheckboxListTile(
             title: const Text('Cards Data'),
             value: includeCards,
@@ -402,6 +408,12 @@ class _ImportExportPageState extends State<ImportExportPage>
           if (isEnabled) ...[
             const SizedBox(height: 10),
             ValueListenableBuilder(
+              valueListenable: _autoBackupSettings.format,
+              builder: (context, format, _) =>
+                  _animatedSegmentedButton(theme, format),
+            ),
+            const SizedBox(height: 10),
+            ValueListenableBuilder(
               valueListenable: _autoBackupSettings.interval,
               builder: (context, interval, _) => Column(
                 children: [
@@ -424,6 +436,115 @@ class _ImportExportPageState extends State<ImportExportPage>
               ),
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _animatedSegmentedButton(ThemeData theme, BackupFormat currentFormat) {
+    return Container(
+      width: double.infinity,
+      height: 48,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Stack(
+        children: [
+          AnimatedAlign(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeInOutCubic,
+            alignment: currentFormat == BackupFormat.json
+                ? Alignment.centerLeft
+                : Alignment.centerRight,
+            child: FractionallySizedBox(
+              widthFactor: 0.5,
+              child: Container(
+                margin: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    _autoBackupSettings.format.value = BackupFormat.json;
+                    saveAutoBackupSettings();
+                  },
+                  behavior: HitTestBehavior.opaque,
+                  child: Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.file_copy,
+                          size: 18,
+                          color: currentFormat == BackupFormat.json
+                              ? theme.colorScheme.onPrimary
+                              : theme.colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'JSON',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: currentFormat == BackupFormat.json
+                                ? theme.colorScheme.onPrimary
+                                : theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    _autoBackupSettings.format.value = BackupFormat.cdb;
+                    saveAutoBackupSettings();
+                  },
+                  behavior: HitTestBehavior.opaque,
+                  child: Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.folder_zip,
+                          size: 18,
+                          color: currentFormat == BackupFormat.cdb
+                              ? theme.colorScheme.onPrimary
+                              : theme.colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'CDB',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: currentFormat == BackupFormat.cdb
+                                ? theme.colorScheme.onPrimary
+                                : theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );

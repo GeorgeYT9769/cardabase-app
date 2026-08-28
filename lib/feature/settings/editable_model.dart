@@ -68,6 +68,7 @@ class EditableSettings {
       tags: tags.value,
       cardListViewOptions: cardListViewOptions.seal(),
       customExportPath: customExportPath.value,
+      format: BackupFormat.json,
     );
   }
 
@@ -89,6 +90,7 @@ class EditableAutoBackupSettings {
     required this.isEnabled,
     required this.lastUpdate,
     required this.interval,
+    required this.format,
   });
 
   factory EditableAutoBackupSettings.fromValue(AutoBackupSettings value) {
@@ -96,17 +98,20 @@ class EditableAutoBackupSettings {
       isEnabled: ValueNotifier(value.isEnabled),
       lastUpdate: ValueNotifier(value.lastUpdate),
       interval: ValueNotifier(value.interval),
+      format: ValueNotifier(value.format),
     );
   }
 
   final ValueNotifier<bool> isEnabled;
   final ValueNotifier<DateTime?> lastUpdate;
   final ValueNotifier<Duration> interval;
+  final ValueNotifier<BackupFormat> format;
 
   void loadValue(AutoBackupSettings value) {
     isEnabled.value = value.isEnabled;
     lastUpdate.value = value.lastUpdate;
     interval.value = value.interval;
+    format.value = value.format;
   }
 
   AutoBackupSettings seal() {
@@ -114,6 +119,7 @@ class EditableAutoBackupSettings {
       isEnabled: isEnabled.value,
       lastUpdate: lastUpdate.value,
       interval: interval.value,
+      format: format.value,
     );
   }
 
@@ -121,6 +127,7 @@ class EditableAutoBackupSettings {
     isEnabled.dispose();
     lastUpdate.dispose();
     interval.dispose();
+    format.dispose();
   }
 }
 

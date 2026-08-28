@@ -22,10 +22,21 @@ Future<void> autoUpdateAfterInterval(
     return;
   }
 
-  await exportCardsAsFile(
-    cardsBox.values,
-    directoryPath: settings.customExportPath,
-  );
+  if (backupSettings.format == BackupFormat.cdb) {
+    await exportDataAsZip(
+      cardsBox.values,
+      settings: settings,
+      directoryPath: settings.customExportPath,
+      includeCards: true,
+      includeSettings: true,
+      includeImages: true,
+    );
+  } else {
+    await exportCardsAsFile(
+      cardsBox.values,
+      directoryPath: settings.customExportPath,
+    );
+  }
 
   final editableSettings = settings.editable();
   editableSettings.autoBackups.lastUpdate.value = DateTime.now().toUtc();

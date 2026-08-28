@@ -11,4 +11,5 @@ class HiveTypeIds {
   static const int barcode = 9;
   static const int color = 10;
   static const int barcodeType = 11;
+  static const int backupFormat = 12;
 }

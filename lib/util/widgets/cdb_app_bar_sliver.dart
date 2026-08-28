@@ -60,6 +60,7 @@ class _CdbAppBarSliverState extends State<CdbAppBarSliver> {
           centerTitle: true,
           elevation: 0.0,
           backgroundColor: theme.colorScheme.surface,
+          floating: true,
         );
       },
     );

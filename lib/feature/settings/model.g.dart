@@ -27,13 +27,14 @@ class SettingsAdapter extends TypeAdapter<Settings> {
       cardListViewOptions: fields[7] as CardListViewOptions,
       customExportPath:
           fields[8] == null ? 'Download/Cardabase' : fields[8] as String,
+      format: fields[9] == null ? BackupFormat.json : fields[9] as BackupFormat,
     );
   }
 
   @override
   void write(BinaryWriter writer, Settings obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.lastSeenAppVersion)
       ..writeByte(1)
@@ -51,7 +52,9 @@ class SettingsAdapter extends TypeAdapter<Settings> {
       ..writeByte(7)
       ..write(obj.cardListViewOptions)
       ..writeByte(8)
-      ..write(obj.customExportPath);
+      ..write(obj.customExportPath)
+      ..writeByte(9)
+      ..write(obj.format);
   }
 
   @override
@@ -80,19 +83,22 @@ class AutoBackupSettingsAdapter extends TypeAdapter<AutoBackupSettings> {
       lastUpdate: fields[1] as DateTime?,
       interval:
           fields[2] == null ? const Duration(days: 7) : fields[2] as Duration,
+      format: fields[3] == null ? BackupFormat.json : fields[3] as BackupFormat,
     );
   }
 
   @override
   void write(BinaryWriter writer, AutoBackupSettings obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.isEnabled)
       ..writeByte(1)
       ..write(obj.lastUpdate)
       ..writeByte(2)
-      ..write(obj.interval);
+      ..write(obj.interval)
+      ..writeByte(3)
+      ..write(obj.format);
   }
 
   @override
@@ -222,6 +228,43 @@ class DeveloperOptionsAdapter extends TypeAdapter<DeveloperOptions> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is DeveloperOptionsAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class BackupFormatAdapter extends TypeAdapter<BackupFormat> {
+  @override
+  final typeId = 12;
+
+  @override
+  BackupFormat read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return BackupFormat.json;
+      case 1:
+        return BackupFormat.cdb;
+      default:
+        return BackupFormat.json;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, BackupFormat obj) {
+    switch (obj) {
+      case BackupFormat.json:
+        writer.writeByte(0);
+      case BackupFormat.cdb:
+        writer.writeByte(1);
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BackupFormatAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

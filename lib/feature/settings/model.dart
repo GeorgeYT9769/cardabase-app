@@ -19,6 +19,7 @@ class Settings {
     required this.tags,
     required this.cardListViewOptions,
     required this.customExportPath,
+    required this.format,
   });
 
   const Settings.defaultValue()
@@ -31,6 +32,7 @@ class Settings {
           vibrateOnDifferentActions: true,
           tags: const [],
           cardListViewOptions: const CardListViewOptions.defaultValue(),
+          format: BackupFormat.json,
           customExportPath: defaultCardExportDirectoryPath,
         );
 
@@ -54,6 +56,8 @@ class Settings {
   final CardListViewOptions cardListViewOptions;
   @HiveField(8, defaultValue: defaultCardExportDirectoryPath)
   final String customExportPath;
+  @HiveField(9, defaultValue: BackupFormat.json)
+  final BackupFormat format;
 
   Map<String, dynamic> toJsonMap() {
     return {
@@ -66,6 +70,7 @@ class Settings {
       'tags': tags,
       'cardListViewOptions': cardListViewOptions.toJsonMap(),
       'customExportPath': customExportPath,
+      'format': format.name,
     };
   }
 
@@ -74,6 +79,10 @@ class Settings {
   factory Settings.fromJsonMap(Map<String, dynamic> map) {
     return Settings(
       lastSeenAppVersion: map['lastSeenAppVersion'] as String?,
+      format: BackupFormat.values.firstWhere(
+        (e) => e.name == map['format'],
+        orElse: () => BackupFormat.json,
+      ),
       autoBackups: map['autoBackups'] != null
           ? AutoBackupSettings.fromJsonMap(map['autoBackups'] as Map<String, dynamic>)
           : const AutoBackupSettings.defaultValue(),
@@ -100,6 +109,7 @@ class AutoBackupSettings {
     required this.isEnabled,
     required this.lastUpdate,
     required this.interval,
+    required this.format,
   });
 
   const AutoBackupSettings.defaultValue()
@@ -107,6 +117,7 @@ class AutoBackupSettings {
           isEnabled: false,
           lastUpdate: null,
           interval: const Duration(days: 7),
+          format: BackupFormat.json,
         );
 
   @HiveField(0, defaultValue: false)
@@ -115,12 +126,15 @@ class AutoBackupSettings {
   final DateTime? lastUpdate;
   @HiveField(2, defaultValue: Duration(days: 7))
   final Duration interval;
+  @HiveField(3, defaultValue: BackupFormat.json)
+  final BackupFormat format;
 
   Map<String, dynamic> toJsonMap() {
     return {
       'isEnabled': isEnabled,
       if (lastUpdate != null) 'lastUpdate': lastUpdate?.toIso8601String(),
       'interval': interval.inMilliseconds,
+      'format': format.name,
     };
   }
 
@@ -129,12 +143,24 @@ class AutoBackupSettings {
       isEnabled: map['isEnabled'] as bool? ?? false,
       lastUpdate: map['lastUpdate'] != null ? DateTime.parse(map['lastUpdate'] as String) : null,
       interval: Duration(milliseconds: map['interval'] as int? ?? const Duration(days: 7).inMilliseconds),
+      format: BackupFormat.values.firstWhere(
+        (e) => e.name == map['format'],
+        orElse: () => BackupFormat.json,
+      ),
     );
   }
 
   EditableAutoBackupSettings editable() {
     return EditableAutoBackupSettings.fromValue(this);
   }
+}
+
+@HiveType(typeId: HiveTypeIds.backupFormat)
+enum BackupFormat {
+  @HiveField(0)
+  json,
+  @HiveField(1)
+  cdb
 }
 
 @HiveType(typeId: HiveTypeIds.themeSettings)

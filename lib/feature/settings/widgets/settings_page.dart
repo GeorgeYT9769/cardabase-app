@@ -419,7 +419,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget _backupRestoreButton(ThemeData theme) {
     return SettingTile(
-      aboutSettingHeader: 'Import or Export your cards and settings',
+      aboutSettingHeader: 'Backup or restore your cards and settings',
       settingAction: () async {
         final success = await requirePassword(context);
         if (!mounted || !success) {
@@ -436,7 +436,7 @@ class _SettingsPageState extends State<SettingsPage> {
           }
         }
       },
-      settingHeader: 'Import & Export',
+      settingHeader: 'Backup/Restore',
       settingIcon: Icons.import_export,
       iconColor: theme.colorScheme.tertiary,
       borderColor: theme.colorScheme.primary,

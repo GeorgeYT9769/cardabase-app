@@ -10,6 +10,7 @@ import 'package:cardabase/feature/settings/model.dart';
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
     registerAdapter(AutoBackupSettingsAdapter());
+    registerAdapter(BackupFormatAdapter());
     registerAdapter(BarcodeAdapter());
     registerAdapter(CardListViewOptionsAdapter());
     registerAdapter(DeveloperOptionsAdapter());
@@ -25,6 +26,7 @@ extension HiveRegistrar on HiveInterface {
 extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
     registerAdapter(AutoBackupSettingsAdapter());
+    registerAdapter(BackupFormatAdapter());
     registerAdapter(BarcodeAdapter());
     registerAdapter(CardListViewOptionsAdapter());
     registerAdapter(DeveloperOptionsAdapter());
