@@ -35,6 +35,9 @@ MockClipboardPlatform createMockClipboardPlatform(
     },
   );
 
+  addTearDown(() {
+    messenger.setMockMethodCallHandler(SystemChannels.platform, null);
+  });
   when(() => mock.setData(any())).thenAnswer((i) {
     mock.clipboardText =
         (i.positionalArguments.first as Map)['text'] as String?;
@@ -51,8 +54,8 @@ MockClipboardPlatform createMockClipboardPlatform(
 
 extension ClipboardGetItExtensions on GetIt {
   void registerMockClipboard() {
-    GetIt.I.registerLazySingleton(() {
-      return createMockClipboardPlatform(GetIt.I<TestDefaultBinaryMessenger>());
+    registerLazySingleton(() {
+      return createMockClipboardPlatform(get<TestDefaultBinaryMessenger>());
     });
   }
 }
