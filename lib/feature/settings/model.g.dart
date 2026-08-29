@@ -27,7 +27,6 @@ class SettingsAdapter extends TypeAdapter<Settings> {
       cardListViewOptions: fields[7] as CardListViewOptions,
       customExportPath:
           fields[8] == null ? 'Download/Cardabase' : fields[8] as String,
-      format: fields[9] == null ? BackupFormat.json : fields[9] as BackupFormat,
     );
   }
 

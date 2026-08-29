@@ -19,7 +19,6 @@ class Settings {
     required this.tags,
     required this.cardListViewOptions,
     required this.customExportPath,
-    required this.format,
   });
 
   const Settings.defaultValue()
@@ -32,7 +31,6 @@ class Settings {
           vibrateOnDifferentActions: true,
           tags: const [],
           cardListViewOptions: const CardListViewOptions.defaultValue(),
-          format: BackupFormat.json,
           customExportPath: defaultCardExportDirectoryPath,
         );
 
@@ -56,8 +54,11 @@ class Settings {
   final CardListViewOptions cardListViewOptions;
   @HiveField(8, defaultValue: defaultCardExportDirectoryPath)
   final String customExportPath;
+
   @HiveField(9, defaultValue: BackupFormat.json)
-  final BackupFormat format;
+  @Deprecated(
+      'format was unused and now only exists as a placeholder for backwards compatibility of the hive box. The actual format of backups is stored under autoBackups')
+  final BackupFormat format = BackupFormat.json;
 
   Map<String, dynamic> toJsonMap() {
     return {
@@ -70,7 +71,6 @@ class Settings {
       'tags': tags,
       'cardListViewOptions': cardListViewOptions.toJsonMap(),
       'customExportPath': customExportPath,
-      'format': format.name,
     };
   }
 
@@ -79,26 +79,27 @@ class Settings {
   factory Settings.fromJsonMap(Map<String, dynamic> map) {
     return Settings(
       lastSeenAppVersion: map['lastSeenAppVersion'] as String?,
-      format: BackupFormat.values.firstWhere(
-        (e) => e.name == map['format'],
-        orElse: () => BackupFormat.json,
-      ),
       autoBackups: map['autoBackups'] != null
-          ? AutoBackupSettings.fromJsonMap(map['autoBackups'] as Map<String, dynamic>)
+          ? AutoBackupSettings.fromJsonMap(
+              map['autoBackups'] as Map<String, dynamic>)
           : const AutoBackupSettings.defaultValue(),
       theme: map['theme'] != null
           ? ThemeSettings.fromJsonMap(map['theme'] as Map<String, dynamic>)
           : const ThemeSettings.defaultValue(),
       developerOptions: map['developerOptions'] != null
-          ? DeveloperOptions.fromJsonMap(map['developerOptions'] as Map<String, dynamic>)
+          ? DeveloperOptions.fromJsonMap(
+              map['developerOptions'] as Map<String, dynamic>)
           : const DeveloperOptions.defaultValue(),
       useAutoBrightness: map['useAutoBrightness'] as bool? ?? true,
-      vibrateOnDifferentActions: map['vibrateOnDifferentActions'] as bool? ?? true,
+      vibrateOnDifferentActions:
+          map['vibrateOnDifferentActions'] as bool? ?? true,
       tags: (map['tags'] as List?)?.cast<String>() ?? const [],
       cardListViewOptions: map['cardListViewOptions'] != null
-          ? CardListViewOptions.fromJsonMap(map['cardListViewOptions'] as Map<String, dynamic>)
+          ? CardListViewOptions.fromJsonMap(
+              map['cardListViewOptions'] as Map<String, dynamic>)
           : const CardListViewOptions.defaultValue(),
-      customExportPath: map['customExportPath'] as String? ?? defaultCardExportDirectoryPath,
+      customExportPath:
+          map['customExportPath'] as String? ?? defaultCardExportDirectoryPath,
     );
   }
 }
@@ -141,8 +142,12 @@ class AutoBackupSettings {
   factory AutoBackupSettings.fromJsonMap(Map<String, dynamic> map) {
     return AutoBackupSettings(
       isEnabled: map['isEnabled'] as bool? ?? false,
-      lastUpdate: map['lastUpdate'] != null ? DateTime.parse(map['lastUpdate'] as String) : null,
-      interval: Duration(milliseconds: map['interval'] as int? ?? const Duration(days: 7).inMilliseconds),
+      lastUpdate: map['lastUpdate'] != null
+          ? DateTime.parse(map['lastUpdate'] as String)
+          : null,
+      interval: Duration(
+          milliseconds: map['interval'] as int? ??
+              const Duration(days: 7).inMilliseconds),
       format: BackupFormat.values.firstWhere(
         (e) => e.name == map['format'],
         orElse: () => BackupFormat.json,
@@ -193,7 +198,6 @@ class ThemeSettings {
   @HiveField(4, defaultValue: false)
   final bool rightBackButton;
 
-
   Map<String, dynamic> toJsonMap() {
     return {
       'useDarkMode': useDarkMode,
@@ -210,7 +214,8 @@ class ThemeSettings {
       useExtraDark: map['useExtraDark'] as bool? ?? false,
       useSystemFont: map['useSystemFont'] as bool? ?? false,
       loyaltyCardEffect: map['loyaltyCardEffect'] != null
-          ? LoyaltyCardEffectSettings.fromJsonMap(map['loyaltyCardEffect'] as Map<String, dynamic>)
+          ? LoyaltyCardEffectSettings.fromJsonMap(
+              map['loyaltyCardEffect'] as Map<String, dynamic>)
           : const LoyaltyCardEffectSettings.defaultValue(),
       rightBackButton: map['rightBackButton'] as bool? ?? false,
     );
