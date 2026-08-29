@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../test_helpers/input_output_test_case.dart';
+import '../../../test_helpers/input_output_test_case.dart';
 
 void main() {
   group('fromLegacySharing', () {

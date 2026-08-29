@@ -44,7 +44,6 @@ class EditableSettings {
   final EditableCardListViewOptions cardListViewOptions;
   final ValueNotifier<String> customExportPath;
 
-
   void loadValue(Settings value) {
     lastSeenAppVersion.value = value.lastSeenAppVersion;
     autoBackups.loadValue(value.autoBackups);
@@ -68,7 +67,6 @@ class EditableSettings {
       tags: tags.value,
       cardListViewOptions: cardListViewOptions.seal(),
       customExportPath: customExportPath.value,
-      format: BackupFormat.json,
     );
   }
 
@@ -157,7 +155,6 @@ class EditableThemeSettings {
   final ValueNotifier<bool> useSystemFont;
   final EditableLoyaltyCardEffectSettings loyaltyCardEffect;
   final ValueNotifier<bool> rightBackButton;
-
 
   void loadValue(ThemeSettings value) {
     useDarkMode.value = value.useDarkMode;
