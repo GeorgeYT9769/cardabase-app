@@ -1,6 +1,4 @@
 import 'package:cardabase/feature/cards/barcode_type_type_adapter.dart';
-import 'package:cardabase/feature/cards/legacy_loyalty_card_adapter.dart';
-import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/hive_registrar.g.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:get_it/get_it.dart';
@@ -15,12 +13,6 @@ extension GetItExtensions on GetIt {
       await Hive.initFlutter();
       Hive.registerAdapter(const BarcodeTypeAdapter());
       Hive.registerAdapters();
-      // Replaces the generated adapter so records written by older versions
-      // (missing fields) can still be read instead of failing the box open.
-      Hive.registerAdapter<LoyaltyCard>(
-        LegacyLoyaltyCardAdapter(),
-        override: true,
-      );
       // ignore: avoid_print
       print('registerHive: Hive initialized');
       return Hive;
