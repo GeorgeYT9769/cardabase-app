@@ -9,17 +9,25 @@ class CardFace extends StatelessWidget {
     required this.fullScreenBuilder,
     required this.child,
     required this.showWhiteOutline,
+    this.showLeftTriangle = false,
+    this.showRightTriangle = false,
   });
 
   factory CardFace.barcode({
+    Key? key,
     required Color? cardTileColor,
     required String cardData,
     required BarcodeType barcodeType,
     required bool showWhiteOutline,
+    bool showLeftTriangle = false,
+    bool showRightTriangle = false,
   }) {
     return CardFace(
+      key: key,
       cardTileColor: cardTileColor,
       showWhiteOutline: showWhiteOutline,
+      showLeftTriangle: showLeftTriangle,
+      showRightTriangle: showRightTriangle,
       fullScreenBuilder: (context) => FullScreenCardFacePage.barcode(
         cardData: cardData,
         barcodeType: barcodeType,
@@ -29,29 +37,46 @@ class CardFace extends StatelessWidget {
         data: cardData,
         barcode: Barcode.fromType(barcodeType),
         style: const TextStyle(color: Colors.black),
-        errorBuilder: (context, error) => Center(
-          child: Text(
-            'Invalid barcode data',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red,
-                ),
-            textAlign: TextAlign.center,
-          ),
+        errorBuilder: (context, error) => Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.qr_code_2,
+              size: 48,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(height: 4),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                cardData,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
   factory CardFace.image({
+    Key? key,
     required Color? cardTileColor,
     required ImageProvider image,
     required bool showWhiteOutline,
+    bool showLeftTriangle = false,
+    bool showRightTriangle = false,
   }) {
     return CardFace(
+      key: key,
       cardTileColor: cardTileColor,
       showWhiteOutline: showWhiteOutline,
+      showLeftTriangle: showLeftTriangle,
+      showRightTriangle: showRightTriangle,
       fullScreenBuilder: (context) => FullScreenCardFacePage.image(
         image: image,
       ),
@@ -71,35 +96,96 @@ class CardFace extends StatelessWidget {
   final WidgetBuilder fullScreenBuilder;
   final Widget child;
   final bool showWhiteOutline;
+  final bool showLeftTriangle;
+  final bool showRightTriangle;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(builder: fullScreenBuilder),
       ),
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        margin: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-        decoration: BoxDecoration(
-          color: cardTileColor,
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: showWhiteOutline
-            ? Container(
-                height: 120,
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.0),
-                  color: Colors.white,
+      child: Stack(
+        alignment: Alignment.center,
+        fit: StackFit.expand,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            margin: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+            decoration: BoxDecoration(
+              color: cardTileColor,
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: showWhiteOutline
+                ? Container(
+                    height: 120,
+                    padding: const EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: Colors.white,
+                    ),
+                    child: child,
+                  )
+                : child,
+          ),
+          if (showLeftTriangle)
+            Positioned(
+              left: 5,
+              child: CustomPaint(
+                size: const Size(8, 12),
+                painter: _TrianglePainter(
+                  color: theme.colorScheme.onSurface.withOpacity(0.3),
+                  isLeft: true,
                 ),
-                child: child,
-              )
-            : child,
+              ),
+            ),
+          if (showRightTriangle)
+            Positioned(
+              right: 5,
+              child: CustomPaint(
+                size: const Size(8, 12),
+                painter: _TrianglePainter(
+                  color: theme.colorScheme.onSurface.withOpacity(0.3),
+                  isLeft: false,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
+}
+
+class _TrianglePainter extends CustomPainter {
+  final Color color;
+  final bool isLeft;
+
+  _TrianglePainter({required this.color, required this.isLeft});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    if (isLeft) {
+      path.moveTo(size.width, 0);
+      path.lineTo(0, size.height / 2);
+      path.lineTo(size.width, size.height);
+    } else {
+      path.moveTo(0, 0);
+      path.lineTo(size.width, size.height / 2);
+      path.lineTo(0, size.height);
+    }
+    path.close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 BarcodeType parseBarcodeType(String cardType) {
