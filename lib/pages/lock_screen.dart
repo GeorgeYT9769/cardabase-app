@@ -203,12 +203,6 @@ class _LockScreenState extends State<LockScreen> {
                     child: OutlinedButton(
                       onPressed: _unlock,
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(
-                          color: theme.colorScheme.primary,
-                          width: 2,
-                        ),
-                        backgroundColor: Colors.transparent,
-                        elevation: 0.0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),

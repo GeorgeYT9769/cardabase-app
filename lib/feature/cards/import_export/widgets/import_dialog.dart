@@ -4,6 +4,7 @@ import 'package:cardabase/feature/cards/import_export/import_cards.dart';
 import 'package:cardabase/feature/cards/import_export/widgets/io_dialog_button.dart';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/settings/model.dart';
+import 'package:cardabase/theme/theme.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:file_picker/file_picker.dart';
@@ -126,11 +127,7 @@ class _ImportDialogState extends State<ImportDialog> {
 
     return AlertDialog(
       scrollable: true,
-      title: Text(
-        'Import:',
-        style: theme.textTheme.bodyLarge
-            ?.copyWith(color: theme.colorScheme.inverseSurface, fontSize: 30),
-      ),
+      title: const Text('Import:'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -145,8 +142,8 @@ class _ImportDialogState extends State<ImportDialog> {
         ],
       ),
       actions: [
-         _cancelButton(theme),
-         _importButton(theme),
+         _cancelButton(),
+         _importButton(),
       ],
     );
   }
@@ -156,68 +153,24 @@ class _ImportDialogState extends State<ImportDialog> {
       controller: textController,
       maxLines: 10,
       decoration: InputDecoration(
-        hintStyle: theme.textTheme.bodyLarge?.copyWith(
-          color: theme.colorScheme.inverseSurface,
-          fontSize: 15,
-        ),
         hintText:
             'This action will rewrite existing cards!\n \nPaste your Cardabase here:',
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(width: 2.0),
-        ),
-        focusColor: theme.colorScheme.primary,
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: theme.colorScheme.primary),
-          borderRadius: BorderRadius.circular(10),
-        ),
       ),
-      style: theme.textTheme.bodyLarge?.copyWith(
-        color: theme.colorScheme.tertiary,
-        fontWeight: FontWeight.bold,
-      ),
+      style: theme.inputTextStyle,
     );
   }
 
-  Widget _cancelButton(ThemeData theme) {
+  Widget _cancelButton() {
     return OutlinedButton(
       onPressed: () => Navigator.of(context).pop(),
-      style: OutlinedButton.styleFrom(
-        elevation: 0.0,
-        side: BorderSide(color: theme.colorScheme.primary, width: 2.0),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(11),
-        ),
-      ),
-      child: Text(
-        'Cancel',
-        style: theme.textTheme.bodyLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-          fontSize: 15,
-          color: theme.colorScheme.tertiary,
-        ),
-      ),
+      child: const Text('Cancel'),
     );
   }
 
-  Widget _importButton(ThemeData theme) {
+  Widget _importButton() {
     return OutlinedButton(
       onPressed: onImportClicked,
-      style: OutlinedButton.styleFrom(
-        elevation: 0.0,
-        side: BorderSide(color: theme.colorScheme.primary, width: 2.0),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(11),
-        ),
-      ),
-      child: Text(
-        'Import',
-        style: theme.textTheme.bodyLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-          fontSize: 15,
-          color: theme.colorScheme.tertiary,
-        ),
-      ),
+      child: const Text('Import'),
     );
   }
 }

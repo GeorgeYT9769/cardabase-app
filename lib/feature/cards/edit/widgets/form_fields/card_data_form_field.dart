@@ -1,5 +1,6 @@
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:cardabase/feature/cards/edit/verify_code.dart';
+import 'package:cardabase/theme/theme.dart';
 import 'package:cardabase/util/form_validation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,27 +31,9 @@ class CardDataFormField extends StatelessWidget {
               ),
             ],
       decoration: InputDecoration(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(width: 2.0),
-        ),
-        focusColor: theme.colorScheme.primary,
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: theme.colorScheme.primary,
-          ),
-          borderRadius: BorderRadius.circular(10),
-        ),
         labelText: 'Card ID',
-        labelStyle: theme.textTheme.bodyLarge?.copyWith(
-          color: theme.colorScheme.inverseSurface,
-          fontWeight: FontWeight.bold,
-          fontSize: 17,
-        ),
-        prefixIcon: Icon(
-          Icons.numbers,
-          color: theme.colorScheme.secondary,
-        ),
+        labelStyle: theme.emphasizedInputLabelStyle,
+        prefixIcon: const Icon(Icons.numbers),
         suffixIcon: IconButton(
           icon: Icon(
             Icons.photo_camera_rounded,
@@ -60,10 +43,7 @@ class CardDataFormField extends StatelessWidget {
         ),
       ),
       keyboardType: TextInputType.text,
-      style: theme.textTheme.bodyLarge?.copyWith(
-        color: theme.colorScheme.tertiary,
-        fontWeight: FontWeight.bold,
-      ),
+      style: theme.inputTextStyle,
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:cardabase/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 class ClearCardsDialog extends StatefulWidget {
@@ -21,13 +22,7 @@ class _ClearCardsDialogState extends State<ClearCardsDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return AlertDialog(
-      title: Text(
-        'Are you sure?',
-        style: theme.textTheme.bodyLarge?.copyWith(
-          color: theme.colorScheme.inverseSurface,
-          fontSize: 30,
-        ),
-      ),
+      title: const Text('Are you sure?'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -49,24 +44,8 @@ class _ClearCardsDialogState extends State<ClearCardsDialog> {
   Widget _deleteButton(ThemeData theme) {
     return OutlinedButton(
       onPressed: onDeleteButtonPressed,
-      style: OutlinedButton.styleFrom(
-        elevation: 0.0,
-        side: BorderSide(
-          color: Colors.red,
-          width: 2.0,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(11),
-        ),
-      ),
-      child: Text(
-        'DELETE',
-        style: theme.textTheme.bodyLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-          fontSize: 15,
-          color: Colors.red,
-        ),
-      ),
+      style: theme.destructiveButtonStyle,
+      child: const Text('DELETE'),
     );
   }
 }

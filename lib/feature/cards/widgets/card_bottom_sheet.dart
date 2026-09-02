@@ -5,6 +5,7 @@ import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/cards/platform/set_widget_card.dart';
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
+import 'package:cardabase/theme/theme.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -130,41 +131,14 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
             onPressed: () {
               Navigator.pop(context, false);
             },
-            style: OutlinedButton.styleFrom(
-              elevation: 0.0,
-              side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(11),
-              ),
-            ),
-            child: Text(
-              'Cancel',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-                color: Theme.of(context).colorScheme.tertiary,
-              ),
-            ),
+            child: const Text('Cancel'),
           ),
           OutlinedButton(
             onPressed: () {
               Navigator.pop(context, true);
             },
-            style: OutlinedButton.styleFrom(
-              elevation: 0.0,
-              side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(11),
-              ),
-            ),
-            child: Text(
-              'DELETE',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-                color: Colors.red,
-              ),
-            ),
+            style: Theme.of(context).destructiveButtonStyle,
+            child: const Text('DELETE'),
           ),
         ],
       ),

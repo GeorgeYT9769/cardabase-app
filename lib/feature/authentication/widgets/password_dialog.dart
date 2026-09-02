@@ -72,13 +72,7 @@ class _PasswordDialogState extends State<PasswordDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return AlertDialog(
-      title: Text(
-        'Enter Password',
-        style: theme.textTheme.bodyLarge?.copyWith(
-          color: theme.colorScheme.inverseSurface,
-          fontSize: 30,
-        ),
-      ),
+      title: const Text('Enter Password'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -96,36 +90,19 @@ class _PasswordDialogState extends State<PasswordDialog> {
           ),
           const SizedBox(height: 20),
           Center(
-            child: _exportButton(theme),
+            child: _exportButton(),
           ),
         ],
       ),
     );
   }
 
-  Widget _exportButton(ThemeData theme) {
+  Widget _exportButton() {
     return Bounceable(
       onTap: () {},
       child: OutlinedButton(
         onPressed: onExportPressed,
-        style: OutlinedButton.styleFrom(
-          elevation: 0.0,
-          side: BorderSide(
-            color: theme.colorScheme.primary,
-            width: 2.0,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(11),
-          ),
-        ),
-        child: Text(
-          'AUTHORIZE',
-          style: theme.textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
-            color: theme.colorScheme.inverseSurface,
-          ),
-        ),
+        child: const Text('AUTHORIZE'),
       ),
     );
   }

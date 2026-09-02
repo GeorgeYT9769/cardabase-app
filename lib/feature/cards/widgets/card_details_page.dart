@@ -7,6 +7,7 @@ import 'package:cardabase/feature/cards/widgets/card_face.dart';
 import 'package:cardabase/feature/cards/widgets/share_card_dialog.dart';
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
+import 'package:cardabase/theme/theme.dart';
 import 'package:cardabase/util/color_extensions.dart';
 import 'package:cardabase/util/widgets/cdb_app_bar_sliver.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
@@ -213,51 +214,11 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                                 true,
                               );
                             },
-                            style: OutlinedButton.styleFrom(
-                              elevation: 0.0,
-                              side: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: 2.0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(11),
-                              ),
-                            ),
-                            child: Text(
-                              'Copy',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color:
-                                        Theme.of(context).colorScheme.tertiary,
-                                  ),
-                            ),
+                            child: const Text('Copy'),
                           ),
                           OutlinedButton(
                             onPressed: () => Navigator.pop(context),
-                            style: OutlinedButton.styleFrom(
-                              elevation: 0.0,
-                              side: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: 2.0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(11),
-                              ),
-                            ),
-                            child: Text(
-                              'Cancel',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color:
-                                        Theme.of(context).colorScheme.tertiary,
-                                  ),
-                            ),
+                            child: const Text('Cancel'),
                           ),
                         ],
                       ),
@@ -333,29 +294,13 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
       enabled: false,
       maxLines: 10,
       decoration: InputDecoration(
-        hintStyle: theme.textTheme.bodyLarge?.copyWith(
-          color: theme.colorScheme.inverseSurface,
-          fontSize: 15,
-        ),
         hintText: card?.notes,
         disabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: theme.colorScheme.primary),
           borderRadius: BorderRadius.circular(10),
         ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(width: 2.0),
-        ),
-        focusColor: theme.colorScheme.primary,
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: theme.colorScheme.primary),
-          borderRadius: BorderRadius.circular(10),
-        ),
       ),
-      style: theme.textTheme.bodyLarge?.copyWith(
-        color: theme.colorScheme.tertiary,
-        fontWeight: FontWeight.bold,
-      ),
+      style: theme.inputTextStyle,
     );
   }
 

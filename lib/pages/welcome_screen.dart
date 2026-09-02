@@ -279,16 +279,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     child: OutlinedButton(
                       onPressed: continueToApp,
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(
-                          color: theme.colorScheme.primary,
-                          width: 2,
-                        ),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 40,
                           vertical: 15,
                         ),
-                        backgroundColor: Colors.transparent,
-                        elevation: 0.0,
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(15),
@@ -343,8 +337,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           horizontal: 40,
                           vertical: 15,
                         ),
-                        backgroundColor: Colors.transparent,
-                        elevation: 0.0,
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(
                             bottomLeft: Radius.circular(15),

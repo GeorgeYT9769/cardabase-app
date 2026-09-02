@@ -12,17 +12,10 @@ class BarcodeTypeSelectorDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final List<BarcodeType?> allowedTypes =
         this.allowedTypes ?? [null, ...BarcodeType.values];
     return AlertDialog(
-      title: Text(
-        'Barcode Type',
-        style: theme.textTheme.bodyLarge?.copyWith(
-          color: theme.colorScheme.inverseSurface,
-          fontSize: 30,
-        ),
-      ),
+      title: const Text('Barcode Type'),
       content: SizedBox(
         height: 300,
         width: double.maxFinite,

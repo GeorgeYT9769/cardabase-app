@@ -34,18 +34,9 @@ class SortingStyleSelector extends StatelessWidget {
               )
               .toList(growable: false),
           initialSelection: value,
-          inputDecorationTheme: InputDecorationTheme(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(width: 2.0),
-            ),
-            focusColor: theme.colorScheme.primary,
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: theme.colorScheme.primary),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            labelStyle: theme.textTheme.bodyLarge
-                ?.copyWith(color: theme.colorScheme.secondary),
+          // A DropdownMenu replaces the ambient decoration theme instead of
+          // merging with it, so start from the global one.
+          inputDecorationTheme: theme.inputDecorationTheme.copyWith(
             iconColor: theme.colorScheme.primary,
           ),
           onSelected: (value) =>

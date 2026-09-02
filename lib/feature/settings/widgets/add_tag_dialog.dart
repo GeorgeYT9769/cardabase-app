@@ -1,3 +1,4 @@
+import 'package:cardabase/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 class AddTagDialog extends StatefulWidget {
@@ -37,13 +38,7 @@ class _AddTagDialogState extends State<AddTagDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return AlertDialog(
-      title: Text(
-        'Add a tag',
-        style: theme.textTheme.bodyLarge?.copyWith(
-          color: theme.colorScheme.inverseSurface,
-          fontSize: 30,
-        ),
-      ),
+      title: const Text('Add a tag'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -52,30 +47,10 @@ class _AddTagDialogState extends State<AddTagDialog> {
             onChanged: _validate,
             decoration: InputDecoration(
               errorText: _errorText,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(width: 2.0),
-              ),
-              focusColor: theme.colorScheme.primary,
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: theme.colorScheme.primary,
-                ),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              labelStyle: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.secondary,
-              ),
-              prefixIcon: Icon(
-                Icons.label,
-                color: theme.colorScheme.secondary,
-              ),
+              prefixIcon: const Icon(Icons.label),
               labelText: 'Tag',
             ),
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.tertiary,
-              fontWeight: FontWeight.bold,
-            ),
+            style: theme.inputTextStyle,
           ),
           const SizedBox(height: 20),
           if (_errorText != 'Tag already exists')
@@ -89,24 +64,7 @@ class _AddTagDialogState extends State<AddTagDialog> {
                   }
                   Navigator.of(context).pop(trimmed);
                 },
-                style: OutlinedButton.styleFrom(
-                  elevation: 0.0,
-                  side: BorderSide(
-                    color: theme.colorScheme.primary,
-                    width: 2.0,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(11),
-                  ),
-                ),
-                child: Text(
-                  'ADD',
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                    color: theme.colorScheme.tertiary,
-                  ),
-                ),
+                child: const Text('ADD'),
               ),
             ),
         ],

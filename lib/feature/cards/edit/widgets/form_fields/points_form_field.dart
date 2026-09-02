@@ -1,3 +1,4 @@
+import 'package:cardabase/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
@@ -134,24 +135,9 @@ class _PointsFormFieldState extends State<PointsFormField> {
       maxLength: 10,
       keyboardType: TextInputType.number,
       decoration: InputDecoration(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(width: 2.0),
-        ),
-        focusColor: theme.colorScheme.primary,
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: theme.colorScheme.primary,
-          ),
-          borderRadius: BorderRadius.circular(10),
-        ),
         counterText: '',
         labelText: 'Points',
-        labelStyle: theme.textTheme.bodyLarge?.copyWith(
-          color: theme.colorScheme.inverseSurface,
-          fontWeight: FontWeight.bold,
-          fontSize: 17,
-        ),
+        labelStyle: theme.emphasizedInputLabelStyle,
         prefixIcon: GestureDetector(
           onTap: _decrementValue,
           onLongPressStart: (_) => _startDecrementTimer(),
@@ -173,10 +159,7 @@ class _PointsFormFieldState extends State<PointsFormField> {
           ),
         ),
       ),
-      style: theme.textTheme.bodyLarge?.copyWith(
-        color: theme.colorScheme.tertiary,
-        fontWeight: FontWeight.bold,
-      ),
+      style: theme.inputTextStyle,
     );
   }
 }
