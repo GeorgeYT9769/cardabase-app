@@ -22,7 +22,7 @@ typedef LoyaltyCardsBox = Box<LoyaltyCard>;
 class LoyaltyCard {
   static const Color defaultColor = Colors.grey;
 
-  const LoyaltyCard({
+  LoyaltyCard({
     required this.id,
     required this.barcode,
     required this.name,
@@ -35,10 +35,11 @@ class LoyaltyCard {
     required this.points,
     required this.requiresAuth,
     required this.hideName,
-    required this.createdAt,
-    required this.lastModifiedAt,
+    required DateTime? createdAt,
+    required DateTime? lastModifiedAt,
     required this.usePoints,
-  });
+  })  : createdAt = createdAt ?? DateTime.now().toUtc(),
+        lastModifiedAt = lastModifiedAt ?? DateTime.now().toUtc();
 
   /// [id] is the unique identifier of the card.
   @HiveField(0)

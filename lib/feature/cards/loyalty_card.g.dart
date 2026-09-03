@@ -29,8 +29,8 @@ class LoyaltyCardAdapter extends TypeAdapter<LoyaltyCard> {
       points: (fields[9] as num).toInt(),
       requiresAuth: fields[10] as bool,
       hideName: fields[11] as bool,
-      createdAt: fields[12] as DateTime,
-      lastModifiedAt: fields[13] as DateTime,
+      createdAt: fields[12] as DateTime?,
+      lastModifiedAt: fields[13] as DateTime?,
       usePoints: fields[14] == null ? false : fields[14] as bool,
     );
   }
