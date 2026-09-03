@@ -125,13 +125,14 @@ class ThemeSettingsAdapter extends TypeAdapter<ThemeSettings> {
       useSystemFont: fields[2] as bool,
       loyaltyCardEffect: fields[3] as LoyaltyCardEffectSettings,
       rightBackButton: fields[4] == null ? false : fields[4] as bool,
+      advancedTextures: fields[5] == null ? false : fields[5] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, ThemeSettings obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.useDarkMode)
       ..writeByte(1)
@@ -141,7 +142,9 @@ class ThemeSettingsAdapter extends TypeAdapter<ThemeSettings> {
       ..writeByte(3)
       ..write(obj.loyaltyCardEffect)
       ..writeByte(4)
-      ..write(obj.rightBackButton);
+      ..write(obj.rightBackButton)
+      ..writeByte(5)
+      ..write(obj.advancedTextures);
   }
 
   @override

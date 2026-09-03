@@ -322,6 +322,23 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  Widget _advancedTextures(ThemeData theme) {
+    return ValueListenableBuilder(
+      valueListenable: _settings.theme.advancedTextures,
+      builder: (context, useAdvancedTextures, _) => SettingTile(
+        aboutSettingHeader: 'Use advanced textures for some widgets. Might cause performance issues.',
+        settingAction: () async {
+          _settings.theme.advancedTextures.value = !useAdvancedTextures;
+          await _settingsBox.save(_settings.seal());
+        },
+        settingHeader: 'Advanced Textures',
+        settingIcon: Icons.texture,
+        iconColor: useAdvancedTextures ? Colors.green : Colors.red,
+        borderColor: theme.colorScheme.primary,
+      ),
+    );
+  }
+
   Widget _autoBrightnessSettingsButton(ThemeData theme) {
     return ValueListenableBuilder(
       valueListenable: _settings.useAutoBrightness,
@@ -538,14 +555,14 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget _kofiLink(ThemeData theme) {
     return SettingTile(
-      aboutSettingHeader: 'Support Cardabase development using ko-fi.com',
+      aboutSettingHeader: 'Support Cardabase development using Ko-fi.com',
       settingAction: () => _launchUrl(
         Uri.parse('https://ko-fi.com/georgeyt9769'),
       ),
       settingHeader: 'Ko-fi',
       settingIcon: Icons.monetization_on,
-      iconColor: Color(0xffe8c767),
-      borderColor: Color(0xffe8c767),
+      iconColor: Color(0xff579fbf),
+      borderColor: Color(0xff579fbf),
     );
   }
 

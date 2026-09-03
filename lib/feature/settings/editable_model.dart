@@ -136,6 +136,7 @@ class EditableThemeSettings {
     required this.useSystemFont,
     required this.loyaltyCardEffect,
     required this.rightBackButton,
+    required this.advancedTextures,
   });
 
   factory EditableThemeSettings.fromValue(ThemeSettings value) {
@@ -147,6 +148,7 @@ class EditableThemeSettings {
         value.loyaltyCardEffect,
       ),
       rightBackButton: ValueNotifier(value.rightBackButton),
+      advancedTextures: ValueNotifier(value.advancedTextures),
     );
   }
 
@@ -155,6 +157,8 @@ class EditableThemeSettings {
   final ValueNotifier<bool> useSystemFont;
   final EditableLoyaltyCardEffectSettings loyaltyCardEffect;
   final ValueNotifier<bool> rightBackButton;
+  final ValueNotifier<bool> advancedTextures;
+
 
   void loadValue(ThemeSettings value) {
     useDarkMode.value = value.useDarkMode;
@@ -162,6 +166,7 @@ class EditableThemeSettings {
     useSystemFont.value = value.useSystemFont;
     loyaltyCardEffect.loadValue(value.loyaltyCardEffect);
     rightBackButton.value = value.rightBackButton;
+    advancedTextures.value = value.advancedTextures;
   }
 
   ThemeSettings seal() {
@@ -171,6 +176,7 @@ class EditableThemeSettings {
       useSystemFont: useSystemFont.value,
       loyaltyCardEffect: loyaltyCardEffect.seal(),
       rightBackButton: rightBackButton.value,
+      advancedTextures: advancedTextures.value,
     );
   }
 
@@ -180,6 +186,7 @@ class EditableThemeSettings {
     useSystemFont.dispose();
     loyaltyCardEffect.dispose();
     rightBackButton.dispose();
+    advancedTextures.dispose();
   }
 }
 

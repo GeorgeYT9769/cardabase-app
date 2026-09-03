@@ -53,6 +53,7 @@ Future<void> migrateSettingsTo202603(
                 effect: loyaltyCardEffect,
               ),
         rightBackButton: oldBox.get('rightBackButton') as bool? ?? false,
+        advancedTextures: oldBox.get('advancedTextures') as bool? ?? false,
       ),
       developerOptions: DeveloperOptions(
         isEnabled: oldBox.get('developerOptions') as bool? ?? false,

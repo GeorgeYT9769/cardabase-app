@@ -136,7 +136,7 @@ class CardFace extends StatelessWidget {
               child: CustomPaint(
                 size: const Size(8, 12),
                 painter: _TrianglePainter(
-                  color: theme.colorScheme.onSurface.withOpacity(0.3),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
                   isLeft: true,
                 ),
               ),
@@ -147,7 +147,7 @@ class CardFace extends StatelessWidget {
               child: CustomPaint(
                 size: const Size(8, 12),
                 painter: _TrianglePainter(
-                  color: theme.colorScheme.onSurface.withOpacity(0.3),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
                   isLeft: false,
                 ),
               ),
