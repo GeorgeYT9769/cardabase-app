@@ -109,12 +109,28 @@ class FullScreenCardFacePage extends StatelessWidget {
             color: Colors.black,
             fontSize: 16,
           ),
-          errorBuilder: (context, error) => Center(
-            child: Text(
-              'Error rendering barcode: $error\nData: $data',
-              style: const TextStyle(color: Colors.red, fontSize: 16),
-              textAlign: TextAlign.center,
-            ),
+          errorBuilder: (context, error) => Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.qr_code_2,
+                size: 80,
+                color: Colors.black,
+              ),
+              const SizedBox(height: 16),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  data,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
           ),
         ),
       ),

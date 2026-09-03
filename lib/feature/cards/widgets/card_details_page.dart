@@ -7,7 +7,6 @@ import 'package:cardabase/feature/cards/widgets/card_face.dart';
 import 'package:cardabase/feature/cards/widgets/share_card_dialog.dart';
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
-import 'package:cardabase/theme/theme.dart';
 import 'package:cardabase/util/color_extensions.dart';
 import 'package:cardabase/util/widgets/cdb_app_bar_sliver.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
@@ -37,18 +36,23 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
   LoyaltyCard? card;
   double? _previousBrightness;
   final settingsBox = GetIt.I.get<SettingsBox>();
+  final _notesController = TextEditingController();
+  final _notesFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
-    if (settingsBox.value.useAutoBrightness == false) {
-      _increaseBrightness();
-    }
+    card = cardsBox.get(widget.cardId);
+    _notesController.text = card?.notes ?? '';
+
     _cardSubscription = cardsBox
         .watch(key: widget.cardId)
         .map((event) => event.value as LoyaltyCard?)
         .listen(onCardChanged);
-    card = cardsBox.get(widget.cardId);
+
+    if (settingsBox.value.useAutoBrightness == false) {
+      _increaseBrightness();
+    }
   }
 
   @override
@@ -60,11 +64,24 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
           .watch(key: widget.cardId)
           .map((event) => event.value as LoyaltyCard?)
           .listen(onCardChanged);
+      card = cardsBox.get(widget.cardId);
+      _notesController.text = card?.notes ?? '';
     }
   }
 
   Future<void> onCardChanged(LoyaltyCard? card) async {
     setState(() => this.card = card);
+    if (card != null &&
+        !_notesFocusNode.hasFocus &&
+        _notesController.text != (card.notes ?? '')) {
+      _notesController.text = card.notes ?? '';
+    }
+  }
+
+  void _saveNotes(String value) {
+    if (card == null) return;
+    final updatedCard = card!.copyWith(notes: value.isEmpty ? null : value);
+    cardsBox.put(updatedCard.id, updatedCard);
   }
 
   Future<void> _increaseBrightness() async {
@@ -76,6 +93,8 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
   void dispose() {
     _resetBrightness();
     _cardSubscription?.cancel();
+    _notesController.dispose();
+    _notesFocusNode.dispose();
     super.dispose();
   }
 
@@ -140,16 +159,15 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                   ),
                 ),
                 _cardPreview(theme),
-                if (card?.notes != null)
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 20,
-                      top: 20,
-                      right: 20,
-                      bottom: 120,
-                    ),
-                    child: _note(theme),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 20,
+                    top: 20,
+                    right: 20,
+                    bottom: 120,
                   ),
+                  child: _note(theme),
+                ),
               ],
             ),
           ),
@@ -260,6 +278,8 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
           cardTileColor: card?.color,
           image: FileImage(File(frontImagePath!)),
           showWhiteOutline: false,
+          showLeftTriangle: false,
+          showRightTriangle: hasBarcode || hasBack,
         ),
       if (hasBarcode)
         CardFace.barcode(
@@ -267,12 +287,16 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
           cardData: card!.barcode.data,
           barcodeType: card!.barcode.type!,
           showWhiteOutline: true,
+          showLeftTriangle: hasFront,
+          showRightTriangle: hasBack,
         ),
       if (hasBack)
         CardFace.image(
           cardTileColor: card?.color,
           image: FileImage(File(backImagePath!)),
           showWhiteOutline: false,
+          showLeftTriangle: hasFront || hasBarcode,
+          showRightTriangle: false,
         ),
     ];
 
@@ -290,53 +314,89 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
   }
 
   Widget _note(ThemeData theme) {
-    return TextField(
-      enabled: false,
-      maxLines: 10,
-      decoration: InputDecoration(
-        hintText: card?.notes,
-        disabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: theme.colorScheme.primary),
-          borderRadius: BorderRadius.circular(10),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Notes',
+          style: theme.textTheme.bodyLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: theme.colorScheme.primary,
+          ),
         ),
-      ),
-      style: theme.inputTextStyle,
+        const SizedBox(height: 8),
+        TextField(
+          controller: _notesController,
+          focusNode: _notesFocusNode,
+          maxLines: null,
+          onChanged: _saveNotes,
+          decoration: InputDecoration(
+            hintText: 'Add a note...',
+            hintStyle: theme.textTheme.bodyLarge?.copyWith(
+              color: theme.colorScheme.outline,
+              fontSize: 16,
+            ),
+            border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            isDense: true,
+            contentPadding: EdgeInsets.zero,
+          ),
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: theme.colorScheme.onSurface,
+            fontSize: 16,
+          ),
+        ),
+      ],
     );
   }
 
   Widget _saveButton(ThemeData theme) {
-    return Bounceable(
-      onTap: () {},
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-        child: SizedBox(
-          height: 60,
-          width: double.infinity,
-          child: FloatingActionButton.extended(
-            elevation: 0.0,
-            heroTag: 'saveFAB',
-            onPressed: () => Navigator.pop(context),
-            tooltip: 'SAVE',
-            backgroundColor: Colors.green.shade700,
-            icon: const Icon(
-              Icons.check,
-              color: Colors.white,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            label: Text(
-              'SAVE',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                //cardTypeText
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: Colors.white,
+    return ListenableBuilder(
+      listenable: _notesFocusNode,
+      builder: (context, child) {
+        final isFocused = _notesFocusNode.hasFocus;
+        return Bounceable(
+          onTap: () {},
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+            child: SizedBox(
+              height: 60,
+              width: double.infinity,
+              child: FloatingActionButton.extended(
+                elevation: 0.0,
+                heroTag: 'saveFAB',
+                onPressed: () {
+                  if (isFocused) {
+                    _saveNotes(_notesController.text);
+                    _notesFocusNode.unfocus();
+                  } else {
+                    Navigator.pop(context);
+                  }
+                },
+                tooltip: isFocused ? 'SAVE' : 'DONE',
+                backgroundColor: isFocused ? theme.colorScheme.primary : Colors.green.shade700,
+                icon: Icon(
+                  isFocused ? Icons.check : Icons.arrow_back_ios,
+                  color: Colors.white,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                label: Text(
+                  isFocused ? 'SAVE' : 'DONE',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 19,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
