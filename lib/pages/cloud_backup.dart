@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cardabase/theme/theme.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
@@ -187,17 +188,9 @@ class _CloudBackupState extends State<CloudBackup> {
             ),
           ),
           OutlinedButton(
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: Colors.red),
-            ),
+            style: Theme.of(context).destructiveButtonStyle,
             onPressed: () => Navigator.pop(context, true),
-            child: Text(
-              'DELETE',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red,
-                  ),
-            ),
+            child: const Text('DELETE'),
           ),
         ],
       ),
@@ -392,34 +385,14 @@ class _CloudBackupState extends State<CloudBackup> {
                     child: SizedBox(
                       height: 70,
                       child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.all(15),
-                          side: BorderSide(
-                            color: theme.colorScheme.primary,
-                          ),
-                          backgroundColor: Colors.transparent,
-                          elevation: 0.0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          minimumSize: const Size.fromHeight(100),
-                        ),
+                        style: theme.tileButtonStyle(),
                         onPressed: () => uploadCardabase(),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              Icons.upload,
-                              color: theme.colorScheme.inverseSurface,
-                            ),
+                            const Icon(Icons.upload),
                             const SizedBox(width: 10),
-                            Text(
-                              'Upload Cardabase',
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                color: theme.colorScheme.inverseSurface,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                            const Text('Upload Cardabase'),
                           ],
                         ),
                       ),
@@ -438,44 +411,21 @@ class _CloudBackupState extends State<CloudBackup> {
                     child: SizedBox(
                       height: 70,
                       child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.all(15),
-                          side: BorderSide(
-                            color: theme.colorScheme.primary,
-                          ),
-                          backgroundColor: Colors.transparent,
-                          elevation: 0.0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          minimumSize: const Size.fromHeight(100),
-                        ),
+                        style: theme.tileButtonStyle(),
                         onPressed: () => downloadCardabase(),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              Icons.download,
-                              color: theme.colorScheme.inverseSurface,
-                            ),
+                            const Icon(Icons.download),
                             const SizedBox(width: 10),
-                            Text(
-                              'Download Cardabase',
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                color: theme.colorScheme.inverseSurface,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                            const Text('Download Cardabase'),
                           ],
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 25),
-                  Divider(
-                    color: theme.colorScheme.primary,
-                    thickness: 1.0,
-                  ),
+                  const Divider(),
                   const SizedBox(height: 15),
                   Text(
                     'Remove server configuration:',
@@ -489,34 +439,14 @@ class _CloudBackupState extends State<CloudBackup> {
                     child: SizedBox(
                       height: 70,
                       child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.all(15),
-                          side: BorderSide(
-                            color: theme.colorScheme.primary,
-                          ),
-                          backgroundColor: Colors.transparent,
-                          elevation: 0.0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          minimumSize: const Size.fromHeight(100),
-                        ),
+                        style: theme.tileButtonStyle(),
                         onPressed: () => logOut(),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              Icons.logout,
-                              color: theme.colorScheme.inverseSurface,
-                            ),
+                            const Icon(Icons.logout),
                             const SizedBox(width: 10),
-                            Text(
-                              'Log Out',
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                color: theme.colorScheme.inverseSurface,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                            const Text('Log Out'),
                           ],
                         ),
                       ),
@@ -535,34 +465,17 @@ class _CloudBackupState extends State<CloudBackup> {
                     child: SizedBox(
                       height: 70,
                       child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.all(15),
-                          side: BorderSide(
-                            color: Colors.red,
-                          ),
-                          backgroundColor: Colors.transparent,
-                          elevation: 0.0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          minimumSize: const Size.fromHeight(100),
+                        style: theme.tileButtonStyle(
+                          borderColor: Colors.red,
+                          foregroundColor: Colors.red,
                         ),
                         onPressed: () => deleteCardabase(),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              Icons.delete_forever,
-                              color: Colors.red,
-                            ),
+                            const Icon(Icons.delete_forever),
                             const SizedBox(width: 10),
-                            Text(
-                              'DELETE CARDABASE',
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                color: Colors.red,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                            const Text('DELETE CARDABASE'),
                           ],
                         ),
                       ),
@@ -598,28 +511,10 @@ class _CloudBackupState extends State<CloudBackup> {
                   TextFormField(
                     controller: ipAddress,
                     decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(width: 2.0),
-                      ),
-                      focusColor: theme.colorScheme.primary,
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: theme.colorScheme.primary),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
                       labelText: 'IP Address of the server',
-                      labelStyle: theme.textTheme.bodyLarge
-                          ?.copyWith(color: theme.colorScheme.secondary),
-                      prefixIcon: Icon(
-                        Icons.numbers,
-                        color: theme.colorScheme.secondary,
-                      ),
+                      prefixIcon: Icon(Icons.numbers),
                     ),
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: theme.colorScheme.tertiary,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: theme.inputTextStyle,
                     keyboardType: TextInputType.visiblePassword,
                     obscureText: false,
                   ),
@@ -627,24 +522,8 @@ class _CloudBackupState extends State<CloudBackup> {
                   TextFormField(
                     controller: cloudPassword,
                     decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(width: 2.0),
-                      ),
-                      focusColor: theme.colorScheme.primary,
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: theme.colorScheme.primary),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
                       labelText: 'Cloud password',
-                      labelStyle: theme.textTheme.bodyLarge?.copyWith(
-                        color: theme.colorScheme.secondary,
-                      ),
-                      prefixIcon: Icon(
-                        Icons.password,
-                        color: theme.colorScheme.secondary,
-                      ),
+                      prefixIcon: Icon(Icons.password),
                       suffixIcon: IconButton(
                         icon: Icon(
                           hideCloudPassword
@@ -666,24 +545,8 @@ class _CloudBackupState extends State<CloudBackup> {
                   TextFormField(
                     controller: storagePassword,
                     decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(width: 2.0),
-                      ),
-                      focusColor: theme.colorScheme.primary,
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: theme.colorScheme.primary),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
                       labelText: 'Storage password',
-                      labelStyle: theme.textTheme.bodyLarge?.copyWith(
-                        color: theme.colorScheme.secondary,
-                      ),
-                      prefixIcon: Icon(
-                        Icons.password,
-                        color: theme.colorScheme.secondary,
-                      ),
+                      prefixIcon: Icon(Icons.password),
                       suffixIcon: IconButton(
                         icon: Icon(
                           hideStoragePassword
@@ -707,34 +570,14 @@ class _CloudBackupState extends State<CloudBackup> {
                     child: SizedBox(
                       height: 70,
                       child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.all(15),
-                          side: BorderSide(
-                            color: theme.colorScheme.primary,
-                          ),
-                          backgroundColor: Colors.transparent,
-                          elevation: 0.0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          minimumSize: const Size.fromHeight(100),
-                        ),
+                        style: theme.tileButtonStyle(),
                         onPressed: () => logIn(),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              Icons.login,
-                              color: theme.colorScheme.inverseSurface,
-                            ),
+                            const Icon(Icons.login),
                             const SizedBox(width: 10),
-                            Text(
-                              'Log In',
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                color: theme.colorScheme.inverseSurface,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                            const Text('Log In'),
                           ],
                         ),
                       ),

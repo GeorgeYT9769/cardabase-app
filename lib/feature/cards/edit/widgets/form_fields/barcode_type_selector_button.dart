@@ -1,4 +1,5 @@
 import 'package:barcode_widget/barcode_widget.dart';
+import 'package:cardabase/theme/theme.dart';
 import 'package:cardabase/util/barcode_type_extensions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -26,18 +27,7 @@ class BarcodeTypeSelectorButton extends StatelessWidget {
       child: SizedBox(
         height: 60,
         child: OutlinedButton(
-          style: OutlinedButton.styleFrom(
-            padding: const EdgeInsets.all(15),
-            side: BorderSide(
-              color: theme.colorScheme.primary,
-            ),
-            backgroundColor: Colors.transparent,
-            elevation: 0.0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            minimumSize: const Size.fromHeight(100),
-          ),
+          style: theme.tileButtonStyle(),
           onPressed: onPressed,
           child: Row(
             children: [

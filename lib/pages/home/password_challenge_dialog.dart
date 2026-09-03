@@ -89,13 +89,7 @@ class _PasswordChallengeDialogState extends State<PasswordChallengeDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return AlertDialog(
-      title: Text(
-        'Enter Password',
-        style: theme.textTheme.bodyLarge?.copyWith(
-          color: theme.colorScheme.inverseSurface,
-          fontSize: 30,
-        ),
-      ),
+      title: const Text('Enter Password'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -113,26 +107,16 @@ class _PasswordChallengeDialogState extends State<PasswordChallengeDialog> {
           ),
           const SizedBox(height: 20),
           Center(
-            child: _challengeButton(theme),
+            child: _challengeButton(),
           ),
         ],
       ),
     );
   }
 
-  Widget _challengeButton(ThemeData theme) {
+  Widget _challengeButton() {
     return OutlinedButton(
       onPressed: onChallengeButtonPressed,
-      style: OutlinedButton.styleFrom(
-        elevation: 0.0,
-        side: BorderSide(
-          color: theme.colorScheme.primary,
-          width: 2.0,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(11),
-        ),
-      ),
       child: widget.challengeButtonChild,
     );
   }

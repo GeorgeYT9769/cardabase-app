@@ -26,13 +26,8 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return AlertDialog(
-      title: Text(
-        'Card Color',
-        style: theme.textTheme.bodyLarge
-          ?.copyWith(color: theme.colorScheme.inverseSurface, fontSize: 30),
-      ),
+      title: const Text('Card Color'),
       content: SingleChildScrollView(
         child: ColorPicker(
           labelTypes: const [ColorLabelType.rgb],
@@ -58,21 +53,7 @@ class _ColorPickerDialogState extends State<ColorPickerDialog> {
             onPressed: () {
               Navigator.pop(context, currentColor);
             },
-            style: OutlinedButton.styleFrom(
-              elevation: 0.0,
-              side: BorderSide(color: theme.colorScheme.primary, width: 2.0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(11),
-              ),
-            ),
-            child: Text(
-              'Got it',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-                color: theme.colorScheme.tertiary,
-              ),
-            ),
+            child: const Text('Got it'),
           ),
         ),
       ],

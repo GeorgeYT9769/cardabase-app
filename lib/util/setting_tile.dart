@@ -80,9 +80,9 @@ class SettingTile extends StatelessWidget {
           child: OutlinedButton(
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.all(15),
-              side: BorderSide(color: borderColor ?? theme.colorScheme.primary, width: 2),
-              backgroundColor: Colors.transparent,
-              elevation: 0.0,
+              side: borderColor == null
+                  ? null
+                  : BorderSide(color: borderColor!, width: 2),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
               ),

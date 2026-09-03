@@ -112,13 +112,7 @@ class _ExportDialogState extends State<ExportDialog> {
     final theme = Theme.of(context);
     return AlertDialog(
       scrollable: true,
-      title: Text(
-        'Export:',
-        style: theme.textTheme.bodyLarge?.copyWith(
-          color: theme.colorScheme.inverseSurface,
-          fontSize: 30,
-        ),
-      ),
+      title: const Text('Export:'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -149,7 +143,7 @@ class _ExportDialogState extends State<ExportDialog> {
       ),
       actions: [
         Center(
-          child: _doneButton(context, theme),
+          child: _doneButton(context),
         ),
       ],
     );
@@ -170,20 +164,6 @@ class _ExportDialogState extends State<ExportDialog> {
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 10,
           vertical: 10,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(11),
-          borderSide: BorderSide(
-            color: theme.colorScheme.primary,
-            width: 2.0,
-          ),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(11),
-          borderSide: BorderSide(
-            color: theme.colorScheme.primary,
-            width: 2.0,
-          ),
         ),
         suffixIcon: exportDirectoryPath.text.isNotEmpty
             ? IconButton(
@@ -209,27 +189,10 @@ class _ExportDialogState extends State<ExportDialog> {
     );
   }
 
-  Widget _doneButton(BuildContext context, ThemeData theme) {
+  Widget _doneButton(BuildContext context) {
     return OutlinedButton(
-      style: OutlinedButton.styleFrom(
-        elevation: 0.0,
-        side: BorderSide(
-          color: theme.colorScheme.primary,
-          width: 2.0,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(11),
-        ),
-      ),
       onPressed: () => Navigator.of(context).pop(),
-      child: Text(
-        'DONE',
-        style: theme.textTheme.bodyLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-          fontSize: 15,
-          color: theme.colorScheme.inverseSurface,
-        ),
-      ),
+      child: const Text('DONE'),
     );
   }
 }

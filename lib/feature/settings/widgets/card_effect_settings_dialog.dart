@@ -33,13 +33,7 @@ class _CardEffectSettingsDialogState extends State<CardEffectSettingsDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return AlertDialog(
-      title: Text(
-        'Card effects',
-        style: theme.textTheme.bodyLarge?.copyWith(
-          color: theme.colorScheme.inverseSurface,
-          fontSize: 30,
-        ),
-      ),
+      title: const Text('Card effects'),
       content: ValueListenableBuilder(
         valueListenable: _settings.isEnabled,
         builder: (context, isEnabled, _) => Column(
@@ -60,7 +54,7 @@ class _CardEffectSettingsDialogState extends State<CardEffectSettingsDialog> {
       ),
       actions: [
         Center(
-          child: _doneButton(context, theme),
+          child: _doneButton(context),
         ),
       ],
     );
@@ -112,27 +106,10 @@ class _CardEffectSettingsDialogState extends State<CardEffectSettingsDialog> {
     );
   }
 
-  Widget _doneButton(BuildContext context, ThemeData theme) {
+  Widget _doneButton(BuildContext context) {
     return OutlinedButton(
-      style: OutlinedButton.styleFrom(
-        elevation: 0.0,
-        side: BorderSide(
-          color: theme.colorScheme.primary,
-          width: 2.0,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(11),
-        ),
-      ),
       onPressed: () => Navigator.of(context).pop(_settings.seal()),
-      child: Text(
-        'DONE',
-        style: theme.textTheme.bodyLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-          fontSize: 15,
-          color: theme.colorScheme.tertiary,
-        ),
-      ),
+      child: const Text('DONE'),
     );
   }
 }

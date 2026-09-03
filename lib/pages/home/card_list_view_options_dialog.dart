@@ -30,13 +30,7 @@ class CardListViewOptionsDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return AlertDialog(
-      title: Text(
-        'Sort',
-        style: theme.textTheme.bodyLarge?.copyWith(
-          color: theme.colorScheme.inverseSurface,
-          fontSize: 30,
-        ),
-      ),
+      title: const Text('Sort'),
       content: SizedBox(
         width: MediaQuery.of(context).size.width,
         child: ConstrainedBox(
@@ -79,7 +73,7 @@ class CardListViewOptionsDialog extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 10),
-                _divider(theme),
+                const Divider(),
                 const SizedBox(height: 10),
                 ValueListenableBuilder(
                   valueListenable: numberOfColumns,
@@ -97,7 +91,7 @@ class CardListViewOptionsDialog extends StatelessWidget {
       ),
       actions: [
         Center(
-          child: _selectButton(context, theme),
+          child: _selectButton(context),
         ),
       ],
     );
@@ -111,13 +105,6 @@ class CardListViewOptionsDialog extends StatelessWidget {
         color: theme.colorScheme.inverseSurface,
         fontWeight: FontWeight.w900,
       ),
-    );
-  }
-
-  Widget _divider(ThemeData theme) {
-    return Divider(
-      color: theme.colorScheme.primary,
-      thickness: 1.0,
     );
   }
 
@@ -156,7 +143,7 @@ class CardListViewOptionsDialog extends StatelessWidget {
           },
         ),
       ),
-      _divider(theme),
+      const Divider(),
       const SizedBox(height: 10),
     ];
   }
@@ -190,31 +177,14 @@ class CardListViewOptionsDialog extends StatelessWidget {
     );
   }
 
-  Widget _selectButton(BuildContext context, ThemeData theme) {
+  Widget _selectButton(BuildContext context) {
     return Bounceable(
       onTap: () {},
       child: OutlinedButton(
-        style: OutlinedButton.styleFrom(
-          elevation: 0.0,
-          side: BorderSide(
-            color: theme.colorScheme.primary,
-            width: 2.0,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(11),
-          ),
-        ),
         onPressed: () {
           Navigator.of(context).pop();
         },
-        child: Text(
-          'SELECT',
-          style: theme.textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
-            color: theme.colorScheme.inverseSurface,
-          ),
-        ),
+        child: const Text('SELECT'),
       ),
     );
   }

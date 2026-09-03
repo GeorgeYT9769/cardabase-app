@@ -69,8 +69,6 @@ class _TakePictureButtonState extends State<TakePictureButton> {
                             width: 2,
                             style: BorderStyle.none,
                           ),
-                          backgroundColor: Colors.transparent,
-                          elevation: 0.0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),

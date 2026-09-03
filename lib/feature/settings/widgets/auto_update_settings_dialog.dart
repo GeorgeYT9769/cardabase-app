@@ -36,13 +36,7 @@ class _AutoUpdateSettingsDialogState extends State<AutoUpdateSettingsDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return AlertDialog(
-      title: Text(
-        'Auto Backups',
-        style: theme.textTheme.bodyLarge?.copyWith(
-          color: theme.colorScheme.inverseSurface,
-          fontSize: 30,
-        ),
-      ),
+      title: const Text('Auto Backups'),
       content: ValueListenableBuilder(
         valueListenable: _settings.isEnabled,
         builder: (context, isEnabled, _) => Column(
@@ -56,7 +50,7 @@ class _AutoUpdateSettingsDialogState extends State<AutoUpdateSettingsDialog> {
       ),
       actions: [
         Center(
-          child: _doneButton(context, theme),
+          child: _doneButton(context),
         ),
       ],
     );
@@ -93,27 +87,10 @@ class _AutoUpdateSettingsDialogState extends State<AutoUpdateSettingsDialog> {
     );
   }
 
-  Widget _doneButton(BuildContext context, ThemeData theme) {
+  Widget _doneButton(BuildContext context) {
     return OutlinedButton(
-      style: OutlinedButton.styleFrom(
-        elevation: 0.0,
-        side: BorderSide(
-          color: theme.colorScheme.primary,
-          width: 2.0,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(11),
-        ),
-      ),
       onPressed: () => Navigator.of(context).pop(_settings.seal()),
-      child: Text(
-        'DONE',
-        style: theme.textTheme.bodyLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-          fontSize: 15,
-          color: theme.colorScheme.inverseSurface,
-        ),
-      ),
+      child: const Text('DONE'),
     );
   }
 }

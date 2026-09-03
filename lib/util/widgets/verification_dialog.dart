@@ -1,3 +1,4 @@
+import 'package:cardabase/theme/theme.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
@@ -12,13 +13,7 @@ Future<bool> showPasswordVerificationDialog(BuildContext context) async {
   final result = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
-      title: Text(
-        'Enter Password',
-        style: theme.textTheme.bodyLarge?.copyWith(
-          color: theme.colorScheme.inverseSurface,
-          fontSize: 30,
-        ),
-      ),
+      title: const Text('Enter Password'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -26,30 +21,10 @@ Future<bool> showPasswordVerificationDialog(BuildContext context) async {
             controller: controller,
             obscureText: true,
             decoration: InputDecoration(
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(width: 2.0),
-              ),
-              focusColor: theme.colorScheme.primary,
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: theme.colorScheme.primary,
-                ),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              labelStyle: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.secondary,
-              ),
-              prefixIcon: Icon(
-                Icons.password,
-                color: theme.colorScheme.secondary,
-              ),
+              prefixIcon: const Icon(Icons.password),
               labelText: 'Password',
             ),
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.tertiary,
-              fontWeight: FontWeight.bold,
-            ),
+            style: theme.inputTextStyle,
           ),
           const SizedBox(height: 20),
           Center(
@@ -66,23 +41,7 @@ Future<bool> showPasswordVerificationDialog(BuildContext context) async {
                   showCustomSnackBar(context, 'Incorrect password!', false);
                 }
               },
-              style: OutlinedButton.styleFrom(
-                elevation: 0.0,
-                side: BorderSide(
-                  color: theme.colorScheme.primary,
-                  width: 2.0,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(11),
-                ),
-              ),
-              child: Text(
-                'VERIFY',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                ),
-              ),
+              child: const Text('VERIFY'),
             ),
           ),
         ],

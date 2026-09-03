@@ -33,7 +33,7 @@ class SettingsAdapter extends TypeAdapter<Settings> {
   @override
   void write(BinaryWriter writer, Settings obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.lastSeenAppVersion)
       ..writeByte(1)
@@ -51,9 +51,7 @@ class SettingsAdapter extends TypeAdapter<Settings> {
       ..writeByte(7)
       ..write(obj.cardListViewOptions)
       ..writeByte(8)
-      ..write(obj.customExportPath)
-      ..writeByte(9)
-      ..write(obj.format);
+      ..write(obj.customExportPath);
   }
 
   @override

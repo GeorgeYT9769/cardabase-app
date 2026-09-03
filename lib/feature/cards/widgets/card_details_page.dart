@@ -232,51 +232,11 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                                 true,
                               );
                             },
-                            style: OutlinedButton.styleFrom(
-                              elevation: 0.0,
-                              side: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: 2.0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(11),
-                              ),
-                            ),
-                            child: Text(
-                              'Copy',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color:
-                                        Theme.of(context).colorScheme.tertiary,
-                                  ),
-                            ),
+                            child: const Text('Copy'),
                           ),
                           OutlinedButton(
                             onPressed: () => Navigator.pop(context),
-                            style: OutlinedButton.styleFrom(
-                              elevation: 0.0,
-                              side: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: 2.0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(11),
-                              ),
-                            ),
-                            child: Text(
-                              'Cancel',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color:
-                                        Theme.of(context).colorScheme.tertiary,
-                                  ),
-                            ),
+                            child: const Text('Cancel'),
                           ),
                         ],
                       ),
@@ -378,6 +338,8 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
               fontSize: 16,
             ),
             border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
             isDense: true,
             contentPadding: EdgeInsets.zero,
           ),

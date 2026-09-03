@@ -33,6 +33,8 @@ class NotesFormField extends StatelessWidget {
               fontSize: 16,
             ),
             border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
             isDense: true,
             contentPadding: EdgeInsets.zero,
           ),

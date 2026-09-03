@@ -12,15 +12,8 @@ class ShareCardDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return AlertDialog(
-      title: Text(
-        'Share',
-        style: theme.textTheme.bodyLarge?.copyWith(
-          color: theme.colorScheme.inverseSurface,
-          fontSize: 30,
-        ),
-      ),
+      title: const Text('Share'),
       content: Container(
         height: 200,
         padding: const EdgeInsets.all(15),
@@ -40,25 +33,8 @@ class ShareCardDialog extends StatelessWidget {
           child: Bounceable(
             onTap: () {},
             child: OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                elevation: 0.0,
-                side: BorderSide(
-                  color: theme.colorScheme.primary,
-                  width: 2.0,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(11),
-                ),
-              ),
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                'DONE',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                  color: theme.colorScheme.tertiary,
-                ),
-              ),
+              child: const Text('DONE'),
             ),
           ),
         ),

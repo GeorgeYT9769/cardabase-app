@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:barcode_widget/barcode_widget.dart';
 import 'package:cardabase/feature/cards/card_face_error_widget.dart';
 import 'package:cardabase/feature/cards/edit/editable_loyalty_card.dart';
 import 'package:cardabase/feature/cards/edit/widgets/barcode_type_selector_dialog.dart';

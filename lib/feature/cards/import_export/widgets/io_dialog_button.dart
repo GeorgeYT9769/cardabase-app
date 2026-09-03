@@ -20,7 +20,6 @@ class IODialogButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Bounceable(
       onTap: () {},
       child: GestureDetector(
@@ -30,28 +29,12 @@ class IODialogButton extends StatelessWidget {
         },
         child: OutlinedButton(
           onPressed: onPressed,
-          style: OutlinedButton.styleFrom(
-            elevation: 0.0,
-            side: BorderSide(
-              color: theme.colorScheme.primary,
-              width: 2.0,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(11),
-            ),
-          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               icon,
               const SizedBox(width: 10),
-              Text(
-                label,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                ),
-              ),
+              Text(label),
             ],
           ),
         ),

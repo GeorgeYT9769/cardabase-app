@@ -11,6 +11,7 @@ import 'package:cardabase/feature/settings/widgets/settings_page.dart';
 import 'package:cardabase/pages/home/card_list_view_options_dialog.dart';
 import 'package:cardabase/pages/home/password_challenge_dialog.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
+import 'package:cardabase/theme/theme.dart';
 import 'package:cardabase/util/widgets/multi_listenable_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
@@ -108,13 +109,7 @@ class _HomePageState extends State<Homepage> {
       final success = await showDialog<bool>(
         context: context,
         builder: (context) => PasswordChallengeDialog(
-          challengeButtonChild: Text(
-            'EDIT',
-            style: theme.textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
-            ),
-          ),
+          challengeButtonChild: const Text('EDIT'),
         ),
       ).then((value) => value ?? false);
 
@@ -272,22 +267,7 @@ class _HomePageState extends State<Homepage> {
                                       vertical: 12,
                                       horizontal: 10,
                                     ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                      borderSide: const BorderSide(width: 2.0),
-                                    ),
-                                    focusColor: theme.colorScheme.primary,
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: theme.colorScheme.primary,
-                                      ),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    labelStyle: theme.textTheme.bodyLarge?.copyWith(
-                                      color: theme.colorScheme.inverseSurface,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 17,
-                                    ),
+                                    labelStyle: theme.emphasizedInputLabelStyle,
                                     hintText: 'Search cards...',
                                     hintStyle: theme.textTheme.bodyLarge?.copyWith(
                                       color: theme.colorScheme.tertiary,
@@ -310,10 +290,7 @@ class _HomePageState extends State<Homepage> {
                                         : null,
                                     filled: false,
                                   ),
-                                  style: theme.textTheme.bodyLarge?.copyWith(
-                                    color: theme.colorScheme.tertiary,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: theme.inputTextStyle,
                                 ),
                               ),
                               IconButton(

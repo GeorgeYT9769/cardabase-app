@@ -103,14 +103,6 @@ class _TagsPageState extends State<TagsPage> {
                       children: tagsFromCards.map((tag) {
                         return OutlinedButton(
                           onPressed: () => _addTag(tag),
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(
-                              color: theme.colorScheme.primary,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
                           child: Text(tag),
                         );
                       }).toList(),
