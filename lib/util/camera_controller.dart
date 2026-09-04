@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data' as typed_data;
+import 'dart:ui';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ import 'package:screenshot/screenshot.dart';
 import '../feature/settings/get_it.dart';
 import '../feature/settings/model.dart';
 import 'expressive_loading_indicator.dart';
+import 'widgets/blur_wrapper.dart';
 
 class CameraControllerScreen extends StatefulWidget {
   final Color cutoutColor;
@@ -201,26 +203,34 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
       valueListenable: GetIt.I<SettingsBox>().listenable(),
       builder: (context, box, _) {
         final settings = box.value;
+        final advancedTextures = settings.theme.advancedTextures;
         final rightBackButton = settings.theme.rightBackButton;
-        final backButton = Container(
-          margin: const EdgeInsets.fromLTRB(5, 5, 5, 0),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface.withValues(alpha: .4),
-            shape: BoxShape.circle,
-          ),
-          child: IconButton(
-            style: ButtonStyle(
-              iconSize: const WidgetStatePropertyAll(24),
-              iconColor: WidgetStatePropertyAll(
-                theme.colorScheme.inverseSurface,
+        final backButton = Padding(
+          padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
+          child: BlurWrapper(
+            useBlur: advancedTextures,
+            isCircle: true,
+            blurSigma: 4.5,
+            child: Container(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface.withValues(alpha: .4),
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                style: ButtonStyle(
+                  iconSize: const WidgetStatePropertyAll(24),
+                  iconColor: WidgetStatePropertyAll(
+                    theme.colorScheme.inverseSurface,
+                  ),
+                ),
+                icon: const Icon(
+                  Icons.arrow_back_ios_new,
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
               ),
             ),
-            icon: const Icon(
-              Icons.arrow_back_ios_new,
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
           ),
         );
 
@@ -338,121 +348,139 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                 },
               ),
               floatingActionButton: _capturedImageFile == null
-                  ? Container(
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 10), // Only vertical margin
-                      decoration: BoxDecoration(
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                      ),
+                      child: BlurWrapper(
+                        useBlur: advancedTextures,
                         borderRadius: BorderRadius.circular(20),
-                        color: theme.colorScheme.surface.withValues(alpha: .4),
-                      ),
-                      child: Row(
-                        mainAxisSize:
-                            MainAxisSize.min, // Make row as slim as possible
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          FloatingActionButton(
-                            heroTag: 'selectFromGallery',
-                            onPressed: () async {
-                              await _pickImageFromGallery();
-                            },
-                            backgroundColor: Colors.transparent,
-                            elevation: 0,
-                            child: const Icon(
-                              Icons.photo_library,
-                              size: 30,
-                            ),
+                        blurSigma: 4.5,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color:
+                                theme.colorScheme.surface.withValues(alpha: .4),
                           ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          FloatingActionButton(
-                            heroTag: 'takePhoto',
-                            onPressed: () async {
-                              try {
-                                await _initializeControllerFuture;
-                                await _takePicture();
-                              } catch (e) {
-                                Navigator.pop(context);
-                              }
-                            },
-                            backgroundColor: Colors.transparent,
-                            elevation: 0,
-                            child: const Icon(
-                              Icons.camera_alt,
-                              size: 30,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : Container(
-                      margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                      padding: const EdgeInsets.only(top: 10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: theme.colorScheme.surface.withValues(alpha: .4),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Brightness: ${_brightness.toStringAsFixed(1)}',
-                            style:
-                                theme.textTheme.bodyLarge?.copyWith(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w900,
-                              color: theme.colorScheme.inverseSurface,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 24.0, vertical: 8.0,),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.brightness_6_rounded),
-                                Expanded(
-                                  child: Slider(
-                                    year2023: false,
-                                    value: _brightness,
-                                    min: -1.0,
-                                    max: 1.0,
-                                    //activeColor: widget.cutoutColor,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _brightness = value;
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Row(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               FloatingActionButton(
-                                heroTag: 'retakePhoto',
-                                onPressed: _retakePicture,
+                                heroTag: 'selectFromGallery',
+                                onPressed: () async {
+                                  await _pickImageFromGallery();
+                                },
                                 backgroundColor: Colors.transparent,
                                 elevation: 0,
                                 child: const Icon(
-                                  Icons.refresh,
+                                  Icons.photo_library,
                                   size: 30,
                                 ),
                               ),
+                              const SizedBox(
+                                width: 20,
+                              ),
                               FloatingActionButton(
-                                heroTag: 'usePhoto',
-                                onPressed: _confirmAndSavePicture,
+                                heroTag: 'takePhoto',
+                                onPressed: () async {
+                                  try {
+                                    await _initializeControllerFuture;
+                                    await _takePicture();
+                                  } catch (e) {
+                                    Navigator.pop(context);
+                                  }
+                                },
                                 backgroundColor: Colors.transparent,
                                 elevation: 0,
                                 child: const Icon(
-                                  Icons.check,
+                                  Icons.camera_alt,
                                   size: 30,
                                 ),
                               ),
                             ],
                           ),
-                        ],
+                        ),
+                      ),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                      child: BlurWrapper(
+                        useBlur: advancedTextures,
+                        borderRadius: BorderRadius.circular(20),
+                        blurSigma: 4.0,
+                        child: Container(
+                          padding: const EdgeInsets.only(top: 10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color:
+                                theme.colorScheme.surface.withValues(alpha: .4),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Brightness: ${_brightness.toStringAsFixed(1)}',
+                                style: theme.textTheme.bodyLarge?.copyWith(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w900,
+                                  color: theme.colorScheme.inverseSurface,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24.0,
+                                  vertical: 8.0,
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.brightness_6_rounded),
+                                    Expanded(
+                                      child: Slider(
+                                        year2023: false,
+                                        value: _brightness,
+                                        min: -1.0,
+                                        max: 1.0,
+                                        //activeColor: widget.cutoutColor,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _brightness = value;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  FloatingActionButton(
+                                    heroTag: 'retakePhoto',
+                                    onPressed: _retakePicture,
+                                    backgroundColor: Colors.transparent,
+                                    elevation: 0,
+                                    child: const Icon(
+                                      Icons.refresh,
+                                      size: 30,
+                                    ),
+                                  ),
+                                  FloatingActionButton(
+                                    heroTag: 'usePhoto',
+                                    onPressed: _confirmAndSavePicture,
+                                    backgroundColor: Colors.transparent,
+                                    elevation: 0,
+                                    child: const Icon(
+                                      Icons.check,
+                                      size: 30,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
               floatingActionButtonLocation:
@@ -460,9 +488,12 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
             ),
             if (_isSaving)
               Positioned.fill(
-                child: Container(
-                  color: Colors.black.withValues(alpha: 0.4),
-                  child: Center(
+                child: BlurWrapper(
+                  useBlur: advancedTextures,
+                  blurSigma: 4.0,
+                  child: Container(
+                    color: Colors.black.withValues(alpha: 0.4),
+                    child: Center(
                     child: ExpressiveLoadingIndicator(
                       color: theme.colorScheme.tertiary,
                       constraints: const BoxConstraints(
@@ -481,6 +512,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                     ),
                   ),
                 ),
+              ),
               ),
           ],
         );

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:cardabase/util/vibration_provider.dart';
+import 'package:cardabase/util/widgets/blur_wrapper.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -50,25 +51,33 @@ class _QRBarReaderState extends State<QRBarReader> {
       valueListenable: GetIt.I<SettingsBox>().listenable(),
       builder: (context, box, _) {
         final settings = box.value;
+        final advancedTextures = settings.theme.advancedTextures;
         final rightBackButton = settings.theme.rightBackButton;
-        final backButton = Container(
-          margin: const EdgeInsets.fromLTRB(5, 5, 5, 0),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface.withValues(alpha: .4),
-            shape: BoxShape.circle,
-          ),
-          child: IconButton(
-            style: ButtonStyle(
-              iconSize: const WidgetStatePropertyAll(24),
-              iconColor: WidgetStatePropertyAll(
-                theme.colorScheme.inverseSurface,
+        final backButton = Padding(
+          padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
+          child: BlurWrapper(
+            useBlur: advancedTextures,
+            isCircle: true,
+            blurSigma: 4.5,
+            child: Container(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface.withValues(alpha: .4),
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                style: ButtonStyle(
+                  iconSize: const WidgetStatePropertyAll(24),
+                  iconColor: WidgetStatePropertyAll(
+                    theme.colorScheme.inverseSurface,
+                  ),
+                ),
+                icon: const Icon(Icons.arrow_back_ios_new),
+                onPressed: () {
+                  controller?.pauseCamera();
+                  Navigator.of(context).pop();
+                },
               ),
             ),
-            icon: const Icon(Icons.arrow_back_ios_new),
-            onPressed: () {
-              controller?.pauseCamera();
-              Navigator.of(context).pop();
-            },
           ),
         );
 
@@ -88,71 +97,81 @@ class _QRBarReaderState extends State<QRBarReader> {
             ],
           ),
           floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-          floatingActionButton: Container(
-            margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: theme.colorScheme.surface.withValues(alpha: .4),
+          floatingActionButton: Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 10,
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Container(
-                  margin: const EdgeInsets.all(10),
-                  child: IconButton(
-                    style: ButtonStyle(
-                      iconSize: const WidgetStatePropertyAll(30),
-                      iconColor: WidgetStatePropertyAll(
-                        theme.colorScheme.inverseSurface,
+            child: BlurWrapper(
+              useBlur: advancedTextures,
+              borderRadius: BorderRadius.circular(20),
+              blurSigma: 4.5,
+              child: Container(
+                //margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: theme.colorScheme.surface.withValues(alpha: .4),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.all(10),
+                      child: IconButton(
+                        style: ButtonStyle(
+                          iconSize: const WidgetStatePropertyAll(30),
+                          iconColor: WidgetStatePropertyAll(
+                            theme.colorScheme.inverseSurface,
+                          ),
+                        ),
+                        icon: const Icon(
+                          Icons.cameraswitch,
+                          size: 30,
+                        ),
+                        onPressed: () async {
+                          await controller?.flipCamera();
+                          if (mounted) setState(() {});
+                        },
                       ),
                     ),
-                    icon: const Icon(
-                      Icons.cameraswitch,
-                      size: 30,
-                    ),
-                    onPressed: () async {
-                      await controller?.flipCamera();
-                      if (mounted) setState(() {});
-                    },
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.all(10),
-                  child: IconButton(
-                    style: ButtonStyle(
-                      iconSize: const WidgetStatePropertyAll(30),
-                      iconColor: WidgetStatePropertyAll(
-                        theme.colorScheme.inverseSurface,
+                    Container(
+                      margin: const EdgeInsets.all(10),
+                      child: IconButton(
+                        style: ButtonStyle(
+                          iconSize: const WidgetStatePropertyAll(30),
+                          iconColor: WidgetStatePropertyAll(
+                            theme.colorScheme.inverseSurface,
+                          ),
+                        ),
+                        icon: const Icon(
+                          Icons.flash_on,
+                          size: 30,
+                        ),
+                        onPressed: () async {
+                          await controller?.toggleFlash();
+                          if (mounted) setState(() {});
+                        },
                       ),
                     ),
-                    icon: const Icon(
-                      Icons.flash_on,
-                      size: 30,
-                    ),
-                    onPressed: () async {
-                      await controller?.toggleFlash();
-                      if (mounted) setState(() {});
-                    },
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.all(10),
-                  child: IconButton(
-                    style: ButtonStyle(
-                      iconSize: const WidgetStatePropertyAll(30),
-                      iconColor: WidgetStatePropertyAll(
-                        theme.colorScheme.inverseSurface,
+                    Container(
+                      margin: const EdgeInsets.all(10),
+                      child: IconButton(
+                        style: ButtonStyle(
+                          iconSize: const WidgetStatePropertyAll(30),
+                          iconColor: WidgetStatePropertyAll(
+                            theme.colorScheme.inverseSurface,
+                          ),
+                        ),
+                        icon: const Icon(
+                          Icons.photo,
+                          size: 30,
+                        ),
+                        onPressed: _pickImage,
                       ),
                     ),
-                    icon: const Icon(
-                      Icons.photo,
-                      size: 30,
-                    ),
-                    onPressed: _pickImage,
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         );
