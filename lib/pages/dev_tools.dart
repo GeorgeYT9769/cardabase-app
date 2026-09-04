@@ -258,32 +258,6 @@ class _DevToolsPageState extends State<DevToolsPage> {
     );
   }
 
-  Widget _appBar(ThemeData theme) {
-    return SliverAppBar(
-      automaticallyImplyLeading: false,
-      actions: [
-        IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: theme.colorScheme.secondary,
-          ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ],
-      title: Text(
-        'Dev Tools',
-        style: theme.textTheme.titleLarge?.copyWith(
-          color: theme.colorScheme.tertiary,
-        ),
-      ),
-      centerTitle: true,
-      elevation: 0.0,
-      backgroundColor: theme.colorScheme.surface,
-      floating: true,
-      snap: true,
-    );
-  }
-
   Widget _subtitle(ThemeData theme, String title) {
     return Padding(
       padding: const EdgeInsets.only(top: 10, left: 20, bottom: 5),

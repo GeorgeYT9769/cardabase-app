@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:cardabase/util/vibration_provider.dart';
+import 'package:cardabase/util/widgets/blur_app_bar_background.dart';
 import 'package:cardabase/util/widgets/blur_wrapper.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +59,7 @@ class _QRBarReaderState extends State<QRBarReader> {
           child: BlurWrapper(
             useBlur: advancedTextures,
             isCircle: true,
-            blurSigma: 4.5,
+            blurSigma: 10,
             child: Container(
               decoration: BoxDecoration(
                 color: theme.colorScheme.surface.withValues(alpha: .4),
@@ -90,6 +91,7 @@ class _QRBarReaderState extends State<QRBarReader> {
             actions: [
               if (rightBackButton) backButton,
             ],
+            flexibleSpace: advancedTextures ? const BlurAppBarBackground() : null,
           ),
           body: Column(
             children: <Widget>[
@@ -104,7 +106,7 @@ class _QRBarReaderState extends State<QRBarReader> {
             child: BlurWrapper(
               useBlur: advancedTextures,
               borderRadius: BorderRadius.circular(20),
-              blurSigma: 4.5,
+              blurSigma: 10,
               child: Container(
                 //margin: const EdgeInsets.fromLTRB(20, 10, 20, 10),
                 decoration: BoxDecoration(

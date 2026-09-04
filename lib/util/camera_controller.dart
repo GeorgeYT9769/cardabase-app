@@ -16,6 +16,7 @@ import 'package:screenshot/screenshot.dart';
 import '../feature/settings/get_it.dart';
 import '../feature/settings/model.dart';
 import 'expressive_loading_indicator.dart';
+import 'widgets/blur_app_bar_background.dart';
 import 'widgets/blur_wrapper.dart';
 
 class CameraControllerScreen extends StatefulWidget {
@@ -210,7 +211,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
           child: BlurWrapper(
             useBlur: advancedTextures,
             isCircle: true,
-            blurSigma: 4.5,
+            blurSigma: 10,
             child: Container(
               decoration: BoxDecoration(
                 color: theme.colorScheme.surface.withValues(alpha: .4),
@@ -248,6 +249,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                 centerTitle: true,
                 elevation: 0.0,
                 backgroundColor: theme.colorScheme.surface,
+                flexibleSpace: advancedTextures ? const BlurAppBarBackground() : null,
               ),
               body: FutureBuilder<void>(
                 future: _initializeControllerFuture,
@@ -355,7 +357,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                       child: BlurWrapper(
                         useBlur: advancedTextures,
                         borderRadius: BorderRadius.circular(20),
-                        blurSigma: 4.5,
+                        blurSigma: 10,
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
@@ -408,7 +410,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                       child: BlurWrapper(
                         useBlur: advancedTextures,
                         borderRadius: BorderRadius.circular(20),
-                        blurSigma: 4.0,
+                        blurSigma: 10.0,
                         child: Container(
                           padding: const EdgeInsets.only(top: 10),
                           decoration: BoxDecoration(
@@ -490,7 +492,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
               Positioned.fill(
                 child: BlurWrapper(
                   useBlur: advancedTextures,
-                  blurSigma: 4.0,
+                  blurSigma: 10.0,
                   child: Container(
                     color: Colors.black.withValues(alpha: 0.4),
                     child: Center(

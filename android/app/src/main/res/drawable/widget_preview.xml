@@ -1,35 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="310dp"
+    android:height="110dp"
+    android:viewportWidth="310"
+    android:viewportHeight="110">
 
-    <!-- Blue outer border -->
-    <item>
-        <shape android:shape="rectangle">
-            <solid android:color="#2196F3" />
-        </shape>
-    </item>
+    <!-- Background (Blue Border) -->
+    <path
+        android:fillColor="#2196F3"
+        android:pathData="M0,0h310v110h-310z" />
 
-    <!-- White card -->
-    <item
-        android:left="6dp"
-        android:top="6dp"
-        android:right="6dp"
-        android:bottom="6dp">
-        <shape android:shape="rectangle">
-            <solid android:color="#FFFFFF" />
-        </shape>
-    </item>
+    <!-- Inner Card (White) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M6,6h298v98h-298z" />
 
-    <!-- Barcode simulated with dashed line to prevent VectorDrawable crash in widget picker -->
-    <item
-        android:width="120dp"
-        android:gravity="center">
-        <shape android:shape="line">
-            <stroke
-                android:width="60dp"
-                android:color="#000000"
-                android:dashWidth="12dp"
-                android:dashGap="8dp" />
-        </shape>
-    </item>
+    <!-- Simulated Shop Name Text (Bold horizontal line) -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M110,20h90v6h-90z" />
 
-</layer-list>
+    <!-- Simulated Barcode Bars -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M70,38h3v40h-3zM78,38h1v40h-1zM86,38h6v40h-6zM96,38h2v40h-2zM106,38h4v40h-4zM117,38h1v40h-1zM126,38h5v40h-5zM137,38h2v40h-2zM147,38h7v40h-7zM160,38h1v40h-1zM169,38h4v40h-4zM180,38h2v40h-2zM190,38h6v40h-6zM202,38h3v40h-3zM212,38h5v40h-5zM224,38h2v40h-2z" />
+
+    <!-- Simulated Data Text (Thin horizontal line) -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M120,86h70v4h-70z" />
+
+</vector>

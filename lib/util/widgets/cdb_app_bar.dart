@@ -3,21 +3,24 @@ import 'package:get_it/get_it.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import '../../feature/settings/get_it.dart';
 import '../../feature/settings/model.dart';
+import 'blur_app_bar_background.dart';
 
 class CdbAppBar extends StatefulWidget implements PreferredSizeWidget {
   const CdbAppBar({
     super.key,
-    required this.title,
+    this.title,
+    this.titleWidget,
     this.actions = const [],
     this.onBackPressed,
     this.leading,
     this.bottom,
   });
 
-  final String title;
+  final String? title;
+  final Widget? titleWidget;
   final List<Widget> actions;
   final VoidCallback? onBackPressed;
-  final IconButton? leading;
+  final Widget? leading;
   final PreferredSizeWidget? bottom;
 
   @override
@@ -38,6 +41,7 @@ class _CdbAppBarState extends State<CdbAppBar> {
       builder: (context, box, _) {
         final settings = box.value;
         final rightBackButton = settings.theme.rightBackButton;
+        final advancedTextures = settings.theme.advancedTextures;
         return AppBar(
           automaticallyImplyLeading: false,
           leading: !rightBackButton
@@ -57,15 +61,22 @@ class _CdbAppBarState extends State<CdbAppBar> {
                 color: theme.colorScheme.tertiary,
               ),
           ],
-          title: Text(
-            widget.title,
-            style: theme.textTheme.titleLarge?.copyWith(
-              color: theme.colorScheme.tertiary,
-            ),
-          ),
+          title: widget.titleWidget ??
+              (widget.title != null
+                  ? Text(
+                      widget.title!,
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        color: theme.colorScheme.tertiary,
+                      ),
+                    )
+                  : null),
           centerTitle: true,
           elevation: 0.0,
-          backgroundColor: theme.colorScheme.surface,
+          backgroundColor: advancedTextures
+              ? Colors.transparent
+              : theme.colorScheme.surface,
+          surfaceTintColor: Colors.transparent,
+          flexibleSpace: advancedTextures ? const BlurAppBarBackground() : null,
           bottom: widget.bottom,
         );
       },

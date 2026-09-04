@@ -11,6 +11,7 @@ Future<bool> createCardWidget(LoyaltyCard loyaltyCard) {
   final color = loyaltyCard.color ?? LoyaltyCard.defaultColor;
   return channel.invokeMethod<bool>('setWidgetCard', {
     'data': loyaltyCard.barcode.data,
+    'name': loyaltyCard.name,
     'type': loyaltyCard.barcode.type?.getDbStringValue() ?? 'CardType.none',
     'r': (color.r * 255).toInt(),
     'g': (color.g * 255).toInt(),

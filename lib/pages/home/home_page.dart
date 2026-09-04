@@ -12,6 +12,7 @@ import 'package:cardabase/pages/home/card_list_view_options_dialog.dart';
 import 'package:cardabase/pages/home/password_challenge_dialog.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
 import 'package:cardabase/theme/theme.dart';
+import 'package:cardabase/util/widgets/blur_app_bar_background.dart';
 import 'package:cardabase/util/widgets/multi_listenable_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
@@ -37,6 +38,7 @@ class _HomePageState extends State<Homepage> {
   final searchQuery = ValueNotifier<String>('');
   final isSearchVisible = ValueNotifier<bool>(false);
   final searchController = TextEditingController();
+  final scrollController = ScrollController();
 
   StreamSubscription? cardsSubscription;
   StreamSubscription? settingsSubscription;
@@ -68,6 +70,7 @@ class _HomePageState extends State<Homepage> {
     searchQuery.dispose();
     isSearchVisible.dispose();
     searchController.dispose();
+    scrollController.dispose();
     super.dispose();
   }
 
@@ -177,9 +180,11 @@ class _HomePageState extends State<Homepage> {
           settings.cardListViewOptions.customOrder,
           isSearchVisible,
           searchQuery,
+          settings.theme.advancedTextures,
         ],
         builder: (context) => SafeArea(
           child: CustomScrollView(
+            controller: scrollController,
             physics: cardsBox.isEmpty
                 ? const NeverScrollableScrollPhysics()
                 : const BouncingScrollPhysics(
@@ -202,6 +207,11 @@ class _HomePageState extends State<Homepage> {
                             searchQuery.value = '';
                             searchController.clear();
                           }
+                          scrollController.animateTo(
+                            0,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
                         },
                       ),
                     ),
@@ -220,7 +230,13 @@ class _HomePageState extends State<Homepage> {
               ),
               centerTitle: true,
               elevation: 0.0,
-              backgroundColor: theme.colorScheme.surface,
+              backgroundColor: settings.theme.advancedTextures.value
+                  ? Colors.transparent
+                  : theme.colorScheme.surface,
+              surfaceTintColor: Colors.transparent,
+              flexibleSpace: settings.theme.advancedTextures.value
+                  ? const BlurAppBarBackground()
+                  : null,
               floating: true,
               snap: true,
             ),
@@ -230,7 +246,7 @@ class _HomePageState extends State<Homepage> {
                 transitionBuilder: (Widget child, Animation<double> animation) {
                   return SizeTransition(
                     sizeFactor: animation,
-                    axisAlignment: -1.0,
+                    alignment: Alignment.topCenter,
                     child: FadeTransition(
                       opacity: animation,
                       child: child,

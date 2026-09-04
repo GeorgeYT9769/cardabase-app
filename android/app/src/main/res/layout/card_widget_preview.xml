@@ -3,19 +3,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#2196F3"
-    android:padding="8dp"
+    android:padding="6dp"
     android:orientation="horizontal">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#FFFFFF"
-        android:padding="12dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="12dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
         android:gravity="center"
         android:orientation="vertical">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cardabase Shop"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="8dp" />
+
         <ImageView
-            android:id="@+id/widget_barcode"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -26,12 +38,12 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="1234 5678 9012"
+            android:text="1 234567 890128"
             android:textColor="#000000"
-            android:textSize="12sp"
+            android:textSize="14sp"
+            android:fontFamily="monospace"
             android:gravity="center"
-            android:layout_marginTop="6dp"
-            android:fontFamily="monospace" />
+            android:layout_marginTop="6dp" />
 
     </LinearLayout>
 </LinearLayout>

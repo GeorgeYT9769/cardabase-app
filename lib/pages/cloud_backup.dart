@@ -8,6 +8,7 @@ import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
+import '../util/widgets/cdb_app_bar.dart';
 import '../util/widgets/custom_snack_bar.dart';
 
 class CloudBackup extends StatefulWidget {
@@ -320,21 +321,11 @@ class _CloudBackupState extends State<CloudBackup> {
     final theme = Theme.of(context);
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       backgroundColor: theme.colorScheme.surface,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios_new,
-              color: theme.colorScheme.secondary,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ],
-        title: Text(
+      appBar: CdbAppBar(
+        onBackPressed: () => Navigator.pop(context),
+        titleWidget: Text(
           'Cloud backup',
           style: theme.textTheme.bodyLarge?.copyWith(
             fontSize: 17,
@@ -344,9 +335,6 @@ class _CloudBackupState extends State<CloudBackup> {
             color: theme.colorScheme.tertiary,
           ),
         ),
-        centerTitle: true,
-        elevation: 0.0,
-        backgroundColor: theme.colorScheme.surface,
       ),
       body: hasCloudSetUp
           ? Container(

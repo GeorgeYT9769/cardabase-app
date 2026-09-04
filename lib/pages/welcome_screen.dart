@@ -5,6 +5,7 @@ import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/pages/home/home_page.dart';
  import 'package:cardabase/pages/lock_screen.dart';
 import 'package:cardabase/pages/terms_of_service.dart';
+import 'package:cardabase/util/widgets/cdb_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle, SystemNavigator;
 import 'package:flutter_bounceable/flutter_bounceable.dart';
@@ -197,16 +198,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           );
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Welcome',
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: theme.colorScheme.tertiary,
-          ),
-        ),
-        centerTitle: true,
-        elevation: 0.0,
-        backgroundColor: theme.colorScheme.surface,
+      extendBodyBehindAppBar: true,
+      appBar: CdbAppBar(
+        title: 'Welcome',
         leading: Transform.rotate(
           angle: math.pi,
           child: IconButton(
@@ -224,7 +218,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               icon: Icon(
                 Icons.arrow_back_ios_new,
                 color: theme.colorScheme.secondary,
-              ), onPressed: continueToApp,
+              ),
+              onPressed: continueToApp,
             ),
           ),
         ],

@@ -94,6 +94,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
     final passNotifier = ValueNotifier<PasswordStrength?>(null);
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       backgroundColor:
           theme.colorScheme.surface,
       appBar: CdbAppBar(

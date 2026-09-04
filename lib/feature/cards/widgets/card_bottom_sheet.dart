@@ -6,6 +6,7 @@ import 'package:cardabase/feature/cards/platform/set_widget_card.dart';
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/theme/theme.dart';
+import 'package:cardabase/util/widgets/blur_app_bar_background.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -19,14 +20,44 @@ Future<void> showLoyaltyCardBottomSheets(
   GetIt.I<VibrationProvider>().vibrateSelection();
   return showModalBottomSheet(
     context: context,
+    backgroundColor: Colors.transparent,
     elevation: 0.0,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
-    builder: (BuildContext context) => _CardBottomSheetContent(
+    builder: (BuildContext context) => _CardBottomSheetSurface(
       loyaltyCard: loyaltyCard,
     ),
   );
+}
+
+class _CardBottomSheetSurface extends StatelessWidget {
+  const _CardBottomSheetSurface({required this.loyaltyCard});
+
+  final LoyaltyCard loyaltyCard;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final advancedTextures = GetIt.I<SettingsBox>().value.theme.advancedTextures;
+
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      child: Stack(
+        children: [
+          if (advancedTextures) const Positioned.fill(child: BlurAppBarBackground()),
+          Material(
+            color: advancedTextures
+                ? theme.colorScheme.surface.withValues(alpha: 0.5)
+                : theme.colorScheme.surface,
+            child: _CardBottomSheetContent(
+              loyaltyCard: loyaltyCard,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _CardBottomSheetContent extends StatefulWidget {
@@ -163,79 +194,83 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
     final theme = Theme.of(context);
     final sortingStyle = settingsBox.value.cardListViewOptions.sortingStyle;
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Wrap(
-        children: [
-          if (canCreateCardWidget)
-            ListTile(
-              leading: Icon(Icons.widgets, color: theme.colorScheme.tertiary),
-              title: Text(
-                'Set as Widget',
-                style: theme.textTheme.bodyLarge?.copyWith(
+    return Wrap(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 50),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (canCreateCardWidget)
+                ListTile(
+                  leading: Icon(Icons.widgets, color: theme.colorScheme.tertiary),
+                  title: Text(
+                    'Set as Widget',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight(700),
+                    ),
+                  ),
+                  onTap: _createCardWidget,
+                ),
+              ListTile(
+                leading: Icon(Icons.edit, color: theme.colorScheme.tertiary),
+                title: Text('Edit', style: theme.textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight(700),
-                ),
+                ),),
+                onTap: _editCard,
               ),
-              onTap: _createCardWidget,
-            ),
-          ListTile(
-            leading: Icon(Icons.edit, color: theme.colorScheme.tertiary),
-            title: Text('Edit', style: theme.textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight(700),
-            ),),
-            onTap: _editCard,
-          ),
-          ListTile(
-            leading: Icon(Icons.copy, color: theme.colorScheme.tertiary),
-            title: Text(
-              'Duplicate',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight(700),
-              ),
-            ),
-            onTap: _duplicateCard,
-          ),
-          if (sortingStyle == SortingStyle.custom)
-            ...[
               ListTile(
-                leading:
-                    Icon(Icons.arrow_upward, color: theme.colorScheme.tertiary),
+                leading: Icon(Icons.copy, color: theme.colorScheme.tertiary),
                 title: Text(
-                  'Move UP',
+                  'Duplicate',
                   style: theme.textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight(700),
                   ),
                 ),
-                onTap: _moveCardUp,
+                onTap: _duplicateCard,
               ),
+              if (sortingStyle == SortingStyle.custom)
+                ...[
+                  ListTile(
+                    leading:
+                        Icon(Icons.arrow_upward, color: theme.colorScheme.tertiary),
+                    title: Text(
+                      'Move UP',
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight(700),
+                      ),
+                    ),
+                    onTap: _moveCardUp,
+                  ),
+                  ListTile(
+                    leading: Icon(
+                      Icons.arrow_downward,
+                      color: theme.colorScheme.tertiary,
+                    ),
+                    title: Text(
+                      'Move DOWN',
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight(700),
+                      ),
+                    ),
+                    onTap: _moveCardDown,
+                  ),
+                ],
               ListTile(
-                leading: Icon(
-                  Icons.arrow_downward,
-                  color: theme.colorScheme.tertiary,
-                ),
+                leading: const Icon(Icons.delete, color: Colors.red),
                 title: Text(
-                  'Move DOWN',
+                  'DELETE',
                   style: theme.textTheme.bodyLarge?.copyWith(
+                    color: Colors.red,
                     fontWeight: FontWeight(700),
                   ),
                 ),
-                onTap: _moveCardDown,
+                onTap: _deleteCard,
               ),
             ],
-          ListTile(
-            leading: const Icon(Icons.delete, color: Colors.red),
-            title: Text(
-              'DELETE',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: Colors.red,
-                fontWeight: FontWeight(700),
-              ),
-            ),
-            onTap: _deleteCard,
           ),
-          const SizedBox(height: 100),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

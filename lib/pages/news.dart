@@ -71,6 +71,7 @@ class _NewsPageState extends State<NewsPage>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: CdbAppBar(
         title: 'Changelog',
         onBackPressed: () => Navigator.of(context).pop(),

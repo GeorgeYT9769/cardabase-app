@@ -63,6 +63,7 @@ class _TagsPageState extends State<TagsPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: CdbAppBar(
         title: 'Tags',
         onBackPressed: () => Navigator.pop(context),
