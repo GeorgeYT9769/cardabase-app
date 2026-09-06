@@ -87,7 +87,7 @@ class _CdbAppBarSliverState extends State<CdbAppBarSliver> {
               ? Colors.transparent
               : theme.colorScheme.surface,
           surfaceTintColor: Colors.transparent,
-          flexibleSpace: advancedTextures ? const BlurAppBarBackground() : null,
+          flexibleSpace: advancedTextures ? const BlurAppBarBackground(alpha: .8) : null,
           floating: widget.floating,
           snap: widget.snap,
           pinned: widget.pinned,

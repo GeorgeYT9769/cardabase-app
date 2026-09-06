@@ -343,7 +343,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       child: Text(
                         'Skip for now',
                         style: theme.textTheme.bodyLarge?.copyWith(
-                            color: theme.colorScheme.inverseSurface),
+                            color: theme.colorScheme.inverseSurface,),
                       ),
                     ),
                   ),

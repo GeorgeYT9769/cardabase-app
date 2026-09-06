@@ -73,6 +73,10 @@ class _CardSummaryState extends State<CardSummary> {
       return;
     }
     widget.onTap?.call();
+
+    // Increment usedCount
+    cardsBox.put(card.id, card.copyWith(usedCount: card.usedCount + 1));
+
     if (card.requiresAuth) {
       if (!await requirePassword(context)) {
         return;

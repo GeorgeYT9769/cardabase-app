@@ -56,6 +56,7 @@ class _DevToolsPageState extends State<DevToolsPage> {
         createdAt: now,
         lastModifiedAt: now,
         usePoints: true,
+        usedCount: 0,
       ),
       LoyaltyCard(
         id: 'dummy-2',
@@ -73,6 +74,7 @@ class _DevToolsPageState extends State<DevToolsPage> {
         createdAt: now,
         lastModifiedAt: now,
         usePoints: true,
+        usedCount: 0,
       ),
       LoyaltyCard(
         id: 'dummy-3',
@@ -90,6 +92,7 @@ class _DevToolsPageState extends State<DevToolsPage> {
         createdAt: now,
         lastModifiedAt: now,
         usePoints: false,
+        usedCount: 0,
       ),
       LoyaltyCard(
         id: 'dummy-4',
@@ -107,6 +110,7 @@ class _DevToolsPageState extends State<DevToolsPage> {
         createdAt: now,
         lastModifiedAt: now,
         usePoints: true,
+        usedCount: 0,
       ),
       LoyaltyCard(
         id: 'dummy-5',
@@ -124,6 +128,7 @@ class _DevToolsPageState extends State<DevToolsPage> {
         createdAt: now,
         lastModifiedAt: now,
         usePoints: true,
+        usedCount: 0,
       ),
     ];
 

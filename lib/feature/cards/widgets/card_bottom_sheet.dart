@@ -45,7 +45,7 @@ class _CardBottomSheetSurface extends StatelessWidget {
       borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       child: Stack(
         children: [
-          if (advancedTextures) const Positioned.fill(child: BlurAppBarBackground()),
+          if (advancedTextures) const Positioned.fill(child: BlurAppBarBackground(alpha: .5,)),
           Material(
             color: advancedTextures
                 ? theme.colorScheme.surface.withValues(alpha: 0.5)

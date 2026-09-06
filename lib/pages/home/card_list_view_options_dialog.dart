@@ -45,8 +45,6 @@ class CardListViewOptionsDialog extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 if (allTags.isNotEmpty) ..._tagFilter(theme),
-                _optionTitle(theme, 'Sort by:'),
-                const SizedBox(height: 10),
                 SortingStyleSelector(controller: sortingStyle),
                 ValueListenableBuilder<SortingStyle>(
                   valueListenable: sortingStyle,

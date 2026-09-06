@@ -19,6 +19,7 @@ class EditableLoyaltyCard {
     required this.hideName,
     required this.createdAt,
     required this.usePoints,
+    required this.usedCount,
   });
 
   EditableLoyaltyCard.createNew()
@@ -37,6 +38,7 @@ class EditableLoyaltyCard {
           hideName: ValueNotifier(false),
           createdAt: ValueNotifier(DateTime.now().toUtc()),
           usePoints: ValueNotifier(false),
+          usedCount: 0,
         );
 
   factory EditableLoyaltyCard.fromValue(LoyaltyCard value) {
@@ -55,6 +57,7 @@ class EditableLoyaltyCard {
       hideName: ValueNotifier(value.hideName),
       createdAt: ValueNotifier(value.createdAt),
       usePoints: ValueNotifier(value.usePoints),
+      usedCount: value.usedCount,
     );
   }
 
@@ -75,6 +78,7 @@ class EditableLoyaltyCard {
   final ValueNotifier<bool> hideName;
   final ValueNotifier<DateTime> createdAt;
   final ValueNotifier<bool> usePoints;
+  final int usedCount;
 
   void loadValue(LoyaltyCard value) {
     id.value = value.id;
@@ -90,6 +94,9 @@ class EditableLoyaltyCard {
     requiresAuth.value = value.requiresAuth;
     hideName.value = value.hideName;
     usePoints.value = value.usePoints;
+    // usedCount is final, so we don't update it here.
+    // This is fine as loadValue is mainly used for settings, not card editing
+    // where you'd change the card you're looking at.
   }
 
   LoyaltyCard seal() {
@@ -109,6 +116,7 @@ class EditableLoyaltyCard {
       createdAt: createdAt.value,
       lastModifiedAt: DateTime.now().toUtc(),
       usePoints: usePoints.value,
+      usedCount: usedCount,
     );
   }
 

@@ -19,6 +19,10 @@ enum SortingStyle {
   oldest,
   @HiveField(4)
   custom,
+  @HiveField(5)
+  mostUsed,
+  @HiveField(6)
+  leastUsed,
 }
 
 @HiveType(typeId: HiveTypeIds.cardListViewOptions)
@@ -104,6 +108,12 @@ class CardListViewOptions {
         return;
       case SortingStyle.latest:
         cards.sort((a, b) => b.lastModifiedAt.compareTo(a.lastModifiedAt));
+        return;
+      case SortingStyle.mostUsed:
+        cards.sort((a, b) => b.usedCount.compareTo(a.usedCount));
+        return;
+      case SortingStyle.leastUsed:
+        cards.sort((a, b) => a.usedCount.compareTo(b.usedCount));
         return;
       case SortingStyle.nameAz:
         comparer = (a, b) => a.compareTo(b);

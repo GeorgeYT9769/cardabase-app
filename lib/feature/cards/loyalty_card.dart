@@ -38,6 +38,7 @@ class LoyaltyCard {
     required DateTime? createdAt,
     required DateTime? lastModifiedAt,
     required this.usePoints,
+    this.usedCount = 0,
   })  : createdAt = createdAt ?? DateTime.now().toUtc(),
         lastModifiedAt = lastModifiedAt ?? DateTime.now().toUtc();
 
@@ -111,6 +112,10 @@ class LoyaltyCard {
   @HiveField(14, defaultValue: false)
   final bool usePoints;
 
+  /// [usedCount] is the number of times the card has been clicked on.
+  @HiveField(15, defaultValue: 0)
+  final int usedCount;
+
   Color get nonNullColor => color ?? defaultColor;
 
   EditableLoyaltyCard editable() => EditableLoyaltyCard.fromValue(this);
@@ -160,6 +165,7 @@ class LoyaltyCard {
       createdAt: now,
       lastModifiedAt: now,
       usePoints: false,
+      usedCount: 0,
     );
   }
 
@@ -216,6 +222,7 @@ class LoyaltyCard {
           createdAt: now,
           lastModifiedAt: now,
           usePoints: points != 0 || cardMap.containsKey('pointsAmount'),
+          usedCount: 0,
         );
       }
     }
@@ -264,6 +271,7 @@ class LoyaltyCard {
       createdAt: now,
       lastModifiedAt: now,
       usePoints: false,
+      usedCount: 0,
     );
   }
 
@@ -299,6 +307,7 @@ class LoyaltyCard {
           (points != 0 ||
               jsonMap.containsKey('points') ||
               jsonMap.containsKey('pointsAmount')),
+      usedCount: jsonMap.getInt('usedCount') ?? 0,
     );
   }
 
@@ -322,6 +331,7 @@ class LoyaltyCard {
       if (useFrontImageOverlay != false)
         'useFrontImageOverlay': useFrontImageOverlay,
       'usePoints': usePoints,
+      'usedCount': usedCount,
     };
   }
 
@@ -341,6 +351,7 @@ class LoyaltyCard {
     DateTime? createdAt,
     DateTime? lastModifiedAt,
     bool? usePoints,
+    int? usedCount,
   }) {
     return LoyaltyCard(
       id: id ?? this.id,
@@ -358,6 +369,7 @@ class LoyaltyCard {
       createdAt: createdAt ?? this.createdAt,
       lastModifiedAt: lastModifiedAt ?? this.lastModifiedAt,
       usePoints: usePoints ?? this.usePoints,
+      usedCount: usedCount ?? this.usedCount,
     );
   }
 
@@ -379,6 +391,7 @@ class LoyaltyCard {
       createdAt: now,
       lastModifiedAt: now,
       usePoints: usePoints,
+      usedCount: 0,
     );
   }
 }

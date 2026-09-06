@@ -109,7 +109,7 @@ If your phone does not have issues with the app, you can add your device into th
 > Signing of the app is ON. You need a singature key and a key.properties in the /cardabase-app/android folder or else the build will fail. You can change [THIS LINE](https://github.com/GeorgeYT9769/cardabase-app/blob/1daf9c7244a081fe847b499cc55509c10772668d/android/app/build.gradle#L86) to debug to sign it with a debug key.
 
 Used versions:
-- Flutter: 3.38.5 (or newer, used Flutter version is always added as a submodule, so you can use that one)
+- Flutter: 3.47.2 (or newer, used Flutter version is always added as a submodule, so you can use that one)
 - Java: JDK-21
 - Gradle: 8.14.2
 
@@ -122,12 +122,12 @@ You may need to:
 ## 📸 Screenshots
 
 <div>
-<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/1.png?raw=true" width=204>
-<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/2.png?raw=true" width=204>
-<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/3.png?raw=true" width=204>
-<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/4.png?raw=true" width=204>
-<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/5.png?raw=true" width=204>
-<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/6.png?raw=true" width=204>
-<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/7.png?raw=true" width=204>
-<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/8.png?raw=true" width=204>
+<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/1.png?raw=true" width=204 alt="Homepage light mode">
+<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/2.png?raw=true" width=204 alt="Card view light mode">
+<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/3.png?raw=true" width=204 alt="New card light mode">
+<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/4.png?raw=true" width=204 alt="Settings light mode">
+<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/5.png?raw=true" width=204 alt="Homepage dark mode">
+<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/6.png?raw=true" width=204 alt="Card view dark mode">
+<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/7.png?raw=true" width=204 alt="New card dark mode">
+<img src="https://github.com/GeorgeYT9769/cardabase-app/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/8.png?raw=true" width=204 alt="Settings dark mode">
 </div>

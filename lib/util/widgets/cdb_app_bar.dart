@@ -76,7 +76,7 @@ class _CdbAppBarState extends State<CdbAppBar> {
               ? Colors.transparent
               : theme.colorScheme.surface,
           surfaceTintColor: Colors.transparent,
-          flexibleSpace: advancedTextures ? const BlurAppBarBackground() : null,
+          flexibleSpace: advancedTextures ? const BlurAppBarBackground(alpha: .8,) : null,
           bottom: widget.bottom,
         );
       },

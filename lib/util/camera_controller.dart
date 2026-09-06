@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:typed_data' as typed_data;
-import 'dart:ui';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +15,6 @@ import 'package:screenshot/screenshot.dart';
 import '../feature/settings/get_it.dart';
 import '../feature/settings/model.dart';
 import 'expressive_loading_indicator.dart';
-import 'widgets/blur_app_bar_background.dart';
 import 'widgets/blur_wrapper.dart';
 
 class CameraControllerScreen extends StatefulWidget {

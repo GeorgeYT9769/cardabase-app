@@ -351,7 +351,7 @@ class _HomePageState extends State<Homepage> {
               tooltip: 'Add a card',
               onPressed: addCard,
               backgroundColor: advancedTextures
-                  ? theme.colorScheme.primaryContainer.withValues(alpha: .5)
+                  ? theme.colorScheme.primaryContainer.withValues(alpha: .9)
                   : null,
               child: const Icon(Icons.add_card),
             ),

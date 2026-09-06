@@ -1,0 +1,131 @@
+name: Android Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Create Android Build & Draft Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Android keystore
+        id: android_keystore
+        uses: timheuer/base64-to-file@v2
+        with:
+          fileName: upload-keystore.jks
+          encodedString: ${{ secrets.KEYSTORE_BASE64 }}
+
+      - name: Create key.properties
+        run: |
+          echo "storeFile=${{ steps.android_keystore.outputs.filePath }}" > android/key.properties
+          echo "storePassword=${{ secrets.STORE_PASSWORD }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: "zulu"
+          java-version: "21"
+          cache: gradle
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.2"
+          channel: "stable"
+          cache: true
+
+      - name: Set up Android SDK
+        run: |
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+          echo "$ANDROID_HOME/emulator" >> $GITHUB_PATH
+
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses || true
+
+      - name: Create secrets file
+        run: |
+          mkdir -p lib/config
+          echo "const String discordWebhookUrl = '${{ secrets.DISCORD_WEBHOOK_URL }}';" > lib/config/secrets.dart
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Start Android Release Build APK ABIs
+        run: flutter build apk --split-per-abi
+
+      - name: Start Android Release Build APK
+        run: flutter build apk
+
+      # Step 1: Rename APKs directly in the output folder
+      - name: Process and Rename APKs
+        run: |
+          cd build/app/outputs/flutter-apk
+          
+          # Rename split ABIs: app-arm64-v8a-release.apk -> cardabase-arm64-v8a-release.apk
+          for f in app-*-release.apk; do
+            if [ -f "$f" ]; then
+              mv "$f" "${f/app-/cardabase-}"
+            fi
+          done
+
+          # Rename universal build: app-release.apk -> cardabase-release-universal.apk
+          if [ -f "app-release.apk" ]; then
+            mv "app-release.apk" "cardabase-release-universal.apk"
+          fi
+
+      # Step 2: Extract Changelog text for the version and format body
+      - name: Parse Changelog
+        id: parse_changelog
+        run: |
+          # Get version tag without 'v' prefix (e.g. 1.9.0)
+          VERSION="${GITHUB_REF_NAME#v}"
+          if [ -z "$VERSION" ] || [ "$VERSION" = "$GITHUB_REF_NAME" ]; then
+            VERSION="1.9.0" # Fallback version for manual workflow_dispatch test runs
+          fi
+
+          # Extract text between the version header and the next date string (DD.MM.YYYY)
+          CHANGES=$(awk -v ver="$VERSION:" '
+            $0 ~ ver {flag=1; next} 
+            /^[0-9]{2}\.[0-9]{2}\.[0-9]{4}/ {if (flag) exit} 
+            flag {print}
+          ' CHANGELOG.txt | sed '/^[[:space:]]*$/d')
+
+          # Save formatted Markdown release body to temporary file
+          cat <<EOF > release_body.md
+          ### **${VERSION} is here! This is what was changed:**
+          ${CHANGES}
+
+          <br>
+
+          **Download:**
+          - UNIVERSAL (if you don't know which one to get)‎ ‎ ‎      >> \`cardabase-release-universal.apk\`
+          - ARM 64-bit v8a (RECOMMENDED, modern devices)‎ ‎  >> \`cardabase-arm64-v8a-release.apk\`
+          - ARM 32-bit v7a (older and cheaper devices)‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎    >> \`cardabase-armeabi-v7a-release.apk\`
+          - x86 64-bit (tiny amount of devices)‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎     >> \`cardabase-x86_64-release.apk\`
+          EOF
+
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      # Step 3: Create GitHub Draft Release
+      - name: Create Draft Release
+        uses: softprops/action-gh-release@v3
+        with:
+          draft: true
+          prerelease: false
+          tag_name: ${{ github.ref_name }}
+          name: "${{ env.VERSION }}"
+          body_path: release_body.md
+          files: |
+            build/app/outputs/flutter-apk/cardabase-*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
