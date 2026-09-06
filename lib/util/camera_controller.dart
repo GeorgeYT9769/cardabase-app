@@ -249,7 +249,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                 centerTitle: true,
                 elevation: 0.0,
                 backgroundColor: theme.colorScheme.surface,
-                flexibleSpace: advancedTextures ? const BlurAppBarBackground() : null,
+                //flexibleSpace: advancedTextures ? const BlurAppBarBackground() : null,
               ),
               body: FutureBuilder<void>(
                 future: _initializeControllerFuture,

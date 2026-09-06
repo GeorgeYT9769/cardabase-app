@@ -14,6 +14,7 @@ class CdbAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.onBackPressed,
     this.leading,
     this.bottom,
+    this.showBackButton = true,
   });
 
   final String? title;
@@ -22,6 +23,7 @@ class CdbAppBar extends StatefulWidget implements PreferredSizeWidget {
   final VoidCallback? onBackPressed;
   final Widget? leading;
   final PreferredSizeWidget? bottom;
+  final bool showBackButton;
 
   @override
   State<CdbAppBar> createState() => _CdbAppBarState();
@@ -42,24 +44,22 @@ class _CdbAppBarState extends State<CdbAppBar> {
         final settings = box.value;
         final rightBackButton = settings.theme.rightBackButton;
         final advancedTextures = settings.theme.advancedTextures;
+
+        final backButton = IconButton(
+          onPressed: widget.onBackPressed,
+          icon: const Icon(Icons.arrow_back_ios_new),
+          color: theme.colorScheme.tertiary,
+        );
+
         return AppBar(
           automaticallyImplyLeading: false,
           leading: !rightBackButton
-              ? IconButton(
-                  onPressed: widget.onBackPressed,
-                  icon: const Icon(Icons.arrow_back_ios_new),
-                  color: theme.colorScheme.tertiary,
-                )
+              ? (widget.showBackButton ? backButton : null)
               : widget.leading,
           actions: [
             ...widget.actions,
             if (!rightBackButton && widget.leading != null) widget.leading!,
-            if (rightBackButton)
-              IconButton(
-                onPressed: widget.onBackPressed,
-                icon: const Icon(Icons.arrow_back_ios_new),
-                color: theme.colorScheme.tertiary,
-              ),
+            if (rightBackButton && widget.showBackButton) backButton,
           ],
           title: widget.titleWidget ??
               (widget.title != null

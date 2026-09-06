@@ -12,7 +12,8 @@ import 'package:cardabase/pages/home/card_list_view_options_dialog.dart';
 import 'package:cardabase/pages/home/password_challenge_dialog.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
 import 'package:cardabase/theme/theme.dart';
-import 'package:cardabase/util/widgets/blur_app_bar_background.dart';
+import 'package:cardabase/util/widgets/blur_wrapper.dart';
+import 'package:cardabase/util/widgets/cdb_app_bar_sliver.dart';
 import 'package:cardabase/util/widgets/multi_listenable_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
@@ -182,8 +183,7 @@ class _HomePageState extends State<Homepage> {
           searchQuery,
           settings.theme.advancedTextures,
         ],
-        builder: (context) => SafeArea(
-          child: CustomScrollView(
+        builder: (context) => CustomScrollView(
             controller: scrollController,
             physics: cardsBox.isEmpty
                 ? const NeverScrollableScrollPhysics()
@@ -191,14 +191,17 @@ class _HomePageState extends State<Homepage> {
                     decelerationRate: ScrollDecelerationRate.fast,
                   ),
             slivers: [
-            SliverAppBar(
+            CdbAppBarSliver(
+              showBackButton: false,
               leading: cardsBox.isEmpty
                   ? null
                   : TapRegion(
                       groupId: 'search_bar',
                       child: IconButton(
                         icon: Icon(
-                          isSearchVisible.value ? Icons.search_off : Icons.search,
+                          isSearchVisible.value
+                              ? Icons.search_off
+                              : Icons.search,
                           color: theme.colorScheme.secondary,
                         ),
                         onPressed: () {
@@ -224,21 +227,7 @@ class _HomePageState extends State<Homepage> {
                   onPressed: navigateToSettingsScreen,
                 ),
               ],
-              title: Text(
-                'Cardabase',
-                style: theme.textTheme.titleLarge?.copyWith(),
-              ),
-              centerTitle: true,
-              elevation: 0.0,
-              backgroundColor: settings.theme.advancedTextures.value
-                  ? Colors.transparent
-                  : theme.colorScheme.surface,
-              surfaceTintColor: Colors.transparent,
-              flexibleSpace: settings.theme.advancedTextures.value
-                  ? const BlurAppBarBackground()
-                  : null,
-              floating: true,
-              snap: true,
+              title: 'Cardabase',
             ),
             SliverToBoxAdapter(
               child: AnimatedSwitcher(
@@ -339,23 +328,33 @@ class _HomePageState extends State<Homepage> {
           ],
         ),
       ),
-    ),
     );
   }
 
   Widget _addCardButton() {
+    final theme = Theme.of(context);
+    final advancedTextures = settings.theme.advancedTextures.value;
     return Bounceable(
       onTap: () {},
       child: SizedBox(
         height: 70,
         width: 70,
-        child: FittedBox(
-          child: FloatingActionButton(
-            elevation: 0.0,
-            enableFeedback: true,
-            tooltip: 'Add a card',
-            onPressed: addCard,
-            child: const Icon(Icons.add_card),
+        child: BlurWrapper(
+          useBlur: advancedTextures,
+          isCircle: false,
+          borderRadius: BorderRadius.circular(20),
+          blurSigma: 10,
+          child: FittedBox(
+            child: FloatingActionButton(
+              elevation: 0.0,
+              enableFeedback: true,
+              tooltip: 'Add a card',
+              onPressed: addCard,
+              backgroundColor: advancedTextures
+                  ? theme.colorScheme.primaryContainer.withValues(alpha: .5)
+                  : null,
+              child: const Icon(Icons.add_card),
+            ),
           ),
         ),
       ),

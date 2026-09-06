@@ -91,7 +91,7 @@ class _QRBarReaderState extends State<QRBarReader> {
             actions: [
               if (rightBackButton) backButton,
             ],
-            flexibleSpace: advancedTextures ? const BlurAppBarBackground() : null,
+            //flexibleSpace: advancedTextures ? const BlurAppBarBackground() : null,
           ),
           body: Column(
             children: <Widget>[

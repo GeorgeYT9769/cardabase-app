@@ -10,6 +10,7 @@ import 'package:get_it/get_it.dart';
 
 import '../../../util/widgets/cdb_app_bar.dart';
 import '../../../util/widgets/custom_snack_bar.dart';
+import '../../../util/widgets/blur_wrapper.dart';
 
 class TagsPage extends StatefulWidget {
   const TagsPage({super.key});
@@ -141,13 +142,22 @@ class _TagsPageState extends State<TagsPage> {
         child: SizedBox(
           height: 70,
           width: 70,
-          child: FittedBox(
-            child: FloatingActionButton(
-              elevation: 0.0,
-              enableFeedback: true,
-              tooltip: 'Add a tag',
-              onPressed: () => showAddDialog(context),
-              child: const Icon(Icons.add),
+          child: BlurWrapper(
+            useBlur: _settings.theme.advancedTextures.value,
+            isCircle: false,
+            borderRadius: BorderRadius.circular(20),
+            blurSigma: 10,
+            child: FittedBox(
+              child: FloatingActionButton(
+                elevation: 0.0,
+                enableFeedback: true,
+                tooltip: 'Add a tag',
+                onPressed: () => showAddDialog(context),
+                backgroundColor: _settings.theme.advancedTextures.value
+                    ? theme.colorScheme.primaryContainer.withValues(alpha: .5)
+                    : null,
+                child: const Icon(Icons.add),
+              ),
             ),
           ),
         ),

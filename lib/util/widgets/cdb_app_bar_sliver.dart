@@ -14,6 +14,10 @@ class CdbAppBarSliver extends StatefulWidget {
     this.actions = const [],
     this.onBackPressed,
     this.leading,
+    this.showBackButton = true,
+    this.floating = true,
+    this.snap = false,
+    this.pinned = false,
   });
 
   final String? title;
@@ -21,6 +25,10 @@ class CdbAppBarSliver extends StatefulWidget {
   final List<Widget> actions;
   final VoidCallback? onBackPressed;
   final Widget? leading;
+  final bool showBackButton;
+  final bool floating;
+  final bool snap;
+  final bool pinned;
 
   @override
   State<CdbAppBarSliver> createState() => _CdbAppBarSliverState();
@@ -36,25 +44,34 @@ class _CdbAppBarSliverState extends State<CdbAppBarSliver> {
         final settings = box.value;
         final rightBackButton = settings.theme.rightBackButton;
         final advancedTextures = settings.theme.advancedTextures;
+
+        final backButton = IconButton(
+          onPressed: widget.onBackPressed,
+          icon: const Icon(Icons.arrow_back_ios_new),
+          color: theme.colorScheme.tertiary,
+        );
+
+        Widget? leading;
+        List<Widget> actions = [...widget.actions];
+
+        if (widget.showBackButton) {
+          if (rightBackButton) {
+            leading = widget.leading;
+            actions.add(backButton);
+          } else {
+            leading = backButton;
+            if (widget.leading != null) {
+              actions.add(widget.leading!);
+            }
+          }
+        } else {
+          leading = widget.leading;
+        }
+
         return SliverAppBar(
           automaticallyImplyLeading: false,
-          leading: !rightBackButton
-              ? IconButton(
-                  onPressed: widget.onBackPressed,
-                  icon: const Icon(Icons.arrow_back_ios_new),
-                  color: theme.colorScheme.tertiary,
-                )
-              : widget.leading,
-          actions: [
-            ...widget.actions,
-            if (!rightBackButton && widget.leading != null) widget.leading!,
-            if (rightBackButton)
-              IconButton(
-                onPressed: widget.onBackPressed,
-                icon: const Icon(Icons.arrow_back_ios_new),
-                color: theme.colorScheme.tertiary,
-              ),
-          ],
+          leading: leading,
+          actions: actions,
           title: widget.titleWidget ??
               (widget.title != null
                   ? Text(
@@ -71,7 +88,9 @@ class _CdbAppBarSliverState extends State<CdbAppBarSliver> {
               : theme.colorScheme.surface,
           surfaceTintColor: Colors.transparent,
           flexibleSpace: advancedTextures ? const BlurAppBarBackground() : null,
-          floating: true,
+          floating: widget.floating,
+          snap: widget.snap,
+          pinned: widget.pinned,
         );
       },
     );
