@@ -7,6 +7,7 @@ import 'package:faker/faker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:integration_test/integration_test.dart';
 
 import '../../../test_helpers/fakers/loyalty_card.dart';
@@ -222,6 +223,276 @@ void main() {
 
       // ASSERT
       expect(settingsBox.value.theme.useDarkMode, isTrue);
+    });
+  });
+
+  group('the tags', () {
+    testWidgets('a tag added in the settings can be put on a card',
+        (tester) async {
+      // ARRANGE
+      usePhoneView(tester);
+      final loyaltyCardsBox = await GetIt.I.getAsync<LoyaltyCardsBox>();
+      await loyaltyCardsBox.put(
+        'delhaize',
+        faker.loyaltyCards.simpleCard().copyWith(
+              id: 'delhaize',
+              name: 'Delhaize',
+              tags: const {},
+            ),
+      );
+      await tester.pumpWidget(Main(initialScreen: Homepage()));
+      await tester.pumpAndSettle();
+
+      // ACT the tag is made in the settings,
+      await tester.tap(find.byIcon(Icons.settings));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.text('Tags'), 200);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Tags'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.add));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextFormField), 'groceries');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('ADD'));
+      await tester.pumpAndSettle();
+
+      // ASSERT the tag is kept,
+      final settingsBox = await GetIt.I.getAsync<SettingsBox>();
+      expect(settingsBox.value.tags, contains('groceries'));
+
+      // and is offered on the form of a card the next time the app opens.
+      await restart(tester, Homepage());
+      await tester.longPress(find.text('Delhaize'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Edit'));
+      await tester.pumpAndSettle();
+      // the tags of a card live on the second tab of the form.
+      await tester.tap(find.text('Others'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(ActionChip, 'groceries'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('SAVE'));
+      await tester.pumpAndSettle();
+
+      // ASSERT
+      expect(loyaltyCardsBox.get('delhaize')?.tags, contains('groceries'));
+    });
+
+    testWidgets('the card list can be filtered down to one tag',
+        (tester) async {
+      // ARRANGE a tagged card and an untagged one, with the tag known to the
+      // settings so the filter offers it.
+      usePhoneView(tester);
+      final loyaltyCardsBox = await GetIt.I.getAsync<LoyaltyCardsBox>();
+      await loyaltyCardsBox.putAll({
+        'delhaize': faker.loyaltyCards.simpleCard().copyWith(
+              id: 'delhaize',
+              name: 'Delhaize',
+              tags: const {'groceries'},
+            ),
+        'mediamarkt': faker.loyaltyCards.simpleCard().copyWith(
+              id: 'mediamarkt',
+              name: 'MediaMarkt',
+              tags: const {},
+            ),
+      });
+      final settingsBox = await GetIt.I.getAsync<SettingsBox>();
+      await settingsBox.save(faker.settings.settings(tags: ['groceries']));
+      await tester.pumpWidget(Main(initialScreen: Homepage()));
+      await tester.pumpAndSettle();
+      expect(find.text('MediaMarkt'), findsOneWidget);
+
+      // ACT the tag filter lives in the sort dialog, which the search row
+      // opens.
+      await tester.tap(find.byIcon(Icons.search));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.sort));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Tags:'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(ActionChip, 'groceries'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('SELECT'));
+      await tester.pumpAndSettle();
+
+      // ASSERT
+      expect(find.text('Delhaize'), findsOneWidget);
+      expect(find.text('MediaMarkt'), findsNothing);
+    });
+  });
+
+  group('the password gate', () {
+    /// The field of the password dialog, which is the only one it shows.
+    final passwordField = find.descendant(
+      of: find.byType(AlertDialog),
+      matching: find.byType(EditableText),
+    );
+
+    /// Starts the app of a user who has a password, on the settings.
+    Future<void> openSettingsWithPassword(WidgetTester tester) async {
+      usePhoneView(tester);
+      final passwordBox =
+          await GetIt.I.getAsync<Box>(instanceName: 'passwordBox');
+      await passwordBox.put('PW', 'letmein');
+      await tester.pumpWidget(Main(initialScreen: Homepage()));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.settings));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('a backup is only made after the password is given',
+        (tester) async {
+      // ARRANGE
+      await openSettingsWithPassword(tester);
+
+      // ACT
+      await tester.scrollUntilVisible(find.text('Backup/Restore'), 200);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Backup/Restore'));
+      await tester.pumpAndSettle();
+
+      // ASSERT the page stays behind the dialog until the password is in.
+      expect(find.text('Enter Password'), findsOneWidget);
+      expect(find.text('CLIPBOARD'), findsNothing);
+
+      await tester.enterText(passwordField, 'letmein');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('AUTHORIZE'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('CLIPBOARD'), findsOneWidget);
+    });
+
+    testWidgets('a wrong password does not open the backup', (tester) async {
+      // ARRANGE
+      await openSettingsWithPassword(tester);
+      await tester.scrollUntilVisible(find.text('Backup/Restore'), 200);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Backup/Restore'));
+      await tester.pumpAndSettle();
+
+      // ACT
+      await tester.enterText(passwordField, 'not the password');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('AUTHORIZE'));
+      await tester.pumpAndSettle();
+
+      // ASSERT
+      expect(snackBarText(tester), 'Incorrect password!');
+      expect(find.text('Enter Password'), findsOneWidget);
+      expect(find.text('CLIPBOARD'), findsNothing);
+    });
+
+    testWidgets('the cards are only cleared after the password is given',
+        (tester) async {
+      // ARRANGE
+      final loyaltyCardsBox = await GetIt.I.getAsync<LoyaltyCardsBox>();
+      await loyaltyCardsBox.put(
+        'delhaize',
+        faker.loyaltyCards
+            .simpleCard()
+            .copyWith(id: 'delhaize', name: 'Delhaize'),
+      );
+      await openSettingsWithPassword(tester);
+
+      // ACT
+      await tester.scrollUntilVisible(find.text('Delete Cardabase'), 200);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Delete Cardabase'));
+      await tester.pumpAndSettle();
+
+      // ASSERT the dialog which asks to delete is not even reached.
+      expect(find.text('Enter Password'), findsOneWidget);
+      expect(loyaltyCardsBox.values, hasLength(1));
+
+      await tester.enterText(passwordField, 'letmein');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('AUTHORIZE'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('DELETE'), findsWidgets);
+    });
+  });
+
+  group('the password itself', () {
+    /// Opens Settings -> Password, which is where a password is made.
+    Future<void> openPasswordScreen(WidgetTester tester) async {
+      usePhoneView(tester);
+      await tester.pumpWidget(Main(initialScreen: Homepage()));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.settings));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.text('Password'), 200);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Password'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('a password set here is the one the app asks for',
+        (tester) async {
+      // ARRANGE
+      await openPasswordScreen(tester);
+      expect(find.text('CREATE A PASSWORD'), findsOneWidget);
+
+      // ACT the password and its confirmation are the only two fields.
+      await tester.enterText(find.byType(TextFormField).first, 'letmein');
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextFormField).at(1), 'letmein');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('SET'));
+      await tester.pumpAndSettle();
+
+      // ASSERT it is stored,
+      final passwordBox =
+          await GetIt.I.getAsync<Box>(instanceName: 'passwordBox');
+      expect(passwordBox.get('PW'), 'letmein');
+
+      // and the settings which are behind it now ask for it.
+      await tester.scrollUntilVisible(find.text('Delete Cardabase'), 200);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Delete Cardabase'));
+      await tester.pumpAndSettle();
+      expect(find.text('Enter Password'), findsOneWidget);
+    });
+
+    testWidgets('a password is not set when the two do not match',
+        (tester) async {
+      // ARRANGE
+      await openPasswordScreen(tester);
+
+      // ACT
+      await tester.enterText(find.byType(TextFormField).first, 'letmein');
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextFormField).at(1), 'let me in');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('SET'));
+      await tester.pumpAndSettle();
+
+      // ASSERT
+      expect(snackBarText(tester), 'Passwords do not match!');
+      final passwordBox =
+          await GetIt.I.getAsync<Box>(instanceName: 'passwordBox');
+      expect(passwordBox.get('PW'), isNull);
+    });
+
+    testWidgets('a password which is set can be taken away again',
+        (tester) async {
+      // ARRANGE a user who already has one: the screen offers a reset instead.
+      final passwordBox =
+          await GetIt.I.getAsync<Box>(instanceName: 'passwordBox');
+      await passwordBox.put('PW', 'letmein');
+      await openPasswordScreen(tester);
+      expect(find.text('RESET PASSWORD'), findsOneWidget);
+
+      // ACT
+      await tester.enterText(find.byType(TextFormField).first, 'letmein');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('RESET'));
+      await tester.pumpAndSettle();
+
+      // ASSERT
+      expect(passwordBox.get('PW'), isNull);
     });
   });
 }

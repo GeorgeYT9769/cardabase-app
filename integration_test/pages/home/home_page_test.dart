@@ -61,6 +61,105 @@ void testHomePage() {
     });
   });
 
+  group('the search', () {
+    /// Puts two cards on the home page and opens the search bar over them.
+    Future<void> openSearchOverTwoCards(WidgetTester tester) async {
+      usePhoneView(tester);
+      final loyaltyCardsBox = await GetIt.I.getAsync<LoyaltyCardsBox>();
+      await loyaltyCardsBox.putAll({
+        'delhaize': faker.loyaltyCards
+            .simpleCard()
+            .copyWith(id: 'delhaize', name: 'Delhaize'),
+        'colruyt': faker.loyaltyCards
+            .simpleCard()
+            .copyWith(id: 'colruyt', name: 'Colruyt'),
+      });
+      await tester.pumpWidget(Main(initialScreen: Homepage()));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.search));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('keeps only the cards whose name matches', (tester) async {
+      // ARRANGE
+      await openSearchOverTwoCards(tester);
+
+      // ACT
+      await tester.enterText(find.byType(TextFormField), 'col');
+      await tester.pumpAndSettle();
+
+      // ASSERT
+      expect(find.text('Colruyt'), findsOneWidget);
+      expect(find.text('Delhaize'), findsNothing);
+    });
+
+    testWidgets('ignores the case of what is typed', (tester) async {
+      // ARRANGE
+      await openSearchOverTwoCards(tester);
+
+      // ACT
+      await tester.enterText(find.byType(TextFormField), 'COLRUYT');
+      await tester.pumpAndSettle();
+
+      // ASSERT
+      expect(find.text('Colruyt'), findsOneWidget);
+      expect(find.text('Delhaize'), findsNothing);
+    });
+
+    testWidgets('says so when no card matches', (tester) async {
+      // ARRANGE
+      await openSearchOverTwoCards(tester);
+
+      // ACT
+      await tester.enterText(find.byType(TextFormField), 'albert heijn');
+      await tester.pumpAndSettle();
+
+      // ASSERT the empty list of a search reads differently from the empty
+      // list of a user who has no cards at all.
+      expect(find.text('No cards match your search...'), findsOneWidget);
+      expect(find.text('There is nothing to see...'), findsNothing);
+    });
+
+    testWidgets('brings the other cards back when the field is cleared',
+        (tester) async {
+      // ARRANGE
+      await openSearchOverTwoCards(tester);
+      await tester.enterText(find.byType(TextFormField), 'col');
+      await tester.pumpAndSettle();
+      expect(find.text('Delhaize'), findsNothing);
+
+      // ACT
+      await tester.tap(find.byIcon(Icons.clear));
+      await tester.pumpAndSettle();
+
+      // ASSERT
+      expect(find.text('Delhaize'), findsOneWidget);
+    });
+
+    testWidgets('forgets what was typed when the search is closed',
+        (tester) async {
+      // ARRANGE
+      await openSearchOverTwoCards(tester);
+      await tester.enterText(find.byType(TextFormField), 'col');
+      await tester.pumpAndSettle();
+
+      // ACT the search icon turns into the one which closes the bar again.
+      await tester.tap(find.byIcon(Icons.search_off));
+      await tester.pumpAndSettle();
+
+      // ASSERT
+      expect(find.text('Delhaize'), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.search));
+      await tester.pumpAndSettle();
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller?.text,
+        isEmpty,
+        reason: 'the field should not still hold the previous search',
+      );
+    });
+  });
+
   group('adding a card', () {
     testWidgets('a new card is shown and kept', (tester) async {
       // ARRANGE
