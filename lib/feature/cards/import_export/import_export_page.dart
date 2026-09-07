@@ -104,7 +104,8 @@ class _ImportExportPageState extends State<ImportExportPage>
     if (!path.toLowerCase().endsWith('.cdb') &&
         !path.toLowerCase().endsWith('.zip')) {
       GetIt.I<VibrationProvider>().vibrateError();
-      if (mounted) showCustomSnackBar(context, 'Please select a CDB file!', false);
+      if (mounted)
+        showCustomSnackBar(context, 'Please select a CDB file!', false);
       return;
     }
 
@@ -131,7 +132,8 @@ class _ImportExportPageState extends State<ImportExportPage>
       Navigator.of(context).pop(true);
     } catch (e) {
       GetIt.I<VibrationProvider>().vibrateError();
-      if (mounted) showCustomSnackBar(context, 'Failed to import CDB: $e', false);
+      if (mounted)
+        showCustomSnackBar(context, 'Failed to import CDB: $e', false);
     }
   }
 
@@ -211,7 +213,7 @@ class _ImportExportPageState extends State<ImportExportPage>
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             CdbAppBarSliver(
-              title:  _tabController.index == 0 ? 'Backup' : 'Restore',
+              title: _tabController.index == 0 ? 'Backup' : 'Restore',
               onBackPressed: () => Navigator.of(context).pop(),
             ),
             SliverToBoxAdapter(

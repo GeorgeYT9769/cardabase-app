@@ -114,7 +114,8 @@ class _CardListState extends State<CardList> {
     return true;
   }
 
-  Widget _buildItem(LoyaltyCard card, Animation<double> animation, {bool isRemoving = false}) {
+  Widget _buildItem(LoyaltyCard card, Animation<double> animation,
+      {bool isRemoving = false}) {
     return ScaleTransition(
       scale: CurvedAnimation(
         parent: animation,
@@ -183,7 +184,8 @@ class _CardListState extends State<CardList> {
         crossAxisCount: widget.numberOfColumns,
         childAspectRatio: childAspectRatio,
         onReorder: widget.moveCard,
-        children: widget.cards.map((card) => _card(context, theme, card)).toList(),
+        children:
+            widget.cards.map((card) => _card(context, theme, card)).toList(),
       );
     } else {
       return SliverAnimatedGrid(

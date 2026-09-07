@@ -93,8 +93,7 @@ class _ExpressiveLoadingIndicatorState extends State<ExpressiveLoadingIndicator>
   @override
   Widget build(BuildContext context) {
     final indicatorTheme = ProgressIndicatorTheme.of(context);
-    _color =
-        widget.color ??
+    _color = widget.color ??
         indicatorTheme.color ??
         Theme.of(context).colorScheme.primary;
     _constraints =
@@ -127,8 +126,7 @@ class _ExpressiveLoadingIndicatorState extends State<ExpressiveLoadingIndicator>
                     _globalRotationController.value * _fullRotation;
 
                 // calculate total rotation (clockwise, matching Kotlin implementation)
-                final totalRotationDegrees =
-                    morphProgress * _quarterRotation +
+                final totalRotationDegrees = morphProgress * _quarterRotation +
                     _morphRotationTargetAngle +
                     globalRotationDegrees;
 

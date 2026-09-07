@@ -125,7 +125,8 @@ class _PointsFormFieldState extends State<PointsFormField> {
           final cleanStr = intValue.toString();
           if (strValue != cleanStr) {
             _textController.text = cleanStr;
-            _textController.selection = TextSelection.collapsed(offset: cleanStr.length);
+            _textController.selection =
+                TextSelection.collapsed(offset: cleanStr.length);
           }
         }
       },

@@ -57,7 +57,8 @@ class Settings {
 
   @HiveField(9, defaultValue: BackupFormat.json)
   @Deprecated(
-      'format was unused and now only exists as a placeholder for backwards compatibility of the hive box. The actual format of backups is stored under autoBackups',)
+    'format was unused and now only exists as a placeholder for backwards compatibility of the hive box. The actual format of backups is stored under autoBackups',
+  )
   final BackupFormat format = BackupFormat.json;
 
   Map<String, dynamic> toJsonMap() {
@@ -81,14 +82,16 @@ class Settings {
       lastSeenAppVersion: map['lastSeenAppVersion'] as String?,
       autoBackups: map['autoBackups'] != null
           ? AutoBackupSettings.fromJsonMap(
-              map['autoBackups'] as Map<String, dynamic>,)
+              map['autoBackups'] as Map<String, dynamic>,
+            )
           : const AutoBackupSettings.defaultValue(),
       theme: map['theme'] != null
           ? ThemeSettings.fromJsonMap(map['theme'] as Map<String, dynamic>)
           : const ThemeSettings.defaultValue(),
       developerOptions: map['developerOptions'] != null
           ? DeveloperOptions.fromJsonMap(
-              map['developerOptions'] as Map<String, dynamic>,)
+              map['developerOptions'] as Map<String, dynamic>,
+            )
           : const DeveloperOptions.defaultValue(),
       useAutoBrightness: map['useAutoBrightness'] as bool? ?? true,
       vibrateOnDifferentActions:
@@ -96,7 +99,8 @@ class Settings {
       tags: (map['tags'] as List?)?.cast<String>() ?? const [],
       cardListViewOptions: map['cardListViewOptions'] != null
           ? CardListViewOptions.fromJsonMap(
-              map['cardListViewOptions'] as Map<String, dynamic>,)
+              map['cardListViewOptions'] as Map<String, dynamic>,
+            )
           : const CardListViewOptions.defaultValue(),
       customExportPath:
           map['customExportPath'] as String? ?? defaultCardExportDirectoryPath,
@@ -146,8 +150,9 @@ class AutoBackupSettings {
           ? DateTime.parse(map['lastUpdate'] as String)
           : null,
       interval: Duration(
-          milliseconds: map['interval'] as int? ??
-              const Duration(days: 7).inMilliseconds,),
+        milliseconds:
+            map['interval'] as int? ?? const Duration(days: 7).inMilliseconds,
+      ),
       format: BackupFormat.values.firstWhere(
         (e) => e.name == map['format'],
         orElse: () => BackupFormat.json,
@@ -220,7 +225,8 @@ class ThemeSettings {
       useSystemFont: map['useSystemFont'] as bool? ?? false,
       loyaltyCardEffect: map['loyaltyCardEffect'] != null
           ? LoyaltyCardEffectSettings.fromJsonMap(
-              map['loyaltyCardEffect'] as Map<String, dynamic>,)
+              map['loyaltyCardEffect'] as Map<String, dynamic>,
+            )
           : const LoyaltyCardEffectSettings.defaultValue(),
       rightBackButton: map['rightBackButton'] as bool? ?? false,
       advancedTextures: map['advancedTextures'] as bool? ?? false,

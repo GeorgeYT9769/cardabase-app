@@ -159,7 +159,6 @@ class EditableThemeSettings {
   final ValueNotifier<bool> rightBackButton;
   final ValueNotifier<bool> advancedTextures;
 
-
   void loadValue(ThemeSettings value) {
     useDarkMode.value = value.useDarkMode;
     useExtraDark.value = value.useExtraDark;

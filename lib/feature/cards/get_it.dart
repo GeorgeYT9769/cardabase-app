@@ -10,7 +10,8 @@ extension GetItExtensions on GetIt {
         // Register the new cards box synchronously and defer heavy
         // migration work to run in the background so startup isn't blocked.
         // ignore: avoid_print
-        print('registerCards: starting cards registration (deferred migration)');
+        print(
+            'registerCards: starting cards registration (deferred migration)');
         final hive = await getAsync<HiveInterface>();
 
         // open new box (fast), return it immediately

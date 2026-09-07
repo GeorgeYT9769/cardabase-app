@@ -22,7 +22,9 @@ class CardDataFormField extends StatelessWidget {
     final theme = Theme.of(context);
     return TextFormField(
       controller: controller,
-      validator: barcodeType == null ? null : isNotEmpty<String>().and(validBarcode(barcodeType)),
+      validator: barcodeType == null
+          ? null
+          : isNotEmpty<String>().and(validBarcode(barcodeType)),
       inputFormatters: barcodeType == BarcodeType.QrCode || barcodeType == null
           ? null
           : [

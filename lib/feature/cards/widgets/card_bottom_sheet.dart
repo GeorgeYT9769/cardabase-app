@@ -39,13 +39,18 @@ class _CardBottomSheetSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final advancedTextures = GetIt.I<SettingsBox>().value.theme.advancedTextures;
+    final advancedTextures =
+        GetIt.I<SettingsBox>().value.theme.advancedTextures;
 
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       child: Stack(
         children: [
-          if (advancedTextures) const Positioned.fill(child: BlurAppBarBackground(alpha: .5,)),
+          if (advancedTextures)
+            const Positioned.fill(
+                child: BlurAppBarBackground(
+              alpha: .5,
+            )),
           Material(
             color: advancedTextures
                 ? theme.colorScheme.surface.withValues(alpha: 0.5)
@@ -156,7 +161,8 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Card'),
-        content: Text('Are you sure you want to delete ${widget.loyaltyCard.name}?'),
+        content:
+            Text('Are you sure you want to delete ${widget.loyaltyCard.name}?'),
         actions: [
           OutlinedButton(
             onPressed: () {
@@ -203,7 +209,8 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
             children: [
               if (canCreateCardWidget)
                 ListTile(
-                  leading: Icon(Icons.widgets, color: theme.colorScheme.tertiary),
+                  leading:
+                      Icon(Icons.widgets, color: theme.colorScheme.tertiary),
                   title: Text(
                     'Set as Widget',
                     style: theme.textTheme.bodyLarge?.copyWith(
@@ -214,9 +221,12 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
                 ),
               ListTile(
                 leading: Icon(Icons.edit, color: theme.colorScheme.tertiary),
-                title: Text('Edit', style: theme.textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight(700),
-                ),),
+                title: Text(
+                  'Edit',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight(700),
+                  ),
+                ),
                 onTap: _editCard,
               ),
               ListTile(
@@ -229,33 +239,32 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
                 ),
                 onTap: _duplicateCard,
               ),
-              if (sortingStyle == SortingStyle.custom)
-                ...[
-                  ListTile(
-                    leading:
-                        Icon(Icons.arrow_upward, color: theme.colorScheme.tertiary),
-                    title: Text(
-                      'Move UP',
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight(700),
-                      ),
+              if (sortingStyle == SortingStyle.custom) ...[
+                ListTile(
+                  leading: Icon(Icons.arrow_upward,
+                      color: theme.colorScheme.tertiary),
+                  title: Text(
+                    'Move UP',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight(700),
                     ),
-                    onTap: _moveCardUp,
                   ),
-                  ListTile(
-                    leading: Icon(
-                      Icons.arrow_downward,
-                      color: theme.colorScheme.tertiary,
-                    ),
-                    title: Text(
-                      'Move DOWN',
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight(700),
-                      ),
-                    ),
-                    onTap: _moveCardDown,
+                  onTap: _moveCardUp,
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.arrow_downward,
+                    color: theme.colorScheme.tertiary,
                   ),
-                ],
+                  title: Text(
+                    'Move DOWN',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight(700),
+                    ),
+                  ),
+                  onTap: _moveCardDown,
+                ),
+              ],
               ListTile(
                 leading: const Icon(Icons.delete, color: Colors.red),
                 title: Text(

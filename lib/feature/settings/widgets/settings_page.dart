@@ -298,8 +298,7 @@ class _SettingsPageState extends State<SettingsPage> {
           await _settingsBox.save(_settings.seal());
         },
         settingHeader: 'Extra Dark Mode',
-        iconColor:
-            useExtraDark ? Colors.green : Colors.red,
+        iconColor: useExtraDark ? Colors.green : Colors.red,
         settingIcon: Icons.brightness_2,
         borderColor: theme.colorScheme.primary,
       ),
@@ -327,7 +326,8 @@ class _SettingsPageState extends State<SettingsPage> {
     return ValueListenableBuilder(
       valueListenable: _settings.theme.advancedTextures,
       builder: (context, useAdvancedTextures, _) => SettingTile(
-        aboutSettingHeader: 'Use advanced textures for some widgets. Might cause performance issues.',
+        aboutSettingHeader:
+            'Use advanced textures for some widgets. Might cause performance issues.',
         settingAction: () async {
           _settings.theme.advancedTextures.value = !useAdvancedTextures;
           await _settingsBox.save(_settings.seal());
@@ -569,7 +569,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget _buymeacoffeeLink(ThemeData theme) {
     return SettingTile(
-      aboutSettingHeader: 'Support Cardabase development using buymeacoffee.com',
+      aboutSettingHeader:
+          'Support Cardabase development using buymeacoffee.com',
       settingAction: () => _launchUrl(
         Uri.parse('https://www.buymeacoffee.com/georgeyt9769'),
       ),

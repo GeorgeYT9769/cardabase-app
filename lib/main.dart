@@ -118,48 +118,43 @@ void main() async {
 
     // ignore: avoid_print
     print('main: awaiting settingsBox');
-    final settingsBox = await GetIt.I
-        .getAsync<SettingsBox>()
-        .timeout(
-          const Duration(seconds: 12),
-          onTimeout: () async {
-            // ignore: avoid_print
-            print('main: settingsBox timeout, opening settings202603 directly');
-            final hive = await GetIt.I.getAsync<HiveInterface>();
-            return hive.openBox<Settings>('settings202603');
-          },
-        );
+    final settingsBox = await GetIt.I.getAsync<SettingsBox>().timeout(
+      const Duration(seconds: 12),
+      onTimeout: () async {
+        // ignore: avoid_print
+        print('main: settingsBox timeout, opening settings202603 directly');
+        final hive = await GetIt.I.getAsync<HiveInterface>();
+        return hive.openBox<Settings>('settings202603');
+      },
+    );
     // ignore: avoid_print
     print('main: got settingsBox');
 
     // ignore: avoid_print
     print('main: awaiting cardsBox');
-    final cardsBox = await GetIt.I
-        .getAsync<LoyaltyCardsBox>()
-        .timeout(
-          const Duration(seconds: 12),
-          onTimeout: () async {
-            // ignore: avoid_print
-            print('main: cardsBox timeout, opening cards202603 directly');
-            return Hive.openBox<LoyaltyCard>('cards202603');
-          },
-        );
+    final cardsBox = await GetIt.I.getAsync<LoyaltyCardsBox>().timeout(
+      const Duration(seconds: 12),
+      onTimeout: () async {
+        // ignore: avoid_print
+        print('main: cardsBox timeout, opening cards202603 directly');
+        return Hive.openBox<LoyaltyCard>('cards202603');
+      },
+    );
     // ignore: avoid_print
     print('main: got cardsBox (length=${cardsBox.length})');
 
     // ignore: avoid_print
     print('main: awaiting passwordBox');
-    final passwordBox = await GetIt.I
-        .getAsync<Box>(instanceName: 'passwordBox')
-        .timeout(
-          const Duration(seconds: 12),
-          onTimeout: () async {
-            // ignore: avoid_print
-            print('main: passwordBox timeout, opening password directly');
-            final hive = await GetIt.I.getAsync<HiveInterface>();
-            return hive.openBox('password');
-          },
-        );
+    final passwordBox =
+        await GetIt.I.getAsync<Box>(instanceName: 'passwordBox').timeout(
+      const Duration(seconds: 12),
+      onTimeout: () async {
+        // ignore: avoid_print
+        print('main: passwordBox timeout, opening password directly');
+        final hive = await GetIt.I.getAsync<HiveInterface>();
+        return hive.openBox('password');
+      },
+    );
     // ignore: avoid_print
     print('main: got passwordBox');
 
@@ -259,7 +254,8 @@ class _MainState extends State<Main> {
 
     if (!_supportsMobileIntegrations) return;
 
-    _intentDataStreamSubscription = ReceiveSharingIntent.instance.getMediaStream().listen((value) {
+    _intentDataStreamSubscription =
+        ReceiveSharingIntent.instance.getMediaStream().listen((value) {
       _handleSharedMedia(value);
     });
 
@@ -322,7 +318,8 @@ class _MainState extends State<Main> {
         context: context,
         builder: (dialogContext) => AlertDialog(
           title: const Text('Import CDB File?'),
-          content: const Text('This will overwrite your current cards and settings.'),
+          content: const Text(
+              'This will overwrite your current cards and settings.'),
           actions: [
             _dialogButton(dialogContext, 'Cancel', false),
             _dialogButton(dialogContext, 'Import', true),
@@ -339,7 +336,9 @@ class _MainState extends State<Main> {
           if (importResult.cards.isNotEmpty) {
             await cardsBox.clear();
             await cardsBox.putAll(
-              importResult.cards.asMap().map((_, value) => MapEntry(value.id, value)),
+              importResult.cards
+                  .asMap()
+                  .map((_, value) => MapEntry(value.id, value)),
             );
           }
 

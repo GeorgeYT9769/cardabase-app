@@ -167,7 +167,11 @@ class _ExportDialogState extends State<ExportDialog> {
         ),
         suffixIcon: exportDirectoryPath.text.isNotEmpty
             ? IconButton(
-                icon: Icon(Icons.clear, size: 18, color: theme.colorScheme.primary,),
+                icon: Icon(
+                  Icons.clear,
+                  size: 18,
+                  color: theme.colorScheme.primary,
+                ),
                 tooltip: 'Reset to base path',
                 onPressed: () async {
                   exportDirectoryPath.text = '';
@@ -175,7 +179,11 @@ class _ExportDialogState extends State<ExportDialog> {
                 },
               )
             : IconButton(
-                icon: Icon(Icons.transit_enterexit, size: 18, color: theme.colorScheme.primary,),
+                icon: Icon(
+                  Icons.transit_enterexit,
+                  size: 18,
+                  color: theme.colorScheme.primary,
+                ),
                 tooltip: 'Set default custom path',
                 onPressed: () async {
                   exportDirectoryPath.text =

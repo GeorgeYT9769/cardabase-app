@@ -184,13 +184,13 @@ class _HomePageState extends State<Homepage> {
           settings.theme.advancedTextures,
         ],
         builder: (context) => CustomScrollView(
-            controller: scrollController,
-            physics: cardsBox.isEmpty
-                ? const NeverScrollableScrollPhysics()
-                : const BouncingScrollPhysics(
-                    decelerationRate: ScrollDecelerationRate.fast,
-                  ),
-            slivers: [
+          controller: scrollController,
+          physics: cardsBox.isEmpty
+              ? const NeverScrollableScrollPhysics()
+              : const BouncingScrollPhysics(
+                  decelerationRate: ScrollDecelerationRate.fast,
+                ),
+          slivers: [
             CdbAppBarSliver(
               showBackButton: false,
               leading: cardsBox.isEmpty
@@ -265,7 +265,8 @@ class _HomePageState extends State<Homepage> {
                               Expanded(
                                 child: TextFormField(
                                   controller: searchController,
-                                  onChanged: (value) => searchQuery.value = value,
+                                  onChanged: (value) =>
+                                      searchQuery.value = value,
                                   decoration: InputDecoration(
                                     isDense: true,
                                     contentPadding: const EdgeInsets.symmetric(
@@ -274,7 +275,8 @@ class _HomePageState extends State<Homepage> {
                                     ),
                                     labelStyle: theme.emphasizedInputLabelStyle,
                                     hintText: 'Search cards...',
-                                    hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                                    hintStyle:
+                                        theme.textTheme.bodyLarge?.copyWith(
                                       color: theme.colorScheme.tertiary,
                                     ),
                                     prefixIcon: Icon(
@@ -299,7 +301,8 @@ class _HomePageState extends State<Homepage> {
                                 ),
                               ),
                               IconButton(
-                                icon: Icon(Icons.sort, color: theme.colorScheme.secondary),
+                                icon: Icon(Icons.sort,
+                                    color: theme.colorScheme.secondary),
                                 onPressed: showCardListViewOptionsDialog,
                               ),
                             ],
