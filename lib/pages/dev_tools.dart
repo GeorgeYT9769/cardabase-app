@@ -57,6 +57,7 @@ class _DevToolsPageState extends State<DevToolsPage> {
         createdAt: now,
         lastModifiedAt: now,
         usePoints: true,
+        usedCount: 0,
       ),
       LoyaltyCard(
         id: 'dummy-2',
@@ -74,6 +75,7 @@ class _DevToolsPageState extends State<DevToolsPage> {
         createdAt: now,
         lastModifiedAt: now,
         usePoints: true,
+        usedCount: 0,
       ),
       LoyaltyCard(
         id: 'dummy-3',
@@ -91,6 +93,7 @@ class _DevToolsPageState extends State<DevToolsPage> {
         createdAt: now,
         lastModifiedAt: now,
         usePoints: false,
+        usedCount: 0,
       ),
       LoyaltyCard(
         id: 'dummy-4',
@@ -108,6 +111,7 @@ class _DevToolsPageState extends State<DevToolsPage> {
         createdAt: now,
         lastModifiedAt: now,
         usePoints: true,
+        usedCount: 0,
       ),
       LoyaltyCard(
         id: 'dummy-5',
@@ -125,6 +129,7 @@ class _DevToolsPageState extends State<DevToolsPage> {
         createdAt: now,
         lastModifiedAt: now,
         usePoints: true,
+        usedCount: 0,
       ),
     ];
 
@@ -257,32 +262,6 @@ class _DevToolsPageState extends State<DevToolsPage> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _appBar(ThemeData theme) {
-    return SliverAppBar(
-      automaticallyImplyLeading: false,
-      actions: [
-        IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: theme.colorScheme.secondary,
-          ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ],
-      title: Text(
-        'Dev Tools',
-        style: theme.textTheme.titleLarge?.copyWith(
-          color: theme.colorScheme.tertiary,
-        ),
-      ),
-      centerTitle: true,
-      elevation: 0.0,
-      backgroundColor: theme.colorScheme.surface,
-      floating: true,
-      snap: true,
     );
   }
 

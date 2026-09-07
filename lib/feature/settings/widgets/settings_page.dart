@@ -178,6 +178,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 _themeSetting(theme),
                 _extraDarkSetting(theme),
                 _backButtonSwitch(theme),
+                _advancedTextures(theme),
                 _autoBrightnessSettingsButton(theme),
                 _vibrationSettingsButton(theme),
                 _fontSettingsButton(theme),

@@ -31,10 +31,12 @@ class CardWidgetProvider : AppWidgetProvider() {
             if (cardData == null) {
                 // Empty state - no card selected yet
                 views.setViewVisibility(R.id.widget_text, android.view.View.VISIBLE)
+                views.setViewVisibility(R.id.widget_shop_name, android.view.View.GONE)
                 views.setViewVisibility(R.id.widget_barcode, android.view.View.GONE)
                 views.setViewVisibility(R.id.widget_data_text, android.view.View.GONE)
                 views.setInt(R.id.widget_bg_border, "setBackgroundColor", Color.DKGRAY)
             } else {
+                val cardName = prefs.getString("card_name", null)
                 val cardType = prefs.getString("card_type", "CardType.ean13") ?: "CardType.ean13"
                 val red = prefs.getInt("card_r", 255)
                 val green = prefs.getInt("card_g", 255)
@@ -42,9 +44,13 @@ class CardWidgetProvider : AppWidgetProvider() {
                 val color = Color.rgb(red, green, blue)
 
                 views.setViewVisibility(R.id.widget_text, android.view.View.GONE)
+                views.setViewVisibility(R.id.widget_shop_name, android.view.View.VISIBLE)
                 views.setViewVisibility(R.id.widget_barcode, android.view.View.VISIBLE)
                 views.setViewVisibility(R.id.widget_data_text, android.view.View.VISIBLE)
                 views.setInt(R.id.widget_bg_border, "setBackgroundColor", color)
+
+                // Show shop name
+                views.setTextViewText(R.id.widget_shop_name, cardName ?: "Card")
 
                 // Show barcode data text
                 views.setTextViewText(R.id.widget_data_text, cardData)

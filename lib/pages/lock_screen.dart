@@ -1,6 +1,7 @@
 import 'package:cardabase/pages/home/form_fields/password_form_field.dart';
 import 'package:cardabase/pages/home/home_page.dart';
 import 'package:cardabase/util/vibration_provider.dart';
+import 'package:cardabase/util/widgets/cdb_app_bar.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
@@ -137,27 +138,13 @@ class _LockScreenState extends State<LockScreen> {
     final useBiometric = _passwordBox.get('use_biometric', defaultValue: false);
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       backgroundColor: theme.colorScheme.surface,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: Navigator.of(context).canPop()
-            ? IconButton(
-                icon: Icon(
-                  Icons.arrow_back_ios_new,
-                  color: theme.colorScheme.secondary,
-                ),
-                onPressed: () => Navigator.of(context).pop(),
-              )
+      appBar: CdbAppBar(
+        onBackPressed: Navigator.of(context).canPop()
+            ? () => Navigator.of(context).pop()
             : null,
-        title: Text(
-          'Locked',
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: theme.colorScheme.tertiary,
-          ),
-        ),
-        centerTitle: true,
-        elevation: 0.0,
-        backgroundColor: theme.colorScheme.surface,
+        title: 'Locked',
       ),
       body: Padding(
         padding: const EdgeInsets.all(24),

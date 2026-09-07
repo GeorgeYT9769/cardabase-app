@@ -69,6 +69,10 @@ class SortingStyleAdapter extends TypeAdapter<SortingStyle> {
         return SortingStyle.oldest;
       case 4:
         return SortingStyle.custom;
+      case 5:
+        return SortingStyle.mostUsed;
+      case 6:
+        return SortingStyle.leastUsed;
       default:
         return SortingStyle.nameAz;
     }
@@ -87,6 +91,10 @@ class SortingStyleAdapter extends TypeAdapter<SortingStyle> {
         writer.writeByte(3);
       case SortingStyle.custom:
         writer.writeByte(4);
+      case SortingStyle.mostUsed:
+        writer.writeByte(5);
+      case SortingStyle.leastUsed:
+        writer.writeByte(6);
     }
   }
 

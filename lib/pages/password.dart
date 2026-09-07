@@ -94,6 +94,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
     final passNotifier = ValueNotifier<PasswordStrength?>(null);
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       backgroundColor: theme.colorScheme.surface,
       appBar: CdbAppBar(
         title: 'Password',
@@ -258,7 +259,9 @@ class _PasswordScreenState extends State<PasswordScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 10,),
+                  SizedBox(
+                    height: 10,
+                  ),
                   const Divider(),
                   ValueListenableBuilder(
                     valueListenable:
@@ -296,7 +299,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                   ValueListenableBuilder(
                     valueListenable: passwordbox.listenable(keys: ['lock_app']),
                     builder: (context, box, _) {
-                      final lock_app = box.get('lock_app', defaultValue: false);
+                      final lockApp = box.get('lock_app', defaultValue: false);
                       return CheckboxListTile(
                         title: Text(
                           'Lock app',
@@ -306,7 +309,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
                             color: theme.colorScheme.inverseSurface,
                           ),
                         ),
-                        value: lock_app,
+                        value: lockApp,
                         onChanged: (value) {
                           passwordbox.put('lock_app', value);
                         },

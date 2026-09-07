@@ -32,13 +32,14 @@ class LoyaltyCardAdapter extends TypeAdapter<LoyaltyCard> {
       createdAt: fields[12] as DateTime?,
       lastModifiedAt: fields[13] as DateTime?,
       usePoints: fields[14] == null ? false : fields[14] as bool,
+      usedCount: fields[15] == null ? 0 : (fields[15] as num).toInt(),
     );
   }
 
   @override
   void write(BinaryWriter writer, LoyaltyCard obj) {
     writer
-      ..writeByte(15)
+      ..writeByte(16)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -68,7 +69,9 @@ class LoyaltyCardAdapter extends TypeAdapter<LoyaltyCard> {
       ..writeByte(13)
       ..write(obj.lastModifiedAt)
       ..writeByte(14)
-      ..write(obj.usePoints);
+      ..write(obj.usePoints)
+      ..writeByte(15)
+      ..write(obj.usedCount);
   }
 
   @override

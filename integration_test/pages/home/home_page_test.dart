@@ -409,10 +409,11 @@ void testHomePage() {
       await tester.pumpAndSettle();
       await tester.tap(find.byIcon(Icons.sort));
       await tester.pumpAndSettle();
-      await tester.tap(find.byType(DropdownMenu<SortingStyle>));
+      // the sorting style is a slider over the styles, and A-Z is the first
+      // of them, so it sits at the far left.
+      await tester.drag(find.byType(Slider).first, const Offset(-500, 0));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Name 0-Z').last);
-      await tester.pumpAndSettle();
+      expect(find.text('A-Z'), findsOneWidget);
       await tester.tap(find.text('SELECT'));
       await tester.pumpAndSettle();
 
@@ -447,7 +448,7 @@ void testHomePage() {
       await tester.tap(find.byIcon(Icons.sort));
       await tester.pumpAndSettle();
       expect(find.text('Columns: 1'), findsOneWidget);
-      await tester.drag(find.byType(Slider), const Offset(200, 0));
+      await tester.drag(find.byType(Slider).last, const Offset(200, 0));
       await tester.pumpAndSettle();
       await tester.tap(find.text('SELECT'));
       await tester.pumpAndSettle();

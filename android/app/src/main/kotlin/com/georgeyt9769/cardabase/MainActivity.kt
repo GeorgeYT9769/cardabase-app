@@ -23,14 +23,15 @@ class MainActivity: FlutterActivity() {
 
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             if (call.method == "setWidgetCard") {
-                val data = call.argument<String>("data")
-                val type = call.argument<String>("type")
+                val data: String? = call.argument("data")
+                val name: String? = call.argument("name")
+                val type: String? = call.argument("type")
                 val r = call.argument<Int>("r") ?: 255
                 val g = call.argument<Int>("g") ?: 255
                 val b = call.argument<Int>("b") ?: 255
 
                 if (data != null && type != null) {
-                    saveWidgetData(data, type, r, g, b)
+                    saveWidgetData(data, name, type, r, g, b)
                     updateAllWidgets()
                     result.success(true)
                 } else {
@@ -42,10 +43,11 @@ class MainActivity: FlutterActivity() {
         }
     }
 
-    private fun saveWidgetData(data: String, type: String, r: Int, g: Int, b: Int) {
+    private fun saveWidgetData(data: String, name: String?, type: String, r: Int, g: Int, b: Int) {
         val prefs = applicationContext.getSharedPreferences("cardabase_widgets", MODE_PRIVATE)
         prefs.edit()
             .putString("card_data", data)
+            .putString("card_name", name)
             .putString("card_type", type)
             .putInt("card_r", r)
             .putInt("card_g", g)
