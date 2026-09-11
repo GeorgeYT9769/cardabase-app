@@ -151,7 +151,8 @@ class _CardSummaryState extends State<CardSummary> {
                             3 => 24,
                             4 => 18,
                             _ => 15,
-                          }.toDouble(),
+                          }
+                              .toDouble(),
                           fontWeight: FontWeight.bold,
                           color: foregroundColor,
                         ),

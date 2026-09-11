@@ -15,7 +15,8 @@ class ColorPickerButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final hexCode = '#${color.toARGB32().toRadixString(16).toUpperCase().padLeft(8, '0').substring(2)}';
+    final hexCode =
+        '#${color.toARGB32().toRadixString(16).toUpperCase().padLeft(8, '0').substring(2)}';
     return Bounceable(
       onTap: () {},
       child: SizedBox(

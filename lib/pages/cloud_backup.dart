@@ -108,7 +108,8 @@ class _CloudBackupState extends State<CloudBackup> {
 
     if (failCount == 0) {
       GetIt.I<VibrationProvider>().vibrateSuccess();
-      showCustomSnackBar(context, 'Successfully uploaded $successCount cards', true);
+      showCustomSnackBar(
+          context, 'Successfully uploaded $successCount cards', true);
     } else {
       GetIt.I<VibrationProvider>().vibrateSuccess();
       showCustomSnackBar(

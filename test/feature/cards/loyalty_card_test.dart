@@ -321,6 +321,7 @@ void main() {
             'lastModifiedAt': '2026-05-26T19:42:35.324Z',
             'points': 0,
             'usePoints': false,
+            'usedCount': 0,
           },
         ),
         InputOutputTestCase(
@@ -364,6 +365,7 @@ void main() {
             'createdAt': '2026-05-26T19:42:35.324Z',
             'lastModifiedAt': '2026-05-26T19:42:35.324Z',
             'usePoints': false,
+            'usedCount': 0,
           },
         ),
         InputOutputTestCase(
@@ -401,6 +403,7 @@ void main() {
             'lastModifiedAt': '2026-05-26T19:42:35.324Z',
             'points': 10,
             'usePoints': true,
+            'usedCount': 0,
           },
         ),
       ];

@@ -16,7 +16,8 @@ extension SettingsGetItExtensions on GetIt {
         // box immediately and defer heavy migration work to the background so
         // the app can start and show UI faster.
         // ignore: avoid_print
-        print('registerSettings: starting settings registration (deferred migration)');
+        print(
+            'registerSettings: starting settings registration (deferred migration)');
         final hive = await getAsync<HiveInterface>();
 
         // open the new settings box and return it immediately
@@ -55,11 +56,13 @@ extension SettingsGetItExtensions on GetIt {
               // start listening for card changes.
               try {
                 final cardsBox = await GetIt.I.getAsync<LoyaltyCardsBox>();
-                await _ensureCustomOrderContainsAllCards(cardsBox, newSettingsBox);
+                await _ensureCustomOrderContainsAllCards(
+                    cardsBox, newSettingsBox);
                 _cardsSubscription = cardsBox.watch().listen(onCardsChanged);
               } catch (e, s) {
                 // ignore: avoid_print
-                print('registerSettings: failed to ensure custom order: $e\n$s');
+                print(
+                    'registerSettings: failed to ensure custom order: $e\n$s');
               }
 
               // ignore: avoid_print

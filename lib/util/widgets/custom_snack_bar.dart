@@ -24,10 +24,10 @@ class CustomSnackBarContent extends StatelessWidget {
         Text(
           message,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            fontSize: 18,
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+                fontSize: 18,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
         ),
       ],
     );

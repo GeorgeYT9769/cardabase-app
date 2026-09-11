@@ -43,7 +43,8 @@ class _DevToolsPageState extends State<DevToolsPage> {
       LoyaltyCard(
         id: 'dummy-1',
         name: 'Supermarket',
-        barcode: const Barcode(data: '978020137962', type: BarcodeType.CodeEAN13),
+        barcode:
+            const Barcode(data: '978020137962', type: BarcodeType.CodeEAN13),
         color: Colors.blue,
         tags: {'Groceries'},
         notes: 'Main supermarket card',
@@ -153,7 +154,8 @@ class _DevToolsPageState extends State<DevToolsPage> {
   Future<void> _copyToClipboard() async {
     Clipboard.setData(
       ClipboardData(
-        text: '[{"id":"202606191546400","barcode":{"data":"978020137964","type":"CodeEAN13"},"name":"CopyCard","createdAt":"2026-06-21T08:42:17.429Z","lastModifiedAt":"2026-06-21T08:42:17.429Z","color":"FFD5DA27","notes":"", "points": 10}]',
+        text:
+            '[{"id":"202606191546400","barcode":{"data":"978020137964","type":"CodeEAN13"},"name":"CopyCard","createdAt":"2026-06-21T08:42:17.429Z","lastModifiedAt":"2026-06-21T08:42:17.429Z","color":"FFD5DA27","notes":"", "points": 10}]',
       ),
     );
   }
@@ -284,7 +286,8 @@ class _DevToolsPageState extends State<DevToolsPage> {
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.2)),
+          border: Border.all(
+              color: theme.colorScheme.primary.withValues(alpha: 0.2)),
         ),
         child: Row(
           children: [
@@ -292,7 +295,8 @@ class _DevToolsPageState extends State<DevToolsPage> {
             const SizedBox(width: 15),
             Text(
               title,
-              style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: theme.textTheme.bodyLarge
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
             const Spacer(),
             Text(

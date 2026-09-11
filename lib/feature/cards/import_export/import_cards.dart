@@ -77,7 +77,8 @@ Future<ZipImportResult> importDataFromZip(List<int> bytes) async {
     throw Exception('ZIP is missing settings file');
   }
   final settingsJson = utf8.decode(settingsFile.content as List<int>);
-  final settings = Settings.fromJsonMap(jsonDecode(settingsJson) as Map<String, dynamic>);
+  final settings =
+      Settings.fromJsonMap(jsonDecode(settingsJson) as Map<String, dynamic>);
 
   // 3. Extract images
   final appDocDir = await getApplicationDocumentsDirectory();

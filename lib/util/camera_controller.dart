@@ -99,7 +99,8 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
       final XFile file = await _cameraController!.takePicture();
       setState(() {
         _capturedImageFile = file;
-        _transformationController.value = Matrix4.identity(); // Start zoomed in, allow zooming out
+        _transformationController.value =
+            Matrix4.identity(); // Start zoomed in, allow zooming out
       });
     } catch (e) {
       // Handle error
@@ -112,7 +113,8 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     if (image != null) {
       setState(() {
         _capturedImageFile = image;
-        _transformationController.value = Matrix4.identity(); // Start zoomed in, allow zooming out
+        _transformationController.value =
+            Matrix4.identity(); // Start zoomed in, allow zooming out
       });
     }
   }
@@ -291,10 +293,26 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                       const EdgeInsets.all(double.infinity),
                                   child: ColorFiltered(
                                     colorFilter: ColorFilter.matrix([
-                                      1, 0, 0, 0, _brightness * 255,
-                                      0, 1, 0, 0, _brightness * 255,
-                                      0, 0, 1, 0, _brightness * 255,
-                                      0, 0, 0, 1, 0,
+                                      1,
+                                      0,
+                                      0,
+                                      0,
+                                      _brightness * 255,
+                                      0,
+                                      1,
+                                      0,
+                                      0,
+                                      _brightness * 255,
+                                      0,
+                                      0,
+                                      1,
+                                      0,
+                                      _brightness * 255,
+                                      0,
+                                      0,
+                                      0,
+                                      1,
+                                      0,
                                     ]),
                                     child: SizedBox.expand(
                                       child: Image.file(
@@ -494,25 +512,25 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                   child: Container(
                     color: Colors.black.withValues(alpha: 0.4),
                     child: Center(
-                    child: ExpressiveLoadingIndicator(
-                      color: theme.colorScheme.tertiary,
-                      constraints: const BoxConstraints(
-                        minWidth: 64.0,
-                        minHeight: 64.0,
-                        maxWidth: 64.0,
-                        maxHeight: 64.0,
+                      child: ExpressiveLoadingIndicator(
+                        color: theme.colorScheme.tertiary,
+                        constraints: const BoxConstraints(
+                          minWidth: 64.0,
+                          minHeight: 64.0,
+                          maxWidth: 64.0,
+                          maxHeight: 64.0,
+                        ),
+                        polygons: [
+                          MaterialShapes.softBurst,
+                          MaterialShapes.pentagon,
+                          MaterialShapes.pill,
+                        ],
+                        semanticsLabel: 'Saving',
+                        semanticsValue: 'Saving image',
                       ),
-                      polygons: [
-                        MaterialShapes.softBurst,
-                        MaterialShapes.pentagon,
-                        MaterialShapes.pill,
-                      ],
-                      semanticsLabel: 'Saving',
-                      semanticsValue: 'Saving image',
                     ),
                   ),
                 ),
-              ),
               ),
           ],
         );
