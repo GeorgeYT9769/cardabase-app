@@ -143,8 +143,8 @@ class _ImportDialogState extends State<ImportDialog> {
         ],
       ),
       actions: [
-         _cancelButton(),
-         _importButton(),
+        _cancelButton(),
+        _importButton(),
       ],
     );
   }

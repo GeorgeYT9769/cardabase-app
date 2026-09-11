@@ -376,7 +376,9 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                   }
                 },
                 tooltip: isFocused ? 'SAVE' : 'DONE',
-                backgroundColor: isFocused ? theme.colorScheme.primary : Colors.green.shade700,
+                backgroundColor: isFocused
+                    ? theme.colorScheme.primary
+                    : Colors.green.shade700,
                 icon: Icon(
                   isFocused ? Icons.check : Icons.arrow_back_ios,
                   color: Colors.white,

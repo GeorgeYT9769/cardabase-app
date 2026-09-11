@@ -179,7 +179,8 @@ class _MainState extends State<Main> {
 
     if (!_supportsMobileIntegrations) return;
 
-    _intentDataStreamSubscription = ReceiveSharingIntent.instance.getMediaStream().listen((value) {
+    _intentDataStreamSubscription =
+        ReceiveSharingIntent.instance.getMediaStream().listen((value) {
       _handleSharedMedia(value);
     });
 

@@ -326,7 +326,8 @@ class _SettingsPageState extends State<SettingsPage> {
     return ValueListenableBuilder(
       valueListenable: _settings.theme.advancedTextures,
       builder: (context, useAdvancedTextures, _) => SettingTile(
-        aboutSettingHeader: 'Use advanced textures for some widgets. Might cause performance issues.',
+        aboutSettingHeader:
+            'Use advanced textures for some widgets. Might cause performance issues.',
         settingAction: () async {
           _settings.theme.advancedTextures.value = !useAdvancedTextures;
           await _settingsBox.save(_settings.seal());
