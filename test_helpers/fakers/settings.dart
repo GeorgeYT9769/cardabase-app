@@ -2,6 +2,7 @@ import 'package:cardabase/feature/cards/card_list_view_options.dart';
 import 'package:cardabase/feature/settings/model.dart';
 import 'package:faker/faker.dart';
 
+import '../../integration_test/app_harness.dart';
 import 'random.dart';
 
 extension SettingsFakerExtensions on Faker {
@@ -19,7 +20,7 @@ class SettingsFaker {
   /// about the one setting it is about, and a random theme or a random number
   /// of columns would change what is on screen underneath it.
   Settings settings({
-    String? lastSeenAppVersion = '1.0.0',
+    String? lastSeenAppVersion = testAppVersion,
     AutoBackupSettings autoBackups = const AutoBackupSettings.defaultValue(),
     ThemeSettings theme = const ThemeSettings.defaultValue(),
     DeveloperOptions developerOptions = const DeveloperOptions.defaultValue(),
@@ -47,7 +48,7 @@ class SettingsFaker {
   /// check that nothing is dropped on the way to storage and back.
   Settings fullSettings() {
     return Settings(
-      lastSeenAppVersion: '1.0.0',
+      lastSeenAppVersion: testAppVersion,
       autoBackups: autoBackupSettings(),
       theme: themeSettings(),
       developerOptions: const DeveloperOptions(isEnabled: true),

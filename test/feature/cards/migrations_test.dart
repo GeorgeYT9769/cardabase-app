@@ -1,186 +1,229 @@
-import 'dart:io';
-import 'dart:ui';
-
-import 'package:cardabase/feature/cards/barcode_type_type_adapter.dart';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/cards/migrations.dart';
-import 'package:cardabase/hive_registrar.g.dart';
+import 'package:faker/faker.dart' hide Color;
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive_ce/hive.dart';
-import 'package:hive_ce_flutter/adapters.dart' show ColorAdapter;
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
+
+import '../../../test_helpers/fakers/loyalty_card.dart';
+import '../../../test_helpers/hive.dart';
 
 void main() {
-  late Directory tempDir;
-
-  setUpAll(() {
-    Hive.registerAdapter(ColorAdapter());
-    Hive.registerAdapter(const BarcodeTypeAdapter());
-    Hive.registerAdapters();
-  });
-
-  setUp(() async {
-    tempDir = await Directory.systemTemp.createTemp('cardabase_migrations');
-    Hive.init(tempDir.path);
-  });
-
-  tearDown(() async {
-    await Hive.close();
-    await tempDir.delete(recursive: true);
-  });
+  final validEan13 = faker.loyaltyCards.codeEAN13();
+  final otherValidEan13 = faker.loyaltyCards.codeEAN13();
 
   group('migrateCardsBoxTo202603', () {
-    var boxCounter = 0;
+    useHive();
 
-    Future<List<LoyaltyCard>> runMigrationsFor(oldCards) async {
-      boxCounter++;
-      final oldBox =
-          await Hive.openBox('migrateCardsBoxTo202603_old_$boxCounter');
-      await oldBox.put('CARDLIST', oldCards);
-      final newBox = await Hive.openBox<LoyaltyCard>(
-        'migrateCardsBoxTo202603_new_$boxCounter',
-      );
+    /// The box the older versions of the app stored their cards in.
+    late Box oldBox;
 
-      await migrateCardsBoxTo202603(oldBox, newBox);
-      return newBox.values.toList(growable: false);
+    setUp(() async {
+      oldBox = await Hive.openBox('mybox');
+      await oldBox.clear();
+    });
+
+    tearDown(() => oldBox.close());
+
+    /// A card the way the old app wrote it: a map of loose values.
+    Map<String, dynamic> legacyCard({
+      String name = 'Delhaize',
+      String? data,
+      String? cardType = 'CardType.ean13',
+      int? red = 1,
+      int? green = 2,
+      int? blue = 3,
+      bool hasPassword = false,
+      String uniqueId = '20240101120000',
+      List<String> tags = const [],
+      String? note,
+      int? pointsAmount,
+    }) {
+      return {
+        'cardName': name,
+        'cardId': data ?? validEan13,
+        if (cardType != null) 'cardType': cardType,
+        if (red != null) 'redValue': red,
+        if (green != null) 'greenValue': green,
+        if (blue != null) 'blueValue': blue,
+        'hasPassword': hasPassword,
+        'uniqueId': uniqueId,
+        'tags': tags,
+        if (note != null) 'note': note,
+        if (pointsAmount != null) 'pointsAmount': pointsAmount,
+      };
     }
 
-    group('cards stored as a list of loose values', () {
-      test('are migrated instead of dropped', () async {
-        // ACT
-        final cards = await runMigrationsFor([
-          ['Shop 1', '2297772559224', 0, 79, 155, 'CardType.ean13', false],
+    test('carries the cards of an older version over', () async {
+      await oldBox.put('CARDLIST', [
+        legacyCard(name: 'Delhaize', uniqueId: '1'),
+        legacyCard(name: 'Colruyt', data: otherValidEan13, uniqueId: '2'),
+      ]);
+
+      await migrateCardsBoxTo202603(oldBox, cardsBox());
+
+      expect(storedCardNames(), containsAll(['Delhaize', 'Colruyt']));
+      expect(storedCards(), hasLength(2));
+    });
+
+    test('carries every field of a card over', () async {
+      await oldBox.put('CARDLIST', [
+        legacyCard(
+          name: 'Delhaize',
+          data: validEan13,
+          cardType: 'CardType.qrcode',
+          red: 1,
+          green: 2,
+          blue: 3,
+          hasPassword: true,
+          uniqueId: '20240101120000',
+          tags: ['groceries'],
+          note: 'The one on the corner',
+          pointsAmount: 42,
+        ),
+      ]);
+
+      await migrateCardsBoxTo202603(oldBox, cardsBox());
+
+      final card = storedCards().single;
+      expect(card.id, '20240101120000');
+      expect(card.name, 'Delhaize');
+      expect(card.barcode.data, validEan13);
+      expect(card.barcode.type, BarcodeType.QrCode);
+      expect(card.color, const Color.fromARGB(255, 1, 2, 3));
+      expect(card.requiresAuth, isTrue);
+      expect(card.tags, {'groceries'});
+      expect(card.notes, 'The one on the corner');
+      expect(card.points, 42);
+    });
+
+    test('keeps a card which was stored without a colour', () async {
+      await oldBox.put('CARDLIST', [
+        legacyCard(name: 'No colour', red: null, green: null, blue: null),
+      ]);
+
+      await migrateCardsBoxTo202603(oldBox, cardsBox());
+
+      expect(storedCards().single.color, isNull);
+    });
+
+    test('keeps a card of the oldest, list-shaped format', () async {
+      await oldBox.put('CARDLIST', [
+        ['Legacy Card', validEan13, 158, 158, 158, 'CardType.ean13', false],
+      ]);
+
+      await migrateCardsBoxTo202603(oldBox, cardsBox());
+
+      expect(storedCardNames(), ['Legacy Card']);
+      expect(storedCards().single.barcode.data, validEan13);
+    });
+
+    group('a card of the oldest, list-shaped format', () {
+      test('carries its every value over', () async {
+        await oldBox.put('CARDLIST', [
+          ['Legacy Card', validEan13, 0, 79, 155, 'CardType.ean13', true],
         ]);
 
-        // ASSERT
-        expect(cards, hasLength(1));
-        final card = cards.single;
-        expect(card.name, 'Shop 1');
-        expect(card.barcode.data, '2297772559224');
+        await migrateCardsBoxTo202603(oldBox, cardsBox());
+
+        final card = storedCards().single;
+        expect(card.name, 'Legacy Card');
+        expect(card.barcode.data, validEan13);
         expect(card.barcode.type, BarcodeType.CodeEAN13);
         expect(card.color, const Color.fromARGB(255, 0, 79, 155));
-        expect(card.requiresAuth, isFalse);
-      });
-
-      test('keep the cards which can be read when one of them cannot',
-          () async {
-        // ACT
-        final cards = await runMigrationsFor([
-          ['Shop 1', '2297772559224', 0, 79, 155, 'CardType.ean13', false],
-          // too few values to be a card
-          ['Shop 2', '123'],
-          ['Shop 3', '4006381333931', 1, 2, 3, 'CardType.ean13', true],
-        ]);
-
-        // ASSERT
-        // the order in the box follows the generated ids, not the input.
-        expect(
-          cards.map((card) => card.name),
-          unorderedEquals(['Shop 1', 'Shop 3']),
-        );
-      });
-
-      test('read the password flag', () async {
-        // ACT
-        final cards = await runMigrationsFor([
-          ['Shop 1', '2297772559224', 0, 79, 155, 'CardType.ean13', true],
-        ]);
-
-        // ASSERT
-        expect(cards.single.requiresAuth, isTrue);
-      });
-
-      test('keeps the value as it was stored', () async {
-        // ACT
-        final cards = await runMigrationsFor([
-          [' Shop 1 ', '2297772559224', 0, 79, 155, 'CardType.ean13', false],
-        ]);
-
-        // ASSERT
-        expect(cards.single.name, ' Shop 1 ');
+        expect(card.requiresAuth, isTrue);
       });
 
       test('keeps a name which contains a comma', () async {
-        // ACT
-        final cards = await runMigrationsFor([
-          [
-            'Shop 1, Antwerp',
-            '2297772559224',
-            0,
-            79,
-            155,
-            'CardType.ean13',
-            false,
-          ],
+        await oldBox.put('CARDLIST', [
+          ['Shop 1, Antwerp', validEan13, 0, 79, 155, 'CardType.ean13', false],
         ]);
 
-        // ASSERT
-        expect(cards.single.name, 'Shop 1, Antwerp');
-        expect(cards.single.barcode.data, '2297772559224');
+        await migrateCardsBoxTo202603(oldBox, cardsBox());
+
+        expect(storedCardNames(), ['Shop 1, Antwerp']);
+        expect(storedCards().single.barcode.data, validEan13);
       });
 
-      test('a null value does not drop the card', () async {
-        // ACT
-        final cards = await runMigrationsFor([
-          ['Shop 1', '2297772559224', 0, 79, 155, 'CardType.ean13', null],
+      test('keeps the name as it was stored', () async {
+        await oldBox.put('CARDLIST', [
+          [' Legacy Card ', validEan13, 0, 79, 155, 'CardType.ean13', false],
         ]);
 
-        // ASSERT
-        expect(cards, hasLength(1));
-        expect(cards.single.name, 'Shop 1');
+        await migrateCardsBoxTo202603(oldBox, cardsBox());
+
+        expect(storedCardNames(), [' Legacy Card ']);
+      });
+
+      test('is not dropped because its password flag is null', () async {
+        await oldBox.put('CARDLIST', [
+          ['Legacy Card', validEan13, 0, 79, 155, 'CardType.ean13', null],
+        ]);
+
+        await migrateCardsBoxTo202603(oldBox, cardsBox());
+
+        expect(storedCardNames(), ['Legacy Card']);
         expect(
-          cards.single.requiresAuth,
+          storedCards().single.requiresAuth,
           isFalse,
           reason: 'a null password flag is not an enabled password',
         );
       });
 
-      test('a null barcode type keeps the card without a type', () async {
-        // ACT
-        final cards = await runMigrationsFor([
-          ['Shop 1', '2297772559224', 0, 79, 155, null, false],
+      test('is kept without a type when its type is null', () async {
+        await oldBox.put('CARDLIST', [
+          ['Legacy Card', validEan13, 0, 79, 155, null, false],
         ]);
 
-        // ASSERT
-        expect(cards.single.name, 'Shop 1');
-        expect(cards.single.barcode.type, isNull);
+        await migrateCardsBoxTo202603(oldBox, cardsBox());
+
+        expect(storedCardNames(), ['Legacy Card']);
+        expect(storedCards().single.barcode.type, isNull);
+      });
+
+      test('does not take the readable cards down with it', () async {
+        await oldBox.put('CARDLIST', [
+          ['Legacy Card', validEan13, 0, 79, 155, 'CardType.ean13', false],
+          // too few values to be a card
+          ['Half a card', '123'],
+          ['Other Card', otherValidEan13, 1, 2, 3, 'CardType.ean13', true],
+        ]);
+
+        await migrateCardsBoxTo202603(oldBox, cardsBox());
+
+        expect(
+          storedCardNames(),
+          unorderedEquals(['Legacy Card', 'Other Card']),
+        );
       });
     });
 
-    test('does not overwrite cards which are already migrated', () async {
-      // ARRANGE
-      boxCounter++;
-      final oldBox = await Hive.openBox<dynamic>('old_$boxCounter');
-      await oldBox.put('CARDLIST', [
-        ['Shop 1', '2297772559224', 0, 79, 155, 'CardType.ean13', false],
+    test('leaves the cards alone when there are already new ones', () async {
+      await storeCards([
+        faker.loyaltyCards.card().copyWith(name: 'Already migrated'),
       ]);
-      final newBox = await Hive.openBox<LoyaltyCard>('new_$boxCounter');
-      final now = DateTime.now().toUtc();
-      await newBox.put(
-        'existing',
-        LoyaltyCard(
-          id: 'existing',
-          barcode: const Barcode(data: '123', type: BarcodeType.Code128),
-          name: 'Already migrated',
-          color: null,
-          tags: const {},
-          notes: null,
-          frontImagePath: null,
-          backImagePath: null,
-          useFrontImageOverlay: false,
-          points: 0,
-          requiresAuth: false,
-          hideName: false,
-          createdAt: now,
-          lastModifiedAt: now,
-          usePoints: false,
-        ),
-      );
+      await oldBox.put('CARDLIST', [legacyCard(name: 'Delhaize')]);
 
-      // ACT
-      await migrateCardsBoxTo202603(oldBox, newBox);
+      await migrateCardsBoxTo202603(oldBox, cardsBox());
 
-      // ASSERT
-      expect(newBox.values.map((card) => card.name), ['Already migrated']);
+      expect(storedCardNames(), ['Already migrated']);
+    });
+
+    test('does nothing when there is nothing to migrate', () async {
+      await migrateCardsBoxTo202603(oldBox, cardsBox());
+
+      expect(storedCards(), isEmpty);
+    });
+
+    test('does not lose a card because another one cannot be read', () async {
+      await oldBox.put('CARDLIST', [
+        'this is not a card',
+        legacyCard(name: 'Delhaize'),
+      ]);
+
+      await migrateCardsBoxTo202603(oldBox, cardsBox());
+
+      expect(storedCardNames(), ['Delhaize']);
     });
   });
 }

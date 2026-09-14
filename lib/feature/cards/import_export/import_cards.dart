@@ -9,15 +9,15 @@ import 'package:path_provider/path_provider.dart';
 
 List<LoyaltyCard> deserializeLoyaltyCards(String input) {
   try {
-    return _deserializeJsonExport(input);
+    return deserializeJsonExport(input);
   } catch (_) {
     // if new parse did not work, try the legacy one
   }
 
-  return _deserializeLegacyExport(input);
+  return deserializeLegacyExport(input);
 }
 
-List<LoyaltyCard> _deserializeLegacyExport(String input) {
+List<LoyaltyCard> deserializeLegacyExport(String input) {
   final cards = <LoyaltyCard>[];
   for (final line in input.split('\n')) {
     if (line.startsWith('{') || line.startsWith('[')) {
@@ -32,22 +32,21 @@ List<LoyaltyCard> _deserializeLegacyExport(String input) {
   return cards;
 }
 
-List<LoyaltyCard> _deserializeJsonExport(String input) {
+List<LoyaltyCard> deserializeJsonExport(String input) {
   final jsonList = jsonDecode(input);
   if (jsonList is! List) {
     throw Exception('input is no a json list');
-  } else {
-    final cards = <LoyaltyCard>[];
-    for (final item in jsonList.whereType<Map<String, dynamic>>()) {
-      try {
-        cards.add(LoyaltyCard.fromJsonMap(item));
-      } catch (_) {
-        // Skip cards that fail to parse
-        continue;
-      }
-    }
-    return cards;
   }
+  final cards = <LoyaltyCard>[];
+  for (final item in jsonList.whereType<Map<String, dynamic>>()) {
+    try {
+      cards.add(LoyaltyCard.fromJsonMap(item));
+    } catch (_) {
+      // Skip cards that fail to parse
+      continue;
+    }
+  }
+  return cards;
 }
 
 class ZipImportResult {

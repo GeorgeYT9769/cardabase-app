@@ -13,6 +13,10 @@ abstract class _ClipboardPlatform {
   Future<bool> hasStrings();
 }
 
+/// The handler stays on the messenger afterwards on purpose: the integration
+/// tests reach the mock through a get_it singleton which outlives the test
+/// which happened to create it, and tearing the handler down there would leave
+/// every later test in the file writing to a clipboard nobody listens to.
 MockClipboardPlatform createMockClipboardPlatform(
   TestDefaultBinaryMessenger messenger,
 ) {
@@ -35,9 +39,6 @@ MockClipboardPlatform createMockClipboardPlatform(
     },
   );
 
-  addTearDown(() {
-    messenger.setMockMethodCallHandler(SystemChannels.platform, null);
-  });
   when(() => mock.setData(any())).thenAnswer((i) {
     mock.clipboardText =
         (i.positionalArguments.first as Map)['text'] as String?;

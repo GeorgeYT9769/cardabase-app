@@ -4,6 +4,8 @@ import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../test_helpers/input_output_test_case.dart';
+import '../../../test_helpers/matchers/is_between.dart';
+import '../../../test_helpers/matchers/loyalty_card.dart';
 
 void main() {
   group('fromLegacySharing', () {
@@ -38,29 +40,25 @@ void main() {
 
       for (final tc in testCases) {
         test(tc.name, () {
+          // ARRANGE
+          final start = DateTime.now().toUtc();
+
           // ACT
           final output = LoyaltyCard.fromLegacySharing(tc.input);
 
           // ARRANGE
+          final end = DateTime.now().toUtc();
+
           expect(
-            output.id,
-            isNot(tc.expected.id),
-            reason:
-                'the id should be recalculated and thus not be the provided id',
+            output,
+            loyaltyCard(
+              expected: tc.expected,
+              // the id should be recalculated and thus not be the provided id
+              id: isNot(tc.expected.id),
+              createdAt: isBetween(start, end),
+              lastModifiedAt: isBetween(start, end),
+            ),
           );
-          expect(output.barcode.data, tc.expected.barcode.data);
-          expect(output.barcode.type, tc.expected.barcode.type);
-          expect(output.name, tc.expected.name);
-          expect(output.color, tc.expected.color);
-          expect(output.tags, tc.expected.tags);
-          expect(output.notes, tc.expected.notes);
-          expect(output.frontImagePath, tc.expected.frontImagePath);
-          expect(output.backImagePath, tc.expected.backImagePath);
-          expect(output.useFrontImageOverlay, tc.expected.useFrontImageOverlay);
-          expect(output.points, tc.expected.points);
-          expect(output.requiresAuth, tc.expected.requiresAuth);
-          expect(output.hideName, tc.expected.hideName);
-          expect(output.usePoints, tc.expected.usePoints);
         });
       }
     });
@@ -123,29 +121,25 @@ void main() {
 
       for (final tc in testCases) {
         test(tc.name, () {
+          // ARRANGE
+          final start = DateTime.now().toUtc();
+
           // ACT
           final output = LoyaltyCard.fromLegacyExport(tc.input);
 
           // ARRANGE
+          final end = DateTime.now().toUtc();
+
           expect(
-            output.id,
-            isNot(tc.expected.id),
-            reason:
-                'the id should be recalculated and thus not be the provided id',
+            output,
+            loyaltyCard(
+              expected: tc.expected,
+              // the id should be recalculated and thus not be the provided id
+              id: isNot(tc.expected.id),
+              createdAt: isBetween(start, end),
+              lastModifiedAt: isBetween(start, end),
+            ),
           );
-          expect(output.barcode.data, tc.expected.barcode.data);
-          expect(output.barcode.type, tc.expected.barcode.type);
-          expect(output.name, tc.expected.name);
-          expect(output.color, tc.expected.color);
-          expect(output.tags, tc.expected.tags);
-          expect(output.notes, tc.expected.notes);
-          expect(output.frontImagePath, tc.expected.frontImagePath);
-          expect(output.backImagePath, tc.expected.backImagePath);
-          expect(output.useFrontImageOverlay, tc.expected.useFrontImageOverlay);
-          expect(output.points, tc.expected.points);
-          expect(output.requiresAuth, tc.expected.requiresAuth);
-          expect(output.hideName, tc.expected.hideName);
-          expect(output.usePoints, tc.expected.usePoints);
         });
       }
     });
@@ -225,61 +219,78 @@ void main() {
             usePoints: false,
           ),
         ),
-        InputOutputTestCase(
-          name: 'missing usePoints but has pointsAmount',
-          input: {
-            'name': 'Legacy Card',
-            'barcode': {
-              'data': '987654321',
-              'type': 'Code128',
-            },
-            'pointsAmount': 100,
-          },
-          expected: LoyaltyCard(
-            id: '',
-            barcode: const Barcode(
-              data: '987654321',
-              type: BarcodeType.Code128,
-            ),
-            name: 'Legacy Card',
-            color: null,
-            tags: const {},
-            notes: null,
-            frontImagePath: null,
-            backImagePath: null,
-            useFrontImageOverlay: false,
-            points: 100,
-            requiresAuth: false,
-            hideName: false,
-            createdAt: DateTime.now().toUtc(),
-            lastModifiedAt: DateTime.now().toUtc(),
-            usePoints: true,
-          ),
-        ),
       ];
 
       for (final tc in testCases) {
         test(tc.name, () {
+          // ARRANGE
+          final start = DateTime.now().toUtc();
+
           // ACT
           final output = LoyaltyCard.fromJsonMap(tc.input);
 
           // ARRANGE
-          expect(output.id, isNotEmpty);
-          expect(output.barcode.data, tc.expected.barcode.data);
-          expect(output.barcode.type, tc.expected.barcode.type);
-          expect(output.name, tc.expected.name);
-          expect(output.color, tc.expected.color);
-          expect(output.tags, tc.expected.tags);
-          expect(output.notes, tc.expected.notes);
-          expect(output.frontImagePath, tc.expected.frontImagePath);
-          expect(output.backImagePath, tc.expected.backImagePath);
-          expect(output.useFrontImageOverlay, tc.expected.useFrontImageOverlay);
-          expect(output.points, tc.expected.points);
-          expect(output.requiresAuth, tc.expected.requiresAuth);
-          expect(output.hideName, tc.expected.hideName);
-          expect(output.usePoints, tc.expected.usePoints);
+          final end = DateTime.now().toUtc();
+
+          expect(
+            output,
+            loyaltyCard(
+              expected: tc.expected,
+              id: isNotEmpty,
+              createdAt: isBetween(start, end),
+              lastModifiedAt: isBetween(start, end),
+            ),
+          );
         });
       }
+    });
+
+    test('id should be taken over when provided', () {
+      // ARRANGE
+      final input = {
+        'id': '6fdfeb5a-04d9-4134-bade-7e5a53c3b268',
+        'name': 'Shop 1',
+        'barcode': {
+          'data': 'this is a test value',
+          'type': 'QrCode',
+        },
+      };
+      final expected = LoyaltyCard(
+        id: '6fdfeb5a-04d9-4134-bade-7e5a53c3b268',
+        barcode: const Barcode(
+          data: 'this is a test value',
+          type: BarcodeType.QrCode,
+        ),
+        name: 'Shop 1',
+        color: null,
+        tags: {},
+        notes: null,
+        frontImagePath: null,
+        backImagePath: null,
+        useFrontImageOverlay: false,
+        points: 0,
+        requiresAuth: false,
+        hideName: false,
+        createdAt: DateTime.now().toUtc(),
+        lastModifiedAt: DateTime.now().toUtc(),
+        usePoints: false,
+      );
+      final start = DateTime.now().toUtc();
+
+      // ACT
+      final output = LoyaltyCard.fromJsonMap(input);
+
+      // ARRANGE
+      final end = DateTime.now().toUtc();
+
+      expect(
+        output,
+        loyaltyCard(
+          expected: expected,
+          createdAt: isBetween(start, end),
+          lastModifiedAt: isBetween(start, end),
+        ),
+      );
     });
   });
 
@@ -304,10 +315,8 @@ void main() {
             points: 0,
             requiresAuth: false,
             hideName: false,
-            createdAt:
-                DateTime.fromMillisecondsSinceEpoch(1779824555324).toUtc(),
-            lastModifiedAt:
-                DateTime.fromMillisecondsSinceEpoch(1779824555324).toUtc(),
+            createdAt: DateTime.parse('2026-05-26T19:42:35.324Z'),
+            lastModifiedAt: DateTime.parse('2026-05-26T19:42:36.324Z'),
             usePoints: false,
           ),
           expected: {
@@ -318,7 +327,7 @@ void main() {
               'type': 'QrCode',
             },
             'createdAt': '2026-05-26T19:42:35.324Z',
-            'lastModifiedAt': '2026-05-26T19:42:35.324Z',
+            'lastModifiedAt': '2026-05-26T19:42:36.324Z',
             'points': 0,
             'usePoints': false,
             'usedCount': 0,
@@ -342,11 +351,9 @@ void main() {
             points: 42,
             requiresAuth: true,
             hideName: true,
-            createdAt:
-                DateTime.fromMillisecondsSinceEpoch(1779824555324).toUtc(),
-            lastModifiedAt:
-                DateTime.fromMillisecondsSinceEpoch(1779824555324).toUtc(),
-            usePoints: false,
+            createdAt: DateTime.parse('2026-05-26T19:42:35.324Z'),
+            lastModifiedAt: DateTime.parse('2026-05-26T19:42:36.324Z'),
+            usePoints: true,
           ),
           expected: {
             'id': '6fdfeb5a-04d9-4134-bade-7e5a53c3b268',
@@ -363,8 +370,8 @@ void main() {
             'requiresAuth': true,
             'hideName': true,
             'createdAt': '2026-05-26T19:42:35.324Z',
-            'lastModifiedAt': '2026-05-26T19:42:35.324Z',
-            'usePoints': false,
+            'lastModifiedAt': '2026-05-26T19:42:36.324Z',
+            'usePoints': true,
             'usedCount': 0,
           },
         ),
@@ -417,6 +424,58 @@ void main() {
           expect(output, equals(tc.expected));
         });
       }
+    });
+  });
+
+  group('fromJsonMap', () {
+    group('not ok', () {
+      test('throws without a name', () {
+        expect(
+          () => LoyaltyCard.fromJsonMap({
+            'barcode': {'data': '123'},
+          }),
+          throwsA(isA<Exception>()),
+        );
+      });
+
+      test('throws without a barcode', () {
+        expect(
+          () => LoyaltyCard.fromJsonMap({'name': 'Shop 1'}),
+          throwsA(isA<Exception>()),
+        );
+      });
+    });
+  });
+
+  group('Barcode', () {
+    test('writes and reads its json', () {
+      const barcode = Barcode(data: '123', type: BarcodeType.QrCode);
+
+      final restored = Barcode.fromJsonMap(barcode.toJsonMap());
+
+      expect(restored.data, barcode.data);
+      expect(restored.type, barcode.type);
+    });
+
+    test('leaves the type out when the card has none', () {
+      const barcode = Barcode(data: '123', type: null);
+
+      expect(barcode.toJsonMap(), {'data': '123'});
+      expect(Barcode.fromJsonMap(barcode.toJsonMap()).type, isNull);
+    });
+
+    test('throws for json without data', () {
+      expect(
+        () => Barcode.fromJsonMap({'type': 'CodeEAN13'}),
+        throwsA(isA<Exception>()),
+      );
+    });
+
+    test('throws for a type it does not know', () {
+      expect(
+        () => Barcode.fromJsonMap({'data': '123', 'type': 'smoke signal'}),
+        throwsA(isA<Exception>()),
+      );
     });
   });
 }

@@ -1,7 +1,11 @@
 import 'dart:async';
+
 import 'package:cardabase/data/unique_id.dart';
 import 'package:cardabase/feature/cards/edit/widgets/edit_card_page.dart';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
+import 'package:cardabase/feature/cards/migrations.dart';
+import 'package:cardabase/feature/errors/flutter_errors.dart';
+import 'package:cardabase/feature/errors/widgets/error_widget.dart' as err;
 import 'package:cardabase/feature/settings/auto_update.dart';
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
@@ -20,96 +24,36 @@ import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'feature/cards/get_it.dart';
 import 'feature/cards/import_export/import_cards.dart';
+import 'feature/errors/widgets/startup_error.dart';
 import 'util/widgets/custom_snack_bar.dart';
 
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
-Future<void> _launchUrl(Uri url) async {
-  if (!await launchUrl(url)) {
-    throw Exception('Could not launch $url');
-  }
-}
+final navigatorKey = GlobalKey<NavigatorState>();
+final flutterErrorHandler = FlutterErrorHandler(navigatorKey: navigatorKey);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  registerDependencies();
+  return run();
+}
 
-  FlutterError.onError = (FlutterErrorDetails details) {
-    FlutterError.presentError(details);
-    if (navigatorKey.currentState != null &&
-        navigatorKey.currentContext != null &&
-        navigatorKey.currentContext!.mounted) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (navigatorKey.currentContext != null &&
-            navigatorKey.currentContext!.mounted) {
-          bool isDialogOpen = false;
-          navigatorKey.currentState!.popUntil((route) {
-            if (route is PopupRoute && route.isActive) {
-              isDialogOpen = true;
-              return false;
-            }
-            return true;
-          });
-          if (isDialogOpen) return;
+void registerDependencies() {
+  GetIt.I
+    ..registerPackageInfo()
+    ..registerHaptics()
+    ..registerHive()
+    ..registerSettings()
+    ..registerCards();
+}
 
-          showDialog(
-            context: navigatorKey.currentContext!,
-            builder: (dialogContext) {
-              return AlertDialog(
-                title: const Text(
-                  'Application Error',
-                  style: TextStyle(color: Colors.red),
-                ),
-                content: Text(
-                  'Oops! Something critical went wrong:\n\n${details.exception}\n\n'
-                  'Please send a screenshot of this error to the developer.\n',
-                  textAlign: TextAlign.center,
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => _launchUrl(
-                      Uri.parse(
-                        'https://github.com/GeorgeYT9769/cardabase-app/issues',
-                      ),
-                    ),
-                    child: const Text('GitHub Issue'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(dialogContext).pop();
-                    },
-                    child: const Text('OK'),
-                  ),
-                ],
-              );
-            },
-          );
-        }
-      });
-    }
-  };
-
-  ErrorWidget.builder = (FlutterErrorDetails details) {
-    return Center(
-      child: Text(
-        'Oops! Something went wrong:\n${details.exception}\nPlease send a screenshot of this error to the developer.',
-        style: const TextStyle(color: Colors.red, fontSize: 18),
-        textAlign: TextAlign.center,
-      ),
-    );
-  };
+Future<void> run() async {
+  FlutterError.onError = flutterErrorHandler.handleError;
+  ErrorWidget.builder =
+      (details) => Center(child: err.ErrorWidget(error: details));
 
   try {
-    GetIt.I
-      ..registerPackageInfo()
-      ..registerHaptics()
-      ..registerHive()
-      ..registerSettings()
-      ..registerCards();
-
     // ignore: avoid_print
     print('main: awaiting packageInfo');
     final packageInfo = await GetIt.I.getAsync<PackageInfo>();
@@ -142,6 +86,14 @@ void main() async {
     );
     // ignore: avoid_print
     print('main: got cardsBox (length=${cardsBox.length})');
+
+    // Run migration in background so we don't block app startup.
+    print('registerCards: background migration start');
+    runLoyaltyCardMigrations()
+        .then((_) => print('registerCards: background migration finished'))
+        .onError(
+          (e, s) => print('registerCards: background migration failed: $e\n$s'),
+        );
 
     // ignore: avoid_print
     print('main: awaiting passwordBox');
@@ -194,34 +146,7 @@ void main() async {
     // As a last resort, show a visible startup error instead of a black screen.
     // ignore: avoid_print
     print('main: fatal startup error: $e\n$s');
-    runApp(StartupErrorApp(errorMessage: e.toString()));
-  }
-}
-
-class StartupErrorApp extends StatelessWidget {
-  final String errorMessage;
-
-  const StartupErrorApp({
-    super.key,
-    required this.errorMessage,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: Center(
-          child: Padding(
-            padding: EdgeInsets.all(24),
-            child: Text(
-              'Cardabase failed to initialize local data.\n\nError:\n$errorMessage\n\nPlease restart the app. If this keeps happening, export your data from the old version and reinstall.',
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
-      ),
-    );
+    runApp(StartupError(error: e));
   }
 }
 

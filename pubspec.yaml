@@ -32,6 +32,7 @@ dependencies:
   barcode_widget: ^2.0.4
   camera: ^0.12.0+1
   cupertino_icons: ^1.0.2
+  equatable: ^2.1.0
   file_picker: ^12.0.0-beta.7
   flutter:
     sdk: flutter
@@ -68,6 +69,8 @@ dev_dependencies:
   faker: ^2.2.0
   flutter_test:
     sdk: flutter
+  integration_test:
+    sdk: flutter
   hive_ce_generator: ^1.11.1
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -76,6 +79,8 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
   mocktail: ^1.0.0
+  path_provider_platform_interface: ^2.1.3
+  plugin_platform_interface: ^2.1.8
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

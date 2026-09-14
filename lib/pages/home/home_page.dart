@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:cardabase/data/unique_id.dart';
 import 'package:cardabase/feature/cards/card_list_view_options.dart';
 import 'package:cardabase/feature/cards/edit/widgets/edit_card_page.dart';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
+import 'package:cardabase/feature/cards/widgets/add_card_button.dart';
 import 'package:cardabase/feature/cards/widgets/card_list.dart';
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
@@ -12,11 +12,9 @@ import 'package:cardabase/pages/home/card_list_view_options_dialog.dart';
 import 'package:cardabase/pages/home/password_challenge_dialog.dart';
 import 'package:cardabase/pages/welcome_screen.dart';
 import 'package:cardabase/theme/theme.dart';
-import 'package:cardabase/util/widgets/blur_wrapper.dart';
 import 'package:cardabase/util/widgets/cdb_app_bar_sliver.dart';
 import 'package:cardabase/util/widgets/multi_listenable_builder.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 
@@ -91,17 +89,6 @@ class _HomePageState extends State<Homepage> {
     }).toList(growable: false);
   }
 
-  Future<void> addCard() {
-    return Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (builder) => EditCardPage(
-          cardId: generateUniqueId(),
-        ),
-      ),
-    );
-  }
-
   Future<void> moveCard(int oldIndex, int newIndex) {
     settings.cardListViewOptions.customOrder.move(oldIndex, newIndex);
     settings.cardListViewOptions.sortingStyle.value = SortingStyle.custom;
@@ -168,7 +155,7 @@ class _HomePageState extends State<Homepage> {
     final theme = Theme.of(context);
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
-      floatingActionButton: _addCardButton(),
+      floatingActionButton: const AddCardButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: MultiListenableBuilder(
         listenables: [
@@ -329,36 +316,6 @@ class _HomePageState extends State<Homepage> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _addCardButton() {
-    final theme = Theme.of(context);
-    final advancedTextures = settings.theme.advancedTextures.value;
-    return Bounceable(
-      onTap: () {},
-      child: SizedBox(
-        height: 70,
-        width: 70,
-        child: BlurWrapper(
-          useBlur: advancedTextures,
-          isCircle: false,
-          borderRadius: BorderRadius.circular(20),
-          blurSigma: 10,
-          child: FittedBox(
-            child: FloatingActionButton(
-              elevation: 0.0,
-              enableFeedback: true,
-              tooltip: 'Add a card',
-              onPressed: addCard,
-              backgroundColor: advancedTextures
-                  ? theme.colorScheme.primaryContainer.withValues(alpha: .9)
-                  : null,
-              child: const Icon(Icons.add_card),
-            ),
-          ),
         ),
       ),
     );

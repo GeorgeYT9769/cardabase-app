@@ -8,6 +8,7 @@ import 'package:cardabase/util/barcode_type_extensions.dart';
 import 'package:cardabase/util/list_extensions.dart';
 import 'package:cardabase/util/map_extensions.dart';
 import 'package:cardabase/util/string_extensions.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:hive_ce/hive.dart';
@@ -19,7 +20,7 @@ part 'loyalty_card.g.dart';
 typedef LoyaltyCardsBox = Box<LoyaltyCard>;
 
 @HiveType(typeId: HiveTypeIds.loyaltyCard)
-class LoyaltyCard {
+class LoyaltyCard extends Equatable {
   static const Color defaultColor = Colors.grey;
 
   LoyaltyCard({
@@ -117,6 +118,25 @@ class LoyaltyCard {
   final int usedCount;
 
   Color get nonNullColor => color ?? defaultColor;
+
+  @override
+  List<Object?> get props => [
+        id,
+        barcode,
+        name,
+        color,
+        tags,
+        notes,
+        frontImagePath,
+        backImagePath,
+        useFrontImageOverlay,
+        points,
+        requiresAuth,
+        hideName,
+        createdAt,
+        lastModifiedAt,
+        usePoints,
+      ];
 
   EditableLoyaltyCard editable() => EditableLoyaltyCard.fromValue(this);
 
@@ -397,7 +417,7 @@ class LoyaltyCard {
 }
 
 @HiveType(typeId: HiveTypeIds.barcode)
-class Barcode {
+class Barcode extends Equatable {
   const Barcode({
     required this.data,
     required this.type,
@@ -407,6 +427,9 @@ class Barcode {
   final String data;
   @HiveField(1)
   final BarcodeType? type;
+
+  @override
+  List<Object?> get props => [data, type];
 
   EditableBarcode editable() => EditableBarcode.fromValue(this);
 

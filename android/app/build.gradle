@@ -80,6 +80,15 @@ android {
         }
 
     buildTypes {
+        debug {
+            // a debug build -- which is what `flutter run` and the integration
+            // tests install -- gets an application id of its own, so it lands
+            // next to the Cardabase which is already on the phone instead of
+            // replacing it.
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+        }
+
         release {
             minifyEnabled true
             shrinkResources true

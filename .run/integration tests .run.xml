@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="integration tests " type="FlutterTestConfigType" factoryName="Flutter Test">
+    <option name="testFile" value="$PROJECT_DIR$/integration_test/integration_test.dart" />
+    <option name="useRegexp" value="false" />
+    <option name="additionalArgs" value="-d flutter-tester" />
+    <method v="2" />
+  </configuration>
+</component>
