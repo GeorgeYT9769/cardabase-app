@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:typed_data' as typed_data;
 
 import 'package:camera/camera.dart';
@@ -16,6 +18,28 @@ import '../feature/settings/get_it.dart';
 import '../feature/settings/model.dart';
 import 'expressive_loading_indicator.dart';
 import 'widgets/blur_wrapper.dart';
+
+class _OverlayItem {
+  final String id;
+  final String type; // 'image' or 'text'
+  String? imagePath;
+  String? text;
+  Color color;
+  Offset position;
+  double scale;
+  double rotation;
+
+  _OverlayItem({
+    required this.id,
+    required this.type,
+    this.imagePath,
+    this.text,
+    this.color = Colors.white,
+    required this.position,
+    this.scale = 1.0,
+    this.rotation = 0.0,
+  });
+}
 
 class CameraControllerScreen extends StatefulWidget {
   final Color cutoutColor;
@@ -40,7 +64,28 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
   List<CameraDescription>? _cameras;
   Future<void>? _initializeControllerFuture;
   XFile? _capturedImageFile;
+  Color? _canvasColor;
   double _brightness = 0.0;
+  bool _isFlashOn = false;
+
+  Offset _photoPosition = Offset.zero;
+  double _photoScale = 1.0;
+  double _photoRotation = 0.0;
+
+  final List<_OverlayItem> _overlayItems = [];
+  String? _selectedOverlayId;
+
+  double? _verticalGuideX;
+  double? _horizontalGuideY;
+
+  Offset? _focusIndicatorPosition;
+  bool _showFocusIndicator = false;
+  Timer? _focusTimer;
+
+  Offset _initialFocalPoint = Offset.zero;
+  Offset _initialPosition = Offset.zero;
+  double _initialScale = 1.0;
+  double _initialRotation = 0.0;
 
   final TransformationController _transformationController =
       TransformationController();
@@ -73,6 +118,12 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
 
   @override
   void dispose() {
+    if (_isFlashOn) {
+      try {
+        _cameraController?.setFlashMode(FlashMode.off);
+      } catch (_) {}
+    }
+    _focusTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     _cameraController?.dispose();
     _transformationController.dispose();
@@ -91,16 +142,66 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     }
   }
 
+  void _initPhotoPosition() {
+    final screenSize = MediaQuery.of(context).size;
+    final screenW = screenSize.width;
+    final screenH = screenSize.height;
+
+    double cutoutWidth = screenW * widget.cutoutWidthPercentage;
+    double cutoutHeight = cutoutWidth / widget.cardAspectRatio;
+    if (cutoutHeight > screenH * 0.7) {
+      cutoutHeight = screenH * 0.7;
+      cutoutWidth = cutoutHeight * widget.cardAspectRatio;
+    }
+    final cutoutLeft = (screenW - cutoutWidth) / 2;
+    final cutoutTop = (screenH - cutoutHeight) / 2;
+
+    _photoPosition = Offset(
+      cutoutLeft - (300 - cutoutWidth) / 2,
+      cutoutTop - (300 / widget.cardAspectRatio - cutoutHeight) / 2,
+    );
+    _photoScale = cutoutWidth / 300.0;
+    _photoRotation = 0.0;
+  }
+
+  Future<void> _toggleFlash() async {
+    if (_cameraController == null || !_cameraController!.value.isInitialized) {
+      return;
+    }
+    try {
+      if (_isFlashOn) {
+        await _cameraController!.setFlashMode(FlashMode.off);
+        setState(() {
+          _isFlashOn = false;
+        });
+      } else {
+        await _cameraController!.setFlashMode(FlashMode.torch);
+        setState(() {
+          _isFlashOn = true;
+        });
+      }
+    } catch (e) {
+      // Ignore if flash mode isn't supported on device/emulator
+    }
+  }
+
   Future<void> _takePicture() async {
     if (!_cameraController!.value.isInitialized) {
       return;
     }
     try {
       final XFile file = await _cameraController!.takePicture();
+      if (_isFlashOn) {
+        try {
+          await _cameraController!.setFlashMode(FlashMode.off);
+        } catch (_) {}
+        _isFlashOn = false;
+      }
       setState(() {
         _capturedImageFile = file;
-        _transformationController.value =
-            Matrix4.identity(); // Start zoomed in, allow zooming out
+        _canvasColor = null;
+        _selectedOverlayId = 'BACKGROUND_PHOTO';
+        _initPhotoPosition();
       });
     } catch (e) {
       // Handle error
@@ -113,16 +214,238 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     if (image != null) {
       setState(() {
         _capturedImageFile = image;
-        _transformationController.value =
-            Matrix4.identity(); // Start zoomed in, allow zooming out
+        _canvasColor = null;
+        _selectedOverlayId = 'BACKGROUND_PHOTO';
+        _initPhotoPosition();
       });
     }
   }
 
+  Future<void> _pickCanvasColorDialog() async {
+    Color? chosenColor;
+
+    final List<Map<String, dynamic>> presetColors = [
+      {'name': 'Transparent', 'color': Colors.transparent},
+      {'name': 'White', 'color': Colors.white},
+      {'name': 'Black', 'color': Colors.black},
+      {'name': 'Red', 'color': Colors.red},
+      {'name': 'Amber', 'color': Colors.amber},
+      {'name': 'Green', 'color': Colors.green},
+      {'name': 'Blue', 'color': Colors.blue},
+      {'name': 'Cyan', 'color': Colors.cyan},
+      {'name': 'Purple', 'color': Colors.purple},
+      {'name': 'Grey', 'color': Colors.grey},
+    ];
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Select Canvas Color'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: GridView.builder(
+              shrinkWrap: true,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 5,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+              ),
+              itemCount: presetColors.length,
+              itemBuilder: (context, index) {
+                final item = presetColors[index];
+                final Color color = item['color'];
+                final bool isTransparent = color == Colors.transparent;
+
+                return GestureDetector(
+                  onTap: () {
+                    chosenColor = color;
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: isTransparent ? Colors.grey.shade300 : color,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.grey, width: 2),
+                    ),
+                    child: isTransparent
+                        ? const Icon(Icons.block, color: Colors.red, size: 20)
+                        : null,
+                  ),
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (chosenColor != null) {
+      setState(() {
+        _canvasColor = chosenColor;
+        _capturedImageFile = XFile('');
+        _transformationController.value = Matrix4.identity();
+      });
+    }
+  }
+
+  Future<void> _addOverlayImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (!mounted) return;
+    if (image != null) {
+      final screenSize = MediaQuery.of(context).size;
+      final newItem = _OverlayItem(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        type: 'image',
+        imagePath: image.path,
+        position: Offset(screenSize.width / 2 - 50, screenSize.height / 3),
+      );
+      setState(() {
+        _overlayItems.add(newItem);
+        _selectedOverlayId = newItem.id;
+      });
+    }
+  }
+
+  Future<void> _addOverlayText() async {
+    final TextEditingController textController = TextEditingController();
+    Color selectedColor = Colors.white;
+
+    final List<Color> colors = [
+      Colors.white,
+      Colors.black,
+      Colors.red,
+      Colors.amber,
+      Colors.green,
+      Colors.blue,
+      Colors.purple,
+      Colors.pink,
+    ];
+
+    final String? resultText = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Add Text Overlay'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: textController,
+                    autofocus: true,
+                    decoration: const InputDecoration(
+                      hintText: 'Enter text...',
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: colors.map((c) {
+                        final isSelected = c == selectedColor;
+                        return GestureDetector(
+                          onTap: () {
+                            setDialogState(() {
+                              selectedColor = c;
+                            });
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: c,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isSelected ? Colors.cyan : Colors.grey,
+                                width: isSelected ? 3 : 1,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context, textController.text),
+                  child: const Text('Add'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    if (!mounted) return;
+    if (resultText != null && resultText.trim().isNotEmpty) {
+      final screenSize = MediaQuery.of(context).size;
+      final newItem = _OverlayItem(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        type: 'text',
+        text: resultText.trim(),
+        color: selectedColor,
+        position: Offset(screenSize.width / 2 - 50, screenSize.height / 3),
+      );
+      setState(() {
+        _overlayItems.add(newItem);
+        _selectedOverlayId = newItem.id;
+      });
+    }
+  }
+
+  double _normalizeAngle(double angle) {
+    if (angle.isNaN || angle.isInfinite) return 0.0;
+    double a = (angle + math.pi) % (2 * math.pi);
+    if (a < 0) {
+      a += 2 * math.pi;
+    }
+    return (a - math.pi).clamp(-math.pi, math.pi);
+  }
+
+  Size _measureItemSize(_OverlayItem item, ThemeData theme) {
+    if (item.type == 'image') {
+      final base = 112.0 * item.scale;
+      return Size(base, base);
+    } else {
+      final tp = TextPainter(
+        text: TextSpan(
+          text: item.text ?? '',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontFamily: 'Roboto',
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      final w = (tp.width + 12) * item.scale;
+      final h = (tp.height + 12) * item.scale;
+      return Size(w, h);
+    }
+  }
+
   Future<String> _cropAndSaveAdjustedImage() async {
-    if (_capturedImageFile == null) return '';
+    if (_capturedImageFile == null && _canvasColor == null) return '';
     setState(() {
       hideCutoutBorder = true;
+      _selectedOverlayId = null;
     });
     await Future.delayed(const Duration(milliseconds: 50));
     final typed_data.Uint8List? imageBytes =
@@ -136,14 +459,10 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     final fullImage = img.decodeImage(imageBytes);
     if (fullImage == null) return _capturedImageFile?.path ?? '';
 
-    // Derive crop region directly from the captured image's own pixel dimensions.
-    // This mirrors the painter's percentage-based logic in pixel space, so X and Y
-    // are always aligned with the cutout overlay — no RenderBox/devicePixelRatio drift.
     final int imgW = fullImage.width;
     final int imgH = fullImage.height;
     int cropWidth = (imgW * widget.cutoutWidthPercentage).round();
     int cropHeight = (cropWidth / widget.cardAspectRatio).round();
-    // Apply the same clamping as the painter
     if (cropHeight > (imgH * 0.7).round()) {
       cropHeight = (imgH * 0.7).round();
       cropWidth = (cropHeight * widget.cardAspectRatio).round();
@@ -158,7 +477,6 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
       width: cropWidth,
       height: cropHeight,
     );
-    // Save to permanent storage
     final String path = join(
       (await getApplicationDocumentsDirectory()).path,
       '${DateTime.now().millisecondsSinceEpoch}.png',
@@ -168,7 +486,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
   }
 
   Future<void> _confirmAndSavePicture() async {
-    if (_capturedImageFile == null) return;
+    if (_capturedImageFile == null && _canvasColor == null) return;
     setState(() {
       _isSaving = true;
     });
@@ -190,16 +508,77 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     }
   }
 
+  Future<void> _setFocusPoint(
+    TapDownDetails details,
+    BoxConstraints constraints,
+  ) async {
+    if (_cameraController == null || !_cameraController!.value.isInitialized) {
+      return;
+    }
+
+    final Offset localPosition = details.localPosition;
+    final double x =
+        (localPosition.dx / constraints.maxWidth).clamp(0.0, 1.0);
+    final double y =
+        (localPosition.dy / constraints.maxHeight).clamp(0.0, 1.0);
+
+    try {
+      if (_cameraController!.value.focusPointSupported) {
+        await _cameraController!.setFocusPoint(Offset(x, y));
+      }
+      await _cameraController!.setFocusMode(FocusMode.auto);
+    } catch (e) {
+      // Ignore if focus is not supported by device hardware
+    }
+
+    setState(() {
+      _focusIndicatorPosition = localPosition;
+      _showFocusIndicator = true;
+    });
+
+    _focusTimer?.cancel();
+    _focusTimer = Timer(const Duration(seconds: 1), () {
+      if (mounted) {
+        setState(() {
+          _showFocusIndicator = false;
+        });
+      }
+    });
+  }
+
   void _retakePicture() {
     setState(() {
       _capturedImageFile = null;
+      _canvasColor = null;
       _brightness = 0.0;
+      _photoScale = 1.0;
+      _photoRotation = 0.0;
+      _photoPosition = Offset.zero;
+      _overlayItems.clear();
+      _selectedOverlayId = null;
+      _verticalGuideX = null;
+      _horizontalGuideY = null;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    final _OverlayItem selectedItem = _overlayItems.firstWhere(
+      (item) => item.id == _selectedOverlayId,
+      orElse: () => _OverlayItem(
+        id: '',
+        type: '',
+        position: Offset.zero,
+      ),
+    );
+
+    final bool isPhotoSelected = _selectedOverlayId == 'BACKGROUND_PHOTO';
+
+    final bool inEditingMode =
+        _capturedImageFile != null || _canvasColor != null;
+
     return ValueListenableBuilder(
       valueListenable: GetIt.I<SettingsBox>().listenable(),
       builder: (context, box, _) {
@@ -249,80 +628,515 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                 centerTitle: true,
                 elevation: 0.0,
                 backgroundColor: theme.colorScheme.surface,
-                //flexibleSpace: advancedTextures ? const BlurAppBarBackground() : null,
               ),
               body: FutureBuilder<void>(
                 future: _initializeControllerFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
-                    if (_capturedImageFile == null) {
-                      return Stack(
-                        children: [
-                          Positioned.fill(
-                            child: AspectRatio(
-                              aspectRatio: widget.cardAspectRatio,
-                              child: CameraPreview(_cameraController!),
+                    if (!inEditingMode) {
+                      return LayoutBuilder(
+                        builder: (context, constraints) {
+                          return GestureDetector(
+                            onTapDown: (details) =>
+                                _setFocusPoint(details, constraints),
+                            child: Stack(
+                              children: [
+                                Positioned.fill(
+                                  child: AspectRatio(
+                                    aspectRatio: widget.cardAspectRatio,
+                                    child: CameraPreview(_cameraController!),
+                                  ),
+                                ),
+                                Positioned.fill(
+                                  child: CustomPaint(
+                                    painter: _CutoutPainter(
+                                      cutoutColor: widget.cutoutColor,
+                                      cutoutWidthPercentage:
+                                          widget.cutoutWidthPercentage,
+                                      cardAspectRatio: widget.cardAspectRatio,
+                                    ),
+                                  ),
+                                ),
+                                if (_showFocusIndicator &&
+                                    _focusIndicatorPosition != null)
+                                  Positioned(
+                                    left: _focusIndicatorPosition!.dx - 24,
+                                    top: _focusIndicatorPosition!.dy - 24,
+                                    child: AnimatedOpacity(
+                                      duration:
+                                          const Duration(milliseconds: 200),
+                                      opacity: _showFocusIndicator ? 1.0 : 0.0,
+                                      child: Container(
+                                        width: 48,
+                                        height: 48,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: theme.colorScheme.primary,
+                                            width: 2,
+                                          ),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Colors.black26,
+                                              blurRadius: 4,
+                                            ),
+                                          ],
+                                        ),
+                                        child: Center(
+                                          child: Container(
+                                            width: 8,
+                                            height: 8,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: theme.colorScheme.primary,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
-                          ),
-                          Positioned.fill(
-                            child: CustomPaint(
-                              painter: _CutoutPainter(
-                                cutoutColor: widget.cutoutColor,
-                                cutoutWidthPercentage:
-                                    widget.cutoutWidthPercentage,
-                                cardAspectRatio: widget.cardAspectRatio,
-                              ),
-                            ),
-                          ),
-                        ],
+                          );
+                        },
                       );
                     } else {
                       return Screenshot(
                         controller: _screenshotController,
-                        child: ColoredBox(
-                          color: Colors.black,
+                        child: Container(
+                          color: _canvasColor ?? Colors.black,
                           child: Stack(
                             children: [
-                              Positioned.fill(
-                                child: InteractiveViewer(
-                                  transformationController:
-                                      _transformationController,
-                                  minScale: 0.1,
-                                  maxScale: 5.0,
-                                  boundaryMargin:
-                                      const EdgeInsets.all(double.infinity),
-                                  child: ColorFiltered(
-                                    colorFilter: ColorFilter.matrix([
-                                      1,
-                                      0,
-                                      0,
-                                      0,
-                                      _brightness * 255,
-                                      0,
-                                      1,
-                                      0,
-                                      0,
-                                      _brightness * 255,
-                                      0,
-                                      0,
-                                      1,
-                                      0,
-                                      _brightness * 255,
-                                      0,
-                                      0,
-                                      0,
-                                      1,
-                                      0,
-                                    ]),
-                                    child: SizedBox.expand(
-                                      child: Image.file(
-                                        File(_capturedImageFile!.path),
-                                        fit: BoxFit.contain,
+                              if (_canvasColor == null &&
+                                  _capturedImageFile != null &&
+                                  _capturedImageFile!.path.isNotEmpty)
+                                Positioned(
+                                  left: _photoPosition.dx,
+                                  top: _photoPosition.dy,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _selectedOverlayId = 'BACKGROUND_PHOTO';
+                                      });
+                                    },
+                                    onScaleStart: (details) {
+                                      setState(() {
+                                        _selectedOverlayId = 'BACKGROUND_PHOTO';
+                                        _initialScale = _photoScale;
+                                        _initialRotation = _photoRotation;
+                                        _initialFocalPoint = details.focalPoint;
+                                        _initialPosition = _photoPosition;
+                                      });
+                                    },
+                                    onScaleUpdate: (details) {
+                                      if (_selectedOverlayId ==
+                                          'BACKGROUND_PHOTO') {
+                                        setState(() {
+                                          final rawPosition =
+                                              _initialPosition +
+                                                  (details.focalPoint -
+                                                      _initialFocalPoint);
+
+                                          if (details.scale != 1.0) {
+                                            _photoScale = (_initialScale *
+                                                    details.scale)
+                                                .clamp(0.2, 4.0);
+                                          }
+                                          if (details.rotation != 0.0) {
+                                            _photoRotation = _normalizeAngle(
+                                              _initialRotation +
+                                                  details.rotation,
+                                            );
+                                          }
+
+                                          final screenSize =
+                                              MediaQuery.of(context).size;
+                                          final screenW = screenSize.width;
+                                          final screenH = screenSize.height;
+
+                                          double cutoutWidth = screenW *
+                                              widget.cutoutWidthPercentage;
+                                          double cutoutHeight =
+                                              cutoutWidth /
+                                                  widget.cardAspectRatio;
+                                          if (cutoutHeight > screenH * 0.7) {
+                                            cutoutHeight = screenH * 0.7;
+                                            cutoutWidth = cutoutHeight *
+                                                widget.cardAspectRatio;
+                                          }
+                                          final cutoutLeft =
+                                              (screenW - cutoutWidth) / 2;
+                                          final cutoutRight =
+                                              cutoutLeft + cutoutWidth;
+                                          final cutoutTop =
+                                              (screenH - cutoutHeight) / 2;
+                                          final cutoutBottom =
+                                              cutoutTop + cutoutHeight;
+                                          final cutoutCenterX = screenW / 2;
+                                          final cutoutCenterY = screenH / 2;
+
+                                          final photoW = 300.0 * _photoScale;
+                                          final photoH = (300.0 /
+                                                  widget.cardAspectRatio) *
+                                              _photoScale;
+
+                                          double newX = rawPosition.dx;
+                                          double newY = rawPosition.dy;
+
+                                          final photoCenterX =
+                                              newX + photoW / 2;
+                                          final photoCenterY =
+                                              newY + photoH / 2;
+                                          final photoLeft = newX;
+                                          final photoRight = newX + photoW;
+                                          final photoTop = newY;
+                                          final photoBottom = newY + photoH;
+
+                                          const threshold = 12.0;
+
+                                          bool snapV = false;
+                                          double? vLineX;
+
+                                          bool snapH = false;
+                                          double? hLineY;
+
+                                          // Horizontal Snapping
+                                          if ((photoCenterX - cutoutCenterX)
+                                                  .abs() <
+                                              threshold) {
+                                            newX = cutoutCenterX - photoW / 2;
+                                            snapV = true;
+                                            vLineX = cutoutCenterX;
+                                          } else if ((photoLeft - cutoutLeft)
+                                                  .abs() <
+                                              threshold) {
+                                            newX = cutoutLeft;
+                                            snapV = true;
+                                            vLineX = cutoutLeft;
+                                          } else if ((photoRight - cutoutRight)
+                                                  .abs() <
+                                              threshold) {
+                                            newX = cutoutRight - photoW;
+                                            snapV = true;
+                                            vLineX = cutoutRight;
+                                          }
+
+                                          // Vertical Snapping
+                                          if ((photoCenterY - cutoutCenterY)
+                                                  .abs() <
+                                              threshold) {
+                                            newY = cutoutCenterY - photoH / 2;
+                                            snapH = true;
+                                            hLineY = cutoutCenterY;
+                                          } else if ((photoTop - cutoutTop)
+                                                  .abs() <
+                                              threshold) {
+                                            newY = cutoutTop;
+                                            snapH = true;
+                                            hLineY = cutoutTop;
+                                          } else if ((photoBottom -
+                                                      cutoutBottom)
+                                                  .abs() <
+                                              threshold) {
+                                            newY = cutoutBottom - photoH;
+                                            snapH = true;
+                                            hLineY = cutoutBottom;
+                                          }
+
+                                          _photoPosition = Offset(newX, newY);
+                                          _verticalGuideX =
+                                              snapV ? vLineX : null;
+                                          _horizontalGuideY =
+                                              snapH ? hLineY : null;
+                                        });
+                                      }
+                                    },
+                                    onScaleEnd: (details) {
+                                      setState(() {
+                                        _verticalGuideX = null;
+                                        _horizontalGuideY = null;
+                                      });
+                                    },
+                                    child: Transform.rotate(
+                                      angle: _photoRotation,
+                                      alignment: Alignment.center,
+                                      child: Transform.scale(
+                                        scale: _photoScale,
+                                        alignment: Alignment.center,
+                                        child: Container(
+                                          decoration: _selectedOverlayId ==
+                                                      'BACKGROUND_PHOTO' &&
+                                                  !hideCutoutBorder
+                                              ? BoxDecoration(
+                                                  border: Border.all(
+                                                    color: theme
+                                                        .colorScheme.primary,
+                                                    width: 2,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                )
+                                              : null,
+                                          child: ColorFiltered(
+                                            colorFilter: ColorFilter.matrix([
+                                              1,
+                                              0,
+                                              0,
+                                              0,
+                                              _brightness * 255,
+                                              0,
+                                              1,
+                                              0,
+                                              0,
+                                              _brightness * 255,
+                                              0,
+                                              0,
+                                              1,
+                                              0,
+                                              _brightness * 255,
+                                              0,
+                                              0,
+                                              0,
+                                              1,
+                                              0,
+                                            ]),
+                                            child: SizedBox(
+                                              width: 300,
+                                              height: 300 /
+                                                  widget.cardAspectRatio,
+                                              child: Image.file(
+                                                File(_capturedImageFile!.path),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
+                              for (final item in _overlayItems) ...[
+                                Positioned(
+                                  left: item.position.dx,
+                                  top: item.position.dy,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _selectedOverlayId = item.id;
+                                      });
+                                    },
+                                    onScaleStart: (details) {
+                                      setState(() {
+                                        _selectedOverlayId = item.id;
+                                        _initialScale = item.scale;
+                                        _initialRotation = item.rotation;
+                                        _initialFocalPoint = details.focalPoint;
+                                        _initialPosition = item.position;
+                                      });
+                                    },
+                                    onScaleUpdate: (details) {
+                                      if (_selectedOverlayId == item.id) {
+                                        setState(() {
+                                          final rawPosition =
+                                              _initialPosition +
+                                                  (details.focalPoint -
+                                                      _initialFocalPoint);
+
+                                          if (details.scale != 1.0) {
+                                            item.scale = (_initialScale *
+                                                    details.scale)
+                                                .clamp(0.2, 4.0);
+                                          }
+                                          if (details.rotation != 0.0) {
+                                            item.rotation = _normalizeAngle(
+                                              _initialRotation +
+                                                  details.rotation,
+                                            );
+                                          }
+
+                                          final screenSize =
+                                              MediaQuery.of(context).size;
+                                          final screenW = screenSize.width;
+                                          final screenH = screenSize.height;
+
+                                          double cutoutWidth = screenW *
+                                              widget.cutoutWidthPercentage;
+                                          double cutoutHeight =
+                                              cutoutWidth /
+                                                  widget.cardAspectRatio;
+                                          if (cutoutHeight > screenH * 0.7) {
+                                            cutoutHeight = screenH * 0.7;
+                                            cutoutWidth = cutoutHeight *
+                                                widget.cardAspectRatio;
+                                          }
+                                          final cutoutLeft =
+                                              (screenW - cutoutWidth) / 2;
+                                          final cutoutRight =
+                                              cutoutLeft + cutoutWidth;
+                                          final cutoutTop =
+                                              (screenH - cutoutHeight) / 2;
+                                          final cutoutBottom =
+                                              cutoutTop + cutoutHeight;
+                                          final cutoutCenterX = screenW / 2;
+                                          final cutoutCenterY = screenH / 2;
+
+                                          final itemSize =
+                                              _measureItemSize(item, theme);
+                                          final itemW = itemSize.width;
+                                          final itemH = itemSize.height;
+
+                                          double newX = rawPosition.dx;
+                                          double newY = rawPosition.dy;
+
+                                          final itemCenterX = newX + itemW / 2;
+                                          final itemCenterY = newY + itemH / 2;
+                                          final itemLeft = newX;
+                                          final itemRight = newX + itemW;
+                                          final itemTop = newY;
+                                          final itemBottom = newY + itemH;
+
+                                          const threshold = 12.0;
+
+                                          bool snapV = false;
+                                          double? vLineX;
+
+                                          bool snapH = false;
+                                          double? hLineY;
+
+                                          // Horizontal Snapping
+                                          if ((itemCenterX - cutoutCenterX)
+                                                  .abs() <
+                                              threshold) {
+                                            newX = cutoutCenterX - itemW / 2;
+                                            snapV = true;
+                                            vLineX = cutoutCenterX;
+                                          } else if ((itemLeft - cutoutLeft)
+                                                  .abs() <
+                                              threshold) {
+                                            newX = cutoutLeft;
+                                            snapV = true;
+                                            vLineX = cutoutLeft;
+                                          } else if ((itemRight - cutoutRight)
+                                                  .abs() <
+                                              threshold) {
+                                            newX = cutoutRight - itemW;
+                                            snapV = true;
+                                            vLineX = cutoutRight;
+                                          }
+
+                                          // Vertical Snapping
+                                          if ((itemCenterY - cutoutCenterY)
+                                                  .abs() <
+                                              threshold) {
+                                            newY = cutoutCenterY - itemH / 2;
+                                            snapH = true;
+                                            hLineY = cutoutCenterY;
+                                          } else if ((itemTop - cutoutTop)
+                                                  .abs() <
+                                              threshold) {
+                                            newY = cutoutTop;
+                                            snapH = true;
+                                            hLineY = cutoutTop;
+                                          } else if ((itemBottom -
+                                                      cutoutBottom)
+                                                  .abs() <
+                                              threshold) {
+                                            newY = cutoutBottom - itemH;
+                                            snapH = true;
+                                            hLineY = cutoutBottom;
+                                          }
+
+                                          item.position = Offset(newX, newY);
+                                          _verticalGuideX =
+                                              snapV ? vLineX : null;
+                                          _horizontalGuideY =
+                                              snapH ? hLineY : null;
+                                        });
+                                      }
+                                    },
+                                    onScaleEnd: (details) {
+                                      setState(() {
+                                        _verticalGuideX = null;
+                                        _horizontalGuideY = null;
+                                      });
+                                    },
+                                    child: Transform.rotate(
+                                      angle: item.rotation,
+                                      alignment: Alignment.center,
+                                      child: Transform.scale(
+                                        scale: item.scale,
+                                        alignment: Alignment.center,
+                                        child: Container(
+                                          decoration: _selectedOverlayId ==
+                                                      item.id &&
+                                                  !hideCutoutBorder
+                                              ? BoxDecoration(
+                                                  border: Border.all(
+                                                    color: theme
+                                                        .colorScheme.primary,
+                                                    width: 2,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                )
+                                              : null,
+                                          padding: const EdgeInsets.all(6),
+                                          child: item.type == 'image'
+                                              ? Image.file(
+                                                  File(item.imagePath!),
+                                                  width: 100,
+                                                  height: 100,
+                                                  fit: BoxFit.contain,
+                                                )
+                                              : Text(
+                                                  item.text ?? '',
+                                                  style: theme
+                                                      .textTheme.titleLarge
+                                                      ?.copyWith(
+                                                    fontFamily: 'Roboto',
+                                                    color: item.color,
+                                                    fontSize: 26,
+                                                    fontWeight: FontWeight.bold,
+                                                    shadows: const [
+                                                      Shadow(
+                                                        blurRadius: 4,
+                                                        color: Colors.black,
+                                                      ),
+                                                      Shadow(
+                                                        blurRadius: 4,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              if (!hideCutoutBorder) ...[
+                                if (_verticalGuideX != null)
+                                  Positioned(
+                                    left: _verticalGuideX! - 1,
+                                    top: 0,
+                                    bottom: 0,
+                                    child: Container(
+                                      width: 2,
+                                      color: Colors.blueAccent,
+                                    ),
+                                  ),
+                                if (_horizontalGuideY != null)
+                                  Positioned(
+                                    top: _horizontalGuideY! - 1,
+                                    left: 0,
+                                    right: 0,
+                                    child: Container(
+                                      height: 2,
+                                      color: Colors.blueAccent,
+                                    ),
+                                  ),
+                              ],
                               Positioned.fill(
                                 child: IgnorePointer(
                                   child: CustomPaint(
@@ -365,7 +1179,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                   }
                 },
               ),
-              floatingActionButton: _capturedImageFile == null
+              floatingActionButton: !inEditingMode
                   ? Padding(
                       padding: const EdgeInsets.symmetric(
                         vertical: 10,
@@ -384,36 +1198,81 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              FloatingActionButton(
-                                heroTag: 'selectFromGallery',
-                                onPressed: () async {
-                                  await _pickImageFromGallery();
-                                },
-                                backgroundColor: Colors.transparent,
-                                elevation: 0,
-                                child: const Icon(
-                                  Icons.photo_library,
-                                  size: 30,
+                              Container(
+                                margin: const EdgeInsets.all(6),
+                                child: IconButton(
+                                  style: ButtonStyle(
+                                    iconSize: const WidgetStatePropertyAll(26),
+                                    iconColor: WidgetStatePropertyAll(
+                                      theme.colorScheme.inverseSurface,
+                                    ),
+                                  ),
+                                  icon: const Icon(
+                                    Icons.palette,
+                                  ),
+                                  tooltip: 'Paint Canvas',
+                                  onPressed: _pickCanvasColorDialog,
                                 ),
                               ),
-                              const SizedBox(
-                                width: 20,
+                              Container(
+                                margin: const EdgeInsets.all(6),
+                                child: IconButton(
+                                  style: ButtonStyle(
+                                    iconSize: const WidgetStatePropertyAll(26),
+                                    iconColor: WidgetStatePropertyAll(
+                                      _isFlashOn
+                                          ? theme.colorScheme.primary
+                                          : theme.colorScheme.inverseSurface,
+                                    ),
+                                  ),
+                                  icon: Icon(
+                                    _isFlashOn
+                                        ? Icons.flash_on
+                                        : Icons.flash_off,
+                                  ),
+                                  tooltip: _isFlashOn ? 'Flash On' : 'Flash Off',
+                                  onPressed: _toggleFlash,
+                                ),
                               ),
-                              FloatingActionButton(
-                                heroTag: 'takePhoto',
-                                onPressed: () async {
-                                  try {
-                                    await _initializeControllerFuture;
-                                    await _takePicture();
-                                  } catch (e) {
-                                    Navigator.pop(context);
-                                  }
-                                },
-                                backgroundColor: Colors.transparent,
-                                elevation: 0,
-                                child: const Icon(
-                                  Icons.camera_alt,
-                                  size: 30,
+                              Container(
+                                margin: const EdgeInsets.all(6),
+                                child: IconButton(
+                                  style: ButtonStyle(
+                                    iconSize: const WidgetStatePropertyAll(26),
+                                    iconColor: WidgetStatePropertyAll(
+                                      theme.colorScheme.inverseSurface,
+                                    ),
+                                  ),
+                                  icon: const Icon(
+                                    Icons.photo_library,
+                                  ),
+                                  tooltip: 'Gallery',
+                                  onPressed: () async {
+                                    await _pickImageFromGallery();
+                                  },
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.all(6),
+                                child: IconButton(
+                                  style: ButtonStyle(
+                                    iconSize: const WidgetStatePropertyAll(26),
+                                    iconColor: WidgetStatePropertyAll(
+                                      theme.colorScheme.inverseSurface,
+                                    ),
+                                  ),
+                                  icon: const Icon(
+                                    Icons.camera_alt,
+                                  ),
+                                  tooltip: 'Take Photo',
+                                  onPressed: () async {
+                                    try {
+                                      await _initializeControllerFuture;
+                                      await _takePicture();
+                                    } catch (e) {
+                                      Navigator.pop(context);
+                                    }
+                                  },
                                 ),
                               ),
                             ],
@@ -437,63 +1296,244 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(
-                                'Brightness: ${_brightness.toStringAsFixed(1)}',
-                                style: theme.textTheme.bodyLarge?.copyWith(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w900,
-                                  color: theme.colorScheme.inverseSurface,
+                              if (_canvasColor == null) ...[
+                                Text(
+                                  'Brightness: ${_brightness.toStringAsFixed(1)}',
+                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w900,
+                                    color: theme.colorScheme.inverseSurface,
+                                  ),
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 24.0,
-                                  vertical: 8.0,
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.brightness_6_rounded),
-                                    Expanded(
-                                      child: Slider(
-                                        year2023: false,
-                                        value: _brightness,
-                                        min: -1.0,
-                                        max: 1.0,
-                                        //activeColor: widget.cutoutColor,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _brightness = value;
-                                          });
-                                        },
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24.0,
+                                    vertical: 4.0,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.brightness_6_rounded),
+                                      Expanded(
+                                        child: Slider(
+                                          year2023: false,
+                                          value: _brightness.clamp(-1.0, 1.0),
+                                          min: -1.0,
+                                          max: 1.0,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _brightness = value;
+                                            });
+                                          },
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
+                              ],
+                              if (isPhotoSelected ||
+                                  selectedItem.id.isNotEmpty) ...[
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.aspect_ratio,
+                                        size: 20,
+                                      ),
+                                      Expanded(
+                                        child: Slider(
+                                          year2023: false,
+                                          value: (isPhotoSelected
+                                                  ? _photoScale
+                                                  : selectedItem.scale)
+                                              .clamp(0.2, 4.0),
+                                          min: 0.2,
+                                          max: 4.0,
+                                          onChanged: (val) {
+                                            setState(() {
+                                              if (isPhotoSelected) {
+                                                _photoScale = val;
+                                              } else {
+                                                selectedItem.scale = val;
+                                              }
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                      const Icon(
+                                        Icons.rotate_right,
+                                        size: 20,
+                                      ),
+                                      Expanded(
+                                        child: Slider(
+                                          year2023: false,
+                                          value: _normalizeAngle(
+                                            isPhotoSelected
+                                                ? _photoRotation
+                                                : selectedItem.rotation,
+                                          ),
+                                          min: -math.pi,
+                                          max: math.pi,
+                                          onChanged: (val) {
+                                            setState(() {
+                                              final norm = _normalizeAngle(val);
+                                              if (isPhotoSelected) {
+                                                _photoRotation = norm;
+                                              } else {
+                                                selectedItem.rotation = norm;
+                                              }
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  FloatingActionButton(
-                                    heroTag: 'retakePhoto',
-                                    onPressed: _retakePicture,
-                                    backgroundColor: Colors.transparent,
-                                    elevation: 0,
-                                    child: const Icon(
-                                      Icons.refresh,
-                                      size: 30,
+                                  Container(
+                                    margin: const EdgeInsets.all(6),
+                                    child: IconButton(
+                                      style: ButtonStyle(
+                                        iconSize:
+                                            const WidgetStatePropertyAll(26),
+                                        iconColor: WidgetStatePropertyAll(
+                                          theme.colorScheme.inverseSurface,
+                                        ),
+                                      ),
+                                      icon: const Icon(
+                                        Icons.palette,
+                                      ),
+                                      tooltip: 'Canvas Color',
+                                      onPressed: _pickCanvasColorDialog,
                                     ),
                                   ),
-                                  FloatingActionButton(
-                                    heroTag: 'usePhoto',
-                                    onPressed: _confirmAndSavePicture,
-                                    backgroundColor: Colors.transparent,
-                                    elevation: 0,
-                                    child: const Icon(
-                                      Icons.check,
-                                      size: 30,
+                                  Container(
+                                    margin: const EdgeInsets.all(6),
+                                    child: IconButton(
+                                      style: ButtonStyle(
+                                        iconSize:
+                                            const WidgetStatePropertyAll(26),
+                                        iconColor: WidgetStatePropertyAll(
+                                          theme.colorScheme.inverseSurface,
+                                        ),
+                                      ),
+                                      icon: const Icon(
+                                        Icons.add_photo_alternate,
+                                      ),
+                                      tooltip: 'Add Image Overlay',
+                                      onPressed: _addOverlayImage,
                                     ),
                                   ),
+                                  Container(
+                                    margin: const EdgeInsets.all(6),
+                                    child: IconButton(
+                                      style: ButtonStyle(
+                                        iconSize:
+                                            const WidgetStatePropertyAll(26),
+                                        iconColor: WidgetStatePropertyAll(
+                                          theme.colorScheme.inverseSurface,
+                                        ),
+                                      ),
+                                      icon: const Icon(
+                                        Icons.text_fields,
+                                      ),
+                                      tooltip: 'Add Text Overlay',
+                                      onPressed: _addOverlayText,
+                                    ),
+                                  ),
+                                  if (_selectedOverlayId != null) ...[
+                                    if (!isPhotoSelected) ...[
+                                      Container(
+                                        margin: const EdgeInsets.all(6),
+                                        child: IconButton(
+                                          style: ButtonStyle(
+                                            iconSize:
+                                                const WidgetStatePropertyAll(
+                                              26,
+                                            ),
+                                            iconColor: WidgetStatePropertyAll(
+                                              theme.colorScheme.error,
+                                            ),
+                                          ),
+                                          icon: const Icon(
+                                            Icons.delete_outline,
+                                          ),
+                                          tooltip: 'Delete Overlay',
+                                          onPressed: () {
+                                            setState(() {
+                                              _overlayItems.removeWhere(
+                                                (i) =>
+                                                    i.id == _selectedOverlayId,
+                                              );
+                                              _selectedOverlayId = null;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                    Container(
+                                      margin: const EdgeInsets.all(6),
+                                      child: IconButton(
+                                        style: ButtonStyle(
+                                          iconSize:
+                                              const WidgetStatePropertyAll(26),
+                                          iconColor: WidgetStatePropertyAll(
+                                            theme.colorScheme.primary,
+                                          ),
+                                        ),
+                                        icon: const Icon(
+                                          Icons.check_circle_outline,
+                                        ),
+                                        tooltip: 'Confirm Additions',
+                                        onPressed: () {
+                                          setState(() {
+                                            _selectedOverlayId = null;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ] else ...[
+                                    Container(
+                                      margin: const EdgeInsets.all(6),
+                                      child: IconButton(
+                                        style: ButtonStyle(
+                                          iconSize:
+                                              const WidgetStatePropertyAll(26),
+                                          iconColor: WidgetStatePropertyAll(
+                                            theme.colorScheme.inverseSurface,
+                                          ),
+                                        ),
+                                        icon: const Icon(
+                                          Icons.refresh,
+                                        ),
+                                        tooltip: 'Retake',
+                                        onPressed: _retakePicture,
+                                      ),
+                                    ),
+                                    Container(
+                                      margin: const EdgeInsets.all(6),
+                                      child: IconButton(
+                                        style: ButtonStyle(
+                                          iconSize:
+                                              const WidgetStatePropertyAll(26),
+                                          iconColor: WidgetStatePropertyAll(
+                                            theme.colorScheme.inverseSurface,
+                                          ),
+                                        ),
+                                        icon: const Icon(
+                                          Icons.check,
+                                        ),
+                                        tooltip: 'Use Image',
+                                        onPressed: _confirmAndSavePicture,
+                                      ),
+                                    ),
+                                  ],
                                 ],
                               ),
                             ],

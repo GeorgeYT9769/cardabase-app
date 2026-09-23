@@ -51,16 +51,27 @@ class _CdbAppBarState extends State<CdbAppBar> {
           color: theme.colorScheme.tertiary,
         );
 
+        Widget? leading;
+        List<Widget> actions = [...widget.actions];
+
+        if (widget.showBackButton) {
+          if (rightBackButton) {
+            leading = widget.leading;
+            actions.add(backButton);
+          } else {
+            leading = backButton;
+            if (widget.leading != null) {
+              actions.add(widget.leading!);
+            }
+          }
+        } else {
+          leading = widget.leading;
+        }
+
         return AppBar(
           automaticallyImplyLeading: false,
-          leading: !rightBackButton
-              ? (widget.showBackButton ? backButton : null)
-              : widget.leading,
-          actions: [
-            ...widget.actions,
-            if (!rightBackButton && widget.leading != null) widget.leading!,
-            if (rightBackButton && widget.showBackButton) backButton,
-          ],
+          leading: leading,
+          actions: actions,
           title: widget.titleWidget ??
               (widget.title != null
                   ? Text(

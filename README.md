@@ -63,6 +63,13 @@ height="80">](https://github.com/GeorgeYT9769/cardabase-app/releases/latest)
 > [!NOTE]
 > F-Droid releases might not be in sync with those from GitHub.
 
+## ▶️ Live Demo
+
+Try the interactive web preview [here](https://georgeyt9769.github.io/cardabase-app/)!
+
+> [!NOTE]
+> The web demo is automatically compiled from the latest codebase to showcase upcoming and experimental features. Because it runs directly in the browser, platform-native capabilities (such as hardware camera scanning or device storage) may be limited or behave differently than on Android.
+
 ## 🔜 Coming soon
 
 - add a counter to every card, so when card is clicked, it would add a point, then this could be used to sort by the most used cards

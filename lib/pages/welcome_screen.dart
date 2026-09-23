@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/pages/home/home_page.dart';
@@ -12,6 +10,7 @@ import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:material_new_shapes/material_new_shapes.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../util/expressive_loading_indicator.dart';
 
@@ -26,6 +25,8 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
   final settingsBox = GetIt.I<SettingsBox>();
+  late final PageController _pageController;
+  int _currentPage = 0;
   String? changelog;
   bool expanded = false;
   late int days = calculateDaysUntilEndOfAndroid();
@@ -33,7 +34,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   void initState() {
     super.initState();
+    _pageController = PageController();
     loadChangelog();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   int calculateDaysUntilEndOfAndroid() {
@@ -103,9 +111,97 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     );
   }
 
+  Widget _buildKeepAndroidOpenWarning(ThemeData theme) {
+    return GestureDetector(
+      onTap: () => launchUrl(
+        Uri.parse('https://keepandroidopen.org/'),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(20.0),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.errorContainer,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Text(
+          'Your phone is about to stop being yours.\nTime left: $days days.\nFor more info visit keepandroidopen.org',
+          style: theme.textTheme.bodyLarge?.copyWith(
+            fontSize: 14,
+            color: theme.colorScheme.error,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWelcomePage(ThemeData theme, double topPadding) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(24, topPadding, 24, 24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (days > 0) ...[
+              _buildKeepAndroidOpenWarning(theme),
+              const SizedBox(height: 20),
+            ],
+            Image.asset(
+              'assets/icons/ic_launcher_foreground.png',
+              height: MediaQuery.of(context).size.width / 2,
+              width: MediaQuery.of(context).size.width / 2,
+            ),
+            const SizedBox(height: 30),
+            Text(
+              'Welcome to Cardabase!',
+              style: theme.textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.primary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Made by GeorgeYT9769',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              'Version: ${widget.currentAppVersion}',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChangelogPage(
+    ThemeData theme,
+    double topPadding,
+    Widget changelogWidget,
+  ) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(24, topPadding, 24, 24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            changelogWidget,
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final topPadding =
+        MediaQuery.of(context).padding.top + kToolbarHeight + 10;
 
     final isErrorOrEmpty =
         changelog == 'No changelog found for this version.' ||
@@ -200,9 +296,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: CdbAppBar(
-        title: 'Welcome',
+        showBackButton: false,
+        title: _currentPage == 0 ? 'Welcome' : 'News',
         leading: Transform.rotate(
-          angle: math.pi,
+          angle: 3.14,
           child: IconButton(
             icon: Icon(
               Icons.exit_to_app,
@@ -212,54 +309,34 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           ),
         ),
         actions: [
-          Transform.rotate(
-            angle: math.pi,
-            child: IconButton(
-              icon: Icon(
-                Icons.arrow_back_ios_new,
-                color: theme.colorScheme.secondary,
-              ),
-              onPressed: continueToApp,
+          IconButton(
+            icon: Icon(
+              Icons.arrow_forward_ios,
+              color: theme.colorScheme.secondary,
             ),
+            onPressed: () {
+              if (_currentPage == 0) {
+                _pageController.nextPage(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+              } else {
+                continueToApp();
+              }
+            },
           ),
         ],
       ),
       body: Column(
         children: [
-          if (days > 0)
-            Container(
-              margin: const EdgeInsets.fromLTRB(20, 5, 20, 10),
-              padding: const EdgeInsets.all(20.0),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.errorContainer,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                'Your phone is about to stop being yours.\nTime left: $days days.\nFor more info visit keepandroidopen.org',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontSize: 14,
-                  color: theme.colorScheme.error,
-                ),
-              ),
-            ),
-          const SizedBox(height: 10),
           Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.auto_awesome,
-                      size: 80,
-                      color: theme.colorScheme.primary,
-                    ),
-                    const SizedBox(height: 30),
-                    changelogWidget,
-                  ],
-                ),
-              ),
+            child: PageView(
+              controller: _pageController,
+              onPageChanged: (page) => setState(() => _currentPage = page),
+              children: [
+                _buildWelcomePage(theme, topPadding),
+                _buildChangelogPage(theme, topPadding, changelogWidget),
+              ],
             ),
           ),
           Padding(
@@ -272,7 +349,16 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.width / 4,
                     child: OutlinedButton(
-                      onPressed: continueToApp,
+                      onPressed: () {
+                        if (_currentPage == 0) {
+                          _pageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        } else {
+                          continueToApp();
+                        }
+                      },
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 40,
@@ -286,7 +372,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ),
                       ),
                       child: Text(
-                        'Continue',
+                        _currentPage == 0 ? 'Next' : 'Continue',
                         style: theme.textTheme.bodyLarge?.copyWith(
                           fontSize: 22,
                           color: theme.colorScheme.primary,

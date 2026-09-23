@@ -7,7 +7,7 @@ import 'package:cardabase/feature/settings/widgets/auto_update_settings_dialog.d
 import 'package:cardabase/feature/settings/widgets/card_effect_settings_dialog.dart';
 import 'package:cardabase/feature/settings/widgets/clear_cards_dialog.dart';
 import 'package:cardabase/feature/settings/widgets/tags_page.dart';
-import 'package:cardabase/pages/cloud_backup.dart';
+//import 'package:cardabase/pages/cloud_backup.dart';
 import 'package:cardabase/pages/dev_tools.dart';
 import 'package:cardabase/pages/info.dart';
 import 'package:cardabase/pages/password.dart';

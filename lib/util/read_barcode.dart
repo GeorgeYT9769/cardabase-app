@@ -26,6 +26,7 @@ class _QRBarReaderState extends State<QRBarReader> {
   Barcode? result;
   QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  bool _isFlashOn = false;
 
   bool _permissionDeniedShown = false;
 
@@ -145,12 +146,17 @@ class _QRBarReaderState extends State<QRBarReader> {
                             theme.colorScheme.inverseSurface,
                           ),
                         ),
-                        icon: const Icon(
-                          Icons.flash_on,
+                        icon: Icon(
+                          _isFlashOn
+                              ? Icons.flash_on
+                              : Icons.flash_off,
                           size: 30,
                         ),
                         onPressed: () async {
                           await controller?.toggleFlash();
+                          setState(() {
+                            _isFlashOn = !_isFlashOn;
+                          });
                           if (mounted) setState(() {});
                         },
                       ),
@@ -184,7 +190,7 @@ class _QRBarReaderState extends State<QRBarReader> {
   Widget _buildQrView(BuildContext context) {
     final scanArea = (MediaQuery.of(context).size.width < 400 ||
             MediaQuery.of(context).size.height < 400)
-        ? 200.0
+        ? 250.0
         : 400.0;
     return QRView(
       key: qrKey,
@@ -192,8 +198,8 @@ class _QRBarReaderState extends State<QRBarReader> {
       overlay: QrScannerOverlayShape(
         borderColor: const Color(0xFF1960A5),
         borderRadius: 10,
-        borderLength: 30,
-        borderWidth: 10,
+        borderLength: 50,
+        borderWidth: 12,
         cutOutSize: scanArea,
       ),
       onPermissionSet: (ctrl, p) => _onPermissionSet(context, ctrl, p),

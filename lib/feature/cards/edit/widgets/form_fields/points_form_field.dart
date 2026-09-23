@@ -1,7 +1,8 @@
+import 'dart:async';
 import 'package:cardabase/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'dart:async';
 
 class PointsFormField extends StatefulWidget {
   const PointsFormField({
@@ -35,11 +36,7 @@ class _PointsFormFieldState extends State<PointsFormField> {
       widget.controller.addListener(onWidgetControllerValueChanged);
       final newText = widget.controller.value.toString();
       if (_textController.text != newText) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            _textController.text = newText;
-          }
-        });
+        onWidgetControllerValueChanged();
       }
     }
   }
@@ -58,11 +55,22 @@ class _PointsFormFieldState extends State<PointsFormField> {
     if (strValue == _textController.text) {
       return;
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (!mounted) return;
+
+    void update() {
       if (mounted) {
-        _textController.text = strValue;
+        setState(() {
+          _textController.text = strValue;
+        });
       }
-    });
+    }
+
+    if (SchedulerBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => update());
+    } else {
+      update();
+    }
   }
 
   void _incrementValue() {
@@ -82,7 +90,7 @@ class _PointsFormFieldState extends State<PointsFormField> {
   void _startIncrementTimer() {
     _incrementTimer?.cancel();
     _incrementValue(); // First increment immediately
-    _incrementTimer = Timer.periodic(Duration(milliseconds: 100), (_) {
+    _incrementTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
       _incrementValue();
     });
   }
@@ -95,7 +103,7 @@ class _PointsFormFieldState extends State<PointsFormField> {
   void _startDecrementTimer() {
     _decrementTimer?.cancel();
     _decrementValue(); // First decrement immediately
-    _decrementTimer = Timer.periodic(Duration(milliseconds: 100), (_) {
+    _decrementTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
       _decrementValue();
     });
   }
