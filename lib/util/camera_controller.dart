@@ -66,7 +66,6 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
   XFile? _capturedImageFile;
   Color? _canvasColor;
   double _brightness = 0.0;
-  bool _isFlashOn = false;
 
   Offset _photoPosition = Offset.zero;
   double _photoScale = 1.0;
@@ -92,6 +91,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
   final ScreenshotController _screenshotController = ScreenshotController();
   bool hideCutoutBorder = false;
   bool _isSaving = false;
+  bool _isFlashOn = false;
 
   @override
   void initState() {
@@ -143,24 +143,8 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
   }
 
   void _initPhotoPosition() {
-    final screenSize = MediaQuery.of(context).size;
-    final screenW = screenSize.width;
-    final screenH = screenSize.height;
-
-    double cutoutWidth = screenW * widget.cutoutWidthPercentage;
-    double cutoutHeight = cutoutWidth / widget.cardAspectRatio;
-    if (cutoutHeight > screenH * 0.7) {
-      cutoutHeight = screenH * 0.7;
-      cutoutWidth = cutoutHeight * widget.cardAspectRatio;
-    }
-    final cutoutLeft = (screenW - cutoutWidth) / 2;
-    final cutoutTop = (screenH - cutoutHeight) / 2;
-
-    _photoPosition = Offset(
-      cutoutLeft - (300 - cutoutWidth) / 2,
-      cutoutTop - (300 / widget.cardAspectRatio - cutoutHeight) / 2,
-    );
-    _photoScale = cutoutWidth / 300.0;
+    _photoPosition = Offset.zero;
+    _photoScale = 1.0;
     _photoRotation = 0.0;
   }
 
@@ -200,7 +184,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
       setState(() {
         _capturedImageFile = file;
         _canvasColor = null;
-        _selectedOverlayId = 'BACKGROUND_PHOTO';
+        _selectedOverlayId = null;
         _initPhotoPosition();
       });
     } catch (e) {
@@ -215,7 +199,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
       setState(() {
         _capturedImageFile = image;
         _canvasColor = null;
-        _selectedOverlayId = 'BACKGROUND_PHOTO';
+        _selectedOverlayId = null;
         _initPhotoPosition();
       });
     }
@@ -546,6 +530,36 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     });
   }
 
+  Widget _buildLiveCameraPreview() {
+    if (_cameraController == null || !_cameraController!.value.isInitialized) {
+      return const SizedBox.shrink();
+    }
+    final previewSize = _cameraController!.value.previewSize;
+    if (previewSize != null) {
+      return SizedBox.expand(
+        child: FittedBox(
+          fit: BoxFit.contain,
+          child: SizedBox(
+            width: previewSize.height,
+            height: previewSize.width,
+            child: CameraPreview(_cameraController!),
+          ),
+        ),
+      );
+    }
+    final aspect = _cameraController!.value.aspectRatio;
+    return SizedBox.expand(
+      child: FittedBox(
+        fit: BoxFit.contain,
+        child: SizedBox(
+          width: 100,
+          height: 100 * aspect,
+          child: CameraPreview(_cameraController!),
+        ),
+      ),
+    );
+  }
+
   void _retakePicture() {
     setState(() {
       _capturedImageFile = null;
@@ -642,10 +656,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                             child: Stack(
                               children: [
                                 Positioned.fill(
-                                  child: AspectRatio(
-                                    aspectRatio: widget.cardAspectRatio,
-                                    child: CameraPreview(_cameraController!),
-                                  ),
+                                  child: _buildLiveCameraPreview(),
                                 ),
                                 Positioned.fill(
                                   child: CustomPaint(
@@ -710,9 +721,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                               if (_canvasColor == null &&
                                   _capturedImageFile != null &&
                                   _capturedImageFile!.path.isNotEmpty)
-                                Positioned(
-                                  left: _photoPosition.dx,
-                                  top: _photoPosition.dy,
+                                Positioned.fill(
                                   child: GestureDetector(
                                     onTap: () {
                                       setState(() {
@@ -775,10 +784,8 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                           final cutoutCenterX = screenW / 2;
                                           final cutoutCenterY = screenH / 2;
 
-                                          final photoW = 300.0 * _photoScale;
-                                          final photoH = (300.0 /
-                                                  widget.cardAspectRatio) *
-                                              _photoScale;
+                                          final photoW = screenW * _photoScale;
+                                          final photoH = screenH * _photoScale;
 
                                           double newX = rawPosition.dx;
                                           double newY = rawPosition.dy;
@@ -857,56 +864,56 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                         _horizontalGuideY = null;
                                       });
                                     },
-                                    child: Transform.rotate(
-                                      angle: _photoRotation,
-                                      alignment: Alignment.center,
-                                      child: Transform.scale(
-                                        scale: _photoScale,
+                                    child: Transform.translate(
+                                      offset: _photoPosition,
+                                      child: Transform.rotate(
+                                        angle: _photoRotation,
                                         alignment: Alignment.center,
-                                        child: Container(
-                                          decoration: _selectedOverlayId ==
-                                                      'BACKGROUND_PHOTO' &&
-                                                  !hideCutoutBorder
-                                              ? BoxDecoration(
-                                                  border: Border.all(
-                                                    color: theme
-                                                        .colorScheme.primary,
-                                                    width: 2,
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(6),
-                                                )
-                                              : null,
-                                          child: ColorFiltered(
-                                            colorFilter: ColorFilter.matrix([
-                                              1,
-                                              0,
-                                              0,
-                                              0,
-                                              _brightness * 255,
-                                              0,
-                                              1,
-                                              0,
-                                              0,
-                                              _brightness * 255,
-                                              0,
-                                              0,
-                                              1,
-                                              0,
-                                              _brightness * 255,
-                                              0,
-                                              0,
-                                              0,
-                                              1,
-                                              0,
-                                            ]),
-                                            child: SizedBox(
-                                              width: 300,
-                                              height: 300 /
-                                                  widget.cardAspectRatio,
-                                              child: Image.file(
-                                                File(_capturedImageFile!.path),
-                                                fit: BoxFit.cover,
+                                        child: Transform.scale(
+                                          scale: _photoScale,
+                                          alignment: Alignment.center,
+                                          child: Container(
+                                            decoration: _selectedOverlayId ==
+                                                        'BACKGROUND_PHOTO' &&
+                                                    !hideCutoutBorder
+                                                ? BoxDecoration(
+                                                    border: Border.all(
+                                                      color: theme
+                                                          .colorScheme.primary,
+                                                      width: 2,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(6),
+                                                  )
+                                                : null,
+                                            child: ColorFiltered(
+                                              colorFilter: ColorFilter.matrix([
+                                                1,
+                                                0,
+                                                0,
+                                                0,
+                                                _brightness * 255,
+                                                0,
+                                                1,
+                                                0,
+                                                0,
+                                                _brightness * 255,
+                                                0,
+                                                0,
+                                                1,
+                                                0,
+                                                _brightness * 255,
+                                                0,
+                                                0,
+                                                0,
+                                                1,
+                                                0,
+                                              ]),
+                                              child: SizedBox.expand(
+                                                child: Image.file(
+                                                  File(_capturedImageFile!.path),
+                                                  fit: BoxFit.contain,
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -1181,103 +1188,125 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
               ),
               floatingActionButton: !inEditingMode
                   ? Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 10,
+                      padding: const EdgeInsets.only(
+                        bottom: 20,
                       ),
-                      child: BlurWrapper(
-                        useBlur: advancedTextures,
-                        borderRadius: BorderRadius.circular(20),
-                        blurSigma: 10,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color:
-                                theme.colorScheme.surface.withValues(alpha: .4),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          FloatingActionButton.large(
+                            heroTag: 'takePhotoShutter',
+                            elevation: 4,
+                            backgroundColor: theme.colorScheme.primary,
+                            foregroundColor: theme.colorScheme.onPrimary,
+                            shape: const CircleBorder(),
+                            onPressed: () async {
+                              try {
+                                await _initializeControllerFuture;
+                                await _takePicture();
+                              } catch (e) {
+                                Navigator.pop(context);
+                              }
+                            },
+                            child: const Icon(
+                              Icons.camera_alt,
+                              size: 36,
+                            ),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Container(
-                                margin: const EdgeInsets.all(6),
-                                child: IconButton(
-                                  style: ButtonStyle(
-                                    iconSize: const WidgetStatePropertyAll(26),
-                                    iconColor: WidgetStatePropertyAll(
-                                      theme.colorScheme.inverseSurface,
+                          const SizedBox(height: 12),
+                          BlurWrapper(
+                            useBlur: advancedTextures,
+                            borderRadius: BorderRadius.circular(15),
+                            blurSigma: 10,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                color: theme.colorScheme.surface
+                                    .withValues(alpha: .4),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.all(2),
+                                    child: IconButton(
+                                      padding: const EdgeInsets.all(12),
+                                      constraints: const BoxConstraints(
+                                        minWidth: 48,
+                                        minHeight: 48,
+                                      ),
+                                      style: ButtonStyle(
+                                        iconSize:
+                                        const WidgetStatePropertyAll(26),
+                                        iconColor: WidgetStatePropertyAll(
+                                          theme.colorScheme.inverseSurface,
+                                        ),
+                                      ),
+                                      icon: const Icon(
+                                        Icons.palette,
+                                      ),
+                                      tooltip: 'Paint Canvas',
+                                      onPressed: _pickCanvasColorDialog,
                                     ),
                                   ),
-                                  icon: const Icon(
-                                    Icons.palette,
-                                  ),
-                                  tooltip: 'Paint Canvas',
-                                  onPressed: _pickCanvasColorDialog,
-                                ),
-                              ),
-                              Container(
-                                margin: const EdgeInsets.all(6),
-                                child: IconButton(
-                                  style: ButtonStyle(
-                                    iconSize: const WidgetStatePropertyAll(26),
-                                    iconColor: WidgetStatePropertyAll(
-                                      _isFlashOn
-                                          ? theme.colorScheme.primary
-                                          : theme.colorScheme.inverseSurface,
+                                  Container(
+                                    margin: const EdgeInsets.all(2),
+                                    child: IconButton(
+                                      padding: const EdgeInsets.all(12),
+                                      constraints: const BoxConstraints(
+                                        minWidth: 48,
+                                        minHeight: 48,
+                                      ),
+                                      style: ButtonStyle(
+                                        iconSize:
+                                            const WidgetStatePropertyAll(26),
+                                        iconColor: WidgetStatePropertyAll(
+                                          _isFlashOn
+                                              ? theme.colorScheme.primary
+                                              : theme.colorScheme.inverseSurface,
+                                        ),
+                                      ),
+                                      icon: Icon(
+                                        _isFlashOn
+                                            ? Icons.flash_on
+                                            : Icons.flash_off,
+                                      ),
+                                      tooltip:
+                                          _isFlashOn ? 'Flash On' : 'Flash Off',
+                                      onPressed: _toggleFlash,
                                     ),
                                   ),
-                                  icon: Icon(
-                                    _isFlashOn
-                                        ? Icons.flash_on
-                                        : Icons.flash_off,
-                                  ),
-                                  tooltip: _isFlashOn ? 'Flash On' : 'Flash Off',
-                                  onPressed: _toggleFlash,
-                                ),
-                              ),
-                              Container(
-                                margin: const EdgeInsets.all(6),
-                                child: IconButton(
-                                  style: ButtonStyle(
-                                    iconSize: const WidgetStatePropertyAll(26),
-                                    iconColor: WidgetStatePropertyAll(
-                                      theme.colorScheme.inverseSurface,
+                                  Container(
+                                    margin: const EdgeInsets.all(2),
+                                    child: IconButton(
+                                      padding: const EdgeInsets.all(12),
+                                      constraints: const BoxConstraints(
+                                        minWidth: 48,
+                                        minHeight: 48,
+                                      ),
+                                      style: ButtonStyle(
+                                        iconSize:
+                                            const WidgetStatePropertyAll(26),
+                                        iconColor: WidgetStatePropertyAll(
+                                          theme.colorScheme.inverseSurface,
+                                        ),
+                                      ),
+                                      icon: const Icon(
+                                        Icons.photo_library,
+                                      ),
+                                      tooltip: 'Gallery',
+                                      onPressed: () async {
+                                        await _pickImageFromGallery();
+                                      },
                                     ),
                                   ),
-                                  icon: const Icon(
-                                    Icons.photo_library,
-                                  ),
-                                  tooltip: 'Gallery',
-                                  onPressed: () async {
-                                    await _pickImageFromGallery();
-                                  },
-                                ),
+                                ],
                               ),
-                              Container(
-                                margin: const EdgeInsets.all(6),
-                                child: IconButton(
-                                  style: ButtonStyle(
-                                    iconSize: const WidgetStatePropertyAll(26),
-                                    iconColor: WidgetStatePropertyAll(
-                                      theme.colorScheme.inverseSurface,
-                                    ),
-                                  ),
-                                  icon: const Icon(
-                                    Icons.camera_alt,
-                                  ),
-                                  tooltip: 'Take Photo',
-                                  onPressed: () async {
-                                    try {
-                                      await _initializeControllerFuture;
-                                      await _takePicture();
-                                    } catch (e) {
-                                      Navigator.pop(context);
-                                    }
-                                  },
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     )
                   : Padding(
@@ -1297,14 +1326,14 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               if (_canvasColor == null) ...[
-                                Text(
-                                  'Brightness: ${_brightness.toStringAsFixed(1)}',
-                                  style: theme.textTheme.bodyLarge?.copyWith(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w900,
-                                    color: theme.colorScheme.inverseSurface,
-                                  ),
-                                ),
+                                //Text(
+                                //  'Brightness: ${_brightness.toStringAsFixed(1)}',
+                                //  style: theme.textTheme.bodyLarge?.copyWith(
+                                //    fontSize: 17,
+                                //    fontWeight: FontWeight.w900,
+                                //    color: theme.colorScheme.inverseSurface,
+                                //  ),
+                                //),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 24.0,
@@ -1324,6 +1353,38 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                               _brightness = value;
                                             });
                                           },
+                                        ),
+                                      ),
+                                      //IconButton(
+                                      //    onPressed: () {
+                                      //      setState(() {
+                                      //        _brightness = 0.0;
+                                      //      });
+                                      //    },
+                                      //    icon: Icon(Icons.refresh, color: Colors.white,),
+                                      //),
+                                      TextButton(
+                                        style: TextButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 4,
+                                          ),
+                                          minimumSize: Size.zero,
+                                          tapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            _brightness = 0.0;
+                                          });
+                                        },
+                                        child: Text(
+                                          _brightness.toStringAsFixed(1),
+                                          style: theme.textTheme.bodyLarge?.copyWith(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w900,
+                                            color: theme.colorScheme.inverseSurface,
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -1392,62 +1453,105 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                   ),
                                 ),
                               ],
+                              if (_selectedOverlayId == null) ...[
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Container(
+                                      margin: const EdgeInsets.all(6),
+                                      child: IconButton(
+                                        style: ButtonStyle(
+                                          iconSize:
+                                              const WidgetStatePropertyAll(26),
+                                          iconColor: WidgetStatePropertyAll(
+                                            theme.colorScheme.inverseSurface,
+                                          ),
+                                        ),
+                                        icon: const Icon(
+                                          Icons.palette,
+                                        ),
+                                        tooltip: 'Canvas Color',
+                                        onPressed: _pickCanvasColorDialog,
+                                      ),
+                                    ),
+                                    Container(
+                                      margin: const EdgeInsets.all(6),
+                                      child: IconButton(
+                                        style: ButtonStyle(
+                                          iconSize:
+                                              const WidgetStatePropertyAll(26),
+                                          iconColor: WidgetStatePropertyAll(
+                                            theme.colorScheme.inverseSurface,
+                                          ),
+                                        ),
+                                        icon: const Icon(
+                                          Icons.add_photo_alternate,
+                                        ),
+                                        tooltip: 'Add Image Overlay',
+                                        onPressed: _addOverlayImage,
+                                      ),
+                                    ),
+                                    Container(
+                                      margin: const EdgeInsets.all(6),
+                                      child: IconButton(
+                                        style: ButtonStyle(
+                                          iconSize:
+                                              const WidgetStatePropertyAll(26),
+                                          iconColor: WidgetStatePropertyAll(
+                                            theme.colorScheme.inverseSurface,
+                                          ),
+                                        ),
+                                        icon: const Icon(
+                                          Icons.text_fields,
+                                        ),
+                                        tooltip: 'Add Text Overlay',
+                                        onPressed: _addOverlayText,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  Container(
-                                    margin: const EdgeInsets.all(6),
-                                    child: IconButton(
-                                      style: ButtonStyle(
-                                        iconSize:
-                                            const WidgetStatePropertyAll(26),
-                                        iconColor: WidgetStatePropertyAll(
-                                          theme.colorScheme.inverseSurface,
+                                  if (_selectedOverlayId == null) ...[
+                                    Container(
+                                      margin: const EdgeInsets.all(6),
+                                      child: IconButton(
+                                        style: ButtonStyle(
+                                          iconSize:
+                                              const WidgetStatePropertyAll(26),
+                                          iconColor: WidgetStatePropertyAll(
+                                            theme.colorScheme.inverseSurface,
+                                          ),
                                         ),
-                                      ),
-                                      icon: const Icon(
-                                        Icons.palette,
-                                      ),
-                                      tooltip: 'Canvas Color',
-                                      onPressed: _pickCanvasColorDialog,
-                                    ),
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.all(6),
-                                    child: IconButton(
-                                      style: ButtonStyle(
-                                        iconSize:
-                                            const WidgetStatePropertyAll(26),
-                                        iconColor: WidgetStatePropertyAll(
-                                          theme.colorScheme.inverseSurface,
+                                        icon: const Icon(
+                                          Icons.refresh,
                                         ),
+                                        tooltip: 'Retake',
+                                        onPressed: _retakePicture,
                                       ),
-                                      icon: const Icon(
-                                        Icons.add_photo_alternate,
-                                      ),
-                                      tooltip: 'Add Image Overlay',
-                                      onPressed: _addOverlayImage,
                                     ),
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.all(6),
-                                    child: IconButton(
-                                      style: ButtonStyle(
-                                        iconSize:
-                                            const WidgetStatePropertyAll(26),
-                                        iconColor: WidgetStatePropertyAll(
-                                          theme.colorScheme.inverseSurface,
+                                    Container(
+                                      margin: const EdgeInsets.all(6),
+                                      child: IconButton(
+                                        style: ButtonStyle(
+                                          iconSize:
+                                              const WidgetStatePropertyAll(26),
+                                          iconColor: WidgetStatePropertyAll(
+                                            Colors.green,
+                                          ),
                                         ),
+                                        icon: const Icon(
+                                          Icons.check,
+                                        ),
+                                        tooltip: 'Use Image',
+                                        onPressed: _confirmAndSavePicture,
                                       ),
-                                      icon: const Icon(
-                                        Icons.text_fields,
-                                      ),
-                                      tooltip: 'Add Text Overlay',
-                                      onPressed: _addOverlayText,
                                     ),
-                                  ),
-                                  if (_selectedOverlayId != null) ...[
+                                  ] else ...[
                                     if (!isPhotoSelected) ...[
                                       Container(
                                         margin: const EdgeInsets.all(6),
@@ -1496,41 +1600,6 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                             _selectedOverlayId = null;
                                           });
                                         },
-                                      ),
-                                    ),
-                                  ] else ...[
-                                    Container(
-                                      margin: const EdgeInsets.all(6),
-                                      child: IconButton(
-                                        style: ButtonStyle(
-                                          iconSize:
-                                              const WidgetStatePropertyAll(26),
-                                          iconColor: WidgetStatePropertyAll(
-                                            theme.colorScheme.inverseSurface,
-                                          ),
-                                        ),
-                                        icon: const Icon(
-                                          Icons.refresh,
-                                        ),
-                                        tooltip: 'Retake',
-                                        onPressed: _retakePicture,
-                                      ),
-                                    ),
-                                    Container(
-                                      margin: const EdgeInsets.all(6),
-                                      child: IconButton(
-                                        style: ButtonStyle(
-                                          iconSize:
-                                              const WidgetStatePropertyAll(26),
-                                          iconColor: WidgetStatePropertyAll(
-                                            theme.colorScheme.inverseSurface,
-                                          ),
-                                        ),
-                                        icon: const Icon(
-                                          Icons.check,
-                                        ),
-                                        tooltip: 'Use Image',
-                                        onPressed: _confirmAndSavePicture,
                                       ),
                                     ),
                                   ],
