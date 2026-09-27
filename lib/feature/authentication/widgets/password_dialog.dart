@@ -2,6 +2,7 @@ import 'package:cardabase/pages/home/form_fields/password_form_field.dart';
 import 'package:cardabase/util/vibration_provider.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_ce/hive.dart';
@@ -17,6 +18,7 @@ class PasswordDialog extends StatefulWidget {
 class _PasswordDialogState extends State<PasswordDialog> {
   final _passwordBox = GetIt.I<Box>(instanceName: 'passwordBox');
   final _password = TextEditingController();
+  final _usernameController = TextEditingController(text: 'Cardabase App');
   final auth = LocalAuthentication();
 
   @override
@@ -27,28 +29,54 @@ class _PasswordDialogState extends State<PasswordDialog> {
     });
   }
 
-  Future<void> _checkBiometric() async {
-    final useBiometric = _passwordBox.get('use_biometric', defaultValue: false);
-    if (useBiometric) {
-      final canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
-      final canAuthenticate =
-          canAuthenticateWithBiometrics || await auth.isDeviceSupported();
+  @override
+  void dispose() {
+    _password.dispose();
+    _usernameController.dispose();
+    super.dispose();
+  }
 
-      if (canAuthenticate) {
-        try {
-          final didAuthenticate = await auth.authenticate(
-            localizedReason: 'Please authenticate to proceed',
-            options: const AuthenticationOptions(
-              stickyAuth: true,
-              biometricOnly: true,
-            ),
-          );
-          if (didAuthenticate && mounted) {
-            Navigator.pop(context, true);
-          }
-        } catch (e) {
-          // Fallback to password
-        }
+  Future<bool> _authenticateWithBiometrics() async {
+    final canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
+    final isDeviceSupported = await auth.isDeviceSupported();
+
+    if (!canAuthenticateWithBiometrics && !isDeviceSupported) {
+      return false;
+    }
+
+    try {
+      final didAuthenticate = await auth.authenticate(
+        localizedReason: 'Please authenticate to proceed',
+        options: const AuthenticationOptions(
+          stickyAuth: true,
+          biometricOnly: false,
+          useErrorDialogs: true,
+        ),
+      );
+      if (didAuthenticate) return true;
+    } catch (_) {
+      try {
+        final didAuthenticate = await auth.authenticate(
+          localizedReason: 'Please authenticate to proceed',
+          options: const AuthenticationOptions(
+            stickyAuth: true,
+            biometricOnly: true,
+            useErrorDialogs: true,
+          ),
+        );
+        if (didAuthenticate) return true;
+      } catch (_) {}
+    }
+    return false;
+  }
+
+  Future<void> _checkBiometric() async {
+    final useBiometric =
+        _passwordBox.get('use_biometric', defaultValue: false);
+    if (useBiometric) {
+      final didAuth = await _authenticateWithBiometrics();
+      if (didAuth && mounted) {
+        Navigator.pop(context, true);
       }
     }
   }
@@ -61,6 +89,7 @@ class _PasswordDialogState extends State<PasswordDialog> {
     }
 
     FocusScope.of(context).unfocus();
+    TextInput.finishAutofillContext(shouldSave: true);
     await Future.delayed(const Duration(milliseconds: 100));
     if (!mounted) {
       return;
@@ -73,26 +102,34 @@ class _PasswordDialogState extends State<PasswordDialog> {
     final theme = Theme.of(context);
     return AlertDialog(
       title: const Text('Enter Password'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          PasswordFormField(
-            controller: _password,
-            suffixIcon: _passwordBox.get('use_biometric', defaultValue: false)
-                ? IconButton(
-                    onPressed: _checkBiometric,
-                    icon: Icon(
-                      Icons.fingerprint,
-                      color: theme.colorScheme.primary,
-                    ),
-                  )
-                : null,
-          ),
-          const SizedBox(height: 20),
-          Center(
-            child: _exportButton(),
-          ),
-        ],
+      content: AutofillGroup(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Offstage(
+              child: TextField(
+                controller: _usernameController,
+                autofillHints: const [AutofillHints.username],
+              ),
+            ),
+            PasswordFormField(
+              controller: _password,
+              suffixIcon: _passwordBox.get('use_biometric', defaultValue: false)
+                  ? IconButton(
+                      onPressed: _checkBiometric,
+                      icon: Icon(
+                        Icons.fingerprint,
+                        color: theme.colorScheme.primary,
+                      ),
+                    )
+                  : null,
+            ),
+            const SizedBox(height: 20),
+            Center(
+              child: _exportButton(),
+            ),
+          ],
+        ),
       ),
     );
   }

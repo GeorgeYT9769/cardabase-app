@@ -4,6 +4,7 @@ import 'package:cardabase/util/vibration_provider.dart';
 import 'package:cardabase/util/widgets/cdb_app_bar.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_ce/hive.dart';
@@ -19,6 +20,7 @@ class LockScreen extends StatefulWidget {
 class _LockScreenState extends State<LockScreen> {
   final _passwordBox = GetIt.I<Box>(instanceName: 'passwordBox');
   final _passwordController = TextEditingController();
+  final _usernameController = TextEditingController(text: 'Cardabase App');
   final _auth = LocalAuthentication();
 
   @override
@@ -32,12 +34,55 @@ class _LockScreenState extends State<LockScreen> {
   @override
   void dispose() {
     _passwordController.dispose();
+    _usernameController.dispose();
     super.dispose();
   }
 
   bool get _hasPassword {
     final storedPassword = _passwordBox.get('PW');
     return storedPassword is String && storedPassword.isNotEmpty;
+  }
+
+  Future<bool> _authenticateWithBiometrics() async {
+    final canAuthenticateWithBiometrics = await _auth.canCheckBiometrics;
+    final isDeviceSupported = await _auth.isDeviceSupported();
+
+    if (!canAuthenticateWithBiometrics && !isDeviceSupported) {
+      debugPrint('LockScreen: biometrics not supported or available');
+      return false;
+    }
+
+    try {
+      final didAuthenticate = await _auth.authenticate(
+        localizedReason: 'Please authenticate to continue',
+        options: const AuthenticationOptions(
+          stickyAuth: true,
+          biometricOnly: false,
+          useErrorDialogs: true,
+        ),
+      );
+      if (didAuthenticate) {
+        return true;
+      }
+    } catch (e) {
+      debugPrint('LockScreen: primary biometric error: $e');
+      try {
+        final didAuthenticate = await _auth.authenticate(
+          localizedReason: 'Please authenticate to continue',
+          options: const AuthenticationOptions(
+            stickyAuth: true,
+            biometricOnly: true,
+            useErrorDialogs: true,
+          ),
+        );
+        if (didAuthenticate) {
+          return true;
+        }
+      } catch (e2) {
+        debugPrint('LockScreen: secondary biometric error: $e2');
+      }
+    }
+    return false;
   }
 
   Future<void> _maybeAutoUnlock() async {
@@ -49,32 +94,15 @@ class _LockScreenState extends State<LockScreen> {
       return;
     }
 
-    final useBiometric = _passwordBox.get('use_biometric', defaultValue: false);
+    final useBiometric =
+        _passwordBox.get('use_biometric', defaultValue: false);
     if (!useBiometric) {
       return;
     }
 
-    final canAuthenticateWithBiometrics = await _auth.canCheckBiometrics;
-    final canAuthenticate =
-        canAuthenticateWithBiometrics || await _auth.isDeviceSupported();
-
-    if (!canAuthenticate || !mounted) {
-      return;
-    }
-
-    try {
-      final didAuthenticate = await _auth.authenticate(
-        localizedReason: 'Please authenticate to continue',
-        options: const AuthenticationOptions(
-          stickyAuth: true,
-          biometricOnly: true,
-        ),
-      );
-      if (didAuthenticate && mounted) {
-        _goToHome();
-      }
-    } catch (_) {
-      // Fallback to password entry.
+    final didAuth = await _authenticateWithBiometrics();
+    if (didAuth && mounted) {
+      _goToHome();
     }
   }
 
@@ -95,6 +123,7 @@ class _LockScreenState extends State<LockScreen> {
     }
 
     FocusScope.of(context).unfocus();
+    TextInput.finishAutofillContext(shouldSave: true);
     await Future.delayed(const Duration(milliseconds: 100));
     if (!mounted) {
       return;
@@ -103,39 +132,28 @@ class _LockScreenState extends State<LockScreen> {
   }
 
   Future<void> _unlockWithBiometric() async {
-    final useBiometric = _passwordBox.get('use_biometric', defaultValue: false);
+    final useBiometric =
+        _passwordBox.get('use_biometric', defaultValue: false);
     if (!useBiometric) {
-      return;
-    }
-
-    final canAuthenticateWithBiometrics = await _auth.canCheckBiometrics;
-    final canAuthenticate =
-        canAuthenticateWithBiometrics || await _auth.isDeviceSupported();
-
-    if (!canAuthenticate || !mounted) {
-      return;
-    }
-
-    try {
-      final didAuthenticate = await _auth.authenticate(
-        localizedReason: 'Please authenticate to continue',
-        options: const AuthenticationOptions(
-          stickyAuth: true,
-          biometricOnly: true,
-        ),
+      showCustomSnackBar(
+        context,
+        'Biometric authentication is not enabled',
+        false,
       );
-      if (didAuthenticate && mounted) {
-        _goToHome();
-      }
-    } catch (_) {
-      // Keep the password field available as a fallback.
+      return;
+    }
+
+    final didAuth = await _authenticateWithBiometrics();
+    if (didAuth && mounted) {
+      _goToHome();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final useBiometric = _passwordBox.get('use_biometric', defaultValue: false);
+    final useBiometric =
+        _passwordBox.get('use_biometric', defaultValue: false);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -150,72 +168,80 @@ class _LockScreenState extends State<LockScreen> {
         padding: const EdgeInsets.all(24),
         child: Center(
           child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.lock_outline,
-                  size: 80,
-                  color: theme.colorScheme.primary,
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  'Enter your password to continue',
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.inverseSurface,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-                PasswordFormField(
-                  controller: _passwordController,
-                  suffixIcon: useBiometric
-                      ? IconButton(
-                          onPressed: _unlockWithBiometric,
-                          icon: Icon(
-                            Icons.fingerprint,
-                            color: theme.colorScheme.primary,
-                          ),
-                        )
-                      : null,
-                ),
-                const SizedBox(height: 20),
-                Bounceable(
-                  onTap: () {},
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    height: 60,
-                    child: OutlinedButton(
-                      onPressed: _unlock,
-                      style: OutlinedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: Text(
-                        'UNLOCK',
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          fontSize: 18,
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+            child: AutofillGroup(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Offstage(
+                    child: TextField(
+                      controller: _usernameController,
+                      autofillHints: const [AutofillHints.username],
                     ),
                   ),
-                ),
-                if (!_hasPassword) ...[
-                  const SizedBox(height: 16),
+                  Icon(
+                    Icons.lock_outline,
+                    size: 80,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(height: 20),
                   Text(
-                    'No password is set, so the app will continue automatically.',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.secondary,
+                    'Enter your password to continue',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.inverseSurface,
                     ),
                     textAlign: TextAlign.center,
                   ),
+                  const SizedBox(height: 20),
+                  PasswordFormField(
+                    controller: _passwordController,
+                    suffixIcon: useBiometric
+                        ? IconButton(
+                            onPressed: _unlockWithBiometric,
+                            icon: Icon(
+                              Icons.fingerprint,
+                              color: theme.colorScheme.primary,
+                            ),
+                          )
+                        : null,
+                  ),
+                  const SizedBox(height: 20),
+                  Bounceable(
+                    onTap: () {},
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      height: 60,
+                      child: OutlinedButton(
+                        onPressed: _unlock,
+                        style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'UNLOCK',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontSize: 18,
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (!_hasPassword) ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      'No password is set, so the app will continue automatically.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.secondary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
         ),
