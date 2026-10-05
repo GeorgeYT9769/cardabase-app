@@ -225,7 +225,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Select Canvas Color'),
+          title: const Text('Canvas Color'),
           content: SizedBox(
             width: double.maxFinite,
             child: GridView.builder(
@@ -261,8 +261,9 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
             ),
           ),
           actions: [
-            TextButton(
+            OutlinedButton(
               onPressed: () => Navigator.pop(context),
+              style: Theme.of(context).outlinedButtonTheme.style?.copyWith(),
               child: const Text('Cancel'),
             ),
           ],
@@ -285,11 +286,12 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     if (!mounted) return;
     if (image != null) {
       final screenSize = MediaQuery.of(context).size;
+      const itemSize = 112.0;
       final newItem = _OverlayItem(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         type: 'image',
         imagePath: image.path,
-        position: Offset(screenSize.width / 2 - 50, screenSize.height / 3),
+        position: Offset((screenSize.width - itemSize) / 2, (screenSize.height - itemSize) / 2),
       );
       setState(() {
         _overlayItems.add(newItem);
@@ -319,7 +321,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              title: const Text('Add Text Overlay'),
+              title: const Text('Text'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -362,12 +364,14 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                 ],
               ),
               actions: [
-                TextButton(
+                OutlinedButton(
                   onPressed: () => Navigator.pop(context),
+                  style: Theme.of(context).outlinedButtonTheme.style?.copyWith(),
                   child: const Text('Cancel'),
                 ),
-                ElevatedButton(
+                OutlinedButton(
                   onPressed: () => Navigator.pop(context, textController.text),
+                  style: Theme.of(context).outlinedButtonTheme.style?.copyWith(),
                   child: const Text('Add'),
                 ),
               ],
@@ -380,12 +384,18 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     if (!mounted) return;
     if (resultText != null && resultText.trim().isNotEmpty) {
       final screenSize = MediaQuery.of(context).size;
+      final theme = Theme.of(context);
       final newItem = _OverlayItem(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         type: 'text',
         text: resultText.trim(),
         color: selectedColor,
-        position: Offset(screenSize.width / 2 - 50, screenSize.height / 3),
+        position: Offset.zero,
+      );
+      final itemSize = _measureItemSize(newItem, theme);
+      newItem.position = Offset(
+        (screenSize.width - itemSize.width) / 2,
+        (screenSize.height - itemSize.height) / 2,
       );
       setState(() {
         _overlayItems.add(newItem);
@@ -631,6 +641,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
         return Stack(
           children: [
             Scaffold(
+              resizeToAvoidBottomInset: false,
               extendBodyBehindAppBar: true,
               appBar: AppBar(
                 automaticallyImplyLeading: false,
@@ -924,8 +935,16 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                 ),
                               for (final item in _overlayItems) ...[
                                 Positioned(
-                                  left: item.position.dx,
-                                  top: item.position.dy,
+                                  left: item.position.dx +
+                                      ((_measureItemSize(item, theme).width /
+                                                  item.scale) *
+                                              (item.scale - 1)) /
+                                          2,
+                                  top: item.position.dy +
+                                      ((_measureItemSize(item, theme).height /
+                                                  item.scale) *
+                                              (item.scale - 1)) /
+                                          2,
                                   child: GestureDetector(
                                     onTap: () {
                                       setState(() {
@@ -1104,16 +1123,6 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                                     color: item.color,
                                                     fontSize: 26,
                                                     fontWeight: FontWeight.bold,
-                                                    shadows: const [
-                                                      Shadow(
-                                                        blurRadius: 4,
-                                                        color: Colors.black,
-                                                      ),
-                                                      Shadow(
-                                                        blurRadius: 4,
-                                                        color: Colors.black,
-                                                      ),
-                                                    ],
                                                   ),
                                                 ),
                                         ),
@@ -1195,6 +1204,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           FloatingActionButton.large(
+
                             heroTag: 'takePhotoShutter',
                             elevation: 4,
                             backgroundColor: theme.colorScheme.primary,

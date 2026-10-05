@@ -88,7 +88,10 @@ class SettingTile extends StatelessWidget {
               ),
               minimumSize: const Size.fromHeight(80),
             ),
-            onPressed: settingAction,
+            onPressed: () {
+              settingAction();
+              GetIt.I<VibrationProvider>().vibrateLight();
+            },
             child: Row(
               children: [
                 const SizedBox(width: 10),

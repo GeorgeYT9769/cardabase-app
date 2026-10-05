@@ -1,5 +1,23 @@
 LATEST CHANGELOG:
 
+05.10.2026
+1.10.0:
+- Added advanced textures option in settings - this adds blur to some widgets,
+- Redesigned password screen,
+- Redesigned camera screen for taking card pictures (thanks @Andrew15-5),
+- Backup and Restore dialogs are now merged into 1 page, giving it more space,
+- Fixed alignment issues on card pictures,
+- Search bar was redesigned for better user experience,
+- Sorting and filtering was moved next to the search field,
+- Fixed a bug with Predictive Back Gesture blocking the app's biometric auth (thanks @Landstalker32X),
+- Buttons in settings can now vibrate,
+- Notes were redesigned,
+- When taking a picture of a card, now you can add a text or an image to the photo, making it even more personal (thanks @TheRealRWJ),
+- Added a proper homescreen widget preview in Android widget picker,
+- Homescreen quick actions were fixed,
+- Debug builds can be installed side-by-side with the release builds,
+- other bug fixes and under-the-hood improvements.
+
 09.08.2026
 1.9.0:
 - You can now set a password for the app,
