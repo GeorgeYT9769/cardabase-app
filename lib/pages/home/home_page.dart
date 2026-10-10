@@ -14,7 +14,7 @@ import 'package:cardabase/pages/welcome_screen.dart';
 import 'package:cardabase/theme/theme.dart';
 import 'package:cardabase/util/widgets/cdb_app_bar_sliver.dart';
 import 'package:cardabase/util/widgets/multi_listenable_builder.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 

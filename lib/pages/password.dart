@@ -1,6 +1,6 @@
 import 'package:cardabase/theme/theme.dart';
 import 'package:cardabase/util/vibration_provider.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get_it/get_it.dart';

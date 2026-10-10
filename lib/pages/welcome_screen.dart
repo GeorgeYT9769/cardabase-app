@@ -4,7 +4,7 @@ import 'package:cardabase/pages/home/home_page.dart';
 import 'package:cardabase/pages/lock_screen.dart';
 import 'package:cardabase/pages/terms_of_service.dart';
 import 'package:cardabase/util/widgets/cdb_app_bar.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart' show rootBundle, SystemNavigator;
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get_it/get_it.dart';

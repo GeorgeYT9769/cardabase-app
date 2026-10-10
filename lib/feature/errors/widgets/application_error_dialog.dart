@@ -1,5 +1,5 @@
 import 'package:cardabase/feature/errors/widgets/error_widget.dart';
-import 'package:flutter/material.dart' hide ErrorWidget;
+import 'package:material_ui/material_ui.dart' hide ErrorWidget;
 import 'package:url_launcher/url_launcher.dart';
 
 Future<void> showApplicationErrorDialog(

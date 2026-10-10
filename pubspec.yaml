@@ -64,6 +64,8 @@ dependencies:
   uuid: ">=4.0.0 <5.0.0"
   zxing2: ^0.2.4
 
+  material_ui: any
+  cupertino_ui: any
 dev_dependencies:
   build_runner: ^2.4.6
   faker: ^2.2.0

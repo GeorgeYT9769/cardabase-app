@@ -1,5 +1,5 @@
 import 'package:cardabase/feature/errors/widgets/application_error_dialog.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class FlutterErrorHandler {
   const FlutterErrorHandler({

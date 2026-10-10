@@ -1,6 +1,6 @@
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:cardabase/util/barcode_type_extensions.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class BarcodeTypeSelectorDialog extends StatelessWidget {
   const BarcodeTypeSelectorDialog({

@@ -8,7 +8,7 @@ import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/theme/theme.dart';
 import 'package:cardabase/util/widgets/blur_app_bar_background.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../../util/vibration_provider.dart';

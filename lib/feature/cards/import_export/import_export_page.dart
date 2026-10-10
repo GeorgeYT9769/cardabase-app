@@ -12,7 +12,7 @@ import 'package:cardabase/util/vibration_provider.dart';
 import 'package:cardabase/util/widgets/cdb_app_bar_sliver.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:get_it/get_it.dart';
 
 class ImportExportPage extends StatefulWidget {

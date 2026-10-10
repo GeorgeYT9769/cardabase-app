@@ -2,7 +2,7 @@ import 'package:cardabase/feature/cards/import_export/export_cards.dart';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:hive_ce/hive.dart';
 
 Future<void> autoUpdateAfterInterval(

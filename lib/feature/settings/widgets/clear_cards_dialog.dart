@@ -1,5 +1,5 @@
 import 'package:cardabase/theme/theme.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class ClearCardsDialog extends StatefulWidget {
   const ClearCardsDialog({super.key});

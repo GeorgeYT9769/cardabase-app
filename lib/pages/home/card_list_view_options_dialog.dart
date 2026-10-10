@@ -2,7 +2,7 @@ import 'package:cardabase/feature/cards/card_list_view_options.dart';
 import 'package:cardabase/pages/home/form_fields/number_of_columns_slider.dart';
 import 'package:cardabase/pages/home/form_fields/sorting_style_selector.dart';
 import 'package:cardabase/util/vibration_provider.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get_it/get_it.dart';
 

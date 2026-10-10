@@ -1,5 +1,5 @@
 import 'dart:ui';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class BlurAppBarBackground extends StatelessWidget {
   const BlurAppBarBackground({super.key, this.alpha = 0});

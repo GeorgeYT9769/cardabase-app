@@ -2,7 +2,7 @@ import 'package:barcode_widget/barcode_widget.dart';
 import 'package:cardabase/feature/cards/edit/verify_code.dart';
 import 'package:cardabase/theme/theme.dart';
 import 'package:cardabase/util/form_validation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 
 class CardDataFormField extends StatelessWidget {

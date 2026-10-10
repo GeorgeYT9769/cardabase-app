@@ -1,6 +1,6 @@
 import 'package:cardabase/feature/settings/editable_model.dart';
 import 'package:cardabase/feature/settings/model.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class AutoUpdateSettingsDialog extends StatefulWidget {
   const AutoUpdateSettingsDialog({

@@ -18,7 +18,7 @@ import 'package:cardabase/util/read_barcode.dart';
 import 'package:cardabase/util/widgets/color_picker_dialog.dart';
 import 'package:cardabase/util/widgets/custom_snack_bar.dart';
 import 'package:cardabase/util/widgets/multi_listenable_builder.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_ce_flutter/adapters.dart';
 

@@ -4,7 +4,7 @@ import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/main.dart';
 import 'package:cardabase/pages/home/home_page.dart';
 import 'package:faker/faker.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';

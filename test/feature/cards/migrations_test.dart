@@ -1,7 +1,7 @@
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/cards/migrations.dart';
 import 'package:faker/faker.dart' hide Color;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 

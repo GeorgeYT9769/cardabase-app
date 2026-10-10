@@ -1,5 +1,5 @@
 import 'package:cardabase/feature/cards/card_list_view_options.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../../util/vibration_provider.dart';

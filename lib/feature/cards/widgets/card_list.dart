@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/cards/widgets/card_bottom_sheet.dart';
 import 'package:cardabase/feature/cards/widgets/card_summary.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 
 class CardList extends StatefulWidget {

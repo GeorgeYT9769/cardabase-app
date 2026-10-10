@@ -1,6 +1,5 @@
 import 'package:cardabase/feature/settings/model.dart';
-import 'package:flutter/material.dart';
-
+import 'package:material_ui/material_ui.dart';
 import 'color_schemes.g.dart';
 
 /// Corner radius of the outlined buttons used for dialog and page actions.

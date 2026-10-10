@@ -1,6 +1,6 @@
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:cardabase/feature/cards/widgets/full_screen_card_face_page.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class CardFace extends StatelessWidget {
   const CardFace({

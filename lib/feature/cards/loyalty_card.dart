@@ -9,7 +9,7 @@ import 'package:cardabase/util/list_extensions.dart';
 import 'package:cardabase/util/map_extensions.dart';
 import 'package:cardabase/util/string_extensions.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:hive_ce/hive.dart';
 
