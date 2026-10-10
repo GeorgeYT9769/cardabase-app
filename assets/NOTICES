@@ -1912,6 +1912,7 @@ camera_avfoundation
 camera_platform_interface
 camera_web
 cross_file
+cupertino_ui
 file_selector_linux
 file_selector_macos
 file_selector_platform_interface
@@ -1922,6 +1923,7 @@ image_picker_macos
 image_picker_platform_interface
 local_auth_android
 local_auth_platform_interface
+material_ui
 path_provider
 path_provider_android
 path_provider_foundation
