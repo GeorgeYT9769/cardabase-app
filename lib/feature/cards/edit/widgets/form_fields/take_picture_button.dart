@@ -4,8 +4,9 @@ import 'package:cardabase/feature/cards/card_face_error_widget.dart';
 import 'package:cardabase/feature/cards/widgets/full_screen_card_face_page.dart';
 import 'package:cardabase/util/camera_controller.dart';
 import 'package:cardabase/util/dashed_rect.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
+import 'package:image_picker/image_picker.dart';
 
 class TakePictureButton extends StatefulWidget {
   const TakePictureButton({
@@ -26,11 +27,47 @@ class _TakePictureButtonState extends State<TakePictureButton> {
     widget.picturePath.value = null;
   }
 
-  Future<void> _takePicture() async {
-    late final String? picturePath;
-    picturePath = await Navigator.push<String>(
+  /// Asks where the picture should come from, so the camera is only started
+  /// when the user actually wants to use it.
+  Future<void> _choosePictureSource() async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Take a photo'),
+              onTap: () => Navigator.pop(sheetContext, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Choose from gallery'),
+              onTap: () => Navigator.pop(sheetContext, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (!mounted || source == null) {
+      return;
+    }
+
+    XFile? pickedImage;
+    if (source == ImageSource.gallery) {
+      pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (!mounted || pickedImage == null) {
+        return;
+      }
+    }
+
+    final String? picturePath = await Navigator.push<String>(
       context,
-      MaterialPageRoute(builder: (context) => const CameraControllerScreen()),
+      MaterialPageRoute(
+        builder: (context) => CameraControllerScreen(initialImage: pickedImage),
+      ),
     );
 
     if (!mounted || picturePath == null) {
@@ -62,7 +99,7 @@ class _TakePictureButtonState extends State<TakePictureButton> {
                     child: GestureDetector(
                       onLongPress: _resetPicture,
                       child: OutlinedButton(
-                        onPressed: _takePicture,
+                        onPressed: _choosePictureSource,
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(
                             color: theme.colorScheme.primary,

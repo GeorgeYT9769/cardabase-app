@@ -2,9 +2,11 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:typed_data' as typed_data;
+import 'dart:ui' as ui;
 
 import 'package:camera/camera.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:image/image.dart' as img;
@@ -16,8 +18,11 @@ import 'package:screenshot/screenshot.dart';
 
 import '../feature/settings/get_it.dart';
 import '../feature/settings/model.dart';
+import 'card_cropper.dart';
 import 'expressive_loading_indicator.dart';
 import 'widgets/blur_wrapper.dart';
+
+enum _PhotoFitMode { custom, fit, fill }
 
 class _OverlayItem {
   final String id;
@@ -46,8 +51,13 @@ class CameraControllerScreen extends StatefulWidget {
   final double cutoutWidthPercentage;
   final double cardAspectRatio;
 
+  /// When set, the screen opens straight in the editor with this image
+  /// (e.g. picked from the gallery) and never starts the camera.
+  final XFile? initialImage;
+
   const CameraControllerScreen({
     super.key,
+    this.initialImage,
     this.cutoutColor = const Color(0xFF1960A5),
     this.cutoutWidthPercentage = 0.9,
     this.cardAspectRatio =
@@ -93,27 +103,207 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
   bool _isSaving = false;
   bool _isFlashOn = false;
 
+  _PhotoFitMode _fitMode = _PhotoFitMode.custom;
+  bool _rotationSnapped = false;
+  bool _cropperOpen = false;
+
+  static const double _maxScale = 6.0;
+  static const double _snapThreshold = 0.06; // ~3.4 degrees
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _initializeCamera();
+    if (widget.initialImage != null) {
+      // Gallery flow: go straight to the card cropper, the camera is never
+      // opened.
+      _initializeControllerFuture = Future<void>.value();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _openCropper(widget.initialImage!);
+      });
+    } else {
+      _initializeCamera();
+    }
   }
 
   Future<void> _initializeCamera() async {
-    _cameras = await availableCameras();
+    if (_cameraController != null) return;
+    _cameras ??= await availableCameras();
     if (_cameras == null || _cameras!.isEmpty) {
       return;
     }
-    _cameraController = CameraController(
+    final controller = CameraController(
       _cameras![0],
       ResolutionPreset.high,
       enableAudio: false,
       imageFormatGroup: ImageFormatGroup.jpeg,
     );
-    _initializeControllerFuture = _cameraController!.initialize();
+    _cameraController = controller;
+    _initializeControllerFuture = controller.initialize();
     if (!mounted) return;
     setState(() {});
+  }
+
+  /// Fully releases the camera (turns off the Android camera-in-use
+  /// indicator). Called as soon as the camera is no longer needed, i.e. after
+  /// a photo is taken, a gallery image is picked or a canvas color is chosen.
+  Future<void> _releaseCamera() async {
+    final controller = _cameraController;
+    if (controller == null) return;
+    _cameraController = null;
+    _initializeControllerFuture = Future<void>.value();
+    if (_isFlashOn) {
+      try {
+        await controller.setFlashMode(FlashMode.off);
+      } catch (_) {}
+      _isFlashOn = false;
+    }
+    if (mounted) setState(() {});
+    // Wait for a frame so CameraPreview is no longer in the tree before the
+    // controller is disposed.
+    await WidgetsBinding.instance.endOfFrame;
+    try {
+      await controller.dispose();
+    } catch (_) {}
+  }
+
+  bool get _inEditingMode => _capturedImageFile != null || _canvasColor != null;
+
+  /// Lets the user mark the card corners (auto-detected first), then continues
+  /// to the editor with the cut-out, perspective-corrected card.
+  Future<void> _openCropper(XFile file) async {
+    _cropperOpen = true;
+    final String? result = await Navigator.of(context).push<String>(
+      MaterialPageRoute(
+        builder: (_) => CardCropScreen(imagePath: file.path),
+      ),
+    );
+    _cropperOpen = false;
+    if (!mounted) return;
+    if (result == null) {
+      // Cancelled: go back to the camera (or to the form for gallery images).
+      if (widget.initialImage != null) {
+        Navigator.of(context).pop();
+      } else {
+        _retakePicture();
+      }
+      return;
+    }
+    setState(() {
+      _capturedImageFile = XFile(result);
+      _canvasColor = null;
+      _selectedOverlayId = null;
+      _fitMode = _PhotoFitMode.custom;
+      _initPhotoPosition();
+    });
+    await _applyPhotoFit(_PhotoFitMode.fill);
+  }
+
+  void _haptic() {
+    HapticFeedback.selectionClick();
+  }
+
+  /// Snaps angles close to 0/90/180/270 degrees and gives a small vibration
+  /// when the snap point is entered.
+  double _snapRotation(double angle) {
+    final a = _normalizeAngle(angle);
+    final nearest = (a / (math.pi / 2)).roundToDouble() * (math.pi / 2);
+    if ((a - nearest).abs() < _snapThreshold) {
+      if (!_rotationSnapped) {
+        _rotationSnapped = true;
+        _haptic();
+      }
+      return _normalizeAngle(nearest);
+    }
+    _rotationSnapped = false;
+    return a;
+  }
+
+  Future<Size?> _readImageSize(String path) async {
+    try {
+      final bytes = await File(path).readAsBytes();
+      final codec = await ui.instantiateImageCodec(bytes);
+      final frame = await codec.getNextFrame();
+      final size = Size(
+        frame.image.width.toDouble(),
+        frame.image.height.toDouble(),
+      );
+      frame.image.dispose();
+      codec.dispose();
+      return size;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Size _cutoutSize(Size screen) {
+    double w = screen.width * widget.cutoutWidthPercentage;
+    double h = w / widget.cardAspectRatio;
+    if (h > screen.height * 0.7) {
+      h = screen.height * 0.7;
+      w = h * widget.cardAspectRatio;
+    }
+    return Size(w, h);
+  }
+
+  /// Centers the background photo in the frame and scales it so that it
+  /// either fills the whole frame (fill) or is fully visible inside it (fit).
+  Future<void> _applyPhotoFit(_PhotoFitMode mode) async {
+    final file = _capturedImageFile;
+    if (file == null || file.path.isEmpty || _canvasColor != null) return;
+    final imageSize = await _readImageSize(file.path);
+    if (!mounted || imageSize == null) return;
+    final screen = MediaQuery.of(context).size;
+    final cutout = _cutoutSize(screen);
+
+    // Size of the image as drawn at scale 1 (BoxFit.contain in the screen).
+    final r = math.min(
+      screen.width / imageSize.width,
+      screen.height / imageSize.height,
+    );
+    final dispW = imageSize.width * r;
+    final dispH = imageSize.height * r;
+    final c = math.cos(_photoRotation).abs();
+    final sn = math.sin(_photoRotation).abs();
+
+    double scale;
+    if (mode == _PhotoFitMode.fill) {
+      final hx = (cutout.width * c + cutout.height * sn) / 2;
+      final hy = (cutout.width * sn + cutout.height * c) / 2;
+      scale = math.max(2 * hx / dispW, 2 * hy / dispH);
+    } else {
+      scale = math.min(
+        cutout.width / (dispW * c + dispH * sn),
+        cutout.height / (dispW * sn + dispH * c),
+      );
+    }
+    setState(() {
+      _photoScale = scale.clamp(0.2, _maxScale);
+      _photoPosition = Offset.zero;
+      _fitMode = mode;
+    });
+  }
+
+  void _rotatePhotoBy(double delta) {
+    _haptic();
+    setState(() {
+      _photoRotation = _normalizeAngle(_photoRotation + delta);
+      _rotationSnapped = true;
+    });
+    if (_fitMode != _PhotoFitMode.custom) {
+      _applyPhotoFit(_fitMode);
+    }
+  }
+
+  void _resetPhotoRotation() {
+    _haptic();
+    setState(() {
+      _photoRotation = 0.0;
+      _rotationSnapped = true;
+    });
+    if (_fitMode != _PhotoFitMode.custom) {
+      _applyPhotoFit(_fitMode);
+    }
   }
 
   @override
@@ -132,13 +322,15 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (_cameraController == null || !_cameraController!.value.isInitialized) {
-      return;
-    }
-    if (state == AppLifecycleState.inactive) {
-      _cameraController?.dispose();
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused) {
+      // Release the camera whenever the app is in the background.
+      _releaseCamera();
     } else if (state == AppLifecycleState.resumed) {
-      _initializeCamera();
+      // Only (re)open the camera if we are actually in camera mode.
+      if (!_inEditingMode && !_cropperOpen && widget.initialImage == null) {
+        _initializeCamera();
+      }
     }
   }
 
@@ -170,23 +362,18 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
   }
 
   Future<void> _takePicture() async {
-    if (!_cameraController!.value.isInitialized) {
+    final controller = _cameraController;
+    if (controller == null || !controller.value.isInitialized) {
       return;
     }
     try {
-      final XFile file = await _cameraController!.takePicture();
-      if (_isFlashOn) {
-        try {
-          await _cameraController!.setFlashMode(FlashMode.off);
-        } catch (_) {}
-        _isFlashOn = false;
-      }
-      setState(() {
-        _capturedImageFile = file;
-        _canvasColor = null;
-        _selectedOverlayId = null;
-        _initPhotoPosition();
-      });
+      final XFile file = await controller.takePicture();
+      if (!mounted) return;
+      // The camera is not needed any more: release it so the system
+      // "camera in use" indicator disappears and the device stops heating up.
+      await _releaseCamera();
+      if (!mounted) return;
+      await _openCropper(file);
     } catch (e) {
       // Handle error
     }
@@ -195,13 +382,11 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
   Future<void> _pickImageFromGallery() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (!mounted) return;
     if (image != null) {
-      setState(() {
-        _capturedImageFile = image;
-        _canvasColor = null;
-        _selectedOverlayId = null;
-        _initPhotoPosition();
-      });
+      await _releaseCamera();
+      if (!mounted) return;
+      await _openCropper(image);
     }
   }
 
@@ -277,6 +462,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
         _capturedImageFile = XFile('');
         _transformationController.value = Matrix4.identity();
       });
+      await _releaseCamera();
     }
   }
 
@@ -571,7 +757,14 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
   }
 
   void _retakePicture() {
+    if (widget.initialImage != null) {
+      // Opened from the gallery: go back so the user can choose again.
+      Navigator.of(context).pop();
+      return;
+    }
     setState(() {
+      _fitMode = _PhotoFitMode.custom;
+      _rotationSnapped = false;
       _capturedImageFile = null;
       _canvasColor = null;
       _brightness = 0.0;
@@ -583,6 +776,8 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
       _verticalGuideX = null;
       _horizontalGuideY = null;
     });
+    // Camera was released after the previous capture; start it again.
+    _initializeCamera();
   }
 
   @override
@@ -599,6 +794,8 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     );
 
     final bool isPhotoSelected = _selectedOverlayId == 'BACKGROUND_PHOTO';
+    // Photo tools apply to the background photo when it (or nothing) is selected.
+    final bool isPhotoTarget = isPhotoSelected || _selectedOverlayId == null;
 
     final bool inEditingMode =
         _capturedImageFile != null || _canvasColor != null;
@@ -676,6 +873,36 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                       cutoutWidthPercentage:
                                           widget.cutoutWidthPercentage,
                                       cardAspectRatio: widget.cardAspectRatio,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  left: 0,
+                                  right: 0,
+                                  bottom: constraints.maxHeight / 2 +
+                                      _cutoutSize(
+                                            Size(
+                                              constraints.maxWidth,
+                                              constraints.maxHeight,
+                                            ),
+                                          ).height /
+                                          2 +
+                                      8,
+                                  child: IgnorePointer(
+                                    child: Text(
+                                      'Place the card in view.\n'
+                                      'You can mark its corners after taking the photo.',
+                                      textAlign: TextAlign.center,
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                        color: Colors.white,
+                                        shadows: const [
+                                          Shadow(
+                                            color: Colors.black87,
+                                            blurRadius: 4,
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -760,13 +987,15 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                           if (details.scale != 1.0) {
                                             _photoScale = (_initialScale *
                                                     details.scale)
-                                                .clamp(0.2, 4.0);
+                                                .clamp(0.2, _maxScale);
+                                            _fitMode = _PhotoFitMode.custom;
                                           }
                                           if (details.rotation != 0.0) {
-                                            _photoRotation = _normalizeAngle(
+                                            _photoRotation = _snapRotation(
                                               _initialRotation +
                                                   details.rotation,
                                             );
+                                            _fitMode = _PhotoFitMode.custom;
                                           }
 
                                           final screenSize =
@@ -862,6 +1091,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                           }
 
                                           _photoPosition = Offset(newX, newY);
+                                          _fitMode = _PhotoFitMode.custom;
                                           _verticalGuideX =
                                               snapV ? vLineX : null;
                                           _horizontalGuideY =
@@ -971,10 +1201,10 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                           if (details.scale != 1.0) {
                                             item.scale = (_initialScale *
                                                     details.scale)
-                                                .clamp(0.2, 4.0);
+                                                .clamp(0.2, _maxScale);
                                           }
                                           if (details.rotation != 0.0) {
-                                            item.rotation = _normalizeAngle(
+                                            item.rotation = _snapRotation(
                                               _initialRotation +
                                                   details.rotation,
                                             );
@@ -1401,6 +1631,46 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                   ),
                                 ),
                               ],
+                              if (isPhotoTarget && _canvasColor == null) ...[
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.rotate_left),
+                                      tooltip: 'Rotate 90° left',
+                                      onPressed: () =>
+                                          _rotatePhotoBy(-math.pi / 2),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.straighten),
+                                      tooltip: 'Reset rotation to 0°',
+                                      onPressed: _resetPhotoRotation,
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.rotate_right),
+                                      tooltip: 'Rotate 90° right',
+                                      onPressed: () =>
+                                          _rotatePhotoBy(math.pi / 2),
+                                    ),
+                                    IconButton(
+                                      icon: Icon(
+                                        _fitMode == _PhotoFitMode.fill
+                                            ? Icons.fit_screen
+                                            : Icons.crop_free,
+                                      ),
+                                      tooltip: _fitMode == _PhotoFitMode.fill
+                                          ? 'Fit whole photo in frame'
+                                          : 'Fill the frame',
+                                      onPressed: () => _applyPhotoFit(
+                                        _fitMode == _PhotoFitMode.fill
+                                            ? _PhotoFitMode.fit
+                                            : _PhotoFitMode.fill,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                               if (isPhotoSelected ||
                                   selectedItem.id.isNotEmpty) ...[
                                 Padding(
@@ -1419,13 +1689,14 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                           value: (isPhotoSelected
                                                   ? _photoScale
                                                   : selectedItem.scale)
-                                              .clamp(0.2, 4.0),
+                                              .clamp(0.2, _maxScale),
                                           min: 0.2,
-                                          max: 4.0,
+                                          max: _maxScale,
                                           onChanged: (val) {
                                             setState(() {
                                               if (isPhotoSelected) {
                                                 _photoScale = val;
+                                                _fitMode = _PhotoFitMode.custom;
                                               } else {
                                                 selectedItem.scale = val;
                                               }
@@ -1449,9 +1720,10 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                           max: math.pi,
                                           onChanged: (val) {
                                             setState(() {
-                                              final norm = _normalizeAngle(val);
+                                              final norm = _snapRotation(val);
                                               if (isPhotoSelected) {
                                                 _photoRotation = norm;
+                                                _fitMode = _PhotoFitMode.custom;
                                               } else {
                                                 selectedItem.rotation = norm;
                                               }

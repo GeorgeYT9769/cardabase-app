@@ -1,0 +1,709 @@
+import 'dart:io';
+import 'dart:isolate';
+import 'dart:math' as math;
+import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:image/image.dart' as img;
+import 'package:path/path.dart' show join;
+import 'package:path_provider/path_provider.dart';
+
+/// Aspect ratio of the output picture (ID-1 card: 85.60 mm x 53.98 mm).
+const double _cardAspectRatio = 1.586;
+
+/// Screen that lets the user mark the four corners of a card on a photo
+/// (taken with the camera or picked from the gallery). The corners are
+/// pre-filled by a simple automatic card detection. On "Done" the card is
+/// cut out and its perspective is corrected, so the result is a flat,
+/// card-shaped picture.
+///
+/// Pops with:
+/// - the path of the resulting image (cropped, or the whole photo if the user
+///   chose "Skip"),
+/// - `null` if the user went back without choosing anything.
+class CardCropScreen extends StatefulWidget {
+  const CardCropScreen({super.key, required this.imagePath});
+
+  final String imagePath;
+
+  @override
+  State<CardCropScreen> createState() => _CardCropScreenState();
+}
+
+class _CardCropScreenState extends State<CardCropScreen> {
+  String? _preparedPath;
+  int _imgW = 0;
+  int _imgH = 0;
+
+  /// Normalized (0..1) corners: top-left, top-right, bottom-right, bottom-left.
+  List<Offset> _corners = const [];
+  List<Offset> _detected = const [];
+
+  int _turns = 0;
+  int? _dragIndex;
+  bool _busy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final tmp = (await getTemporaryDirectory()).path;
+      final outPath = join(tmp, 'crop_src_${DateTime.now().microsecondsSinceEpoch}.jpg');
+      final inPath = widget.imagePath;
+      final List<Object> result = await Isolate.run(
+        () => _prepareImage(<String>[inPath, outPath]),
+      );
+      if (!mounted) return;
+      final c = (result[2] as List).cast<double>();
+      final corners = List<Offset>.generate(
+        4,
+        (i) => Offset(c[i * 2], c[i * 2 + 1]),
+      );
+      setState(() {
+        _preparedPath = outPath;
+        _imgW = result[0] as int;
+        _imgH = result[1] as int;
+        _corners = corners;
+        _detected = List<Offset>.of(corners);
+      });
+    } catch (_) {
+      // Could not process the image: fall back to the original photo.
+      if (mounted) Navigator.of(context).pop(widget.imagePath);
+    }
+  }
+
+  Future<void> _done() async {
+    if (_busy || _preparedPath == null) return;
+    setState(() => _busy = true);
+    try {
+      final pts = _corners
+          .map((o) => Offset(o.dx * _imgW, o.dy * _imgH))
+          .toList();
+
+      double dist(Offset a, Offset b) => (a - b).distance;
+      final w = (dist(pts[0], pts[1]) + dist(pts[3], pts[2])) / 2;
+      final h = (dist(pts[0], pts[3]) + dist(pts[1], pts[2])) / 2;
+      // Make the result landscape; the user can still rotate it.
+      final shift = ((h > w ? 1 : 0) + _turns) % 4;
+      final ordered = List<Offset>.generate(4, (i) => pts[(i + shift) % 4]);
+      final outW = (shift.isOdd ? h : w).round().clamp(800, 1400);
+      final outH = (outW / _cardAspectRatio).round();
+
+      final flat = <double>[
+        for (final p in ordered) ...[p.dx, p.dy],
+      ];
+      final srcPath = _preparedPath!;
+      final tmp = (await getTemporaryDirectory()).path;
+      final outPath = join(tmp, 'crop_out_${DateTime.now().microsecondsSinceEpoch}.png');
+      final String path = await Isolate.run(
+        () => _warpAndSave(<Object>[srcPath, outPath, flat, outW, outH]),
+      );
+      if (mounted) Navigator.of(context).pop(path);
+    } catch (_) {
+      if (mounted) {
+        setState(() => _busy = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not crop the image')),
+        );
+      }
+    }
+  }
+
+  void _resetToDetected() {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _corners = List<Offset>.of(_detected);
+      _turns = 0;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final ready = _preparedPath != null;
+
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        title: const Text('Crop card'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new),
+          onPressed: _busy ? null : () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: !ready
+                  ? const Center(child: CircularProgressIndicator())
+                  : LayoutBuilder(builder: (context, constraints) {
+                      final size = constraints.biggest;
+                      final scale = math.min(size.width / _imgW, size.height / _imgH);
+                      final dw = _imgW * scale;
+                      final dh = _imgH * scale;
+                      final rect = Rect.fromLTWH(
+                        (size.width - dw) / 2,
+                        (size.height - dh) / 2,
+                        dw,
+                        dh,
+                      );
+                      Offset toScreen(Offset n) => Offset(
+                            rect.left + n.dx * rect.width,
+                            rect.top + n.dy * rect.height,
+                          );
+                      final screenPoints = _corners.map(toScreen).toList();
+
+                      return GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onPanStart: (d) {
+                          int? nearest;
+                          double best = 64; // touch radius
+                          for (var i = 0; i < 4; i++) {
+                            final dd = (screenPoints[i] - d.localPosition).distance;
+                            if (dd < best) {
+                              best = dd;
+                              nearest = i;
+                            }
+                          }
+                          _dragIndex = nearest;
+                        },
+                        onPanUpdate: (d) {
+                          final i = _dragIndex;
+                          if (i == null) return;
+                          final s = screenPoints[i] + d.delta;
+                          final nx = ((s.dx - rect.left) / rect.width).clamp(0.0, 1.0);
+                          final ny = ((s.dy - rect.top) / rect.height).clamp(0.0, 1.0);
+                          setState(() {
+                            _corners = List<Offset>.of(_corners)..[i] = Offset(nx, ny);
+                          });
+                        },
+                        onPanEnd: (_) => _dragIndex = null,
+                        child: Stack(
+                          children: [
+                            Positioned.fromRect(
+                              rect: rect,
+                              child: Image.file(
+                                File(_preparedPath!),
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                            Positioned.fill(
+                              child: IgnorePointer(
+                                child: CustomPaint(
+                                  painter: _QuadPainter(
+                                    points: screenPoints,
+                                    imageRect: rect,
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+              child: Text(
+                'Drag the four corners to the corners of the card.',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white70),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    tooltip: 'Detect card again',
+                    color: Colors.white,
+                    icon: const Icon(Icons.auto_fix_high),
+                    onPressed: ready && !_busy ? _resetToDetected : null,
+                  ),
+                  IconButton(
+                    tooltip: 'Rotate result 90°',
+                    color: Colors.white,
+                    icon: const Icon(Icons.rotate_right),
+                    onPressed: ready && !_busy
+                        ? () {
+                            HapticFeedback.selectionClick();
+                            setState(() => _turns = (_turns + 1) % 4);
+                          }
+                        : null,
+                  ),
+                  TextButton(
+                    onPressed: ready && !_busy
+                        ? () => Navigator.of(context).pop(_preparedPath)
+                        : null,
+                    child: const Text('Skip'),
+                  ),
+                  FilledButton.icon(
+                    onPressed: ready && !_busy ? _done : null,
+                    icon: _busy
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.check),
+                    label: const Text('Done'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _QuadPainter extends CustomPainter {
+  _QuadPainter({
+    required this.points,
+    required this.imageRect,
+    required this.color,
+  });
+
+  final List<Offset> points;
+  final Rect imageRect;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final quad = Path()..addPolygon(points, true);
+    final outside = Path.combine(
+      PathOperation.difference,
+      Path()..addRect(imageRect),
+      quad,
+    );
+    canvas.drawPath(
+      outside,
+      Paint()..color = Colors.black.withValues(alpha: .55),
+    );
+    canvas.drawPath(
+      quad,
+      Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.5,
+    );
+    for (final p in points) {
+      canvas.drawCircle(p, 18, Paint()..color = color.withValues(alpha: .25));
+      canvas.drawCircle(p, 8, Paint()..color = color);
+      canvas.drawCircle(
+        p,
+        8,
+        Paint()
+          ..color = Colors.white
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _QuadPainter oldDelegate) => true;
+}
+
+// ---------------------------------------------------------------------------
+// Image processing. Everything below runs in a background isolate.
+// ---------------------------------------------------------------------------
+
+/// Decodes the photo, applies its EXIF orientation, limits its size, saves
+/// the normalized JPEG to `args[1]` and detects the card corners.
+/// Returns `[width, height, List<double> corners(8 normalized values)]`.
+List<Object> _prepareImage(List<String> args) {
+  final bytes = File(args[0]).readAsBytesSync();
+  img.Image? image = img.decodeImage(bytes);
+  if (image == null) {
+    throw const FormatException('Unsupported image');
+  }
+  image = img.bakeOrientation(image);
+  const maxSide = 2400;
+  if (image.width > maxSide || image.height > maxSide) {
+    image = image.width >= image.height
+        ? img.copyResize(image, width: maxSide)
+        : img.copyResize(image, height: maxSide);
+  }
+  File(args[1]).writeAsBytesSync(img.encodeJpg(image, quality: 92));
+  final corners = _detectCorners(image);
+  return <Object>[image.width, image.height, corners];
+}
+
+List<double> _fallbackCorners(int w, int h) {
+  double rw = 0.8;
+  double rh = rw * w / _cardAspectRatio / h;
+  if (rh > 0.8) {
+    rh = 0.8;
+    rw = rh * h * _cardAspectRatio / w;
+  }
+  final l = (1 - rw) / 2;
+  final t = (1 - rh) / 2;
+  return <double>[l, t, l + rw, t, l + rw, t + rh, l, t + rh];
+}
+
+int _otsu(Uint8List data) {
+  final hist = List<int>.filled(256, 0);
+  for (final v in data) {
+    hist[v]++;
+  }
+  final total = data.length;
+  double sum = 0;
+  for (var i = 0; i < 256; i++) {
+    sum += i * hist[i];
+  }
+  double sumB = 0;
+  int wB = 0;
+  double maxVar = -1;
+  int threshold = 0;
+  for (var t = 0; t < 256; t++) {
+    wB += hist[t];
+    if (wB == 0) continue;
+    final wF = total - wB;
+    if (wF == 0) break;
+    sumB += t * hist[t];
+    final mB = sumB / wB;
+    final mF = (sum - sumB) / wF;
+    final between = wB.toDouble() * wF * (mB - mF) * (mB - mF);
+    if (between > maxVar) {
+      maxVar = between;
+      threshold = t;
+    }
+  }
+  return threshold;
+}
+
+Uint8List _morph(Uint8List src, int w, int h, {required bool dilate}) {
+  final out = Uint8List(w * h);
+  for (var y = 0; y < h; y++) {
+    for (var x = 0; x < w; x++) {
+      bool result = !dilate;
+      for (var dy = -1; dy <= 1; dy++) {
+        for (var dx = -1; dx <= 1; dx++) {
+          final nx = x + dx;
+          final ny = y + dy;
+          final v = (nx >= 0 && nx < w && ny >= 0 && ny < h)
+              ? src[ny * w + nx]
+              : 0;
+          if (dilate) {
+            if (v == 1) result = true;
+          } else {
+            if (v == 0) result = false;
+          }
+        }
+      }
+      out[y * w + x] = result ? 1 : 0;
+    }
+  }
+  return out;
+}
+
+int _median(List<int> values) {
+  values.sort();
+  return values[values.length ~/ 2];
+}
+
+/// Simple card detection: the colour of the image border is treated as the
+/// background, pixels that differ from it are the foreground, and the minimum
+/// area rectangle around the central foreground blob is the card. This is a
+/// heuristic; if it is not confident it returns a centered card-shaped frame.
+/// The user can always correct the corners by hand.
+List<double> _detectCorners(img.Image full) {
+  try {
+    final scale = 320 / math.max(full.width, full.height);
+    final w = math.max(8, (full.width * scale).round());
+    final h = math.max(8, (full.height * scale).round());
+    final small = img.copyResize(
+      full,
+      width: w,
+      height: h,
+      interpolation: img.Interpolation.average,
+    );
+
+    final rCh = Uint8List(w * h);
+    final gCh = Uint8List(w * h);
+    final bCh = Uint8List(w * h);
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++) {
+        final p = small.getPixel(x, y);
+        final i = y * w + x;
+        rCh[i] = p.r.toInt();
+        gCh[i] = p.g.toInt();
+        bCh[i] = p.b.toInt();
+      }
+    }
+
+    // Background colour = median colour of the outer ring.
+    final margin = math.max(2, (0.05 * math.min(w, h)).round());
+    final rs = <int>[], gs = <int>[], bs = <int>[];
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++) {
+        if (x < margin || y < margin || x >= w - margin || y >= h - margin) {
+          final i = y * w + x;
+          rs.add(rCh[i]);
+          gs.add(gCh[i]);
+          bs.add(bCh[i]);
+        }
+      }
+    }
+    final mr = _median(rs), mg = _median(gs), mb = _median(bs);
+
+    final dist = Uint8List(w * h);
+    for (var i = 0; i < w * h; i++) {
+      final dr = rCh[i] - mr;
+      final dg = gCh[i] - mg;
+      final db = bCh[i] - mb;
+      dist[i] = math.sqrt((dr * dr + dg * dg + db * db).toDouble()).clamp(0, 255).round();
+    }
+    final threshold = math.max(_otsu(dist), 20);
+    var mask = Uint8List(w * h);
+    for (var i = 0; i < w * h; i++) {
+      mask[i] = dist[i] > threshold ? 1 : 0;
+    }
+
+    // Open (remove noise), then close (fill small holes).
+    for (var k = 0; k < 2; k++) {
+      mask = _morph(mask, w, h, dilate: false);
+    }
+    for (var k = 0; k < 2; k++) {
+      mask = _morph(mask, w, h, dilate: true);
+    }
+    for (var k = 0; k < 2; k++) {
+      mask = _morph(mask, w, h, dilate: true);
+    }
+    for (var k = 0; k < 2; k++) {
+      mask = _morph(mask, w, h, dilate: false);
+    }
+
+    // Connected components (4-neighbourhood).
+    final labels = Int32List(w * h);
+    final areas = <int>[0];
+    var next = 0;
+    final stack = <int>[];
+    for (var i = 0; i < w * h; i++) {
+      if (mask[i] == 1 && labels[i] == 0) {
+        next++;
+        labels[i] = next;
+        stack.add(i);
+        var area = 0;
+        while (stack.isNotEmpty) {
+          final c = stack.removeLast();
+          area++;
+          final cx = c % w;
+          final cy = c ~/ w;
+          void visit(int nx, int ny) {
+            if (nx < 0 || ny < 0 || nx >= w || ny >= h) return;
+            final n = ny * w + nx;
+            if (mask[n] == 1 && labels[n] == 0) {
+              labels[n] = next;
+              stack.add(n);
+            }
+          }
+
+          visit(cx - 1, cy);
+          visit(cx + 1, cy);
+          visit(cx, cy - 1);
+          visit(cx, cy + 1);
+        }
+        areas.add(area);
+      }
+    }
+    if (next == 0) return _fallbackCorners(full.width, full.height);
+
+    var best = 1;
+    for (var l = 2; l <= next; l++) {
+      if (areas[l] > areas[best]) best = l;
+    }
+    final centerLabel = labels[(h ~/ 2) * w + (w ~/ 2)];
+    if (centerLabel != 0 && areas[centerLabel] >= 0.04 * w * h) {
+      best = centerLabel;
+    }
+    final fraction = areas[best] / (w * h);
+    if (fraction < 0.04 || fraction > 0.9) {
+      return _fallbackCorners(full.width, full.height);
+    }
+
+    // Boundary pixels of the chosen blob.
+    final xs = <double>[];
+    final ys = <double>[];
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++) {
+        if (labels[y * w + x] != best) continue;
+        bool boundary = false;
+        if (x == 0 || y == 0 || x == w - 1 || y == h - 1) {
+          boundary = true;
+        } else if (labels[y * w + x - 1] != best ||
+            labels[y * w + x + 1] != best ||
+            labels[(y - 1) * w + x] != best ||
+            labels[(y + 1) * w + x] != best) {
+          boundary = true;
+        }
+        if (boundary) {
+          xs.add(x + 0.5);
+          ys.add(y + 0.5);
+        }
+      }
+    }
+
+    // Minimum-area rotated rectangle.
+    double bestArea = double.infinity;
+    double bestC = 1, bestS = 0;
+    double bMinU = 0, bMaxU = 0, bMinV = 0, bMaxV = 0;
+    for (var deg = 0; deg < 90; deg++) {
+      final t = deg * math.pi / 180;
+      final c = math.cos(t);
+      final s = math.sin(t);
+      double minU = double.infinity, maxU = -double.infinity;
+      double minV = double.infinity, maxV = -double.infinity;
+      for (var i = 0; i < xs.length; i++) {
+        final u = xs[i] * c + ys[i] * s;
+        final v = -xs[i] * s + ys[i] * c;
+        if (u < minU) minU = u;
+        if (u > maxU) maxU = u;
+        if (v < minV) minV = v;
+        if (v > maxV) maxV = v;
+      }
+      final area = (maxU - minU) * (maxV - minV);
+      if (area < bestArea) {
+        bestArea = area;
+        bestC = c;
+        bestS = s;
+        bMinU = minU;
+        bMaxU = maxU;
+        bMinV = minV;
+        bMaxV = maxV;
+      }
+    }
+
+    final rw = bMaxU - bMinU;
+    final rh = bMaxV - bMinV;
+    final ratio = math.max(rw, rh) / math.max(1.0, math.min(rw, rh));
+    if (ratio < 1.2 || ratio > 2.2 || bestArea < 0.04 * w * h) {
+      return _fallbackCorners(full.width, full.height);
+    }
+
+    Offset back(double u, double v) =>
+        Offset(u * bestC - v * bestS, u * bestS + v * bestC);
+    final pts = <Offset>[
+      back(bMinU, bMinV),
+      back(bMaxU, bMinV),
+      back(bMaxU, bMaxV),
+      back(bMinU, bMaxV),
+    ];
+    pts.sort((a, b) => a.dy.compareTo(b.dy));
+    final top = pts.sublist(0, 2)..sort((a, b) => a.dx.compareTo(b.dx));
+    final bottom = pts.sublist(2, 4)..sort((a, b) => a.dx.compareTo(b.dx));
+    final ordered = <Offset>[top[0], top[1], bottom[1], bottom[0]];
+    return <double>[
+      for (final p in ordered) ...[
+        (p.dx / w).clamp(0.0, 1.0),
+        (p.dy / h).clamp(0.0, 1.0),
+      ],
+    ];
+  } catch (_) {
+    return _fallbackCorners(full.width, full.height);
+  }
+}
+
+/// Perspective-corrects the quadrilateral given by `args[2]` (8 pixel
+/// coordinates: top-left, top-right, bottom-right, bottom-left) of the image
+/// at `args[0]` into an `args[3]` x `args[4]` picture saved to `args[1]`.
+String _warpAndSave(List<Object> args) {
+  final src = img.decodeImage(File(args[0] as String).readAsBytesSync());
+  if (src == null) {
+    throw const FormatException('Unsupported image');
+  }
+  final c = (args[2] as List).cast<double>();
+  final outW = args[3] as int;
+  final outH = args[4] as int;
+
+  final x0 = c[0], y0 = c[1];
+  final x1 = c[2], y1 = c[3];
+  final x2 = c[4], y2 = c[5];
+  final x3 = c[6], y3 = c[7];
+
+  // Unit square -> quadrilateral projective mapping (Heckbert).
+  final dx1 = x1 - x2, dx2 = x3 - x2, dx3 = x0 - x1 + x2 - x3;
+  final dy1 = y1 - y2, dy2 = y3 - y2, dy3 = y0 - y1 + y2 - y3;
+  double a, b, cc, d, e, f, g, h;
+  if (dx3.abs() < 1e-9 && dy3.abs() < 1e-9) {
+    a = x1 - x0;
+    b = x2 - x1;
+    cc = x0;
+    d = y1 - y0;
+    e = y2 - y1;
+    f = y0;
+    g = 0;
+    h = 0;
+    // For a parallelogram, (u, v) -> x0 + u*(x1-x0) + v*(x3-x0).
+    b = x3 - x0;
+    e = y3 - y0;
+  } else {
+    final den = dx1 * dy2 - dx2 * dy1;
+    g = (dx3 * dy2 - dx2 * dy3) / den;
+    h = (dx1 * dy3 - dx3 * dy1) / den;
+    a = x1 - x0 + g * x1;
+    b = x3 - x0 + h * x3;
+    cc = x0;
+    d = y1 - y0 + g * y1;
+    e = y3 - y0 + h * y3;
+    f = y0;
+  }
+
+  final out = img.Image(width: outW, height: outH);
+  final maxX = src.width - 1;
+  final maxY = src.height - 1;
+
+  for (var y = 0; y < outH; y++) {
+    final v = (y + 0.5) / outH;
+    for (var x = 0; x < outW; x++) {
+      final u = (x + 0.5) / outW;
+      final den = g * u + h * v + 1;
+      final sx = ((a * u + b * v + cc) / den - 0.5).clamp(0.0, maxX.toDouble());
+      final sy = ((d * u + e * v + f) / den - 0.5).clamp(0.0, maxY.toDouble());
+      final ix = sx.floor();
+      final iy = sy.floor();
+      final fx = sx - ix;
+      final fy = sy - iy;
+      final jx = math.min(ix + 1, maxX);
+      final jy = math.min(iy + 1, maxY);
+
+      final p00 = src.getPixel(ix, iy);
+      final r00 = p00.r.toDouble(), g00 = p00.g.toDouble(), b00 = p00.b.toDouble();
+      final p10 = src.getPixel(jx, iy);
+      final r10 = p10.r.toDouble(), g10 = p10.g.toDouble(), b10 = p10.b.toDouble();
+      final p01 = src.getPixel(ix, jy);
+      final r01 = p01.r.toDouble(), g01 = p01.g.toDouble(), b01 = p01.b.toDouble();
+      final p11 = src.getPixel(jx, jy);
+      final r11 = p11.r.toDouble(), g11 = p11.g.toDouble(), b11 = p11.b.toDouble();
+
+      double mix(double v00, double v10, double v01, double v11) {
+        final top = v00 + (v10 - v00) * fx;
+        final bottom = v01 + (v11 - v01) * fx;
+        return top + (bottom - top) * fy;
+      }
+
+      out.setPixelRgb(
+        x,
+        y,
+        mix(r00, r10, r01, r11).round(),
+        mix(g00, g10, g01, g11).round(),
+        mix(b00, b10, b01, b11).round(),
+      );
+    }
+  }
+
+  File(args[1] as String).writeAsBytesSync(img.encodePng(out));
+  return args[1] as String;
+}
