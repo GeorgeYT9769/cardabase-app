@@ -52,7 +52,7 @@ class CameraControllerScreen extends StatefulWidget {
   final double cardAspectRatio;
 
   /// When set, the screen opens straight in the editor with this image
-  /// (e.g. picked from the gallery) and never starts the camera.
+  /// (already cropped by the caller) and never starts the camera.
   final XFile? initialImage;
 
   const CameraControllerScreen({
@@ -115,11 +115,12 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     if (widget.initialImage != null) {
-      // Gallery flow: go straight to the card cropper, the camera is never
-      // opened.
+      // Editor-only flow (image already cropped by the caller): the camera is
+      // never opened.
+      _capturedImageFile = widget.initialImage;
       _initializeControllerFuture = Future<void>.value();
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _openCropper(widget.initialImage!);
+        if (mounted) _applyPhotoFit(_PhotoFitMode.fill);
       });
     } else {
       _initializeCamera();
@@ -169,40 +170,50 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
 
   bool get _inEditingMode => _capturedImageFile != null || _canvasColor != null;
 
-  /// Lets the user mark the card corners (auto-detected first), then continues
-  /// to the editor with the cut-out, perspective-corrected card.
+  /// Lets the user mark the card corners (auto-detected first). "Done" uses
+  /// the cut-out card as the final picture, "Edit more" continues in
+  /// the editor.
   Future<void> _openCropper(XFile file) async {
     _cropperOpen = true;
-    final String? result = await Navigator.of(context).push<String>(
+    final CardCropResult? result = await Navigator.of(context).push<CardCropResult>(
       MaterialPageRoute(
         builder: (_) => CardCropScreen(imagePath: file.path),
       ),
     );
-    _cropperOpen = false;
     if (!mounted) return;
     if (result == null) {
-      // Cancelled: go back to the camera (or to the form for gallery images).
-      if (widget.initialImage != null) {
-        final route = ModalRoute.of(context);
-        if (route != null) {
-          // Remove immediately to avoid showing a second pop animation behind
-          // the cropper when the user dismisses it with a back gesture.
-          Navigator.of(context).removeRoute(route);
-        } else {
-          Navigator.of(context).pop();
-        }
-      } else {
-        _retakePicture();
-      }
+      // Cancelled: back to the live camera.
+      _cropperOpen = false;
+      _retakePicture();
       return;
     }
+    if (!result.edit) {
+      await _finishWithoutEditing(result.path);
+      return;
+    }
+    _cropperOpen = false;
     setState(() {
-      _capturedImageFile = XFile(result);
+      _capturedImageFile = XFile(result.path);
       _canvasColor = null;
       _selectedOverlayId = null;
       _fitMode = _PhotoFitMode.custom;
       _initPhotoPosition();
     });
+    await _applyPhotoFit(_PhotoFitMode.fill);
+  }
+
+  /// Uses the cropped card as the final picture without opening the editor.
+  Future<void> _finishWithoutEditing(String sourcePath) async {
+    try {
+      final String path = join(
+        (await getApplicationDocumentsDirectory()).path,
+        '${DateTime.now().millisecondsSinceEpoch}.png',
+      );
+      await File(sourcePath).copy(path);
+      if (mounted) Navigator.pop(context, path);
+    } catch (_) {
+      if (mounted) Navigator.pop(context, sourcePath);
+    }
   }
 
   void _haptic() {
@@ -788,9 +799,9 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
 
   @override
   Widget build(BuildContext context) {
-    if (widget.initialImage != null && _cropperOpen) {
-      // The cropper sits above this route in the initial-image flow. Render a
-      // neutral backdrop so predictive back does not reveal a closing camera UI.
+    if (_cropperOpen) {
+      // The cropper sits above this route. Render a neutral backdrop so no
+      // camera UI flashes while the cropper opens or closes.
       return const Scaffold(backgroundColor: Colors.black);
     }
 
