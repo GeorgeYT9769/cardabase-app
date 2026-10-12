@@ -559,6 +559,14 @@ class _CardCropScreenState extends State<CardCropScreen> {
                                       }
                                     : null,
                               ),
+                              IconButton(
+                                tooltip: 'Skip cropping',
+                                color: theme.colorScheme.secondary,
+                                icon: const Icon(Icons.skip_next),
+                                onPressed: ready && !_busy
+                                    ? () => Navigator.of(context).pop(CardCropResult(widget.imagePath, edit: true))
+                                    : null,
+                              ),
                         ],
                       ),
                       const SizedBox(height: 4),

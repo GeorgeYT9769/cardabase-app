@@ -1850,38 +1850,28 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                           MainAxisAlignment.spaceEvenly,
                           children: [
                             if (_selectedOverlayId == null) ...[
-                              Container(
-                                margin: const EdgeInsets.all(6),
-                                child: IconButton(
-                                  style: ButtonStyle(
-                                    iconSize:
-                                    const WidgetStatePropertyAll(26),
-                                    iconColor: WidgetStatePropertyAll(
-                                      theme.colorScheme.inverseSurface,
-                                    ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: OutlinedButton.icon(
+                                    onPressed: _retakePicture,
+                                    icon: const Icon(Icons.refresh),
+                                    label: const Text('Reset'),
                                   ),
-                                  icon: const Icon(
-                                    Icons.refresh,
-                                  ),
-                                  tooltip: 'Retake',
-                                  onPressed: _retakePicture,
                                 ),
                               ),
-                              Container(
-                                margin: const EdgeInsets.all(6),
-                                child: IconButton(
-                                  style: ButtonStyle(
-                                    iconSize:
-                                    const WidgetStatePropertyAll(26),
-                                    iconColor: WidgetStatePropertyAll(
-                                      Colors.green,
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: OutlinedButton.icon(
+                                    onPressed: _confirmAndSavePicture,
+                                    icon: Icon(Icons.check),
+                                    label: const Text('Confirm'),
+                                    style: theme.outlinedButtonTheme.style?.copyWith(
+                                      backgroundColor: WidgetStatePropertyAll(Colors.green.shade700),
+                                      foregroundColor: const WidgetStatePropertyAll(Colors.white),
                                     ),
                                   ),
-                                  icon: const Icon(
-                                    Icons.check,
-                                  ),
-                                  tooltip: 'Use Image',
-                                  onPressed: _confirmAndSavePicture,
                                 ),
                               ),
                             ] else ...[
@@ -1914,25 +1904,18 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                   ),
                                 ),
                               ],
-                              Container(
-                                margin: const EdgeInsets.all(6),
-                                child: IconButton(
-                                  style: ButtonStyle(
-                                    iconSize:
-                                    const WidgetStatePropertyAll(26),
-                                    iconColor: WidgetStatePropertyAll(
-                                      theme.colorScheme.primary,
-                                    ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: OutlinedButton.icon(
+                                    icon: const Icon(Icons.check_circle_outline),
+                                    label: const Text('Confirm additions'),
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedOverlayId = null;
+                                      });
+                                    },
                                   ),
-                                  icon: const Icon(
-                                    Icons.check_circle_outline,
-                                  ),
-                                  tooltip: 'Confirm Additions',
-                                  onPressed: () {
-                                    setState(() {
-                                      _selectedOverlayId = null;
-                                    });
-                                  },
                                 ),
                               ),
                             ],
