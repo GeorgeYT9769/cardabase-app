@@ -107,6 +107,10 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
   bool _rotationSnapped = false;
   bool _cropperOpen = false;
 
+  /// The photo that was handed to the cropper (camera flow). "Back" in the
+  /// editor returns to the cropper with this photo instead of leaving.
+  XFile? _cropSourceFile;
+
   static const double _maxScale = 6.0;
   static const double _snapThreshold = 0.06; // ~3.4 degrees
 
@@ -174,7 +178,9 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
   /// the cut-out card as the final picture, "Edit more" continues in
   /// the editor.
   Future<void> _openCropper(XFile file) async {
+    _cropSourceFile = file;
     _cropperOpen = true;
+    if (mounted) setState(() {});
     final CardCropResult? result = await Navigator.of(context).push<CardCropResult>(
       MaterialPageRoute(
         builder: (_) => CardCropScreen(imagePath: file.path),
@@ -312,15 +318,24 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     }
   }
 
-  void _resetPhotoRotation() {
+  /// Resets everything done in the editor (brightness, photo position, size
+  /// and rotation, texts and stickers). Leaving the editor is done with the
+  /// back button.
+  Future<void> _resetEditor() async {
     _haptic();
     setState(() {
+      _brightness = 0.0;
       _photoRotation = 0.0;
-      _rotationSnapped = true;
+      _photoScale = 1.0;
+      _photoPosition = Offset.zero;
+      _rotationSnapped = false;
+      _overlayItems.clear();
+      _selectedOverlayId = null;
+      _verticalGuideX = null;
+      _horizontalGuideY = null;
+      _fitMode = _PhotoFitMode.custom;
     });
-    if (_fitMode != _PhotoFitMode.custom) {
-      _applyPhotoFit(_fitMode);
-    }
+    await _applyPhotoFit(_PhotoFitMode.fill);
   }
 
   @override
@@ -780,6 +795,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
       return;
     }
     setState(() {
+      _cropSourceFile = null;
       _fitMode = _PhotoFitMode.custom;
       _rotationSnapped = false;
       _capturedImageFile = null;
@@ -795,6 +811,23 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     });
     // Camera was released after the previous capture; start it again.
     _initializeCamera();
+  }
+
+  /// In the camera flow the editor was reached through the cropper, so "back"
+  /// goes back to the cropper (same photo) instead of leaving everything.
+  bool get _backReturnsToCropper =>
+      widget.initialImage == null &&
+      _cropSourceFile != null &&
+      _capturedImageFile != null &&
+      _canvasColor == null &&
+      !_cropperOpen;
+
+  void _handleBack() {
+    if (_backReturnsToCropper) {
+      _openCropper(_cropSourceFile!);
+      return;
+    }
+    Navigator.of(context).pop();
   }
 
   @override
@@ -823,7 +856,12 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     final bool inEditingMode =
         _capturedImageFile != null || _canvasColor != null;
 
-    return ValueListenableBuilder(
+    return PopScope(
+      canPop: !_backReturnsToCropper,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) _handleBack();
+      },
+      child: ValueListenableBuilder(
       valueListenable: GetIt.I<SettingsBox>().listenable(),
       builder: (context, box, _) {
         final settings = box.value;
@@ -850,9 +888,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                 icon: const Icon(
                   Icons.arrow_back_ios_new,
                 ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+                onPressed: _handleBack,
               ),
             ),
           ),
@@ -1673,18 +1709,6 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                     _rotatePhotoBy(-math.pi / 2),
                               ),
                               IconButton(
-                                icon: const Icon(Icons.straighten),
-                                style: ButtonStyle(
-                                  iconSize:
-                                  const WidgetStatePropertyAll(26),
-                                  iconColor: WidgetStatePropertyAll(
-                                    theme.colorScheme.inverseSurface,
-                                  ),
-                                ),
-                                tooltip: 'Reset rotation to 0°',
-                                onPressed: _resetPhotoRotation,
-                              ),
-                              IconButton(
                                 icon: const Icon(Icons.rotate_right),
                                 style: ButtonStyle(
                                   iconSize:
@@ -1849,12 +1873,13 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                           mainAxisAlignment:
                           MainAxisAlignment.spaceEvenly,
                           children: [
-                            if (_selectedOverlayId == null) ...[
+                            if (_selectedOverlayId == null ||
+                                isPhotoSelected) ...[
                               Expanded(
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: OutlinedButton.icon(
-                                    onPressed: _retakePicture,
+                                    onPressed: _resetEditor,
                                     icon: const Icon(Icons.refresh),
                                     label: const Text('Reset'),
                                   ),
@@ -1960,6 +1985,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
           ],
         );
       },
+      ),
     );
   }
 }
