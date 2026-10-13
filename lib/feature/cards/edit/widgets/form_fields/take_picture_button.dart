@@ -6,11 +6,14 @@ import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/feature/cards/widgets/full_screen_card_face_page.dart';
 import 'package:cardabase/util/widgets/blur_app_bar_background.dart';
 import 'package:cardabase/util/camera_controller.dart';
+import 'package:cardabase/util/card_cropper.dart';
 import 'package:cardabase/util/dashed_rect.dart';
 import 'package:get_it/get_it.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' show join;
+import 'package:path_provider/path_provider.dart';
 
 
 class TakePictureButton extends StatefulWidget {
@@ -52,18 +55,20 @@ class _TakePictureButtonState extends State<TakePictureButton> {
       return;
     }
 
-    XFile? pickedImage;
     if (source == ImageSource.gallery) {
-      pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+      final XFile? pickedImage =
+          await ImagePicker().pickImage(source: ImageSource.gallery);
       if (!mounted || pickedImage == null) {
         return;
       }
+      await _cropAndUse(pickedImage);
+      return;
     }
 
     final String? picturePath = await Navigator.push<String>(
       context,
       MaterialPageRoute(
-        builder: (context) => CameraControllerScreen(initialImage: pickedImage),
+        builder: (context) => const CameraControllerScreen(),
       ),
     );
 
@@ -71,6 +76,52 @@ class _TakePictureButtonState extends State<TakePictureButton> {
       return;
     }
     widget.picturePath.value = picturePath;
+  }
+
+  /// Gallery flow: the cropper is opened directly from the form (no camera
+  /// screen in between). "Done" uses the cropped card as the final picture,
+  /// "Edit more" continues in the editor.
+  Future<void> _cropAndUse(XFile pickedImage) async {
+    final CardCropResult? result = await Navigator.push<CardCropResult>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CardCropScreen(imagePath: pickedImage.path),
+      ),
+    );
+    if (!mounted || result == null) {
+      return;
+    }
+
+    if (!result.edit) {
+      String path = result.path;
+      try {
+        final String target = join(
+          (await getApplicationDocumentsDirectory()).path,
+          '${DateTime.now().millisecondsSinceEpoch}.png',
+        );
+        await File(result.path).copy(target);
+        path = target;
+      } catch (_) {
+        // Fall back to the temporary file.
+      }
+      if (!mounted) {
+        return;
+      }
+      widget.picturePath.value = path;
+      return;
+    }
+
+    final String? editedPath = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            CameraControllerScreen(initialImage: XFile(result.path)),
+      ),
+    );
+    if (!mounted || editedPath == null) {
+      return;
+    }
+    widget.picturePath.value = editedPath;
   }
 
   @override

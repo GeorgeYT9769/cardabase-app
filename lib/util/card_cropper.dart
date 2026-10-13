@@ -21,6 +21,18 @@ import 'expressive_loading_indicator.dart';
 /// Aspect ratio of the output picture (ID-1 card: 85.60 mm x 53.98 mm).
 const double _cardAspectRatio = 1.586;
 
+/// Result of [CardCropScreen].
+class CardCropResult {
+  const CardCropResult(this.path, {this.edit = false});
+
+  /// Path of the image to use.
+  final String path;
+
+  /// `true` if the user wants to continue in the full editor (brightness,
+  /// text, stickers, manual positioning). `false` means the picture is final.
+  final bool edit;
+}
+
 /// Screen that lets the user mark the four corners of a card on a photo
 /// (taken with the camera or picked from the gallery). The corners are
 /// pre-filled by a simple automatic card detection. On "Done" the card is
@@ -28,8 +40,8 @@ const double _cardAspectRatio = 1.586;
 /// card-shaped picture.
 ///
 /// Pops with:
-/// - the path of the resulting image (cropped, or the whole photo if the user
-///   chose "Skip"),
+/// - a [CardCropResult] with `edit: false` after "Done" (final picture),
+/// - a [CardCropResult] with `edit: true` after "Edit more" (cropped picture),
 /// - `null` if the user went back without choosing anything.
 class CardCropScreen extends StatefulWidget {
   const CardCropScreen({super.key, required this.imagePath});
@@ -53,6 +65,11 @@ class _CardCropScreenState extends State<CardCropScreen> {
   int? _dragIndex;
   bool _isDraggingWholeQuad = false;
   bool _busy = false;
+
+  /// When true, dragging a corner also moves the two neighbouring corners so
+  /// the whole side follows (rectangle-style resize). When false every corner
+  /// moves on its own (free perspective).
+  bool _linkSides = true;
 
   @override
   void initState() {
@@ -92,7 +109,7 @@ class _CardCropScreenState extends State<CardCropScreen> {
     } catch (e, stack) {
       debugPrint('CardCropScreen _load failed completely: $e\n$stack');
       // Could not process the image: fall back to the original photo.
-      if (mounted) Navigator.of(context).pop(widget.imagePath);
+      if (mounted) Navigator.of(context).pop(CardCropResult(widget.imagePath, edit: true));
     }
   }
 
@@ -117,7 +134,7 @@ class _CardCropScreenState extends State<CardCropScreen> {
     return <Object>[w, h, corners];
   }
 
-  Future<void> _done() async {
+  Future<void> _done({bool edit = false}) async {
     if (_busy || _preparedPath == null) return;
     setState(() => _busy = true);
     try {
@@ -130,8 +147,10 @@ class _CardCropScreenState extends State<CardCropScreen> {
       double dist(Offset a, Offset b) => (a - b).distance;
       final w = (dist(pts[0], pts[1]) + dist(pts[3], pts[2])) / 2;
 
-      final ordered = List<Offset>.generate(4, (i) => pts[i % 4]);
-      final outW = w.round().clamp(800, 1400);
+      final hh = (dist(pts[0], pts[3]) + dist(pts[1], pts[2])) / 2;
+      final shift = hh > w ? 1 : 0; // portrait card -> make the result landscape
+      final ordered = List<Offset>.generate(4, (i) => pts[(i + shift) % 4]);
+      final outW = (shift == 1 ? hh : w).round().clamp(800, 1400);
       final outH = (outW / _cardAspectRatio).round();
 
       final flat = <double>[
@@ -143,7 +162,7 @@ class _CardCropScreenState extends State<CardCropScreen> {
       final String path = await Isolate.run(
         () => _warpAndSave(<Object>[srcPath, outPath, flat, outW, outH, _turns]),
       );
-      if (mounted) Navigator.of(context).pop(path);
+      if (mounted) Navigator.of(context).pop(CardCropResult(path, edit: edit));
     } catch (e, stack) {
       debugPrint('CardCropScreen _done error: $e\n$stack');
       try {
@@ -155,8 +174,10 @@ class _CardCropScreenState extends State<CardCropScreen> {
 
         double dist(Offset a, Offset b) => (a - b).distance;
         final w = (dist(pts[0], pts[1]) + dist(pts[3], pts[2])) / 2;
-        final ordered = List<Offset>.generate(4, (i) => pts[i % 4]);
-        final outW = w.round().clamp(800, 1400);
+        final hh = (dist(pts[0], pts[3]) + dist(pts[1], pts[2])) / 2;
+      final shift = hh > w ? 1 : 0; // portrait card -> make the result landscape
+      final ordered = List<Offset>.generate(4, (i) => pts[(i + shift) % 4]);
+        final outW = (shift == 1 ? hh : w).round().clamp(800, 1400);
         final outH = (outW / _cardAspectRatio).round();
 
         final flat = <double>[
@@ -166,7 +187,7 @@ class _CardCropScreenState extends State<CardCropScreen> {
         final tmp = (await getTemporaryDirectory()).path;
         final outPath = join(tmp, 'crop_out_${DateTime.now().microsecondsSinceEpoch}.png');
         final String path = _warpAndSave(<Object>[srcPath, outPath, flat, outW, outH, _turns]);
-        if (mounted) Navigator.of(context).pop(path);
+        if (mounted) Navigator.of(context).pop(CardCropResult(path, edit: edit));
       } catch (e2, stack2) {
         debugPrint('CardCropScreen _done sync fallback error: $e2\n$stack2');
         if (mounted) {
@@ -177,6 +198,38 @@ class _CardCropScreenState extends State<CardCropScreen> {
         }
       }
     }
+  }
+
+  /// Moves corner [i] to [target] (normalized) and makes the sides that touch
+  /// it follow: the next corner moves only along the direction of the other
+  /// side and vice versa. For a rectangle this is the usual crop-box resize
+  /// (the opposite corner stays fixed); it also works for rotated frames.
+  List<Offset> _moveCornerLinked(int i, Offset target, Size size) {
+    Offset toPx(Offset n) => Offset(n.dx * size.width, n.dy * size.height);
+    Offset toNorm(Offset p) => Offset(
+          (p.dx / size.width).clamp(0.0, 1.0),
+          (p.dy / size.height).clamp(0.0, 1.0),
+        );
+    Offset unit(Offset v) {
+      final l = v.distance;
+      return l < 1e-6 ? Offset.zero : v / l;
+    }
+
+    final pts = _corners.map(toPx).toList();
+    final next = (i + 1) % 4;
+    final prev = (i + 3) % 4;
+    final p = pts[i];
+    final d = toPx(target) - p;
+    final u = unit(pts[next] - p); // direction of the side towards next
+    final v = unit(pts[prev] - p); // direction of the side towards prev
+    final moveNext = v * (d.dx * v.dx + d.dy * v.dy);
+    final movePrev = u * (d.dx * u.dx + d.dy * u.dy);
+
+    final result = List<Offset>.of(_corners);
+    result[i] = toNorm(p + d);
+    result[next] = toNorm(pts[next] + moveNext);
+    result[prev] = toNorm(pts[prev] + movePrev);
+    return result;
   }
 
   void _rotate90() {
@@ -300,7 +353,9 @@ class _CardCropScreenState extends State<CardCropScreen> {
                                   final nx = ((s.dx - rect.left) / rect.width).clamp(0.0, 1.0);
                                   final ny = ((s.dy - rect.top) / rect.height).clamp(0.0, 1.0);
                                   setState(() {
-                                    _corners = List<Offset>.of(_corners)..[i] = Offset(nx, ny);
+                                    _corners = _linkSides
+                                        ? _moveCornerLinked(i, Offset(nx, ny), rect.size)
+                                        : (List<Offset>.of(_corners)..[i] = Offset(nx, ny));
                                   });
                                 } else if (_isDraggingWholeQuad) {
                                   final dxNorm = d.delta.dx / rect.width;
@@ -452,7 +507,11 @@ class _CardCropScreenState extends State<CardCropScreen> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
                   child: Text(
-                    'Drag inside to move the frame, or drag corners to adjust.',
+                    _linkSides
+                        ? 'Drag a corner to resize the frame (its sides follow), '
+                            'or drag inside to move it.'
+                        : 'Drag each corner separately, '
+                            'or drag inside to move the frame.',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.inverseSurface.withValues(alpha: .75),
@@ -469,41 +528,78 @@ class _CardCropScreenState extends State<CardCropScreen> {
                       ),
                     ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      IconButton(
-                        tooltip: 'Detect card again',
-                        color: theme.colorScheme.secondary,
-                        icon: const Icon(Icons.auto_fix_high),
-                        onPressed: ready && !_busy ? _resetToDetected : null,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                              IconButton(
+                                tooltip: 'Detect card again',
+                                color: theme.colorScheme.secondary,
+                                icon: const Icon(Icons.auto_fix_high),
+                                onPressed: ready && !_busy ? _resetToDetected : null,
+                              ),
+                              IconButton(
+                                tooltip: 'Rotate image 90°',
+                                color: theme.colorScheme.secondary,
+                                icon: const Icon(Icons.rotate_right),
+                                onPressed: ready && !_busy ? _rotate90 : null,
+                              ),
+                              IconButton(
+                                tooltip: _linkSides
+                                    ? 'Sides follow corners (tap to move corners separately)'
+                                    : 'Corners move separately (tap to move sides together)',
+                                color: theme.colorScheme.secondary,
+                                icon: Icon(_linkSides ? Icons.link : Icons.link_off),
+                                onPressed: ready && !_busy
+                                    ? () {
+                                        HapticFeedback.selectionClick();
+                                        setState(() => _linkSides = !_linkSides);
+                                      }
+                                    : null,
+                              ),
+                              IconButton(
+                                tooltip: 'Skip cropping',
+                                color: theme.colorScheme.secondary,
+                                icon: const Icon(Icons.skip_next),
+                                onPressed: ready && !_busy
+                                    ? () => Navigator.of(context).pop(CardCropResult(widget.imagePath, edit: true))
+                                    : null,
+                              ),
+                        ],
                       ),
-                      IconButton(
-                        tooltip: 'Rotate image 90°',
-                        color: theme.colorScheme.secondary,
-                        icon: const Icon(Icons.rotate_right),
-                        onPressed: ready && !_busy ? _rotate90 : null,
-                      ),
-                      OutlinedButton(
-                        onPressed: ready && !_busy
-                            ? () => Navigator.of(context).pop(_preparedPath)
-                            : null,
-                        child: const Text('Skip'),
-                      ),
-                      OutlinedButton.icon(
-                        onPressed: ready && !_busy ? _done : null,
-                        icon: _busy
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              )
-                            : const Icon(Icons.check),
-                        label: const Text('Done'),
-                        style: theme.outlinedButtonTheme.style?.copyWith(
-                          backgroundColor: WidgetStatePropertyAll(Colors.green.shade700),
-                          foregroundColor: WidgetStatePropertyAll(Colors.white),
-                        )  ,
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: ready && !_busy
+                                  ? () => _done(edit: true)
+                                  : null,
+                              icon: const Icon(Icons.tune),
+                              label: const Text('Edit more'),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: ready && !_busy ? _done : null,
+                              icon: _busy
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                    )
+                                  : const Icon(Icons.check),
+                              label: const Text('Done'),
+                              style: theme.outlinedButtonTheme.style?.copyWith(
+                                backgroundColor: WidgetStatePropertyAll(Colors.green.shade700),
+                                foregroundColor: const WidgetStatePropertyAll(Colors.white),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -661,11 +757,17 @@ int _median(List<int> values) {
   return values[values.length ~/ 2];
 }
 
-/// Simple card detection: the colour of the image border is treated as the
-/// background, pixels that differ from it are the foreground, and the minimum
-/// area rectangle around the central foreground blob is the card. This is a
-/// heuristic; if it is not confident it returns a centered card-shaped frame.
-/// The user can always correct the corners by hand.
+/// Card detection (heuristic).
+///
+/// Two segmentations of the photo into "card" and "background" are tried:
+/// 1. a colour model: colours seen in the centre of the photo (the card) versus
+///    colours seen along its border (the table); a pixel is "card" if its
+///    colour is clearly more typical for the centre than for the border,
+/// 2. distance from the median border colour (Otsu threshold).
+/// For the first one that gives a plausible blob (size, aspect ratio) the
+/// minimum-area rotated rectangle around the blob is used as the card. If
+/// neither is confident a centered card-shaped frame is returned. The user can
+/// always correct the corners by hand.
 List<double> _detectCorners(img.Image full) {
   try {
     final scale = 320 / math.max(full.width, full.height);
@@ -691,176 +793,244 @@ List<double> _detectCorners(img.Image full) {
       }
     }
 
-    // Background colour = median colour of the outer ring.
-    final margin = math.max(2, (0.05 * math.min(w, h)).round());
-    final rs = <int>[], gs = <int>[], bs = <int>[];
-    for (var y = 0; y < h; y++) {
-      for (var x = 0; x < w; x++) {
-        if (x < margin || y < margin || x >= w - margin || y >= h - margin) {
-          final i = y * w + x;
-          rs.add(rCh[i]);
-          gs.add(gCh[i]);
-          bs.add(bCh[i]);
-        }
-      }
-    }
-    final mr = _median(rs), mg = _median(gs), mb = _median(bs);
+    final byColourModel =
+        _cornersFromMask(_colourModelMask(rCh, gCh, bCh, w, h), w, h);
+    if (byColourModel != null) return byColourModel;
 
-    final dist = Uint8List(w * h);
-    for (var i = 0; i < w * h; i++) {
-      final dr = rCh[i] - mr;
-      final dg = gCh[i] - mg;
-      final db = bCh[i] - mb;
-      dist[i] = math.sqrt((dr * dr + dg * dg + db * db).toDouble()).clamp(0, 255).round();
-    }
-    final threshold = math.max(_otsu(dist), 20);
-    var mask = Uint8List(w * h);
-    for (var i = 0; i < w * h; i++) {
-      mask[i] = dist[i] > threshold ? 1 : 0;
-    }
+    final byDistance =
+        _cornersFromMask(_borderDistanceMask(rCh, gCh, bCh, w, h), w, h);
+    if (byDistance != null) return byDistance;
 
-    // Open (remove noise), then close (fill small holes).
-    for (var k = 0; k < 2; k++) {
-      mask = _morph(mask, w, h, dilate: false);
-    }
-    for (var k = 0; k < 2; k++) {
-      mask = _morph(mask, w, h, dilate: true);
-    }
-    for (var k = 0; k < 2; k++) {
-      mask = _morph(mask, w, h, dilate: true);
-    }
-    for (var k = 0; k < 2; k++) {
-      mask = _morph(mask, w, h, dilate: false);
-    }
-
-    // Connected components (4-neighbourhood).
-    final labels = Int32List(w * h);
-    final areas = <int>[0];
-    var next = 0;
-    final stack = <int>[];
-    for (var i = 0; i < w * h; i++) {
-      if (mask[i] == 1 && labels[i] == 0) {
-        next++;
-        labels[i] = next;
-        stack.add(i);
-        var area = 0;
-        while (stack.isNotEmpty) {
-          final c = stack.removeLast();
-          area++;
-          final cx = c % w;
-          final cy = c ~/ w;
-          void visit(int nx, int ny) {
-            if (nx < 0 || ny < 0 || nx >= w || ny >= h) return;
-            final n = ny * w + nx;
-            if (mask[n] == 1 && labels[n] == 0) {
-              labels[n] = next;
-              stack.add(n);
-            }
-          }
-
-          visit(cx - 1, cy);
-          visit(cx + 1, cy);
-          visit(cx, cy - 1);
-          visit(cx, cy + 1);
-        }
-        areas.add(area);
-      }
-    }
-    if (next == 0) return _fallbackCorners(full.width, full.height);
-
-    var best = 1;
-    for (var l = 2; l <= next; l++) {
-      if (areas[l] > areas[best]) best = l;
-    }
-    final centerLabel = labels[(h ~/ 2) * w + (w ~/ 2)];
-    if (centerLabel != 0 && areas[centerLabel] >= 0.04 * w * h) {
-      best = centerLabel;
-    }
-    final fraction = areas[best] / (w * h);
-    if (fraction < 0.04 || fraction > 0.9) {
-      return _fallbackCorners(full.width, full.height);
-    }
-
-    // Boundary pixels of the chosen blob.
-    final xs = <double>[];
-    final ys = <double>[];
-    for (var y = 0; y < h; y++) {
-      for (var x = 0; x < w; x++) {
-        if (labels[y * w + x] != best) continue;
-        bool boundary = false;
-        if (x == 0 || y == 0 || x == w - 1 || y == h - 1) {
-          boundary = true;
-        } else if (labels[y * w + x - 1] != best ||
-            labels[y * w + x + 1] != best ||
-            labels[(y - 1) * w + x] != best ||
-            labels[(y + 1) * w + x] != best) {
-          boundary = true;
-        }
-        if (boundary) {
-          xs.add(x + 0.5);
-          ys.add(y + 0.5);
-        }
-      }
-    }
-
-    // Minimum-area rotated rectangle.
-    double bestArea = double.infinity;
-    double bestC = 1, bestS = 0;
-    double bMinU = 0, bMaxU = 0, bMinV = 0, bMaxV = 0;
-    for (var deg = 0; deg < 90; deg++) {
-      final t = deg * math.pi / 180;
-      final c = math.cos(t);
-      final s = math.sin(t);
-      double minU = double.infinity, maxU = -double.infinity;
-      double minV = double.infinity, maxV = -double.infinity;
-      for (var i = 0; i < xs.length; i++) {
-        final u = xs[i] * c + ys[i] * s;
-        final v = -xs[i] * s + ys[i] * c;
-        if (u < minU) minU = u;
-        if (u > maxU) maxU = u;
-        if (v < minV) minV = v;
-        if (v > maxV) maxV = v;
-      }
-      final area = (maxU - minU) * (maxV - minV);
-      if (area < bestArea) {
-        bestArea = area;
-        bestC = c;
-        bestS = s;
-        bMinU = minU;
-        bMaxU = maxU;
-        bMinV = minV;
-        bMaxV = maxV;
-      }
-    }
-
-    final rw = bMaxU - bMinU;
-    final rh = bMaxV - bMinV;
-    final ratio = math.max(rw, rh) / math.max(1.0, math.min(rw, rh));
-    if (ratio < 1.2 || ratio > 2.2 || bestArea < 0.04 * w * h) {
-      return _fallbackCorners(full.width, full.height);
-    }
-
-    Offset back(double u, double v) =>
-        Offset(u * bestC - v * bestS, u * bestS + v * bestC);
-    final pts = <Offset>[
-      back(bMinU, bMinV),
-      back(bMaxU, bMinV),
-      back(bMaxU, bMaxV),
-      back(bMinU, bMaxV),
-    ];
-    pts.sort((a, b) => a.dy.compareTo(b.dy));
-    final top = pts.sublist(0, 2)..sort((a, b) => a.dx.compareTo(b.dx));
-    final bottom = pts.sublist(2, 4)..sort((a, b) => a.dx.compareTo(b.dx));
-    final ordered = <Offset>[top[0], top[1], bottom[1], bottom[0]];
-    return <double>[
-      for (final p in ordered) ...[
-        (p.dx / w).clamp(0.0, 1.0),
-        (p.dy / h).clamp(0.0, 1.0),
-      ],
-    ];
+    return _fallbackCorners(full.width, full.height);
   } catch (_) {
     return _fallbackCorners(full.width, full.height);
   }
+}
+
+/// "Card" = colours that are more typical for the centre of the photo than for
+/// its border (8 levels per channel, smoothed histograms).
+Uint8List _colourModelMask(
+  Uint8List rCh,
+  Uint8List gCh,
+  Uint8List bCh,
+  int w,
+  int h,
+) {
+  const bins = 512;
+  final fg = List<double>.filled(bins, 0);
+  final bg = List<double>.filled(bins, 0);
+  var nf = 0;
+  var nb = 0;
+  final margin = math.max(2, (0.05 * math.min(w, h)).round());
+  final x0 = (w * 0.3).round(), x1 = (w * 0.7).round();
+  final y0 = (h * 0.3).round(), y1 = (h * 0.7).round();
+  int binOf(int i) =>
+      ((rCh[i] >> 5) << 6) | ((gCh[i] >> 5) << 3) | (bCh[i] >> 5);
+
+  for (var y = 0; y < h; y++) {
+    for (var x = 0; x < w; x++) {
+      final i = y * w + x;
+      if (x < margin || y < margin || x >= w - margin || y >= h - margin) {
+        bg[binOf(i)]++;
+        nb++;
+      } else if (x >= x0 && x < x1 && y >= y0 && y < y1) {
+        fg[binOf(i)]++;
+        nf++;
+      }
+    }
+  }
+
+  final mask = Uint8List(w * h);
+  if (nf == 0 || nb == 0) return mask;
+  for (var i = 0; i < w * h; i++) {
+    final k = binOf(i);
+    final pf = (fg[k] + 0.5) / (nf + bins * 0.5);
+    final pb = (bg[k] + 0.5) / (nb + bins * 0.5);
+    mask[i] = pf > 1.5 * pb ? 1 : 0;
+  }
+  return mask;
+}
+
+/// "Card" = pixels far from the median colour of the photo border.
+Uint8List _borderDistanceMask(
+  Uint8List rCh,
+  Uint8List gCh,
+  Uint8List bCh,
+  int w,
+  int h,
+) {
+  final margin = math.max(2, (0.05 * math.min(w, h)).round());
+  final rs = <int>[], gs = <int>[], bs = <int>[];
+  for (var y = 0; y < h; y++) {
+    for (var x = 0; x < w; x++) {
+      if (x < margin || y < margin || x >= w - margin || y >= h - margin) {
+        final i = y * w + x;
+        rs.add(rCh[i]);
+        gs.add(gCh[i]);
+        bs.add(bCh[i]);
+      }
+    }
+  }
+  final mr = _median(rs), mg = _median(gs), mb = _median(bs);
+
+  final dist = Uint8List(w * h);
+  for (var i = 0; i < w * h; i++) {
+    final dr = rCh[i] - mr;
+    final dg = gCh[i] - mg;
+    final db = bCh[i] - mb;
+    dist[i] = math
+        .sqrt((dr * dr + dg * dg + db * db).toDouble())
+        .clamp(0, 255)
+        .round();
+  }
+  final threshold = math.max(_otsu(dist), 20);
+  final mask = Uint8List(w * h);
+  for (var i = 0; i < w * h; i++) {
+    mask[i] = dist[i] > threshold ? 1 : 0;
+  }
+  return mask;
+}
+
+/// Finds the card blob in [raw] and returns its minimum-area rotated rectangle
+/// as 8 normalized values (top-left, top-right, bottom-right, bottom-left), or
+/// `null` if no plausible card-shaped blob is found.
+List<double>? _cornersFromMask(Uint8List raw, int w, int h) {
+  var mask = raw;
+  // Open (remove noise), then close (fill small holes).
+  for (var k = 0; k < 2; k++) {
+    mask = _morph(mask, w, h, dilate: false);
+  }
+  for (var k = 0; k < 2; k++) {
+    mask = _morph(mask, w, h, dilate: true);
+  }
+  for (var k = 0; k < 2; k++) {
+    mask = _morph(mask, w, h, dilate: true);
+  }
+  for (var k = 0; k < 2; k++) {
+    mask = _morph(mask, w, h, dilate: false);
+  }
+
+  // Connected components (4-neighbourhood).
+  final labels = Int32List(w * h);
+  final areas = <int>[0];
+  var next = 0;
+  final stack = <int>[];
+  for (var i = 0; i < w * h; i++) {
+    if (mask[i] == 1 && labels[i] == 0) {
+      next++;
+      labels[i] = next;
+      stack.add(i);
+      var area = 0;
+      while (stack.isNotEmpty) {
+        final c = stack.removeLast();
+        area++;
+        final cx = c % w;
+        final cy = c ~/ w;
+        void visit(int nx, int ny) {
+          if (nx < 0 || ny < 0 || nx >= w || ny >= h) return;
+          final n = ny * w + nx;
+          if (mask[n] == 1 && labels[n] == 0) {
+            labels[n] = next;
+            stack.add(n);
+          }
+        }
+
+        visit(cx - 1, cy);
+        visit(cx + 1, cy);
+        visit(cx, cy - 1);
+        visit(cx, cy + 1);
+      }
+      areas.add(area);
+    }
+  }
+  if (next == 0) return null;
+
+  var best = 1;
+  for (var l = 2; l <= next; l++) {
+    if (areas[l] > areas[best]) best = l;
+  }
+  final centerLabel = labels[(h ~/ 2) * w + (w ~/ 2)];
+  if (centerLabel != 0 && areas[centerLabel] >= 0.04 * w * h) {
+    best = centerLabel;
+  }
+  final fraction = areas[best] / (w * h);
+  if (fraction < 0.04 || fraction > 0.9) return null;
+
+  // Boundary pixels of the chosen blob.
+  final xs = <double>[];
+  final ys = <double>[];
+  for (var y = 0; y < h; y++) {
+    for (var x = 0; x < w; x++) {
+      if (labels[y * w + x] != best) continue;
+      bool boundary = false;
+      if (x == 0 || y == 0 || x == w - 1 || y == h - 1) {
+        boundary = true;
+      } else if (labels[y * w + x - 1] != best ||
+          labels[y * w + x + 1] != best ||
+          labels[(y - 1) * w + x] != best ||
+          labels[(y + 1) * w + x] != best) {
+        boundary = true;
+      }
+      if (boundary) {
+        xs.add(x + 0.5);
+        ys.add(y + 0.5);
+      }
+    }
+  }
+
+  // Minimum-area rotated rectangle.
+  double bestArea = double.infinity;
+  double bestC = 1, bestS = 0;
+  double bMinU = 0, bMaxU = 0, bMinV = 0, bMaxV = 0;
+  for (var deg = 0; deg < 90; deg++) {
+    final t = deg * math.pi / 180;
+    final c = math.cos(t);
+    final s = math.sin(t);
+    double minU = double.infinity, maxU = -double.infinity;
+    double minV = double.infinity, maxV = -double.infinity;
+    for (var i = 0; i < xs.length; i++) {
+      final u = xs[i] * c + ys[i] * s;
+      final v = -xs[i] * s + ys[i] * c;
+      if (u < minU) minU = u;
+      if (u > maxU) maxU = u;
+      if (v < minV) minV = v;
+      if (v > maxV) maxV = v;
+    }
+    final area = (maxU - minU) * (maxV - minV);
+    if (area < bestArea) {
+      bestArea = area;
+      bestC = c;
+      bestS = s;
+      bMinU = minU;
+      bMaxU = maxU;
+      bMinV = minV;
+      bMaxV = maxV;
+    }
+  }
+
+  final rw = bMaxU - bMinU;
+  final rh = bMaxV - bMinV;
+  final ratio = math.max(rw, rh) / math.max(1.0, math.min(rw, rh));
+  if (ratio < 1.2 || ratio > 2.2 || bestArea < 0.04 * w * h) return null;
+
+  Offset back(double u, double v) =>
+      Offset(u * bestC - v * bestS, u * bestS + v * bestC);
+  final pts = <Offset>[
+    back(bMinU, bMinV),
+    back(bMaxU, bMinV),
+    back(bMaxU, bMaxV),
+    back(bMinU, bMaxV),
+  ];
+  pts.sort((a, b) => a.dy.compareTo(b.dy));
+  final top = pts.sublist(0, 2)..sort((a, b) => a.dx.compareTo(b.dx));
+  final bottom = pts.sublist(2, 4)..sort((a, b) => a.dx.compareTo(b.dx));
+  final ordered = <Offset>[top[0], top[1], bottom[1], bottom[0]];
+  return <double>[
+    for (final p in ordered) ...[
+      (p.dx / w).clamp(0.0, 1.0),
+      (p.dy / h).clamp(0.0, 1.0),
+    ],
+  ];
 }
 
 /// Perspective-corrects the quadrilateral given by `args[2]` (8 pixel
