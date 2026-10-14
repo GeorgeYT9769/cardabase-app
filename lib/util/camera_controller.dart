@@ -21,8 +21,10 @@ import '../feature/settings/model.dart';
 import 'card_cropper.dart';
 import 'expressive_loading_indicator.dart';
 import 'widgets/blur_wrapper.dart';
+import 'widgets/labeled_icon_button.dart';
 
 enum _PhotoFitMode { custom, fit, fill }
+enum _ActiveControlMode { none, brightness, size, rotation }
 
 class _OverlayItem {
   final String id;
@@ -80,6 +82,8 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
   Offset _photoPosition = Offset.zero;
   double _photoScale = 1.0;
   double _photoRotation = 0.0;
+  _ActiveControlMode _activeControlMode = _ActiveControlMode.none;
+  String? _statusMessage;
 
   final List<_OverlayItem> _overlayItems = [];
   String? _selectedOverlayId;
@@ -334,6 +338,8 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
       _verticalGuideX = null;
       _horizontalGuideY = null;
       _fitMode = _PhotoFitMode.custom;
+      _activeControlMode = _ActiveControlMode.none;
+      _statusMessage = null;
     });
     await _applyPhotoFit(_PhotoFitMode.fill);
   }
@@ -514,6 +520,8 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
       setState(() {
         _overlayItems.add(newItem);
         _selectedOverlayId = newItem.id;
+        _activeControlMode = _ActiveControlMode.size;
+        _statusMessage = 'Image overlay added';
       });
     }
   }
@@ -618,6 +626,8 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
       setState(() {
         _overlayItems.add(newItem);
         _selectedOverlayId = newItem.id;
+        _activeControlMode = _ActiveControlMode.size;
+        _statusMessage = 'Text overlay added';
       });
     }
   }
@@ -1624,23 +1634,15 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (_canvasColor == null) ...[
-                          //Text(
-                          //  'Brightness: ${_brightness.toStringAsFixed(1)}',
-                          //  style: theme.textTheme.bodyLarge?.copyWith(
-                          //    fontSize: 17,
-                          //    fontWeight: FontWeight.w900,
-                          //    color: theme.colorScheme.inverseSurface,
-                          //  ),
-                          //),
+                        if (_activeControlMode == _ActiveControlMode.brightness && _canvasColor == null) ...[
                           Padding(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 24.0,
-                              vertical: 4.0,
+                              horizontal: 20.0,
+                              vertical: 2.0,
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.brightness_6_rounded),
+                                const Icon(Icons.brightness_6_rounded, size: 22),
                                 Expanded(
                                   child: Slider(
                                     year2023: false,
@@ -1654,14 +1656,6 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                     },
                                   ),
                                 ),
-                                //IconButton(
-                                //    onPressed: () {
-                                //      setState(() {
-                                //        _brightness = 0.0;
-                                //      });
-                                //    },
-                                //    icon: Icon(Icons.refresh, color: Colors.white,),
-                                //),
                                 TextButton(
                                   style: TextButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(
@@ -1680,7 +1674,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                   child: Text(
                                     _brightness.toStringAsFixed(1),
                                     style: theme.textTheme.bodyLarge?.copyWith(
-                                      fontSize: 17,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.w900,
                                       color: theme.colorScheme.inverseSurface,
                                     ),
@@ -1689,75 +1683,15 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                               ],
                             ),
                           ),
-                        ],
-                        if (isPhotoTarget && _canvasColor == null) ...[
-                          Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.spaceEvenly,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.rotate_left),
-                                style: ButtonStyle(
-                                  iconSize:
-                                  const WidgetStatePropertyAll(26),
-                                  iconColor: WidgetStatePropertyAll(
-                                    theme.colorScheme.inverseSurface,
-                                  ),
-                                ),
-                                tooltip: 'Rotate 90° left',
-                                onPressed: () =>
-                                    _rotatePhotoBy(-math.pi / 2),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.rotate_right),
-                                style: ButtonStyle(
-                                  iconSize:
-                                  const WidgetStatePropertyAll(26),
-                                  iconColor: WidgetStatePropertyAll(
-                                    theme.colorScheme.inverseSurface,
-                                  ),
-                                ),
-                                tooltip: 'Rotate 90° right',
-                                onPressed: () =>
-                                    _rotatePhotoBy(math.pi / 2),
-                              ),
-                              IconButton(
-                                icon: Icon(
-                                  _fitMode == _PhotoFitMode.fill
-                                      ? Icons.fit_screen
-                                      : Icons.crop_free,
-                                ),
-                                style: ButtonStyle(
-                                  iconSize:
-                                  const WidgetStatePropertyAll(26),
-                                  iconColor: WidgetStatePropertyAll(
-                                    theme.colorScheme.inverseSurface,
-                                  ),
-                                ),
-                                tooltip: _fitMode == _PhotoFitMode.fill
-                                    ? 'Fit whole photo in frame'
-                                    : 'Fill the frame',
-                                onPressed: () => _applyPhotoFit(
-                                  _fitMode == _PhotoFitMode.fill
-                                      ? _PhotoFitMode.fit
-                                      : _PhotoFitMode.fill,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                        if (isPhotoSelected ||
-                            selectedItem.id.isNotEmpty) ...[
+                        ] else if (_activeControlMode == _ActiveControlMode.size) ...[
                           Padding(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0,
+                              horizontal: 20.0,
+                              vertical: 2.0,
                             ),
                             child: Row(
                               children: [
-                                const Icon(
-                                  Icons.aspect_ratio,
-                                  size: 20,
-                                ),
+                                const Icon(Icons.aspect_ratio, size: 22),
                                 Expanded(
                                   child: Slider(
                                     year2023: false,
@@ -1779,10 +1713,46 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                     },
                                   ),
                                 ),
-                                const Icon(
-                                  Icons.rotate_right,
-                                  size: 20,
+                                TextButton(
+                                  style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    minimumSize: Size.zero,
+                                    tapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      if (isPhotoSelected) {
+                                        _photoScale = 1.0;
+                                      } else {
+                                        selectedItem.scale = 1.0;
+                                      }
+                                    });
+                                  },
+                                  child: Text(
+                                    '${((isPhotoSelected ? _photoScale : selectedItem.scale) * 100).round()}%',
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: theme.colorScheme.inverseSurface,
+                                    ),
+                                  ),
                                 ),
+                              ],
+                            ),
+                          ),
+                        ] else if (_activeControlMode == _ActiveControlMode.rotation) ...[
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20.0,
+                              vertical: 2.0,
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.screen_rotation, size: 22),
                                 Expanded(
                                   child: Slider(
                                     year2023: false,
@@ -1806,69 +1776,203 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                     },
                                   ),
                                 ),
+                                TextButton(
+                                  style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    minimumSize: Size.zero,
+                                    tapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      if (isPhotoSelected) {
+                                        _photoRotation = 0.0;
+                                      } else {
+                                        selectedItem.rotation = 0.0;
+                                      }
+                                    });
+                                  },
+                                  child: Text(
+                                    '${(_normalizeAngle(isPhotoSelected ? _photoRotation : selectedItem.rotation) * 180 / math.pi).round()}°',
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: theme.colorScheme.inverseSurface,
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           ),
-                        ],
-                        if (_selectedOverlayId == null) ...[
-                          Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Container(
-                                margin: const EdgeInsets.all(6),
-                                child: IconButton(
-                                  style: ButtonStyle(
-                                    iconSize:
-                                    const WidgetStatePropertyAll(26),
-                                    iconColor: WidgetStatePropertyAll(
-                                      theme.colorScheme.inverseSurface,
-                                    ),
-                                  ),
-                                  icon: const Icon(
-                                    Icons.palette,
-                                  ),
-                                  tooltip: 'Canvas Color',
-                                  onPressed: _pickCanvasColorDialog,
-                                ),
+                        ] else ...[
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0,
+                              vertical: 8.0,
+                            ),
+                            child: Text(
+                              _statusMessage ?? 'Tap an action below to edit photo',
+                              textAlign: TextAlign.center,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: theme.colorScheme.inverseSurface,
                               ),
-                              Container(
-                                margin: const EdgeInsets.all(6),
-                                child: IconButton(
-                                  style: ButtonStyle(
-                                    iconSize:
-                                    const WidgetStatePropertyAll(26),
-                                    iconColor: WidgetStatePropertyAll(
-                                      theme.colorScheme.inverseSurface,
-                                    ),
-                                  ),
-                                  icon: const Icon(
-                                    Icons.add_photo_alternate,
-                                  ),
-                                  tooltip: 'Add Image Overlay',
-                                  onPressed: _addOverlayImage,
-                                ),
-                              ),
-                              Container(
-                                margin: const EdgeInsets.all(6),
-                                child: IconButton(
-                                  style: ButtonStyle(
-                                    iconSize:
-                                    const WidgetStatePropertyAll(26),
-                                    iconColor: WidgetStatePropertyAll(
-                                      theme.colorScheme.inverseSurface,
-                                    ),
-                                  ),
-                                  icon: const Icon(
-                                    Icons.text_fields,
-                                  ),
-                                  tooltip: 'Add Text Overlay',
-                                  onPressed: _addOverlayText,
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ],
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                          child: Row(
+                            children: [
+                              if (_selectedOverlayId != null && !isPhotoSelected) ...[
+                                LabeledIconButton(
+                                  icon: Icons.aspect_ratio,
+                                  label: 'Size',
+                                  isSelected: _activeControlMode == _ActiveControlMode.size,
+                                  onPressed: () {
+                                    setState(() {
+                                      _activeControlMode = _activeControlMode == _ActiveControlMode.size
+                                          ? _ActiveControlMode.none
+                                          : _ActiveControlMode.size;
+                                    });
+                                  },
+                                ),
+                                LabeledIconButton(
+                                  icon: Icons.screen_rotation,
+                                  label: 'Rotation',
+                                  isSelected: _activeControlMode == _ActiveControlMode.rotation,
+                                  onPressed: () {
+                                    setState(() {
+                                      _activeControlMode = _activeControlMode == _ActiveControlMode.rotation
+                                          ? _ActiveControlMode.none
+                                          : _ActiveControlMode.rotation;
+                                    });
+                                  },
+                                ),
+                                LabeledIconButton(
+                                  icon: Icons.rotate_left,
+                                  label: 'Rotate L',
+                                  tooltip: 'Rotate overlay 90° left',
+                                  onPressed: () {
+                                    setState(() {
+                                      selectedItem.rotation = _normalizeAngle(selectedItem.rotation - math.pi / 2);
+                                      _activeControlMode = _ActiveControlMode.none;
+                                      _statusMessage = 'Rotated overlay left';
+                                    });
+                                  },
+                                ),
+                                LabeledIconButton(
+                                  icon: Icons.rotate_right,
+                                  label: 'Rotate R',
+                                  tooltip: 'Rotate overlay 90° right',
+                                  onPressed: () {
+                                    setState(() {
+                                      selectedItem.rotation = _normalizeAngle(selectedItem.rotation + math.pi / 2);
+                                      _activeControlMode = _ActiveControlMode.none;
+                                      _statusMessage = 'Rotated overlay right';
+                                    });
+                                  },
+                                ),
+                              ] else ...[
+                                if (_canvasColor == null) ...[
+                                  LabeledIconButton(
+                                    icon: Icons.brightness_6,
+                                    label: 'Brightness',
+                                    isSelected: _activeControlMode == _ActiveControlMode.brightness,
+                                    onPressed: () {
+                                      setState(() {
+                                        _activeControlMode = _activeControlMode == _ActiveControlMode.brightness
+                                            ? _ActiveControlMode.none
+                                            : _ActiveControlMode.brightness;
+                                      });
+                                    },
+                                  ),
+                                  if (isPhotoTarget) ...[
+                                    LabeledIconButton(
+                                      icon: Icons.rotate_left,
+                                      label: 'Rotate L',
+                                      tooltip: 'Rotate 90° left',
+                                      onPressed: () {
+                                        _rotatePhotoBy(-math.pi / 2);
+                                        setState(() {
+                                          _activeControlMode = _ActiveControlMode.none;
+                                          _statusMessage = 'Rotated to the left';
+                                        });
+                                      },
+                                    ),
+                                    LabeledIconButton(
+                                      icon: Icons.rotate_right,
+                                      label: 'Rotate R',
+                                      tooltip: 'Rotate 90° right',
+                                      onPressed: () {
+                                        _rotatePhotoBy(math.pi / 2);
+                                        setState(() {
+                                          _activeControlMode = _ActiveControlMode.none;
+                                          _statusMessage = 'Rotated to the right';
+                                        });
+                                      },
+                                    ),
+                                    LabeledIconButton(
+                                      icon: _fitMode == _PhotoFitMode.fill ? Icons.fit_screen : Icons.crop_free,
+                                      label: _fitMode == _PhotoFitMode.fill ? 'Fit' : 'Fill',
+                                      tooltip: _fitMode == _PhotoFitMode.fill ? 'Fit whole photo in frame' : 'Fill the frame',
+                                      onPressed: () {
+                                        _applyPhotoFit(
+                                          _fitMode == _PhotoFitMode.fill ? _PhotoFitMode.fit : _PhotoFitMode.fill,
+                                        );
+                                        setState(() {
+                                          _activeControlMode = _ActiveControlMode.none;
+                                          _statusMessage = _fitMode == _PhotoFitMode.fill
+                                              ? 'Fitted photo in frame'
+                                              : 'Filled frame with photo';
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ],
+                                if (_selectedOverlayId == null) ...[
+                                  LabeledIconButton(
+                                    icon: Icons.palette,
+                                    label: 'Canvas',
+                                    tooltip: 'Canvas Color',
+                                    onPressed: () {
+                                      setState(() {
+                                        _activeControlMode = _ActiveControlMode.none;
+                                      });
+                                      _pickCanvasColorDialog();
+                                    },
+                                  ),
+                                  LabeledIconButton(
+                                    icon: Icons.add_photo_alternate,
+                                    label: 'Add Image',
+                                    tooltip: 'Add Image Overlay',
+                                    onPressed: () {
+                                      setState(() {
+                                        _activeControlMode = _ActiveControlMode.none;
+                                      });
+                                      _addOverlayImage();
+                                    },
+                                  ),
+                                  LabeledIconButton(
+                                    icon: Icons.text_fields,
+                                    label: 'Add Text',
+                                    tooltip: 'Add Text Overlay',
+                                    onPressed: () {
+                                      setState(() {
+                                        _activeControlMode = _ActiveControlMode.none;
+                                      });
+                                      _addOverlayText();
+                                    },
+                                  ),
+                                ],
+                              ],
+                            ],
+                          ),
+                        ),
                         Row(
                           mainAxisAlignment:
                           MainAxisAlignment.spaceEvenly,
@@ -1911,6 +2015,12 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                       ),
                                       iconColor: WidgetStatePropertyAll(
                                         theme.colorScheme.error,
+                                      ),
+                                      side: WidgetStatePropertyAll(
+                                        BorderSide(
+                                          color: theme.colorScheme.error,
+                                          width: 2.0,
+                                        ),
                                       ),
                                     ),
                                     icon: const Icon(

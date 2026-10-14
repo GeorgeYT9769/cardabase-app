@@ -7,6 +7,7 @@ import 'dart:ui' as ui;
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/util/widgets/blur_app_bar_background.dart';
+import 'package:cardabase/util/widgets/labeled_icon_button.dart';
 import 'package:flutter/foundation.dart';
 import 'package:material_new_shapes/material_new_shapes.dart';
 import 'package:material_ui/material_ui.dart';
@@ -236,6 +237,13 @@ class _CardCropScreenState extends State<CardCropScreen> {
     HapticFeedback.selectionClick();
     setState(() {
       _turns = (_turns + 1) % 4;
+    });
+  }
+
+  void _rotateBack90() {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _turns = (_turns - 1) % 4;
     });
   }
 
@@ -548,36 +556,54 @@ class _CardCropScreenState extends State<CardCropScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                              _CropTool(
-                                icon: Icons.auto_fix_high,
-                                label: 'Auto-detect',
-                                tooltip: 'Place the frame on the card again',
-                                onPressed: ready && !_busy ? _resetToDetected : null,
+                              Expanded(
+                                child: LabeledIconButton(
+                                  icon: Icons.auto_fix_high,
+                                  label: 'Auto-detect',
+                                  tooltip: 'Place the frame on the card again',
+                                  onPressed: ready && !_busy ? _resetToDetected : null,
+                                ),
                               ),
-                              _CropTool(
-                                icon: Icons.rotate_right,
-                                label: 'Rotate',
-                                tooltip: 'Rotate the photo 90°',
-                                onPressed: ready && !_busy ? _rotate90 : null,
+                              Expanded(
+                                child: LabeledIconButton(
+                                  icon: Icons.rotate_left,
+                                  label: 'Rotate L',
+                                  tooltip: 'Rotate the photo -90°',
+                                  onPressed: ready && !_busy ? _rotateBack90 : null,
+                                ),
                               ),
-                              _CropTool(
-                                icon: _linkSides ? Icons.link : Icons.link_off,
-                                label: _linkSides ? 'Linked sides' : 'Free corners',
-                                tooltip: _linkSides
-                                    ? 'Sides follow the corner (tap to move corners freely)'
-                                    : 'Corners move freely (tap to link the sides)',
-                                onPressed: ready && !_busy
-                                    ? () {
-                                        HapticFeedback.selectionClick();
-                                        setState(() => _linkSides = !_linkSides);
-                                      }
-                                    : null,
+                              Expanded(
+                                child: LabeledIconButton(
+                                  icon: Icons.rotate_right,
+                                  label: 'Rotate R',
+                                  tooltip: 'Rotate the photo 90°',
+                                  onPressed: ready && !_busy ? _rotate90 : null,
+                                ),
                               ),
-                              _CropTool(
-                                icon: Icons.crop_free,
-                                label: 'Whole photo',
-                                tooltip: 'Use the whole photo as the card',
-                                onPressed: ready && !_busy ? _selectWholePhoto : null,
+                              Expanded(
+                                child: LabeledIconButton(
+                                  icon: _linkSides ? Icons.link : Icons.link_off,
+                                  label: _linkSides ? 'Linked sides' : 'Free corners',
+                                  tooltip: _linkSides
+                                      ? 'Sides follow the corner (tap to move corners freely)'
+                                      : 'Corners move freely (tap to link the sides)',
+                                  onPressed: ready && !_busy
+                                      ? () {
+                                          HapticFeedback.selectionClick();
+                                          setState(() => _linkSides = !_linkSides);
+                                        }
+                                      : null,
+                                ),
+                              ),
+                              Expanded(
+                                child: LabeledIconButton(
+                                  icon: Icons.skip_next,
+                                  label: 'Skip & Edit',
+                                  tooltip: 'Skip cropping and edit the image',
+                                  onPressed: ready && !_busy
+                                      ? () => Navigator.of(context).pop(CardCropResult(widget.imagePath, edit: true))
+                                      : null,
+                                ),
                               ),
                         ],
                       ),
@@ -590,7 +616,7 @@ class _CardCropScreenState extends State<CardCropScreen> {
                                   ? () => _done(edit: true)
                                   : null,
                               icon: const Icon(Icons.tune),
-                              label: const Text('Edit more'),
+                              label: const Text('Edit cutout'),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -1302,52 +1328,4 @@ String _warpAndSave(List<Object> args) {
 
   File(args[1] as String).writeAsBytesSync(img.encodePng(out));
   return args[1] as String;
-}
-
-/// A tool button of the cropper: icon with a short label below it.
-class _CropTool extends StatelessWidget {
-  const _CropTool({
-    required this.icon,
-    required this.label,
-    required this.onPressed,
-    this.tooltip,
-  });
-
-  final IconData icon;
-  final String label;
-  final String? tooltip;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final color =
-        onPressed == null ? theme.disabledColor : theme.colorScheme.secondary;
-    return Expanded(
-      child: Tooltip(
-        message: tooltip ?? label,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: onPressed,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, color: color, size: 24),
-                const SizedBox(height: 2),
-                Text(
-                  label,
-                  maxLines: 1,
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.labelSmall?.copyWith(color: color),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }
