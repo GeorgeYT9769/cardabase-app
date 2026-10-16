@@ -275,11 +275,14 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
 
   /// Centers the background photo in the frame and scales it so that it
   /// either fills the whole frame (fill) or is fully visible inside it (fit).
-  Future<void> _applyPhotoFit(_PhotoFitMode mode) async {
+  ///
+  /// Returns `false` when "fit" and "fill" give (almost) the same result, i.e.
+  /// the photo already has the shape of the frame.
+  Future<bool> _applyPhotoFit(_PhotoFitMode mode) async {
     final file = _capturedImageFile;
-    if (file == null || file.path.isEmpty || _canvasColor != null) return;
+    if (file == null || file.path.isEmpty || _canvasColor != null) return true;
     final imageSize = await _readImageSize(file.path);
-    if (!mounted || imageSize == null) return;
+    if (!mounted || imageSize == null) return true;
     final screen = MediaQuery.of(context).size;
     final cutout = _cutoutSize(screen);
 
@@ -293,22 +296,20 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     final c = math.cos(_photoRotation).abs();
     final sn = math.sin(_photoRotation).abs();
 
-    double scale;
-    if (mode == _PhotoFitMode.fill) {
-      final hx = (cutout.width * c + cutout.height * sn) / 2;
-      final hy = (cutout.width * sn + cutout.height * c) / 2;
-      scale = math.max(2 * hx / dispW, 2 * hy / dispH);
-    } else {
-      scale = math.min(
-        cutout.width / (dispW * c + dispH * sn),
-        cutout.height / (dispW * sn + dispH * c),
-      );
-    }
+    final hx = (cutout.width * c + cutout.height * sn) / 2;
+    final hy = (cutout.width * sn + cutout.height * c) / 2;
+    final fillScale = math.max(2 * hx / dispW, 2 * hy / dispH);
+    final fitScale = math.min(
+      cutout.width / (dispW * c + dispH * sn),
+      cutout.height / (dispW * sn + dispH * c),
+    );
+    final scale = mode == _PhotoFitMode.fill ? fillScale : fitScale;
     setState(() {
       _photoScale = scale.clamp(0.2, _maxScale);
       _photoPosition = Offset.zero;
       _fitMode = mode;
     });
+    return (fillScale - fitScale).abs() / fillScale > 0.03;
   }
 
   void _rotatePhotoBy(double delta) {
@@ -1067,104 +1068,13 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                             _fitMode = _PhotoFitMode.custom;
                                           }
 
-                                          final screenSize =
-                                              MediaQuery.of(context).size;
-                                          final screenW = screenSize.width;
-                                          final screenH = screenSize.height;
-
-                                          double cutoutWidth = screenW *
-                                              widget.cutoutWidthPercentage;
-                                          double cutoutHeight =
-                                              cutoutWidth /
-                                                  widget.cardAspectRatio;
-                                          if (cutoutHeight > screenH * 0.7) {
-                                            cutoutHeight = screenH * 0.7;
-                                            cutoutWidth = cutoutHeight *
-                                                widget.cardAspectRatio;
-                                          }
-                                          final cutoutLeft =
-                                              (screenW - cutoutWidth) / 2;
-                                          final cutoutRight =
-                                              cutoutLeft + cutoutWidth;
-                                          final cutoutTop =
-                                              (screenH - cutoutHeight) / 2;
-                                          final cutoutBottom =
-                                              cutoutTop + cutoutHeight;
-                                          final cutoutCenterX = screenW / 2;
-                                          final cutoutCenterY = screenH / 2;
-
-                                          final photoW = screenW * _photoScale;
-                                          final photoH = screenH * _photoScale;
-
-                                          double newX = rawPosition.dx;
-                                          double newY = rawPosition.dy;
-
-                                          final photoCenterX =
-                                              newX + photoW / 2;
-                                          final photoCenterY =
-                                              newY + photoH / 2;
-                                          final photoLeft = newX;
-                                          final photoRight = newX + photoW;
-                                          final photoTop = newY;
-                                          final photoBottom = newY + photoH;
-
-                                          const threshold = 12.0;
-
-                                          bool snapV = false;
-                                          double? vLineX;
-
-                                          bool snapH = false;
-                                          double? hLineY;
-
-                                          // Horizontal Snapping
-                                          if ((photoCenterX - cutoutCenterX)
-                                              .abs() <
-                                              threshold) {
-                                            newX = cutoutCenterX - photoW / 2;
-                                            snapV = true;
-                                            vLineX = cutoutCenterX;
-                                          } else if ((photoLeft - cutoutLeft)
-                                              .abs() <
-                                              threshold) {
-                                            newX = cutoutLeft;
-                                            snapV = true;
-                                            vLineX = cutoutLeft;
-                                          } else if ((photoRight - cutoutRight)
-                                              .abs() <
-                                              threshold) {
-                                            newX = cutoutRight - photoW;
-                                            snapV = true;
-                                            vLineX = cutoutRight;
-                                          }
-
-                                          // Vertical Snapping
-                                          if ((photoCenterY - cutoutCenterY)
-                                              .abs() <
-                                              threshold) {
-                                            newY = cutoutCenterY - photoH / 2;
-                                            snapH = true;
-                                            hLineY = cutoutCenterY;
-                                          } else if ((photoTop - cutoutTop)
-                                              .abs() <
-                                              threshold) {
-                                            newY = cutoutTop;
-                                            snapH = true;
-                                            hLineY = cutoutTop;
-                                          } else if ((photoBottom -
-                                              cutoutBottom)
-                                              .abs() <
-                                              threshold) {
-                                            newY = cutoutBottom - photoH;
-                                            snapH = true;
-                                            hLineY = cutoutBottom;
-                                          }
-
-                                          _photoPosition = Offset(newX, newY);
+                                          // The background photo moves freely (no snapping): its
+                                          // edges are not the card's edges, so magnetic guides
+                                          // only made fine positioning harder.
+                                          _photoPosition = rawPosition;
                                           _fitMode = _PhotoFitMode.custom;
-                                          _verticalGuideX =
-                                          snapV ? vLineX : null;
-                                          _horizontalGuideY =
-                                          snapH ? hLineY : null;
+                                          _verticalGuideX = null;
+                                          _horizontalGuideY = null;
                                         });
                                       }
                                     },
@@ -1920,15 +1830,19 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                       icon: _fitMode == _PhotoFitMode.fill ? Icons.fit_screen : Icons.crop_free,
                                       label: _fitMode == _PhotoFitMode.fill ? 'Fit' : 'Fill',
                                       tooltip: _fitMode == _PhotoFitMode.fill ? 'Fit whole photo in frame' : 'Fill the frame',
-                                      onPressed: () {
-                                        _applyPhotoFit(
-                                          _fitMode == _PhotoFitMode.fill ? _PhotoFitMode.fit : _PhotoFitMode.fill,
-                                        );
+                                      onPressed: () async {
+                                        final target = _fitMode == _PhotoFitMode.fill
+                                            ? _PhotoFitMode.fit
+                                            : _PhotoFitMode.fill;
+                                        final differs = await _applyPhotoFit(target);
+                                        if (!mounted) return;
                                         setState(() {
                                           _activeControlMode = _ActiveControlMode.none;
-                                          _statusMessage = _fitMode == _PhotoFitMode.fill
-                                              ? 'Fitted photo in frame'
-                                              : 'Filled frame with photo';
+                                          _statusMessage = !differs
+                                              ? 'Photo already matches the frame (Fit = Fill)'
+                                              : target == _PhotoFitMode.fit
+                                                  ? 'Whole photo fitted inside the frame'
+                                                  : 'Photo fills the whole frame';
                                         });
                                       },
                                     ),

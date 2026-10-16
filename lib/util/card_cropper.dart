@@ -72,6 +72,10 @@ class _CardCropScreenState extends State<CardCropScreen> {
   /// moves on its own (free perspective).
   bool _linkSides = true;
 
+  /// False when the automatic detection did not find a card (the frame is a
+  /// centered guess then).
+  bool _detectionFound = true;
+
   @override
   void initState() {
     super.initState();
@@ -106,6 +110,7 @@ class _CardCropScreenState extends State<CardCropScreen> {
         _imgH = result[1] as int;
         _corners = corners;
         _detected = List<Offset>.of(corners);
+        _detectionFound = result.length > 3 ? result[3] as bool : true;
       });
     } catch (e, stack) {
       debugPrint('CardCropScreen _load failed completely: $e\n$stack');
@@ -131,8 +136,37 @@ class _CardCropScreenState extends State<CardCropScreen> {
     }
 
     await File(outPath).writeAsBytes(byteData.buffer.asUint8List());
-    final corners = _fallbackCorners(w, h);
-    return <Object>[w, h, corners];
+
+    // Detect the card on a small native decode of the same photo (the
+    // fallback used to skip the detection completely).
+    _Detection detection = _Detection(_fallbackCorners(w, h), false);
+    try {
+      final smallCodec = await ui.instantiateImageCodec(
+        bytes,
+        targetWidth: 320,
+      );
+      final smallImage = (await smallCodec.getNextFrame()).image;
+      final sw = smallImage.width;
+      final sh = smallImage.height;
+      final raw = await smallImage.toByteData(
+        format: ui.ImageByteFormat.rawRgba,
+      );
+      if (raw != null) {
+        final rgba = raw.buffer.asUint8List();
+        final rCh = Uint8List(sw * sh);
+        final gCh = Uint8List(sw * sh);
+        final bCh = Uint8List(sw * sh);
+        for (var i = 0; i < sw * sh; i++) {
+          rCh[i] = rgba[i * 4];
+          gCh[i] = rgba[i * 4 + 1];
+          bCh[i] = rgba[i * 4 + 2];
+        }
+        detection = _detectFromChannels(rCh, gCh, bCh, sw, sh);
+      }
+    } catch (e, stack) {
+      debugPrint('Native card detection failed: $e\n$stack');
+    }
+    return <Object>[w, h, detection.corners, detection.found];
   }
 
   Future<void> _done({bool edit = false}) async {
@@ -244,20 +278,6 @@ class _CardCropScreenState extends State<CardCropScreen> {
     HapticFeedback.selectionClick();
     setState(() {
       _turns = (_turns - 1) % 4;
-    });
-  }
-
-  /// Moves the frame to the edges of the photo (for pictures that already
-  /// show only the card).
-  void _selectWholePhoto() {
-    HapticFeedback.selectionClick();
-    setState(() {
-      _corners = <Offset>[
-        const Offset(0, 0),
-        const Offset(1, 0),
-        const Offset(1, 1),
-        const Offset(0, 1),
-      ];
     });
   }
 
@@ -529,11 +549,14 @@ class _CardCropScreenState extends State<CardCropScreen> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
                   child: Text(
-                    _linkSides
-                        ? 'Drag a corner to resize the frame (its sides follow), '
-                            'or drag inside to move it.'
-                        : 'Drag each corner separately, '
-                            'or drag inside to move the frame.',
+                    !_detectionFound
+                        ? 'Card not found automatically. Drag the corners '
+                            'onto the card.'
+                        : _linkSides
+                            ? 'Drag a corner to resize the frame (its sides follow), '
+                                'or drag inside to move it.'
+                            : 'Drag each corner separately, '
+                                'or drag inside to move the frame.',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.inverseSurface.withValues(alpha: .75),
@@ -718,8 +741,13 @@ List<Object> _prepareImage(List<String> args) {
         : img.copyResize(image, height: maxSide);
   }
   File(args[1]).writeAsBytesSync(img.encodeJpg(image, quality: 92));
-  final corners = _detectCorners(image);
-  return <Object>[image.width, image.height, corners];
+  final detection = _detectCorners(image);
+  return <Object>[
+    image.width,
+    image.height,
+    detection.corners,
+    detection.found,
+  ];
 }
 
 List<double> _fallbackCorners(int w, int h) {
@@ -809,7 +837,7 @@ int _median(List<int> values) {
 /// of a card (the user cropped it before), the whole photo is used; otherwise
 /// a centered card-shaped frame is returned. The user can always correct the
 /// corners by hand.
-List<double> _detectCorners(img.Image full) {
+_Detection _detectCorners(img.Image full) {
   try {
     final scale = 320 / math.max(full.width, full.height);
     final w = math.max(8, (full.width * scale).round());
@@ -833,37 +861,62 @@ List<double> _detectCorners(img.Image full) {
         bCh[i] = p.b.toInt();
       }
     }
-
-    final masks = <Uint8List>[
-      _colourModelMask(rCh, gCh, bCh, w, h, 0.2),
-      _colourModelMask(rCh, gCh, bCh, w, h, 0.4),
-      _borderDistanceMask(rCh, gCh, bCh, w, h, 1.0),
-      _borderDistanceMask(rCh, gCh, bCh, w, h, 0.7),
-      _greyMask(rCh, gCh, bCh, w, h, dark: true),
-      _greyMask(rCh, gCh, bCh, w, h, dark: false),
-    ];
-
-    _CardCandidate? best;
-    for (final mask in masks) {
-      final c = _cornersFromMask(mask, w, h);
-      if (c != null && (best == null || c.score > best.score)) {
-        best = c;
-      }
-    }
-    if (best != null) return best.corners;
-
-    // Nothing found. A photo that is already card-shaped is most likely a
-    // picture of the card only: use all of it.
-    final aspect = full.width / full.height;
-    final bool cardShaped = (aspect >= 1.35 && aspect <= 1.85) ||
-        (aspect >= 0.54 && aspect <= 0.74);
-    if (cardShaped) {
-      return <double>[0, 0, 1, 0, 1, 1, 0, 1];
-    }
-    return _fallbackCorners(full.width, full.height);
-  } catch (_) {
-    return _fallbackCorners(full.width, full.height);
+    return _detectFromChannels(rCh, gCh, bCh, w, h);
+  } catch (e, stack) {
+    debugPrint('Card detection failed: $e\n$stack');
+    return _Detection(_fallbackCorners(full.width, full.height), false);
   }
+}
+
+/// Result of the card detection: [corners] (8 normalized values) and whether
+/// a card was actually found ([found] is false for the fallback frames).
+class _Detection {
+  const _Detection(this.corners, this.found);
+
+  final List<double> corners;
+  final bool found;
+}
+
+/// Runs the detection on a small copy of the photo given as separate colour
+/// channels ([w] x [h] pixels each).
+_Detection _detectFromChannels(
+  Uint8List rCh,
+  Uint8List gCh,
+  Uint8List bCh,
+  int w,
+  int h,
+) {
+  final masks = <Uint8List>[
+    _colourModelMask(rCh, gCh, bCh, w, h, 0.2),
+    _colourModelMask(rCh, gCh, bCh, w, h, 0.4),
+    _borderDistanceMask(rCh, gCh, bCh, w, h, 1.0),
+    _borderDistanceMask(rCh, gCh, bCh, w, h, 0.7),
+    _greyMask(rCh, gCh, bCh, w, h, dark: true),
+    _greyMask(rCh, gCh, bCh, w, h, dark: false),
+  ];
+
+  _CardCandidate? best;
+  for (final mask in masks) {
+    final c = _cornersFromMask(mask, w, h);
+    if (c != null && (best == null || c.score > best.score)) {
+      best = c;
+    }
+  }
+  if (best != null) {
+    debugPrint('Card detection: found (score ${best.score.toStringAsFixed(2)})');
+    return _Detection(best.corners, true);
+  }
+
+  // Nothing found. A photo that is already card-shaped is most likely a
+  // picture of the card only: use all of it.
+  final aspect = w / h;
+  final bool cardShaped = (aspect >= 1.35 && aspect <= 1.85) ||
+      (aspect >= 0.54 && aspect <= 0.74);
+  debugPrint('Card detection: nothing found (card-shaped photo: $cardShaped)');
+  if (cardShaped) {
+    return const _Detection(<double>[0, 0, 1, 0, 1, 1, 0, 1], true);
+  }
+  return _Detection(_fallbackCorners(w, h), false);
 }
 
 /// A card-like blob: [corners] are 8 normalized values (top-left, top-right,
