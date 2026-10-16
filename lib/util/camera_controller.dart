@@ -21,8 +21,10 @@ import '../feature/settings/model.dart';
 import 'card_cropper.dart';
 import 'expressive_loading_indicator.dart';
 import 'widgets/blur_wrapper.dart';
+import 'widgets/labeled_icon_button.dart';
 
 enum _PhotoFitMode { custom, fit, fill }
+enum _ActiveControlMode { none, brightness, size, rotation }
 
 class _OverlayItem {
   final String id;
@@ -80,6 +82,8 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
   Offset _photoPosition = Offset.zero;
   double _photoScale = 1.0;
   double _photoRotation = 0.0;
+  _ActiveControlMode _activeControlMode = _ActiveControlMode.none;
+  String? _statusMessage;
 
   final List<_OverlayItem> _overlayItems = [];
   String? _selectedOverlayId;
@@ -106,6 +110,10 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
   _PhotoFitMode _fitMode = _PhotoFitMode.custom;
   bool _rotationSnapped = false;
   bool _cropperOpen = false;
+
+  /// The photo that was handed to the cropper (camera flow). "Back" in the
+  /// editor returns to the cropper with this photo instead of leaving.
+  XFile? _cropSourceFile;
 
   static const double _maxScale = 6.0;
   static const double _snapThreshold = 0.06; // ~3.4 degrees
@@ -174,7 +182,9 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
   /// the cut-out card as the final picture, "Edit more" continues in
   /// the editor.
   Future<void> _openCropper(XFile file) async {
+    _cropSourceFile = file;
     _cropperOpen = true;
+    if (mounted) setState(() {});
     final CardCropResult? result = await Navigator.of(context).push<CardCropResult>(
       MaterialPageRoute(
         builder: (_) => CardCropScreen(imagePath: file.path),
@@ -265,11 +275,14 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
 
   /// Centers the background photo in the frame and scales it so that it
   /// either fills the whole frame (fill) or is fully visible inside it (fit).
-  Future<void> _applyPhotoFit(_PhotoFitMode mode) async {
+  ///
+  /// Returns `false` when "fit" and "fill" give (almost) the same result, i.e.
+  /// the photo already has the shape of the frame.
+  Future<bool> _applyPhotoFit(_PhotoFitMode mode) async {
     final file = _capturedImageFile;
-    if (file == null || file.path.isEmpty || _canvasColor != null) return;
+    if (file == null || file.path.isEmpty || _canvasColor != null) return true;
     final imageSize = await _readImageSize(file.path);
-    if (!mounted || imageSize == null) return;
+    if (!mounted || imageSize == null) return true;
     final screen = MediaQuery.of(context).size;
     final cutout = _cutoutSize(screen);
 
@@ -283,22 +296,20 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     final c = math.cos(_photoRotation).abs();
     final sn = math.sin(_photoRotation).abs();
 
-    double scale;
-    if (mode == _PhotoFitMode.fill) {
-      final hx = (cutout.width * c + cutout.height * sn) / 2;
-      final hy = (cutout.width * sn + cutout.height * c) / 2;
-      scale = math.max(2 * hx / dispW, 2 * hy / dispH);
-    } else {
-      scale = math.min(
-        cutout.width / (dispW * c + dispH * sn),
-        cutout.height / (dispW * sn + dispH * c),
-      );
-    }
+    final hx = (cutout.width * c + cutout.height * sn) / 2;
+    final hy = (cutout.width * sn + cutout.height * c) / 2;
+    final fillScale = math.max(2 * hx / dispW, 2 * hy / dispH);
+    final fitScale = math.min(
+      cutout.width / (dispW * c + dispH * sn),
+      cutout.height / (dispW * sn + dispH * c),
+    );
+    final scale = mode == _PhotoFitMode.fill ? fillScale : fitScale;
     setState(() {
       _photoScale = scale.clamp(0.2, _maxScale);
       _photoPosition = Offset.zero;
       _fitMode = mode;
     });
+    return (fillScale - fitScale).abs() / fillScale > 0.03;
   }
 
   void _rotatePhotoBy(double delta) {
@@ -312,15 +323,26 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     }
   }
 
-  void _resetPhotoRotation() {
+  /// Resets everything done in the editor (brightness, photo position, size
+  /// and rotation, texts and stickers). Leaving the editor is done with the
+  /// back button.
+  Future<void> _resetEditor() async {
     _haptic();
     setState(() {
+      _brightness = 0.0;
       _photoRotation = 0.0;
-      _rotationSnapped = true;
+      _photoScale = 1.0;
+      _photoPosition = Offset.zero;
+      _rotationSnapped = false;
+      _overlayItems.clear();
+      _selectedOverlayId = null;
+      _verticalGuideX = null;
+      _horizontalGuideY = null;
+      _fitMode = _PhotoFitMode.custom;
+      _activeControlMode = _ActiveControlMode.none;
+      _statusMessage = null;
     });
-    if (_fitMode != _PhotoFitMode.custom) {
-      _applyPhotoFit(_fitMode);
-    }
+    await _applyPhotoFit(_PhotoFitMode.fill);
   }
 
   @override
@@ -499,6 +521,8 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
       setState(() {
         _overlayItems.add(newItem);
         _selectedOverlayId = newItem.id;
+        _activeControlMode = _ActiveControlMode.size;
+        _statusMessage = 'Image overlay added';
       });
     }
   }
@@ -603,6 +627,8 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
       setState(() {
         _overlayItems.add(newItem);
         _selectedOverlayId = newItem.id;
+        _activeControlMode = _ActiveControlMode.size;
+        _statusMessage = 'Text overlay added';
       });
     }
   }
@@ -780,6 +806,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
       return;
     }
     setState(() {
+      _cropSourceFile = null;
       _fitMode = _PhotoFitMode.custom;
       _rotationSnapped = false;
       _capturedImageFile = null;
@@ -795,6 +822,23 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     });
     // Camera was released after the previous capture; start it again.
     _initializeCamera();
+  }
+
+  /// In the camera flow the editor was reached through the cropper, so "back"
+  /// goes back to the cropper (same photo) instead of leaving everything.
+  bool get _backReturnsToCropper =>
+      widget.initialImage == null &&
+      _cropSourceFile != null &&
+      _capturedImageFile != null &&
+      _canvasColor == null &&
+      !_cropperOpen;
+
+  void _handleBack() {
+    if (_backReturnsToCropper) {
+      _openCropper(_cropSourceFile!);
+      return;
+    }
+    Navigator.of(context).pop();
   }
 
   @override
@@ -823,7 +867,12 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     final bool inEditingMode =
         _capturedImageFile != null || _canvasColor != null;
 
-    return ValueListenableBuilder(
+    return PopScope(
+      canPop: !_backReturnsToCropper,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) _handleBack();
+      },
+      child: ValueListenableBuilder(
       valueListenable: GetIt.I<SettingsBox>().listenable(),
       builder: (context, box, _) {
         final settings = box.value;
@@ -850,9 +899,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                 icon: const Icon(
                   Icons.arrow_back_ios_new,
                 ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+                onPressed: _handleBack,
               ),
             ),
           ),
@@ -1021,104 +1068,13 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                             _fitMode = _PhotoFitMode.custom;
                                           }
 
-                                          final screenSize =
-                                              MediaQuery.of(context).size;
-                                          final screenW = screenSize.width;
-                                          final screenH = screenSize.height;
-
-                                          double cutoutWidth = screenW *
-                                              widget.cutoutWidthPercentage;
-                                          double cutoutHeight =
-                                              cutoutWidth /
-                                                  widget.cardAspectRatio;
-                                          if (cutoutHeight > screenH * 0.7) {
-                                            cutoutHeight = screenH * 0.7;
-                                            cutoutWidth = cutoutHeight *
-                                                widget.cardAspectRatio;
-                                          }
-                                          final cutoutLeft =
-                                              (screenW - cutoutWidth) / 2;
-                                          final cutoutRight =
-                                              cutoutLeft + cutoutWidth;
-                                          final cutoutTop =
-                                              (screenH - cutoutHeight) / 2;
-                                          final cutoutBottom =
-                                              cutoutTop + cutoutHeight;
-                                          final cutoutCenterX = screenW / 2;
-                                          final cutoutCenterY = screenH / 2;
-
-                                          final photoW = screenW * _photoScale;
-                                          final photoH = screenH * _photoScale;
-
-                                          double newX = rawPosition.dx;
-                                          double newY = rawPosition.dy;
-
-                                          final photoCenterX =
-                                              newX + photoW / 2;
-                                          final photoCenterY =
-                                              newY + photoH / 2;
-                                          final photoLeft = newX;
-                                          final photoRight = newX + photoW;
-                                          final photoTop = newY;
-                                          final photoBottom = newY + photoH;
-
-                                          const threshold = 12.0;
-
-                                          bool snapV = false;
-                                          double? vLineX;
-
-                                          bool snapH = false;
-                                          double? hLineY;
-
-                                          // Horizontal Snapping
-                                          if ((photoCenterX - cutoutCenterX)
-                                              .abs() <
-                                              threshold) {
-                                            newX = cutoutCenterX - photoW / 2;
-                                            snapV = true;
-                                            vLineX = cutoutCenterX;
-                                          } else if ((photoLeft - cutoutLeft)
-                                              .abs() <
-                                              threshold) {
-                                            newX = cutoutLeft;
-                                            snapV = true;
-                                            vLineX = cutoutLeft;
-                                          } else if ((photoRight - cutoutRight)
-                                              .abs() <
-                                              threshold) {
-                                            newX = cutoutRight - photoW;
-                                            snapV = true;
-                                            vLineX = cutoutRight;
-                                          }
-
-                                          // Vertical Snapping
-                                          if ((photoCenterY - cutoutCenterY)
-                                              .abs() <
-                                              threshold) {
-                                            newY = cutoutCenterY - photoH / 2;
-                                            snapH = true;
-                                            hLineY = cutoutCenterY;
-                                          } else if ((photoTop - cutoutTop)
-                                              .abs() <
-                                              threshold) {
-                                            newY = cutoutTop;
-                                            snapH = true;
-                                            hLineY = cutoutTop;
-                                          } else if ((photoBottom -
-                                              cutoutBottom)
-                                              .abs() <
-                                              threshold) {
-                                            newY = cutoutBottom - photoH;
-                                            snapH = true;
-                                            hLineY = cutoutBottom;
-                                          }
-
-                                          _photoPosition = Offset(newX, newY);
+                                          // The background photo moves freely (no snapping): its
+                                          // edges are not the card's edges, so magnetic guides
+                                          // only made fine positioning harder.
+                                          _photoPosition = rawPosition;
                                           _fitMode = _PhotoFitMode.custom;
-                                          _verticalGuideX =
-                                          snapV ? vLineX : null;
-                                          _horizontalGuideY =
-                                          snapH ? hLineY : null;
+                                          _verticalGuideX = null;
+                                          _horizontalGuideY = null;
                                         });
                                       }
                                     },
@@ -1588,23 +1544,15 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (_canvasColor == null) ...[
-                          //Text(
-                          //  'Brightness: ${_brightness.toStringAsFixed(1)}',
-                          //  style: theme.textTheme.bodyLarge?.copyWith(
-                          //    fontSize: 17,
-                          //    fontWeight: FontWeight.w900,
-                          //    color: theme.colorScheme.inverseSurface,
-                          //  ),
-                          //),
+                        if (_activeControlMode == _ActiveControlMode.brightness && _canvasColor == null) ...[
                           Padding(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 24.0,
-                              vertical: 4.0,
+                              horizontal: 20.0,
+                              vertical: 2.0,
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.brightness_6_rounded),
+                                const Icon(Icons.brightness_6_rounded, size: 22),
                                 Expanded(
                                   child: Slider(
                                     year2023: false,
@@ -1618,14 +1566,6 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                     },
                                   ),
                                 ),
-                                //IconButton(
-                                //    onPressed: () {
-                                //      setState(() {
-                                //        _brightness = 0.0;
-                                //      });
-                                //    },
-                                //    icon: Icon(Icons.refresh, color: Colors.white,),
-                                //),
                                 TextButton(
                                   style: TextButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(
@@ -1644,7 +1584,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                   child: Text(
                                     _brightness.toStringAsFixed(1),
                                     style: theme.textTheme.bodyLarge?.copyWith(
-                                      fontSize: 17,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.w900,
                                       color: theme.colorScheme.inverseSurface,
                                     ),
@@ -1653,87 +1593,15 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                               ],
                             ),
                           ),
-                        ],
-                        if (isPhotoTarget && _canvasColor == null) ...[
-                          Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.spaceEvenly,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.rotate_left),
-                                style: ButtonStyle(
-                                  iconSize:
-                                  const WidgetStatePropertyAll(26),
-                                  iconColor: WidgetStatePropertyAll(
-                                    theme.colorScheme.inverseSurface,
-                                  ),
-                                ),
-                                tooltip: 'Rotate 90° left',
-                                onPressed: () =>
-                                    _rotatePhotoBy(-math.pi / 2),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.straighten),
-                                style: ButtonStyle(
-                                  iconSize:
-                                  const WidgetStatePropertyAll(26),
-                                  iconColor: WidgetStatePropertyAll(
-                                    theme.colorScheme.inverseSurface,
-                                  ),
-                                ),
-                                tooltip: 'Reset rotation to 0°',
-                                onPressed: _resetPhotoRotation,
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.rotate_right),
-                                style: ButtonStyle(
-                                  iconSize:
-                                  const WidgetStatePropertyAll(26),
-                                  iconColor: WidgetStatePropertyAll(
-                                    theme.colorScheme.inverseSurface,
-                                  ),
-                                ),
-                                tooltip: 'Rotate 90° right',
-                                onPressed: () =>
-                                    _rotatePhotoBy(math.pi / 2),
-                              ),
-                              IconButton(
-                                icon: Icon(
-                                  _fitMode == _PhotoFitMode.fill
-                                      ? Icons.fit_screen
-                                      : Icons.crop_free,
-                                ),
-                                style: ButtonStyle(
-                                  iconSize:
-                                  const WidgetStatePropertyAll(26),
-                                  iconColor: WidgetStatePropertyAll(
-                                    theme.colorScheme.inverseSurface,
-                                  ),
-                                ),
-                                tooltip: _fitMode == _PhotoFitMode.fill
-                                    ? 'Fit whole photo in frame'
-                                    : 'Fill the frame',
-                                onPressed: () => _applyPhotoFit(
-                                  _fitMode == _PhotoFitMode.fill
-                                      ? _PhotoFitMode.fit
-                                      : _PhotoFitMode.fill,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                        if (isPhotoSelected ||
-                            selectedItem.id.isNotEmpty) ...[
+                        ] else if (_activeControlMode == _ActiveControlMode.size) ...[
                           Padding(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0,
+                              horizontal: 20.0,
+                              vertical: 2.0,
                             ),
                             child: Row(
                               children: [
-                                const Icon(
-                                  Icons.aspect_ratio,
-                                  size: 20,
-                                ),
+                                const Icon(Icons.aspect_ratio, size: 22),
                                 Expanded(
                                   child: Slider(
                                     year2023: false,
@@ -1755,10 +1623,46 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                     },
                                   ),
                                 ),
-                                const Icon(
-                                  Icons.rotate_right,
-                                  size: 20,
+                                TextButton(
+                                  style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    minimumSize: Size.zero,
+                                    tapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      if (isPhotoSelected) {
+                                        _photoScale = 1.0;
+                                      } else {
+                                        selectedItem.scale = 1.0;
+                                      }
+                                    });
+                                  },
+                                  child: Text(
+                                    '${((isPhotoSelected ? _photoScale : selectedItem.scale) * 100).round()}%',
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: theme.colorScheme.inverseSurface,
+                                    ),
+                                  ),
                                 ),
+                              ],
+                            ),
+                          ),
+                        ] else if (_activeControlMode == _ActiveControlMode.rotation) ...[
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20.0,
+                              vertical: 2.0,
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.screen_rotation, size: 22),
                                 Expanded(
                                   child: Slider(
                                     year2023: false,
@@ -1782,79 +1686,218 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                     },
                                   ),
                                 ),
+                                TextButton(
+                                  style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    minimumSize: Size.zero,
+                                    tapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      if (isPhotoSelected) {
+                                        _photoRotation = 0.0;
+                                      } else {
+                                        selectedItem.rotation = 0.0;
+                                      }
+                                    });
+                                  },
+                                  child: Text(
+                                    '${(_normalizeAngle(isPhotoSelected ? _photoRotation : selectedItem.rotation) * 180 / math.pi).round()}°',
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: theme.colorScheme.inverseSurface,
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           ),
-                        ],
-                        if (_selectedOverlayId == null) ...[
-                          Row(
-                            mainAxisAlignment:
-                            MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Container(
-                                margin: const EdgeInsets.all(6),
-                                child: IconButton(
-                                  style: ButtonStyle(
-                                    iconSize:
-                                    const WidgetStatePropertyAll(26),
-                                    iconColor: WidgetStatePropertyAll(
-                                      theme.colorScheme.inverseSurface,
-                                    ),
-                                  ),
-                                  icon: const Icon(
-                                    Icons.palette,
-                                  ),
-                                  tooltip: 'Canvas Color',
-                                  onPressed: _pickCanvasColorDialog,
-                                ),
+                        ] else ...[
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0,
+                              vertical: 8.0,
+                            ),
+                            child: Text(
+                              _statusMessage ?? 'Tap an action below to edit photo',
+                              textAlign: TextAlign.center,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: theme.colorScheme.inverseSurface,
                               ),
-                              Container(
-                                margin: const EdgeInsets.all(6),
-                                child: IconButton(
-                                  style: ButtonStyle(
-                                    iconSize:
-                                    const WidgetStatePropertyAll(26),
-                                    iconColor: WidgetStatePropertyAll(
-                                      theme.colorScheme.inverseSurface,
-                                    ),
-                                  ),
-                                  icon: const Icon(
-                                    Icons.add_photo_alternate,
-                                  ),
-                                  tooltip: 'Add Image Overlay',
-                                  onPressed: _addOverlayImage,
-                                ),
-                              ),
-                              Container(
-                                margin: const EdgeInsets.all(6),
-                                child: IconButton(
-                                  style: ButtonStyle(
-                                    iconSize:
-                                    const WidgetStatePropertyAll(26),
-                                    iconColor: WidgetStatePropertyAll(
-                                      theme.colorScheme.inverseSurface,
-                                    ),
-                                  ),
-                                  icon: const Icon(
-                                    Icons.text_fields,
-                                  ),
-                                  tooltip: 'Add Text Overlay',
-                                  onPressed: _addOverlayText,
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ],
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                          child: Row(
+                            children: [
+                              if (_selectedOverlayId != null && !isPhotoSelected) ...[
+                                LabeledIconButton(
+                                  icon: Icons.aspect_ratio,
+                                  label: 'Size',
+                                  isSelected: _activeControlMode == _ActiveControlMode.size,
+                                  onPressed: () {
+                                    setState(() {
+                                      _activeControlMode = _activeControlMode == _ActiveControlMode.size
+                                          ? _ActiveControlMode.none
+                                          : _ActiveControlMode.size;
+                                    });
+                                  },
+                                ),
+                                LabeledIconButton(
+                                  icon: Icons.screen_rotation,
+                                  label: 'Rotation',
+                                  isSelected: _activeControlMode == _ActiveControlMode.rotation,
+                                  onPressed: () {
+                                    setState(() {
+                                      _activeControlMode = _activeControlMode == _ActiveControlMode.rotation
+                                          ? _ActiveControlMode.none
+                                          : _ActiveControlMode.rotation;
+                                    });
+                                  },
+                                ),
+                                LabeledIconButton(
+                                  icon: Icons.rotate_left,
+                                  label: 'Rotate L',
+                                  tooltip: 'Rotate overlay 90° left',
+                                  onPressed: () {
+                                    setState(() {
+                                      selectedItem.rotation = _normalizeAngle(selectedItem.rotation - math.pi / 2);
+                                      _activeControlMode = _ActiveControlMode.none;
+                                      _statusMessage = 'Rotated overlay left';
+                                    });
+                                  },
+                                ),
+                                LabeledIconButton(
+                                  icon: Icons.rotate_right,
+                                  label: 'Rotate R',
+                                  tooltip: 'Rotate overlay 90° right',
+                                  onPressed: () {
+                                    setState(() {
+                                      selectedItem.rotation = _normalizeAngle(selectedItem.rotation + math.pi / 2);
+                                      _activeControlMode = _ActiveControlMode.none;
+                                      _statusMessage = 'Rotated overlay right';
+                                    });
+                                  },
+                                ),
+                              ] else ...[
+                                if (_canvasColor == null) ...[
+                                  LabeledIconButton(
+                                    icon: Icons.brightness_6,
+                                    label: 'Brightness',
+                                    isSelected: _activeControlMode == _ActiveControlMode.brightness,
+                                    onPressed: () {
+                                      setState(() {
+                                        _activeControlMode = _activeControlMode == _ActiveControlMode.brightness
+                                            ? _ActiveControlMode.none
+                                            : _ActiveControlMode.brightness;
+                                      });
+                                    },
+                                  ),
+                                  if (isPhotoTarget) ...[
+                                    LabeledIconButton(
+                                      icon: Icons.rotate_left,
+                                      label: 'Rotate L',
+                                      tooltip: 'Rotate 90° left',
+                                      onPressed: () {
+                                        _rotatePhotoBy(-math.pi / 2);
+                                        setState(() {
+                                          _activeControlMode = _ActiveControlMode.none;
+                                          _statusMessage = 'Rotated to the left';
+                                        });
+                                      },
+                                    ),
+                                    LabeledIconButton(
+                                      icon: Icons.rotate_right,
+                                      label: 'Rotate R',
+                                      tooltip: 'Rotate 90° right',
+                                      onPressed: () {
+                                        _rotatePhotoBy(math.pi / 2);
+                                        setState(() {
+                                          _activeControlMode = _ActiveControlMode.none;
+                                          _statusMessage = 'Rotated to the right';
+                                        });
+                                      },
+                                    ),
+                                    LabeledIconButton(
+                                      icon: _fitMode == _PhotoFitMode.fill ? Icons.fit_screen : Icons.crop_free,
+                                      label: _fitMode == _PhotoFitMode.fill ? 'Fit' : 'Fill',
+                                      tooltip: _fitMode == _PhotoFitMode.fill ? 'Fit whole photo in frame' : 'Fill the frame',
+                                      onPressed: () async {
+                                        final target = _fitMode == _PhotoFitMode.fill
+                                            ? _PhotoFitMode.fit
+                                            : _PhotoFitMode.fill;
+                                        final differs = await _applyPhotoFit(target);
+                                        if (!mounted) return;
+                                        setState(() {
+                                          _activeControlMode = _ActiveControlMode.none;
+                                          _statusMessage = !differs
+                                              ? 'Photo already matches the frame (Fit = Fill)'
+                                              : target == _PhotoFitMode.fit
+                                                  ? 'Whole photo fitted inside the frame'
+                                                  : 'Photo fills the whole frame';
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ],
+                                if (_selectedOverlayId == null) ...[
+                                  LabeledIconButton(
+                                    icon: Icons.palette,
+                                    label: 'Canvas',
+                                    tooltip: 'Canvas Color',
+                                    onPressed: () {
+                                      setState(() {
+                                        _activeControlMode = _ActiveControlMode.none;
+                                      });
+                                      _pickCanvasColorDialog();
+                                    },
+                                  ),
+                                  LabeledIconButton(
+                                    icon: Icons.add_photo_alternate,
+                                    label: 'Add Image',
+                                    tooltip: 'Add Image Overlay',
+                                    onPressed: () {
+                                      setState(() {
+                                        _activeControlMode = _ActiveControlMode.none;
+                                      });
+                                      _addOverlayImage();
+                                    },
+                                  ),
+                                  LabeledIconButton(
+                                    icon: Icons.text_fields,
+                                    label: 'Add Text',
+                                    tooltip: 'Add Text Overlay',
+                                    onPressed: () {
+                                      setState(() {
+                                        _activeControlMode = _ActiveControlMode.none;
+                                      });
+                                      _addOverlayText();
+                                    },
+                                  ),
+                                ],
+                              ],
+                            ],
+                          ),
+                        ),
                         Row(
                           mainAxisAlignment:
                           MainAxisAlignment.spaceEvenly,
                           children: [
-                            if (_selectedOverlayId == null) ...[
+                            if (_selectedOverlayId == null ||
+                                isPhotoSelected) ...[
                               Expanded(
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: OutlinedButton.icon(
-                                    onPressed: _retakePicture,
+                                    onPressed: _resetEditor,
                                     icon: const Icon(Icons.refresh),
                                     label: const Text('Reset'),
                                   ),
@@ -1886,6 +1929,12 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
                                       ),
                                       iconColor: WidgetStatePropertyAll(
                                         theme.colorScheme.error,
+                                      ),
+                                      side: WidgetStatePropertyAll(
+                                        BorderSide(
+                                          color: theme.colorScheme.error,
+                                          width: 2.0,
+                                        ),
                                       ),
                                     ),
                                     icon: const Icon(
@@ -1960,6 +2009,7 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
           ],
         );
       },
+      ),
     );
   }
 }

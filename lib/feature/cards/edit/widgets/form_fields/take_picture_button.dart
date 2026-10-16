@@ -80,48 +80,55 @@ class _TakePictureButtonState extends State<TakePictureButton> {
 
   /// Gallery flow: the cropper is opened directly from the form (no camera
   /// screen in between). "Done" uses the cropped card as the final picture,
-  /// "Edit more" continues in the editor.
+  /// "Edit more" continues in the editor. "Back" in the editor returns to
+  /// the cropper (same photo), "back" in the cropper returns to the form.
   Future<void> _cropAndUse(XFile pickedImage) async {
-    final CardCropResult? result = await Navigator.push<CardCropResult>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CardCropScreen(imagePath: pickedImage.path),
-      ),
-    );
-    if (!mounted || result == null) {
-      return;
-    }
-
-    if (!result.edit) {
-      String path = result.path;
-      try {
-        final String target = join(
-          (await getApplicationDocumentsDirectory()).path,
-          '${DateTime.now().millisecondsSinceEpoch}.png',
-        );
-        await File(result.path).copy(target);
-        path = target;
-      } catch (_) {
-        // Fall back to the temporary file.
+    while (mounted) {
+      final CardCropResult? result = await Navigator.push<CardCropResult>(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CardCropScreen(imagePath: pickedImage.path),
+        ),
+      );
+      if (!mounted || result == null) {
+        return;
       }
+
+      if (!result.edit) {
+        String path = result.path;
+        try {
+          final String target = join(
+            (await getApplicationDocumentsDirectory()).path,
+            '${DateTime.now().millisecondsSinceEpoch}.png',
+          );
+          await File(result.path).copy(target);
+          path = target;
+        } catch (_) {
+          // Fall back to the temporary file.
+        }
+        if (!mounted) {
+          return;
+        }
+        widget.picturePath.value = path;
+        return;
+      }
+
+      final String? editedPath = await Navigator.push<String>(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              CameraControllerScreen(initialImage: XFile(result.path)),
+        ),
+      );
       if (!mounted) {
         return;
       }
-      widget.picturePath.value = path;
-      return;
+      if (editedPath != null) {
+        widget.picturePath.value = editedPath;
+        return;
+      }
+      // Back from the editor: open the cropper again.
     }
-
-    final String? editedPath = await Navigator.push<String>(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            CameraControllerScreen(initialImage: XFile(result.path)),
-      ),
-    );
-    if (!mounted || editedPath == null) {
-      return;
-    }
-    widget.picturePath.value = editedPath;
   }
 
   @override
