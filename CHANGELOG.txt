@@ -1,5 +1,10 @@
 LATEST CHANGELOG:
 
+24.10.2026
+1.10.1:
+- Improved card cropping ability when taking pictures (thanks @Zokii0),
+- Fixed camera bugs and improved performance (thanks @Zokii0).
+
 05.10.2026
 1.10.0:
 - Added advanced textures option in settings - this adds blur to some widgets,
