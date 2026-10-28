@@ -161,7 +161,7 @@ void main() {
 
       // lose the cards -- clearing them closes the settings again,
       await tapSetting(tester, 'Delete Cardabase');
-      await tester.tap(find.text('DELETE'));
+      await tester.tap(find.text('Delete'));
       await tester.pumpAndSettle();
       expect(loyaltyCardsBox.values, isEmpty);
       expect(find.text('There is nothing to see...'), findsOneWidget);
@@ -411,7 +411,7 @@ void main() {
       await tester.tap(find.text('AUTHORIZE'));
       await tester.pumpAndSettle();
 
-      expect(find.text('DELETE'), findsWidgets);
+      expect(find.text('Delete'), findsWidgets);
     });
   });
 

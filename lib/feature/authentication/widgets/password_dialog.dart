@@ -137,9 +137,9 @@ class _PasswordDialogState extends State<PasswordDialog> {
   Widget _exportButton() {
     return Bounceable(
       onTap: () {},
-      child: OutlinedButton(
+      child: FilledButton(
         onPressed: onExportPressed,
-        child: const Text('AUTHORIZE'),
+        child: const Text('Authorize'),
       ),
     );
   }

@@ -103,7 +103,7 @@ class _TagsPageState extends State<TagsPage> {
                       spacing: 8,
                       runSpacing: 0,
                       children: tagsFromCards.map((tag) {
-                        return OutlinedButton(
+                        return FilledButton(
                           onPressed: () => _addTag(tag),
                           child: Text(tag),
                         );

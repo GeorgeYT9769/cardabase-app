@@ -103,6 +103,9 @@ class _CardListState extends State<CardList> {
       // Force SliverAnimatedGrid to re-initialize with the new item count
       // to avoid animations during search/filtering
       _gridKey = GlobalKey<SliverAnimatedGridState>();
+    } else {
+      // Refresh cached cards when their data changes but their IDs remain same.
+      _items = List.from(newList);
     }
   }
 

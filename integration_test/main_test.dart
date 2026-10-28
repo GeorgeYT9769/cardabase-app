@@ -204,7 +204,7 @@ void testMain() {
       await tester.pumpAndSettle();
       await tester.drag(find.byType(Slider).last, const Offset(200, 0));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('SELECT'));
+      await tester.tap(find.text('Select'));
       await tester.pumpAndSettle();
       final chosenColumns =
           settingsBox.value.cardListViewOptions.numberOfColumns;

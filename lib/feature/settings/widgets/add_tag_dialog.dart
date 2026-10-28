@@ -55,7 +55,7 @@ class _AddTagDialogState extends State<AddTagDialog> {
           const SizedBox(height: 20),
           if (_errorText != 'Tag already exists')
             Center(
-              child: OutlinedButton(
+              child: FilledButton(
                 onPressed: () {
                   final trimmed = _controller.text.trim();
                   if (trimmed.isEmpty) {
@@ -64,7 +64,7 @@ class _AddTagDialogState extends State<AddTagDialog> {
                   }
                   Navigator.of(context).pop(trimmed);
                 },
-                child: const Text('ADD'),
+                child: const Text('Add tag'),
               ),
             ),
         ],

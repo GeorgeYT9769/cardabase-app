@@ -178,11 +178,11 @@ class CardListViewOptionsDialog extends StatelessWidget {
   Widget _selectButton(BuildContext context) {
     return Bounceable(
       onTap: () {},
-      child: OutlinedButton(
+      child: FilledButton(
         onPressed: () {
           Navigator.of(context).pop();
         },
-        child: const Text('SELECT'),
+        child: const Text('Select'),
       ),
     );
   }

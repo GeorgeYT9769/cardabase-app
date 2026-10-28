@@ -107,9 +107,9 @@ class _CardEffectSettingsDialogState extends State<CardEffectSettingsDialog> {
   }
 
   Widget _doneButton(BuildContext context) {
-    return OutlinedButton(
+    return FilledButton(
       onPressed: () => Navigator.of(context).pop(_settings.seal()),
-      child: const Text('DONE'),
+      child: const Text('Done'),
     );
   }
 }

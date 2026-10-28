@@ -198,9 +198,9 @@ class _ExportDialogState extends State<ExportDialog> {
   }
 
   Widget _doneButton(BuildContext context) {
-    return OutlinedButton(
+    return FilledButton(
       onPressed: () => Navigator.of(context).pop(),
-      child: const Text('DONE'),
+      child: const Text('Done'),
     );
   }
 }

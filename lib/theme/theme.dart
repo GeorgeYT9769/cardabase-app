@@ -118,10 +118,16 @@ extension CdbThemeStyles on ThemeData {
       );
 
   /// Outlined button for a destructive action, e.g. deleting a card.
-  ButtonStyle get destructiveButtonStyle => OutlinedButton.styleFrom(
+  ButtonStyle get destructiveOutlinedButtonStyle => OutlinedButton.styleFrom(
         foregroundColor: _destructiveColor,
         side: const BorderSide(color: _destructiveColor, width: _borderWidth),
       );
+
+  /// Outlined button for a destructive action, e.g. deleting a card.
+  ButtonStyle get destructiveFilledButtonStyle => FilledButton.styleFrom(
+    foregroundColor: colorScheme.inverseSurface,
+    backgroundColor: _destructiveColor,
+  );
 
   /// Outlined button that spans the full width of the page and acts as a tile,
   /// e.g. the buttons on the settings and cloud backup pages.

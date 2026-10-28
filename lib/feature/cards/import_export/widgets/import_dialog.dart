@@ -162,14 +162,14 @@ class _ImportDialogState extends State<ImportDialog> {
   }
 
   Widget _cancelButton() {
-    return OutlinedButton(
+    return TextButton(
       onPressed: () => Navigator.of(context).pop(),
       child: const Text('Cancel'),
     );
   }
 
   Widget _importButton() {
-    return OutlinedButton(
+    return TextButton(
       onPressed: onImportClicked,
       child: const Text('Import'),
     );

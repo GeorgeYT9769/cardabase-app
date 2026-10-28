@@ -634,7 +634,7 @@ class _CardCropScreenState extends State<CardCropScreen> {
                       Row(
                         children: [
                           Expanded(
-                            child: OutlinedButton.icon(
+                            child: TextButton.icon(
                               onPressed: ready && !_busy
                                   ? () => _done(edit: true)
                                   : null,
@@ -644,7 +644,7 @@ class _CardCropScreenState extends State<CardCropScreen> {
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: OutlinedButton.icon(
+                            child: FilledButton.icon(
                               onPressed: ready && !_busy ? _done : null,
                               icon: _busy
                                   ? const SizedBox(
@@ -654,10 +654,6 @@ class _CardCropScreenState extends State<CardCropScreen> {
                                     )
                                   : const Icon(Icons.check),
                               label: const Text('Done'),
-                              style: theme.outlinedButtonTheme.style?.copyWith(
-                                backgroundColor: WidgetStatePropertyAll(Colors.green.shade700),
-                                foregroundColor: const WidgetStatePropertyAll(Colors.white),
-                              ),
                             ),
                           ),
                         ],

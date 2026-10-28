@@ -32,9 +32,9 @@ class ShareCardDialog extends StatelessWidget {
         Center(
           child: Bounceable(
             onTap: () {},
-            child: OutlinedButton(
+            child: FilledButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('DONE'),
+              child: const Text('Done'),
             ),
           ),
         ),

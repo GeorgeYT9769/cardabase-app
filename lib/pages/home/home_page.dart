@@ -100,7 +100,7 @@ class _HomePageState extends State<Homepage> {
       final success = await showDialog<bool>(
         context: context,
         builder: (context) => PasswordChallengeDialog(
-          challengeButtonChild: const Text('EDIT'),
+          challengeButtonChild: const Text('Edit card'),
         ),
       ).then((value) => value ?? false);
 

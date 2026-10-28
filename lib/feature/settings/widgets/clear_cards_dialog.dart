@@ -42,10 +42,10 @@ class _ClearCardsDialogState extends State<ClearCardsDialog> {
   }
 
   Widget _deleteButton(ThemeData theme) {
-    return OutlinedButton(
+    return FilledButton(
       onPressed: onDeleteButtonPressed,
-      style: theme.destructiveButtonStyle,
-      child: const Text('DELETE'),
+      style: theme.destructiveFilledButtonStyle,
+      child: const Text('Delete'),
     );
   }
 }

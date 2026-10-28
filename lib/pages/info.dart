@@ -237,7 +237,7 @@ class _InfoScreenState extends State<InfoScreen> {
                               const SizedBox(height: 20),
                               Bounceable(
                                 onTap: () {},
-                                child: OutlinedButton.icon(
+                                child: FilledButton.icon(
                                   onPressed: _fetchAppAndLatestVersion,
                                   icon: const Icon(Icons.refresh),
                                   label: const Text('Retry'),
@@ -419,7 +419,7 @@ class _InfoScreenState extends State<InfoScreen> {
             ),
             actions: <Widget>[
               Center(
-                child: OutlinedButton(
+                child: FilledButton(
                   onPressed: () {
                     Navigator.pop(context);
                   },

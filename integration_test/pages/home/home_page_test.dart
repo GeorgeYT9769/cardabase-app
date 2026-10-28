@@ -9,6 +9,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:hive_ce/hive.dart';
 
 import '../../../test_helpers/fakers/loyalty_card.dart';
 import '../../../test_helpers/fakers/settings.dart';
@@ -334,13 +335,13 @@ void testHomePage() {
 
       // ACT
       await openCardMenu(tester, 'Delhaize');
-      await tester.tap(find.widgetWithText(ListTile, 'DELETE'));
+      await tester.tap(find.widgetWithText(ListTile, 'Delete'));
       await tester.pumpAndSettle();
 
       // ASSERT
       expect(find.text('Delete Card'), findsOneWidget);
       expect(find.textContaining('Delhaize'), findsWidgets);
-      await tester.tap(find.widgetWithText(OutlinedButton, 'DELETE'));
+      await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
       await tester.pumpAndSettle();
 
       expect(find.text('Delhaize'), findsNothing);
@@ -367,6 +368,36 @@ void testHomePage() {
 
       // ASSERT
       expect(fieldText(tester, 'Card Name'), 'Delhaize');
+    });
+
+    testWidgets('uses the latest password requirement when opening edit',
+        (tester) async {
+      usePhoneView(tester);
+      final cardsBox = await GetIt.I.getAsync<LoyaltyCardsBox>();
+      final passwordBox =
+          await GetIt.I.getAsync<Box>(instanceName: 'passwordBox');
+      await passwordBox.put('PW', 'letmein');
+      await cardsBox.put(
+        'delhaize',
+        faker.loyaltyCards
+            .simpleCard()
+            .copyWith(id: 'delhaize', name: 'Delhaize'),
+      );
+      await tester.pumpWidget(Main(initialScreen: Homepage()));
+      await tester.pumpAndSettle();
+
+      // The list's cached card still has requiresAuth=false. Change the stored
+      // record directly, just as a save from the edit form does.
+      await cardsBox.put(
+        'delhaize',
+        cardsBox.get('delhaize')!.copyWith(requiresAuth: true),
+      );
+      await tester.pumpAndSettle();
+      await openCardMenu(tester, 'Delhaize');
+      await tester.tap(find.text('Edit'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Enter Password'), findsOneWidget);
     });
   });
 
@@ -414,7 +445,7 @@ void testHomePage() {
       await tester.drag(find.byType(Slider).first, const Offset(-500, 0));
       await tester.pumpAndSettle();
       expect(find.text('A-Z'), findsOneWidget);
-      await tester.tap(find.text('SELECT'));
+      await tester.tap(find.text('Select'));
       await tester.pumpAndSettle();
 
       // ASSERT
@@ -450,7 +481,7 @@ void testHomePage() {
       expect(find.text('Columns: 1'), findsOneWidget);
       await tester.drag(find.byType(Slider).last, const Offset(200, 0));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('SELECT'));
+      await tester.tap(find.text('Select'));
       await tester.pumpAndSettle();
 
       // ASSERT

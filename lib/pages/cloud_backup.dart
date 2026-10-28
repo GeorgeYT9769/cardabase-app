@@ -190,9 +190,9 @@ class _CloudBackupState extends State<CloudBackup> {
             ),
           ),
           OutlinedButton(
-            style: Theme.of(context).destructiveButtonStyle,
+            style: Theme.of(context).destructiveOutlinedButtonStyle,
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('DELETE'),
+            child: const Text('Delete'),
           ),
         ],
       ),

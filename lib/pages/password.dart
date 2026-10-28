@@ -240,7 +240,7 @@ class _PasswordScreenState extends State<PasswordScreen> {
               ),
               onPressed: () => setPasswordFunc(theme),
               child: Text(
-                'SET PASSWORD',
+                'Set password',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.colorScheme.primary,
@@ -382,9 +382,9 @@ class _PasswordScreenState extends State<PasswordScreen> {
           child: SizedBox(
             height: 56,
             child: OutlinedButton(
-              style: theme.destructiveButtonStyle,
+              style: theme.destructiveOutlinedButtonStyle,
               onPressed: () => resetPasswordFunc(theme),
-              child: const Text('RESET PASSWORD'),
+              child: const Text('Reset password'),
             ),
           ),
         ),

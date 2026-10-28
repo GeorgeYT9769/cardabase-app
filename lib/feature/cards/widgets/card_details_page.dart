@@ -220,7 +220,11 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                           ),
                         ),
                         actions: [
-                          OutlinedButton(
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('Cancel'),
+                          ),
+                          FilledButton(
                             onPressed: () {
                               Clipboard.setData(
                                 ClipboardData(text: card!.toJson()),
@@ -233,10 +237,6 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                               );
                             },
                             child: const Text('Copy'),
-                          ),
-                          OutlinedButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Cancel'),
                           ),
                         ],
                       ),
@@ -375,7 +375,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                     Navigator.pop(context);
                   }
                 },
-                tooltip: isFocused ? 'SAVE' : 'DONE',
+                tooltip: isFocused ? 'Save' : 'Done',
                 backgroundColor: isFocused
                     ? theme.colorScheme.primary
                     : Colors.green.shade700,
@@ -387,7 +387,7 @@ class _CardDetailsPageState extends State<CardDetailsPage> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 label: Text(
-                  isFocused ? 'SAVE' : 'DONE',
+                  isFocused ? 'Save' : 'Done',
                   style: theme.textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     fontSize: 19,

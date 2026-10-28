@@ -164,18 +164,18 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
         content:
             Text('Are you sure you want to delete ${widget.loyaltyCard.name}?'),
         actions: [
-          OutlinedButton(
+          TextButton(
             onPressed: () {
               Navigator.pop(context, false);
             },
             child: const Text('Cancel'),
           ),
-          OutlinedButton(
+          FilledButton(
             onPressed: () {
               Navigator.pop(context, true);
             },
-            style: Theme.of(context).destructiveButtonStyle,
-            child: const Text('DELETE'),
+            style: Theme.of(context).destructiveFilledButtonStyle,
+            child: const Text('Delete'),
           ),
         ],
       ),
@@ -268,7 +268,7 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
               ListTile(
                 leading: const Icon(Icons.delete, color: Colors.red),
                 title: Text(
-                  'DELETE',
+                  'Delete',
                   style: theme.textTheme.bodyLarge?.copyWith(
                     color: Colors.red,
                     fontWeight: FontWeight(700),
