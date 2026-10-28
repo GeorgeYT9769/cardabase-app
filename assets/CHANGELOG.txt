@@ -1,5 +1,10 @@
 LATEST CHANGELOG:
 
+28.10.2026
+1.10.2:
+- Fixed and improved the color picker bug (thanks @pm0pm),
+- Fixed other bugs.
+
 24.10.2026
 1.10.1:
 - Improved card cropping ability when taking pictures (thanks @Zokii0),
