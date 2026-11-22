@@ -141,17 +141,17 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     if (_cameras == null || _cameras!.isEmpty) {
       return;
     }
-    // ultraHigh = 2160p (~8 MP) for the still photo. With `high` (720p) a card
+    // Default (Settings > Camera quality) is ultraHigh = 2160p (~8 MP). With `high` (720p) a card
     // that fills about half of the frame was only ~400 px wide and the cropper
     // had to upscale it, so the result looked blurry; at 2160p it is ~1200 px
     // and only gets downscaled. The live preview stays at the screen size
     // (CameraX caps it), and 8 MP is still less than the gallery photos the
     // cropper already handles, so the camera stays as light as before.
-    // `max` is avoided on purpose: on 50/108 MP sensors it would capture the
-    // full-resolution image, which is slow and memory hungry.
+    // `max` is not the default on purpose: on 50/108 MP sensors it would
+    // capture the full-resolution image, which is slow and memory hungry.
     final controller = CameraController(
       _cameras![0],
-      ResolutionPreset.ultraHigh,
+      _resolutionPresetFromSettings(),
       enableAudio: false,
       imageFormatGroup: ImageFormatGroup.jpeg,
     );
@@ -170,6 +170,26 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     });
     if (!mounted) return;
     setState(() {});
+  }
+
+  /// Maps Settings > Camera quality (0-3) to a [ResolutionPreset].
+  ResolutionPreset _resolutionPresetFromSettings() {
+    int quality = Settings.defaultCameraQuality;
+    try {
+      quality = GetIt.I<SettingsBox>().value.cameraQuality;
+    } catch (_) {
+      // Settings not available: use the default.
+    }
+    switch (quality) {
+      case 0:
+        return ResolutionPreset.high; // 720p
+      case 1:
+        return ResolutionPreset.veryHigh; // 1080p
+      case 3:
+        return ResolutionPreset.max;
+      default:
+        return ResolutionPreset.ultraHigh; // 2160p
+    }
   }
 
   /// Focuses and meters on the card frame (screen centre) as soon as the

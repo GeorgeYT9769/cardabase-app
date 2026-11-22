@@ -4,6 +4,7 @@ import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/settings/get_it.dart';
 import 'package:cardabase/feature/settings/model.dart';
 import 'package:cardabase/feature/settings/widgets/auto_update_settings_dialog.dart';
+import 'package:cardabase/feature/settings/widgets/camera_quality_dialog.dart';
 import 'package:cardabase/feature/settings/widgets/card_effect_settings_dialog.dart';
 import 'package:cardabase/feature/settings/widgets/clear_cards_dialog.dart';
 import 'package:cardabase/feature/settings/widgets/tags_page.dart';
@@ -183,6 +184,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 _vibrationSettingsButton(theme),
                 _fontSettingsButton(theme),
                 _effectsButton(theme),
+                _cameraQualityButton(theme),
                 _passwordButton(theme),
                 _tagsButton(theme),
                 _backupRestoreButton(theme),
@@ -401,6 +403,35 @@ class _SettingsPageState extends State<SettingsPage> {
         settingHeader: 'Card Tile effects',
         iconColor: useEffects ? Colors.green : Colors.red,
         settingIcon: CupertinoIcons.sparkles,
+        borderColor: theme.colorScheme.primary,
+        showMore: true,
+      ),
+    );
+  }
+
+  Future<void> showCameraQualityDialog() async {
+    final quality = await showDialog<int>(
+      context: context,
+      builder: (context) => CameraQualityDialog(
+        initialValue: _settings.cameraQuality.value,
+      ),
+    );
+    if (quality != null) {
+      _settings.cameraQuality.value = quality;
+      await _settingsBox.save(_settings.seal());
+    }
+  }
+
+  Widget _cameraQualityButton(ThemeData theme) {
+    return ValueListenableBuilder(
+      valueListenable: _settings.cameraQuality,
+      builder: (context, quality, _) => SettingTile(
+        aboutSettingHeader:
+            'Resolution of photos taken with the in-app camera: ${cameraQualityLabels[quality.clamp(0, cameraQualityLabels.length - 1)]}',
+        settingAction: showCameraQualityDialog,
+        settingHeader: 'Camera quality',
+        iconColor: theme.colorScheme.tertiary,
+        settingIcon: Icons.camera_alt_outlined,
         borderColor: theme.colorScheme.primary,
         showMore: true,
       ),
