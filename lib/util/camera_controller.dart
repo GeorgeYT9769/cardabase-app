@@ -141,16 +141,43 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     if (_cameras == null || _cameras!.isEmpty) {
       return;
     }
+    // veryHigh = 1080p. With `high` (720p) a card that fills about half of
+    // the frame is only ~400 px wide, so the cropper had to upscale it and the
+    // result looked blurry. 1080p gives ~1.5x more detail per side while the
+    // preview, memory use and capture speed stay practically the same.
     final controller = CameraController(
       _cameras![0],
-      ResolutionPreset.high,
+      ResolutionPreset.veryHigh,
       enableAudio: false,
       imageFormatGroup: ImageFormatGroup.jpeg,
     );
     _cameraController = controller;
-    _initializeControllerFuture = controller.initialize();
+    final init = controller.initialize();
+    _initializeControllerFuture = init;
+    // Not awaited: the preview shows up exactly as fast as before.
+    init.then((_) => _focusOnCardFrame(controller), onError: (_) {});
     if (!mounted) return;
     setState(() {});
+  }
+
+  /// Focuses and meters on the card frame (screen centre) as soon as the
+  /// camera is ready, so the first shot is sharp and the card is not
+  /// over-exposed by a dark background. Tap-to-focus still works as before.
+  Future<void> _focusOnCardFrame(CameraController controller) async {
+    if (_cameraController != controller || !controller.value.isInitialized) {
+      return;
+    }
+    try {
+      if (controller.value.focusPointSupported) {
+        await controller.setFocusPoint(const Offset(0.5, 0.5));
+      }
+      if (controller.value.exposurePointSupported) {
+        await controller.setExposurePoint(const Offset(0.5, 0.5));
+      }
+      await controller.setFocusMode(FocusMode.auto);
+    } catch (_) {
+      // Not supported by this camera (or it was released meanwhile).
+    }
   }
 
   /// Fully releases the camera (turns off the Android camera-in-use
