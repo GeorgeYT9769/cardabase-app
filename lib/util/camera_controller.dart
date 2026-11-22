@@ -141,13 +141,17 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     if (_cameras == null || _cameras!.isEmpty) {
       return;
     }
-    // veryHigh = 1080p. With `high` (720p) a card that fills about half of
-    // the frame is only ~400 px wide, so the cropper had to upscale it and the
-    // result looked blurry. 1080p gives ~1.5x more detail per side while the
-    // preview, memory use and capture speed stay practically the same.
+    // ultraHigh = 2160p (~8 MP) for the still photo. With `high` (720p) a card
+    // that fills about half of the frame was only ~400 px wide and the cropper
+    // had to upscale it, so the result looked blurry; at 2160p it is ~1200 px
+    // and only gets downscaled. The live preview stays at the screen size
+    // (CameraX caps it), and 8 MP is still less than the gallery photos the
+    // cropper already handles, so the camera stays as light as before.
+    // `max` is avoided on purpose: on 50/108 MP sensors it would capture the
+    // full-resolution image, which is slow and memory hungry.
     final controller = CameraController(
       _cameras![0],
-      ResolutionPreset.veryHigh,
+      ResolutionPreset.ultraHigh,
       enableAudio: false,
       imageFormatGroup: ImageFormatGroup.jpeg,
     );
@@ -155,7 +159,15 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     final init = controller.initialize();
     _initializeControllerFuture = init;
     // Not awaited: the preview shows up exactly as fast as before.
-    init.then((_) => _focusOnCardFrame(controller), onError: (_) {});
+    init.then((_) => _focusOnCardFrame(controller), onError: (_) {
+      // e.g. camera permission denied: forget this controller so that the
+      // next resume (or reopening the screen) can try again.
+      if (_cameraController == controller) {
+        _cameraController = null;
+        controller.dispose().catchError((_) {});
+        if (mounted) setState(() {});
+      }
+    });
     if (!mounted) return;
     setState(() {});
   }
@@ -388,8 +400,13 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.inactive ||
-        state == AppLifecycleState.paused) {
+    // Only `paused` (app really in the background), not `inactive`: the
+    // camera permission dialog makes the app `inactive` while
+    // `controller.initialize()` is still waiting for the answer. Releasing
+    // the camera then disposed it mid-initialisation (and CameraX unbinds
+    // all use cases on dispose), so after "Allow" the preview stayed empty
+    // until the screen was reopened.
+    if (state == AppLifecycleState.paused) {
       // Release the camera whenever the app is in the background.
       _releaseCamera();
     } else if (state == AppLifecycleState.resumed) {
