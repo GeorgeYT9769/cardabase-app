@@ -2,11 +2,14 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:archive/archive.dart';
+import 'package:cardabase/feature/cards/import_export/export_directory.dart';
 import 'package:cardabase/feature/cards/loyalty_card.dart';
 import 'package:cardabase/feature/settings/model.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 import 'package:permission_handler/permission_handler.dart';
+
+export 'export_directory.dart' show NoPermissionToExternalStorageException;
 
 Future<bool> _requestStoragePermission() async {
   if (Platform.isAndroid) {
@@ -32,10 +35,7 @@ Future<void> exportCardsAsFile(
     throw NoPermissionToExternalStorageException();
   }
 
-  const rootDirectory = '/storage/emulated/0';
-  final directory = directoryPath.startsWith('/')
-      ? Directory('$rootDirectory$directoryPath')
-      : Directory('$rootDirectory/$directoryPath');
+  final directory = await resolveExportDirectory(directoryPath);
   if (!await directory.exists()) {
     await directory.create(recursive: true);
   }
@@ -61,10 +61,7 @@ Future<void> exportDataAsZip(
     throw NoPermissionToExternalStorageException();
   }
 
-  const rootDirectory = '/storage/emulated/0';
-  final directory = directoryPath.startsWith('/')
-      ? Directory('$rootDirectory$directoryPath')
-      : Directory('$rootDirectory/$directoryPath');
+  final directory = await resolveExportDirectory(directoryPath);
   if (!await directory.exists()) {
     await directory.create(recursive: true);
   }
@@ -129,9 +126,3 @@ Future<void> exportCardsToClipboard(Iterable<LoyaltyCard> cards) async {
   final serializedCards = cards.serializeToJson();
   await Clipboard.setData(ClipboardData(text: serializedCards));
 }
-
-// ------------------------------------------------------
-// EXCEPTIONS
-// ------------------------------------------------------
-
-class NoPermissionToExternalStorageException implements Exception {}

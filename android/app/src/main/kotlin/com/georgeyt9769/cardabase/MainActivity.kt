@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
 import android.os.Build
+import android.os.Environment
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -11,6 +12,7 @@ import io.flutter.plugins.GeneratedPluginRegistrant
 
 class MainActivity: FlutterFragmentActivity() {
     private val CHANNEL = "cardabase_widget"
+    private val STORAGE_CHANNEL = "cardabase_storage"
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
@@ -20,6 +22,19 @@ class MainActivity: FlutterFragmentActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         GeneratedPluginRegistrant.registerWith(flutterEngine)
+
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, STORAGE_CHANNEL).setMethodCallHandler { call, result ->
+            if (call.method == "getExternalStorageDirectory") {
+                // Deprecated on Android 10+, but this app already relies on
+                // MANAGE_EXTERNAL_STORAGE / legacy external storage and needs
+                // the public root for the *current* user, not user 0.
+                @Suppress("DEPRECATION")
+                val path = Environment.getExternalStorageDirectory().absolutePath
+                result.success(path)
+            } else {
+                result.notImplemented()
+            }
+        }
 
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             if (call.method == "setWidgetCard") {

@@ -44,11 +44,14 @@ const double _cardAspectRatio = 1.586;
 class CardCropResult {
   const CardCropResult(this.path, {this.edit = false});
 
-  /// Path of the image to use.
+  /// Path of the image to use. Final crops are saved in the app documents
+  /// directory, so they survive cleanup of temporary files.
   final String path;
 
   /// `true` if the user wants to continue in the full editor (brightness,
-  /// text, stickers, manual positioning). `false` means the picture is final.
+  /// text, stickers, manual positioning). In that case [path] is only an
+  /// intermediate input: the editor persists a documents path before the card
+  /// uses it. `false` means the picture is final.
   final bool edit;
 }
 
@@ -84,6 +87,9 @@ class _CardCropScreenState extends State<CardCropScreen> {
   int? _dragIndex;
   bool _isDraggingWholeQuad = false;
   bool _busy = false;
+
+  /// Which button started the crop, so only that button shows the spinner.
+  bool _busyEditing = false;
 
   /// When true, dragging a corner also moves the two neighbouring corners so
   /// the whole side follows (rectangle-style resize). When false every corner
@@ -189,73 +195,92 @@ class _CardCropScreenState extends State<CardCropScreen> {
 
   Future<void> _done({bool edit = false}) async {
     if (_busy || _preparedPath == null) return;
-    setState(() => _busy = true);
+    final started = DateTime.now();
+    setState(() {
+      _busy = true;
+      _busyEditing = edit;
+    });
+    // Make sure the on-screen loader is painted before the crop starts.
+    await WidgetsBinding.instance.endOfFrame;
+
+    // A fast crop must still show the loader long enough to be noticed before
+    // the result screen (cropper or editor) is opened.
+    Future<void> finish(CardCropResult result) async {
+      const minVisible = Duration(milliseconds: 350);
+      final elapsed = DateTime.now().difference(started);
+      if (elapsed < minVisible) {
+        await Future.delayed(minVisible - elapsed);
+      }
+      if (mounted) Navigator.of(context).pop(result);
+    }
+
+    final displayW = _turns.isOdd ? _imgH : _imgW;
+    final displayH = _turns.isOdd ? _imgW : _imgH;
+    final pts = _corners
+        .map((o) => Offset(o.dx * displayW, o.dy * displayH))
+        .toList();
+
+    double dist(Offset a, Offset b) => (a - b).distance;
+    final w = (dist(pts[0], pts[1]) + dist(pts[3], pts[2])) / 2;
+    final hh = (dist(pts[0], pts[3]) + dist(pts[1], pts[2])) / 2;
+    final shift = hh > w ? 1 : 0; // portrait card -> make the result landscape
+    final ordered = List<Offset>.generate(4, (i) => pts[(i + shift) % 4]);
+    final size = _outputSize(shift == 1 ? hh : w);
+    final outW = size.width;
+    final outH = (outW / _cardAspectRatio).round();
+    final flat = <double>[
+      for (final p in ordered) ...[p.dx, p.dy],
+    ];
+    final srcPath = _preparedPath!;
+
+    // The crop is a card picture, not a working file: save it straight to
+    // permanent storage. Temp files are only used to prepare the source photo.
+    late final String outPath;
     try {
-      final displayW = _turns.isOdd ? _imgH : _imgW;
-      final displayH = _turns.isOdd ? _imgW : _imgH;
-      final pts = _corners
-          .map((o) => Offset(o.dx * displayW, o.dy * displayH))
-          .toList();
-
-      double dist(Offset a, Offset b) => (a - b).distance;
-      final w = (dist(pts[0], pts[1]) + dist(pts[3], pts[2])) / 2;
-
-      final hh = (dist(pts[0], pts[3]) + dist(pts[1], pts[2])) / 2;
-      final shift = hh > w ? 1 : 0; // portrait card -> make the result landscape
-      final ordered = List<Offset>.generate(4, (i) => pts[(i + shift) % 4]);
-      final size = _outputSize(shift == 1 ? hh : w);
-      final outW = size.width;
-      final outH = (outW / _cardAspectRatio).round();
-
-      final flat = <double>[
-        for (final p in ordered) ...[p.dx, p.dy],
-      ];
-      final srcPath = _preparedPath!;
-      final tmp = (await getTemporaryDirectory()).path;
-      final outPath = join(tmp, 'crop_out_${DateTime.now().microsecondsSinceEpoch}.png');
-      final sharpen = size.sharpen;
-      final String path = await Isolate.run(
-        () => _warpAndSave(<Object>[srcPath, outPath, flat, outW, outH, _turns, sharpen]),
+      final documents = (await getApplicationDocumentsDirectory()).path;
+      outPath = join(
+        documents,
+        'card_${DateTime.now().microsecondsSinceEpoch}.png',
       );
-      if (mounted) Navigator.of(context).pop(CardCropResult(path, edit: edit));
+    } catch (e, stack) {
+      debugPrint('Could not resolve documents directory: $e\n$stack');
+      _showCropError();
+      return;
+    }
+
+    final args = <Object>[
+      srcPath,
+      outPath,
+      flat,
+      outW,
+      outH,
+      _turns,
+      size.sharpen,
+    ];
+    try {
+      final String path = await Isolate.run(() => _warpAndSave(args));
+      await finish(CardCropResult(path, edit: edit));
     } catch (e, stack) {
       debugPrint('CardCropScreen _done error: $e\n$stack');
       try {
-        final displayW = _turns.isOdd ? _imgH : _imgW;
-        final displayH = _turns.isOdd ? _imgW : _imgH;
-        final pts = _corners
-            .map((o) => Offset(o.dx * displayW, o.dy * displayH))
-            .toList();
-
-        double dist(Offset a, Offset b) => (a - b).distance;
-        final w = (dist(pts[0], pts[1]) + dist(pts[3], pts[2])) / 2;
-        final hh = (dist(pts[0], pts[3]) + dist(pts[1], pts[2])) / 2;
-      final shift = hh > w ? 1 : 0; // portrait card -> make the result landscape
-      final ordered = List<Offset>.generate(4, (i) => pts[(i + shift) % 4]);
-        final size = _outputSize(shift == 1 ? hh : w);
-        final outW = size.width;
-        final outH = (outW / _cardAspectRatio).round();
-
-        final flat = <double>[
-          for (final p in ordered) ...[p.dx, p.dy],
-        ];
-        final srcPath = _preparedPath!;
-        final tmp = (await getTemporaryDirectory()).path;
-        final outPath = join(tmp, 'crop_out_${DateTime.now().microsecondsSinceEpoch}.png');
-        final String path = _warpAndSave(
-          <Object>[srcPath, outPath, flat, outW, outH, _turns, size.sharpen],
-        );
-        if (mounted) Navigator.of(context).pop(CardCropResult(path, edit: edit));
+        final String path = _warpAndSave(args);
+        await finish(CardCropResult(path, edit: edit));
       } catch (e2, stack2) {
         debugPrint('CardCropScreen _done sync fallback error: $e2\n$stack2');
-        if (mounted) {
-          setState(() => _busy = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not crop the image')),
-          );
-        }
+        _showCropError();
       }
     }
+  }
+
+  void _showCropError() {
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      _busyEditing = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Could not crop the image')),
+    );
   }
 
   /// Moves corner [i] to [target] (normalized) and makes the sides that touch
@@ -358,7 +383,9 @@ class _CardCropScreenState extends State<CardCropScreen> {
                 Expanded(
                   child: Container(
                     color: Colors.black,
-                    child: !ready
+                    // Show the same on-screen loader while the crop is being
+                    // saved, so "Edit cutout" / "Done" visibly do work.
+                    child: !ready || _busy
                         ? Center(
                           child: ExpressiveLoadingIndicator(
                             color: Theme.of(context).colorScheme.tertiary,
@@ -661,7 +688,13 @@ class _CardCropScreenState extends State<CardCropScreen> {
                               onPressed: ready && !_busy
                                   ? () => _done(edit: true)
                                   : null,
-                              icon: const Icon(Icons.tune),
+                              icon: _busy && _busyEditing
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                    )
+                                  : const Icon(Icons.tune),
                               label: const Text('Edit cutout'),
                             ),
                           ),
@@ -669,7 +702,7 @@ class _CardCropScreenState extends State<CardCropScreen> {
                           Expanded(
                             child: FilledButton.icon(
                               onPressed: ready && !_busy ? _done : null,
-                              icon: _busy
+                              icon: _busy && !_busyEditing
                                   ? const SizedBox(
                                       width: 16,
                                       height: 16,

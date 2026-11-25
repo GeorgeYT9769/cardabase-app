@@ -1,5 +1,8 @@
 import 'package:cardabase/feature/settings/model.dart';
+import 'package:get_it/get_it.dart';
 import 'package:material_ui/material_ui.dart';
+
+import '../../../util/vibration_provider.dart';
 
 /// Labels for [Settings.cameraQuality] (index = stored value).
 const cameraQualityLabels = <String>['720p', '1080p', '4K', 'Max'];
@@ -46,11 +49,15 @@ class _CameraQualityDialogState extends State<CameraQualityDialog> {
             ),
           ),
           Slider(
+            year2023: false,
             value: _value.toDouble(),
             max: (cameraQualityLabels.length - 1).toDouble(),
             divisions: cameraQualityLabels.length - 1,
             label: cameraQualityLabels[_value],
-            onChanged: (v) => setState(() => _value = v.round()),
+            onChanged: (v) => setState(() {
+              GetIt.I<VibrationProvider>().vibrateSelection();
+              _value = v.round();
+            }),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),

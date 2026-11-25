@@ -272,17 +272,11 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
   }
 
   /// Uses the cropped card as the final picture without opening the editor.
-  Future<void> _finishWithoutEditing(String sourcePath) async {
-    try {
-      final String path = join(
-        (await getApplicationDocumentsDirectory()).path,
-        '${DateTime.now().millisecondsSinceEpoch}.png',
-      );
-      await File(sourcePath).copy(path);
-      if (mounted) Navigator.pop(context, path);
-    } catch (_) {
-      if (mounted) Navigator.pop(context, sourcePath);
-    }
+  ///
+  /// The cropper already saved it in the app documents directory, so there is
+  /// no copy step that could fail and leave the card pointing at a temp file.
+  Future<void> _finishWithoutEditing(String croppedPath) async {
+    if (mounted) Navigator.pop(context, croppedPath);
   }
 
   void _haptic() {
@@ -728,8 +722,13 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     }
   }
 
-  Future<String> _cropAndSaveAdjustedImage() async {
-    if (_capturedImageFile == null && _canvasColor == null) return '';
+  /// Saves the edited card picture to the app documents directory.
+  ///
+  /// Returns `null` when no permanent image could be produced. Callers must
+  /// never fall back to the source photo path: it can live in a temp folder.
+  Future<String?> _cropAndSaveAdjustedImage() async {
+    if (_capturedImageFile == null && _canvasColor == null) return null;
+    final pixelRatio = MediaQuery.of(context).devicePixelRatio;
     setState(() {
       hideCutoutBorder = true;
       _selectedOverlayId = null;
@@ -737,14 +736,15 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     await Future.delayed(const Duration(milliseconds: 50));
     final typed_data.Uint8List? imageBytes =
     await _screenshotController.capture(
-      pixelRatio: MediaQuery.of(context).devicePixelRatio,
+      pixelRatio: pixelRatio,
     );
+    if (!mounted) return null;
     setState(() {
       hideCutoutBorder = false;
     });
-    if (imageBytes == null) return _capturedImageFile?.path ?? '';
+    if (imageBytes == null) return null;
     final fullImage = img.decodeImage(imageBytes);
-    if (fullImage == null) return _capturedImageFile?.path ?? '';
+    if (fullImage == null) return null;
 
     final int imgW = fullImage.width;
     final int imgH = fullImage.height;
@@ -778,20 +778,23 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
       _isSaving = true;
     });
     try {
-      final String croppedPath = await _cropAndSaveAdjustedImage();
-      if (mounted) {
-        setState(() {
-          _isSaving = false;
-        });
-        Navigator.pop(context, croppedPath);
+      final String? croppedPath = await _cropAndSaveAdjustedImage();
+      if (!mounted) return;
+      setState(() => _isSaving = false);
+      if (croppedPath == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not save the image')),
+        );
+        return;
       }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isSaving = false;
-        });
-        Navigator.pop(context);
-      }
+      Navigator.pop(context, croppedPath);
+    } catch (e, stack) {
+      debugPrint('Could not save edited card picture: $e\n$stack');
+      if (!mounted) return;
+      setState(() => _isSaving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not save the image')),
+      );
     }
   }
 

@@ -65,7 +65,7 @@ LATEST CHANGELOG:
 - Deleting your Cardabase now has it's own Danger Zone to make it more visible,
 - Added Terms of Service,
 - You can now anonymously report a bug, this will only gather text you write and sends it directly into Discord issues channel (please be kind and don't misuse this feature),
-- App Info page got overhauled, added app informations such as version, build number, signature and installation info,
+- App Info page got overhauled, added app information such as version, build number, signature and installation info,
 - Buttons for Card Type and Card Color were redesigned to match the design of other input fields,
 - You can now add points to different cards, either by manually entering, clicking or holding side buttons,
 - Taking pictures of you cards is now much easier and better, also with buttons redesign,
@@ -79,7 +79,7 @@ LATEST CHANGELOG:
 - Card pictures are available for you by the sides of the card, so when looking at the barcode of the card, just swipe left for back picture and right for front picture,
 - Photos and barcodes have preview screen, so you can see what they look like better (mainly for barcodes if the reader has troubles),
 - App now supports full dark theme for OLED screens,
-- Setting tiles are now slimmer, the details are hidde and can be shown by holding on the setting tile,
+- Setting tiles are now slimmer, the details are hidden and can be shown by holding on the setting tile,
 - You can now export your Cardabase into clipboard and paste/send/save it however you like,
 - App bar (the top bar of the page) at the Homepage and Settings hides when you scroll downwards and shows up when you scroll upwards,
 - You can now duplicate your cards (was removed somehow, my fault),
@@ -96,7 +96,7 @@ LATEST CHANGELOG:
 
 02.11.2025:
 1.6.1:
-- Fixed a bug where the name of the card would not be visible due to card's colour being too light,
+- Fixed a bug where the name of the card would not be visible due to card's color being too light,
 - Small improvements and bug fixes.
 
 19.10.2025:
@@ -130,7 +130,7 @@ LATEST CHANGELOG:
 - Cards can now be sorted by name and date,
 - Introducing tags: Tags are Strings that categorize your cards however you like,
 - Welcome back screen with a quick summary what was changed,
-- Info page with information about app; this also serves a update check,
+- Info page with information about app; this also serves as a update check,
 - You can now switch into using system font of your phone instead of Cardabase font pack (xirod + Roboto),
 - When creating a card, you can now select an image to automatically apply its data and barcode type,
 - New page transitions,
@@ -185,9 +185,9 @@ LATEST CHANGELOG:
 08.01.2025:
 1.2.0:
 - You can now save any of barcode type, not just EAN 13 (any of those that are available),
-- When creating a new card, the CANCEL button was removed and SAVE button was moved to the center, it's wider and sits on top (you can scroll and it will stay on the bottom),
+- When creating a new card, the CANCEL button was removed and SAVE button was moved to the center, it's wider and sits on top (you can scroll down, and it will stay on the bottom),
 - Switching theme is now smooth and does not require app restart,
-- Now you can secure your cards with a password - set up one, check the box when creating a password and you are done (if you no longer want to reset the password, you can do that),
+- Now you can secure your cards with a password - set up one, check the box when creating a password, and you are done (if you no longer want to reset the password, you can do that),
 - NOTE: If you forget the password, there is no possibility of removing it. You will have to reset the data of the entire app.
 - App icon was changed,
 - App screenshots were updated,

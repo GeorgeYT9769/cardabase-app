@@ -50,7 +50,7 @@ class _CardBottomSheetSurface extends StatelessWidget {
             const Positioned.fill(
                 child: BlurAppBarBackground(
               alpha: .5,
-            )),
+            ),),
           Material(
             color: advancedTextures
                 ? theme.colorScheme.surface.withValues(alpha: 0.5)
@@ -242,7 +242,7 @@ class _CardBottomSheetContentState extends State<_CardBottomSheetContent> {
               if (sortingStyle == SortingStyle.custom) ...[
                 ListTile(
                   leading: Icon(Icons.arrow_upward,
-                      color: theme.colorScheme.tertiary),
+                      color: theme.colorScheme.tertiary,),
                   title: Text(
                     'Move UP',
                     style: theme.textTheme.bodyLarge?.copyWith(

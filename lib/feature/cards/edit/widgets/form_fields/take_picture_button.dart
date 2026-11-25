@@ -12,8 +12,6 @@ import 'package:get_it/get_it.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart' show join;
-import 'package:path_provider/path_provider.dart';
 
 
 class TakePictureButton extends StatefulWidget {
@@ -95,21 +93,12 @@ class _TakePictureButtonState extends State<TakePictureButton> {
       }
 
       if (!result.edit) {
-        String path = result.path;
-        try {
-          final String target = join(
-            (await getApplicationDocumentsDirectory()).path,
-            '${DateTime.now().millisecondsSinceEpoch}.png',
-          );
-          await File(result.path).copy(target);
-          path = target;
-        } catch (_) {
-          // Fall back to the temporary file.
-        }
+        // The cropper already saved the picture in the documents directory;
+        // never store a temp path on the card.
         if (!mounted) {
           return;
         }
-        widget.picturePath.value = path;
+        widget.picturePath.value = result.path;
         return;
       }
 
