@@ -141,16 +141,75 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
     if (_cameras == null || _cameras!.isEmpty) {
       return;
     }
+    // Default (Settings > Camera quality) is ultraHigh = 2160p (~8 MP). With `high` (720p) a card
+    // that fills about half of the frame was only ~400 px wide and the cropper
+    // had to upscale it, so the result looked blurry; at 2160p it is ~1200 px
+    // and only gets downscaled. The live preview stays at the screen size
+    // (CameraX caps it), and 8 MP is still less than the gallery photos the
+    // cropper already handles, so the camera stays as light as before.
+    // `max` is not the default on purpose: on 50/108 MP sensors it would
+    // capture the full-resolution image, which is slow and memory hungry.
     final controller = CameraController(
       _cameras![0],
-      ResolutionPreset.high,
+      _resolutionPresetFromSettings(),
       enableAudio: false,
       imageFormatGroup: ImageFormatGroup.jpeg,
     );
     _cameraController = controller;
-    _initializeControllerFuture = controller.initialize();
+    final init = controller.initialize();
+    _initializeControllerFuture = init;
+    // Not awaited: the preview shows up exactly as fast as before.
+    init.then((_) => _focusOnCardFrame(controller), onError: (_) {
+      // e.g. camera permission denied: forget this controller so that the
+      // next resume (or reopening the screen) can try again.
+      if (_cameraController == controller) {
+        _cameraController = null;
+        controller.dispose().catchError((_) {});
+        if (mounted) setState(() {});
+      }
+    });
     if (!mounted) return;
     setState(() {});
+  }
+
+  /// Maps Settings > Camera quality (0-3) to a [ResolutionPreset].
+  ResolutionPreset _resolutionPresetFromSettings() {
+    int quality = Settings.defaultCameraQuality;
+    try {
+      quality = GetIt.I<SettingsBox>().value.cameraQuality;
+    } catch (_) {
+      // Settings not available: use the default.
+    }
+    switch (quality) {
+      case 0:
+        return ResolutionPreset.high; // 720p
+      case 1:
+        return ResolutionPreset.veryHigh; // 1080p
+      case 3:
+        return ResolutionPreset.max;
+      default:
+        return ResolutionPreset.ultraHigh; // 2160p
+    }
+  }
+
+  /// Focuses and meters on the card frame (screen centre) as soon as the
+  /// camera is ready, so the first shot is sharp and the card is not
+  /// over-exposed by a dark background. Tap-to-focus still works as before.
+  Future<void> _focusOnCardFrame(CameraController controller) async {
+    if (_cameraController != controller || !controller.value.isInitialized) {
+      return;
+    }
+    try {
+      if (controller.value.focusPointSupported) {
+        await controller.setFocusPoint(const Offset(0.5, 0.5));
+      }
+      if (controller.value.exposurePointSupported) {
+        await controller.setExposurePoint(const Offset(0.5, 0.5));
+      }
+      await controller.setFocusMode(FocusMode.auto);
+    } catch (_) {
+      // Not supported by this camera (or it was released meanwhile).
+    }
   }
 
   /// Fully releases the camera (turns off the Android camera-in-use
@@ -361,8 +420,13 @@ class _CameraControllerScreenState extends State<CameraControllerScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.inactive ||
-        state == AppLifecycleState.paused) {
+    // Only `paused` (app really in the background), not `inactive`: the
+    // camera permission dialog makes the app `inactive` while
+    // `controller.initialize()` is still waiting for the answer. Releasing
+    // the camera then disposed it mid-initialisation (and CameraX unbinds
+    // all use cases on dispose), so after "Allow" the preview stayed empty
+    // until the screen was reopened.
+    if (state == AppLifecycleState.paused) {
       // Release the camera whenever the app is in the background.
       _releaseCamera();
     } else if (state == AppLifecycleState.resumed) {

@@ -22,6 +22,24 @@ import 'expressive_loading_indicator.dart';
 /// Aspect ratio of the output picture (ID-1 card: 85.60 mm x 53.98 mm).
 const double _cardAspectRatio = 1.586;
 
+/// Width of the saved card picture and how much to sharpen it.
+///
+/// [naturalWidth] is the width of the card in the (prepared) source photo.
+/// The picture is never smaller than 800 px (it is shown full width), so a
+/// card that is smaller in the photo, e.g. from the in-app camera, has to be
+/// upscaled. Upscaling softens edges and text, so in that case a light
+/// unsharp mask is applied, a bit stronger the more the picture is enlarged.
+/// Cards that are already big enough are only downscaled and not touched.
+({int width, double sharpen}) _outputSize(double naturalWidth) {
+  const minW = 800;
+  const maxW = 1400;
+  final width = naturalWidth.round().clamp(minW, maxW);
+  final upscale = naturalWidth > 0 ? width / naturalWidth : 1.0;
+  if (upscale <= 1.05) return (width: width, sharpen: 0.0);
+  final sharpen = (0.35 + 0.5 * (upscale - 1)).clamp(0.35, 0.8).toDouble();
+  return (width: width, sharpen: sharpen);
+}
+
 /// Result of [CardCropScreen].
 class CardCropResult {
   const CardCropResult(this.path, {this.edit = false});
@@ -185,7 +203,8 @@ class _CardCropScreenState extends State<CardCropScreen> {
       final hh = (dist(pts[0], pts[3]) + dist(pts[1], pts[2])) / 2;
       final shift = hh > w ? 1 : 0; // portrait card -> make the result landscape
       final ordered = List<Offset>.generate(4, (i) => pts[(i + shift) % 4]);
-      final outW = (shift == 1 ? hh : w).round().clamp(800, 1400);
+      final size = _outputSize(shift == 1 ? hh : w);
+      final outW = size.width;
       final outH = (outW / _cardAspectRatio).round();
 
       final flat = <double>[
@@ -194,8 +213,9 @@ class _CardCropScreenState extends State<CardCropScreen> {
       final srcPath = _preparedPath!;
       final tmp = (await getTemporaryDirectory()).path;
       final outPath = join(tmp, 'crop_out_${DateTime.now().microsecondsSinceEpoch}.png');
+      final sharpen = size.sharpen;
       final String path = await Isolate.run(
-        () => _warpAndSave(<Object>[srcPath, outPath, flat, outW, outH, _turns]),
+        () => _warpAndSave(<Object>[srcPath, outPath, flat, outW, outH, _turns, sharpen]),
       );
       if (mounted) Navigator.of(context).pop(CardCropResult(path, edit: edit));
     } catch (e, stack) {
@@ -212,7 +232,8 @@ class _CardCropScreenState extends State<CardCropScreen> {
         final hh = (dist(pts[0], pts[3]) + dist(pts[1], pts[2])) / 2;
       final shift = hh > w ? 1 : 0; // portrait card -> make the result landscape
       final ordered = List<Offset>.generate(4, (i) => pts[(i + shift) % 4]);
-        final outW = (shift == 1 ? hh : w).round().clamp(800, 1400);
+        final size = _outputSize(shift == 1 ? hh : w);
+        final outW = size.width;
         final outH = (outW / _cardAspectRatio).round();
 
         final flat = <double>[
@@ -221,7 +242,9 @@ class _CardCropScreenState extends State<CardCropScreen> {
         final srcPath = _preparedPath!;
         final tmp = (await getTemporaryDirectory()).path;
         final outPath = join(tmp, 'crop_out_${DateTime.now().microsecondsSinceEpoch}.png');
-        final String path = _warpAndSave(<Object>[srcPath, outPath, flat, outW, outH, _turns]);
+        final String path = _warpAndSave(
+          <Object>[srcPath, outPath, flat, outW, outH, _turns, size.sharpen],
+        );
         if (mounted) Navigator.of(context).pop(CardCropResult(path, edit: edit));
       } catch (e2, stack2) {
         debugPrint('CardCropScreen _done sync fallback error: $e2\n$stack2');
@@ -1332,7 +1355,9 @@ String _warpAndSave(List<Object> args) {
     f = y0;
   }
 
-  final out = img.Image(width: outW, height: outH);
+  final sharpen = args.length > 6 ? (args[6] as num).toDouble() : 0.0;
+  // RGB bytes of the result, written directly (faster than setPixelRgb).
+  final pixels = Uint8List(outW * outH * 3);
   final maxX = src.width - 1;
   final maxY = src.height - 1;
 
@@ -1365,16 +1390,59 @@ String _warpAndSave(List<Object> args) {
         return top + (bottom - top) * fy;
       }
 
-      out.setPixelRgb(
-        x,
-        y,
-        mix(r00, r10, r01, r11).round(),
-        mix(g00, g10, g01, g11).round(),
-        mix(b00, b10, b01, b11).round(),
-      );
+      final o = (y * outW + x) * 3;
+      pixels[o] = mix(r00, r10, r01, r11).round().clamp(0, 255);
+      pixels[o + 1] = mix(g00, g10, g01, g11).round().clamp(0, 255);
+      pixels[o + 2] = mix(b00, b10, b01, b11).round().clamp(0, 255);
     }
   }
 
+  final result = sharpen > 0 ? _unsharpMask(pixels, outW, outH, sharpen) : pixels;
+  final out = img.Image.fromBytes(
+    width: outW,
+    height: outH,
+    bytes: result.buffer,
+    numChannels: 3,
+  );
   File(args[1] as String).writeAsBytesSync(img.encodePng(out));
   return args[1] as String;
+}
+
+/// Light unsharp mask on packed RGB bytes: `out = src + amount * (src - blur)`
+/// with a 3x3 Gaussian blur. Differences of 1-2 levels (sensor noise, flat
+/// areas) are left alone so the noise is not boosted. Runs in the isolate;
+/// a ~1270x800 card takes well under 100 ms.
+Uint8List _unsharpMask(Uint8List src, int w, int h, double amount) {
+  final stride = w * 3;
+  // Horizontal [1 2 1] pass (values up to 4 * 255).
+  final tmp = Uint16List(src.length);
+  for (var y = 0; y < h; y++) {
+    final row = y * stride;
+    for (var x = 0; x < w; x++) {
+      final l = row + (x > 0 ? x - 1 : x) * 3;
+      final m = row + x * 3;
+      final r = row + (x < w - 1 ? x + 1 : x) * 3;
+      for (var c = 0; c < 3; c++) {
+        tmp[m + c] = src[l + c] + 2 * src[m + c] + src[r + c];
+      }
+    }
+  }
+  // Vertical [1 2 1] pass (sum / 16) and the sharpening itself.
+  final out = Uint8List(src.length);
+  for (var y = 0; y < h; y++) {
+    final up = (y > 0 ? y - 1 : y) * stride;
+    final row = y * stride;
+    final down = (y < h - 1 ? y + 1 : y) * stride;
+    for (var i = 0; i < stride; i++) {
+      final v = src[row + i];
+      final blur = (tmp[up + i] + 2 * tmp[row + i] + tmp[down + i]) / 16.0;
+      final diff = v - blur;
+      if (diff.abs() <= 2) {
+        out[row + i] = v;
+      } else {
+        out[row + i] = (v + amount * diff).round().clamp(0, 255);
+      }
+    }
+  }
+  return out;
 }

@@ -27,13 +27,14 @@ class SettingsAdapter extends TypeAdapter<Settings> {
       cardListViewOptions: fields[7] as CardListViewOptions,
       customExportPath:
           fields[8] == null ? 'Download/Cardabase' : fields[8] as String,
+      cameraQuality: fields[10] == null ? 2 : (fields[10] as num).toInt(),
     );
   }
 
   @override
   void write(BinaryWriter writer, Settings obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.lastSeenAppVersion)
       ..writeByte(1)
@@ -51,7 +52,9 @@ class SettingsAdapter extends TypeAdapter<Settings> {
       ..writeByte(7)
       ..write(obj.cardListViewOptions)
       ..writeByte(8)
-      ..write(obj.customExportPath);
+      ..write(obj.customExportPath)
+      ..writeByte(10)
+      ..write(obj.cameraQuality);
   }
 
   @override

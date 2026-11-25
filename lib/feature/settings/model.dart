@@ -19,6 +19,7 @@ class Settings {
     required this.tags,
     required this.cardListViewOptions,
     required this.customExportPath,
+    this.cameraQuality = defaultCameraQuality,
   });
 
   const Settings.defaultValue()
@@ -35,6 +36,9 @@ class Settings {
         );
 
   static const defaultCardExportDirectoryPath = 'Download/Cardabase';
+
+  /// Default for [cameraQuality]: 2160p.
+  static const defaultCameraQuality = 2;
 
   @HiveField(0)
   final String? lastSeenAppVersion;
@@ -61,6 +65,13 @@ class Settings {
   )
   final BackupFormat format = BackupFormat.json;
 
+  /// Resolution of photos taken with the in-app camera:
+  /// 0 = 720p, 1 = 1080p, 2 = 2160p (default), 3 = highest the camera offers.
+  /// Only affects the temporary photo: the saved card picture is always the
+  /// cropped card (800-1400 px wide), so this changes sharpness, not storage.
+  @HiveField(10, defaultValue: defaultCameraQuality)
+  final int cameraQuality;
+
   Map<String, dynamic> toJsonMap() {
     return {
       if (lastSeenAppVersion != null) 'lastSeenAppVersion': lastSeenAppVersion,
@@ -72,6 +83,7 @@ class Settings {
       'tags': tags,
       'cardListViewOptions': cardListViewOptions.toJsonMap(),
       'customExportPath': customExportPath,
+      'cameraQuality': cameraQuality,
     };
   }
 
@@ -104,6 +116,7 @@ class Settings {
           : const CardListViewOptions.defaultValue(),
       customExportPath:
           map['customExportPath'] as String? ?? defaultCardExportDirectoryPath,
+      cameraQuality: map['cameraQuality'] as int? ?? defaultCameraQuality,
     );
   }
 }

@@ -14,6 +14,7 @@ class EditableSettings {
     required this.tags,
     required this.cardListViewOptions,
     required this.customExportPath,
+    required this.cameraQuality,
   });
 
   factory EditableSettings.fromValue(Settings value) {
@@ -31,6 +32,7 @@ class EditableSettings {
         value.cardListViewOptions,
       ),
       customExportPath: ValueNotifier(value.customExportPath),
+      cameraQuality: ValueNotifier(value.cameraQuality),
     );
   }
 
@@ -43,6 +45,7 @@ class EditableSettings {
   final ListNotifier<String> tags;
   final EditableCardListViewOptions cardListViewOptions;
   final ValueNotifier<String> customExportPath;
+  final ValueNotifier<int> cameraQuality;
 
   void loadValue(Settings value) {
     lastSeenAppVersion.value = value.lastSeenAppVersion;
@@ -54,6 +57,7 @@ class EditableSettings {
     tags.value = value.tags;
     cardListViewOptions.loadValue(value.cardListViewOptions);
     customExportPath.value = value.customExportPath;
+    cameraQuality.value = value.cameraQuality;
   }
 
   Settings seal() {
@@ -67,6 +71,7 @@ class EditableSettings {
       tags: tags.value,
       cardListViewOptions: cardListViewOptions.seal(),
       customExportPath: customExportPath.value,
+      cameraQuality: cameraQuality.value,
     );
   }
 
@@ -80,6 +85,7 @@ class EditableSettings {
     tags.dispose();
     cardListViewOptions.dispose();
     customExportPath.dispose();
+    cameraQuality.dispose();
   }
 }
 
