@@ -114,11 +114,12 @@ class _CardCropScreenState extends State<CardCropScreen> {
 
       List<Object>? result;
       try {
-        result = await Isolate.run(
-          () => _prepareImage(<String>[inPath, outPath]),
+        result = await compute(
+          _prepareImage,
+          <String>[inPath, outPath],
         );
       } catch (e) {
-        debugPrint('Isolate _prepareImage failed: $e. Attempting native decoder fallback.');
+        debugPrint('compute _prepareImage failed: $e. Attempting native decoder fallback.');
         result = await _prepareImageNativeFallback(inPath, outPath);
       }
 
@@ -201,7 +202,7 @@ class _CardCropScreenState extends State<CardCropScreen> {
       _busyEditing = edit;
     });
     // Make sure the on-screen loader is painted before the crop starts.
-    await WidgetsBinding.instance.endOfFrame;
+    await Future<void>.delayed(const Duration(milliseconds: 50));
 
     // A fast crop must still show the loader long enough to be noticed before
     // the result screen (cropper or editor) is opened.
@@ -258,7 +259,7 @@ class _CardCropScreenState extends State<CardCropScreen> {
       size.sharpen,
     ];
     try {
-      final String path = await Isolate.run(() => _warpAndSave(args));
+      final String path = await compute(_warpAndSave, args);
       await finish(CardCropResult(path, edit: edit));
     } catch (e, stack) {
       debugPrint('CardCropScreen _done error: $e\n$stack');
@@ -688,13 +689,7 @@ class _CardCropScreenState extends State<CardCropScreen> {
                               onPressed: ready && !_busy
                                   ? () => _done(edit: true)
                                   : null,
-                              icon: _busy && _busyEditing
-                                  ? const SizedBox(
-                                      width: 16,
-                                      height: 16,
-                                      child: CircularProgressIndicator(strokeWidth: 2),
-                                    )
-                                  : const Icon(Icons.tune),
+                              icon: const Icon(Icons.edit),
                               label: const Text('Edit cutout'),
                             ),
                           ),

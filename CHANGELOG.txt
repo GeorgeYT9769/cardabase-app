@@ -1,5 +1,11 @@
 LATEST CHANGELOG:
 
+26.11.2026
+1.10.3:
+- Added variable resolution for the pictures to make them sharper (resolution stays the same, thanks @Zokii0),
+- Fixed temporary pictures being stored (thanks @pm0pm),
+- Fixed hardcoded user 0 exports (my bad, I thought it is default for each user, thanks @chris968).
+
 28.10.2026
 1.10.2:
 - Fixed and improved the color picker bug (thanks @pm0pm),
